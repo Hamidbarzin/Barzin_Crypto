@@ -4,8 +4,20 @@ Configuration settings for the cryptocurrency trading bot
 import os
 
 # API Keys (from environment variables with defaults for development)
+# Binance API Keys
 BINANCE_API_KEY = os.environ.get('BINANCE_API_KEY', '')
 BINANCE_API_SECRET = os.environ.get('BINANCE_API_SECRET', '')
+
+# KuCoin API Keys
+KUCOIN_API_KEY = os.environ.get('KUCOIN_API_KEY', '')
+KUCOIN_API_SECRET = os.environ.get('KUCOIN_API_SECRET', '')
+KUCOIN_API_PASSPHRASE = os.environ.get('KUCOIN_API_PASSPHRASE', '')
+
+# CoinEx API Keys
+COINEX_API_KEY = os.environ.get('COINEX_API_KEY', '')
+COINEX_API_SECRET = os.environ.get('COINEX_API_SECRET', '')
+
+# Other API Keys
 COINGECKO_API_KEY = os.environ.get('COINGECKO_API_KEY', '')
 NEWS_API_KEY = os.environ.get('NEWS_API_KEY', '')
 
