@@ -42,6 +42,11 @@ def initialize_session():
 @app.route('/')
 def index():
     return render_template('index.html')
+    
+@app.route('/test')
+def test_dashboard():
+    """Render test dashboard page to debug API and JavaScript issues"""
+    return render_template('test_dashboard.html')
 
 @app.route('/dashboard')
 def dashboard():

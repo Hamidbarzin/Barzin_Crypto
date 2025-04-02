@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست داشبورد</title>
+    <!-- بوت‌استرپ استایل‌ها -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <style>
+        body {
+            direction: rtl;
+            text-align: right;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .price-up {
+            color: #22c55e;
+        }
+        .price-down {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">صفحه تست داشبورد</h1>
+        
+        <!-- تست طلا، نقره، نفت -->
+        <div class="card">
+            <div class="card-header">
+                <h3>تست بخش کالاها</h3>
+                <button id="testCommoditiesBtn" class="btn btn-primary">بررسی API طلا، نقره و نفت</button>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5>طلا</h5>
+                                <div id="gold-price" class="h4">...</div>
+                                <div id="gold-change" class="badge bg-secondary">...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5>نقره</h5>
+                                <div id="silver-price" class="h4">...</div>
+                                <div id="silver-change" class="badge bg-secondary">...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5>نفت</h5>
+                                <div id="oil-price" class="h4">...</div>
+                                <div id="oil-change" class="badge bg-secondary">...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <pre id="commodities-response"></pre>
+                </div>
+            </div>
+        </div>
+        
+        <!-- تست ارزهای جهانی -->
+        <div class="card">
+            <div class="card-header">
+                <h3>تست بخش ارزهای جهانی</h3>
+                <button id="testForexBtn" class="btn btn-primary">بررسی API ارزهای جهانی</button>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ارز</th>
+                            <th>قیمت</th>
+                            <th>تغییر</th>
+                        </tr>
+                    </thead>
+                    <tbody id="forex-tbody">
+                        <!-- اینجا داده‌ها نمایش داده می‌شوند -->
+                    </tbody>
+                </table>
+                <div class="mt-3">
+                    <pre id="forex-response"></pre>
+                </div>
+            </div>
+        </div>
+        
+        <!-- تست وضعیت اقتصادی -->
+        <div class="card">
+            <div class="card-header">
+                <h3>تست بخش شاخص‌های اقتصادی</h3>
+                <button id="testEconomicBtn" class="btn btn-primary">بررسی API شاخص‌های اقتصادی</button>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>وضعیت بازارهای جهانی</h5>
+                                <div id="global-markets-status" class="h4">...</div>
+                                <div id="global-markets-trend" class="badge bg-secondary">...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>تورم</h5>
+                                <div id="inflation-value" class="h4">...</div>
+                                <div id="inflation-trend" class="badge bg-secondary">...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <pre id="economic-response"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript کد تست -->
+    <script>
+        // فانکشن نمایش خروجی JSON به صورت خوانا
+        function displayJSON(elementId, data) {
+            document.getElementById(elementId).textContent = JSON.stringify(data, null, 2);
+        }
+        
+        // تست API کالاها
+        document.getElementById('testCommoditiesBtn').addEventListener('click', function() {
+            console.log('Fetching commodities data...');
+            fetch('/api/commodities')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Commodities data received:', data);
+                    displayJSON('commodities-response', data);
+                    
+                    if (data.success && data.data) {
+                        // نمایش داده‌های طلا
+                        if (data.data.GOLD) {
+                            document.getElementById('gold-price').textContent = '$' + data.data.GOLD.price.toFixed(2);
+                            const goldChange = document.getElementById('gold-change');
+                            goldChange.textContent = data.data.GOLD.change.toFixed(2) + '%';
+                            goldChange.className = 'badge ' + (data.data.GOLD.change > 0 ? 'bg-success' : 'bg-danger');
+                        }
+                        
+                        // نمایش داده‌های نقره
+                        if (data.data.SILVER) {
+                            document.getElementById('silver-price').textContent = '$' + data.data.SILVER.price.toFixed(2);
+                            const silverChange = document.getElementById('silver-change');
+                            silverChange.textContent = data.data.SILVER.change.toFixed(2) + '%';
+                            silverChange.className = 'badge ' + (data.data.SILVER.change > 0 ? 'bg-success' : 'bg-danger');
+                        }
+                        
+                        // نمایش داده‌های نفت
+                        if (data.data.OIL) {
+                            document.getElementById('oil-price').textContent = '$' + data.data.OIL.price.toFixed(2);
+                            const oilChange = document.getElementById('oil-change');
+                            oilChange.textContent = data.data.OIL.change.toFixed(2) + '%';
+                            oilChange.className = 'badge ' + (data.data.OIL.change > 0 ? 'bg-success' : 'bg-danger');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching commodities:', error);
+                    document.getElementById('commodities-response').textContent = 'Error: ' + error.message;
+                });
+        });
+        
+        // تست API ارزهای جهانی
+        document.getElementById('testForexBtn').addEventListener('click', function() {
+            console.log('Fetching forex data...');
+            fetch('/api/forex')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Forex data received:', data);
+                    displayJSON('forex-response', data);
+                    
+                    const forexTbody = document.getElementById('forex-tbody');
+                    forexTbody.innerHTML = '';
+                    
+                    if (data.success && data.data) {
+                        for (const [symbol, info] of Object.entries(data.data)) {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${info.name} <small class="text-muted">${symbol}</small></td>
+                                <td>${info.price.toFixed(4)}</td>
+                                <td>
+                                    <span class="badge ${info.change > 0 ? 'bg-success' : 'bg-danger'}">
+                                        ${info.change.toFixed(2)}%
+                                    </span>
+                                </td>
+                            `;
+                            forexTbody.appendChild(row);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching forex:', error);
+                    document.getElementById('forex-response').textContent = 'Error: ' + error.message;
+                });
+        });
+        
+        // تست API شاخص‌های اقتصادی
+        document.getElementById('testEconomicBtn').addEventListener('click', function() {
+            console.log('Fetching economic data...');
+            fetch('/api/economic')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Economic data received:', data);
+                    displayJSON('economic-response', data);
+                    
+                    if (data.success && data.data) {
+                        // وضعیت بازارهای جهانی
+                        if (data.data.global_markets) {
+                            document.getElementById('global-markets-status').textContent = data.data.global_markets.status;
+                            document.getElementById('global-markets-trend').textContent = data.data.global_markets.trend;
+                        }
+                        
+                        // تورم
+                        if (data.data.inflation) {
+                            document.getElementById('inflation-value').textContent = data.data.inflation.value;
+                            document.getElementById('inflation-trend').textContent = data.data.inflation.trend;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching economic data:', error);
+                    document.getElementById('economic-response').textContent = 'Error: ' + error.message;
+                });
+        });
+    </script>
+</body>
+</html>
