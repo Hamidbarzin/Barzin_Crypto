@@ -9,6 +9,7 @@ from crypto_bot.technical_analysis import get_technical_indicators
 from crypto_bot.news_analyzer import get_latest_news
 from crypto_bot.signal_generator import generate_signals
 from crypto_bot.email_service import send_test_email, update_email_settings
+from crypto_bot.commodity_data import get_commodity_prices, get_forex_rates, get_economic_indicators
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -59,6 +60,25 @@ def dashboard():
     # Generate signals
     signals = generate_signals(watched_currencies)
     
+    # Get commodity prices, forex rates, and economic indicators
+    try:
+        commodities = get_commodity_prices()
+    except Exception as e:
+        logger.error(f"Error getting commodity prices: {str(e)}")
+        commodities = {}
+    
+    try:
+        forex_rates = get_forex_rates()
+    except Exception as e:
+        logger.error(f"Error getting forex rates: {str(e)}")
+        forex_rates = {}
+    
+    try:
+        economic_indicators = get_economic_indicators()
+    except Exception as e:
+        logger.error(f"Error getting economic indicators: {str(e)}")
+        economic_indicators = {}
+    
     return render_template(
         'dashboard.html',
         prices=current_prices,
@@ -69,7 +89,10 @@ def dashboard():
         watched_currencies=watched_currencies,
         timeframes=TIMEFRAMES,
         scheduler_running=session.get('scheduler_running', False),
-        include_middle_east=include_middle_east
+        include_middle_east=include_middle_east,
+        commodities=commodities,
+        forex_rates=forex_rates,
+        economic_indicators=economic_indicators
     )
 
 @app.route('/settings', methods=['GET', 'POST'])
@@ -176,6 +199,33 @@ def get_signals():
         return jsonify({'success': True, 'data': signals})
     except Exception as e:
         logger.error(f"Error generating signals: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/commodities')
+def get_commodities():
+    try:
+        commodities = get_commodity_prices()
+        return jsonify({'success': True, 'data': commodities})
+    except Exception as e:
+        logger.error(f"Error getting commodity prices: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/forex')
+def get_forex():
+    try:
+        forex_rates = get_forex_rates()
+        return jsonify({'success': True, 'data': forex_rates})
+    except Exception as e:
+        logger.error(f"Error getting forex rates: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/economic')
+def get_economic():
+    try:
+        indicators = get_economic_indicators()
+        return jsonify({'success': True, 'data': indicators})
+    except Exception as e:
+        logger.error(f"Error getting economic indicators: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
 
 if __name__ == "__main__":

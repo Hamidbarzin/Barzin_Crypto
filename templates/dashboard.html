@@ -46,6 +46,115 @@
         letter-spacing: 0.05em;
     }
     
+    /* استایل‌های مربوط به بخش کالاها و ارزهای جهانی */
+    .commodity-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 1rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .commodity-card:hover {
+        transform: translateY(-4px);
+    }
+    
+    .commodity-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+        z-index: 0;
+    }
+    
+    .commodity-card .card-body {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .commodity-icon {
+        font-size: 1.5rem;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.75rem;
+    }
+    
+    .gold-bg {
+        background-color: rgba(212, 175, 55, 0.2);
+        color: #d4af37;
+    }
+    
+    .silver-bg {
+        background-color: rgba(192, 192, 192, 0.2);
+        color: #c0c0c0;
+    }
+    
+    .oil-bg {
+        background-color: rgba(77, 77, 77, 0.2);
+        color: #4d4d4d;
+    }
+    
+    .forex-row {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(var(--bs-secondary-rgb), 0.1);
+    }
+    
+    .forex-row:last-child {
+        border-bottom: none;
+    }
+    
+    .forex-row:hover {
+        background-color: rgba(var(--bs-primary-rgb), 0.05);
+    }
+    
+    .economic-indicator {
+        padding: 1rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        background-color: rgba(var(--bs-secondary-rgb), 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .economic-indicator:hover {
+        background-color: rgba(var(--bs-secondary-rgb), 0.1);
+    }
+    
+    .risk-low {
+        border-right: 4px solid var(--bs-success);
+    }
+    
+    .risk-medium {
+        border-right: 4px solid var(--bs-warning);
+    }
+    
+    .risk-high {
+        border-right: 4px solid var(--bs-danger);
+    }
+    
+    .trend-up::after {
+        content: '↑';
+        margin-right: 0.25rem;
+        color: var(--bs-success);
+    }
+    
+    .trend-down::after {
+        content: '↓';
+        margin-right: 0.25rem;
+        color: var(--bs-danger);
+    }
+    
+    .trend-stable::after {
+        content: '→';
+        margin-right: 0.25rem;
+        color: var(--bs-secondary);
+    }
+    
     .data-table {
         border-spacing: 0 0.5rem !important;
         border-collapse: separate !important;
@@ -507,6 +616,238 @@
                 {% else %}
                     <div class="alert alert-info">
                         در حال حاضر خبری موجود نیست.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- کالاها، نرخ ارز و شاخص‌های اقتصادی -->
+<div class="row mt-5 mb-5">
+    <div class="col-12 mb-4">
+        <h2 class="section-title">
+            <i class="fas fa-globe me-2"></i>
+            نرخ‌های جهانی و شاخص‌های اقتصادی
+        </h2>
+    </div>
+    
+    <!-- کالاها -->
+    <div class="col-lg-4 mb-4">
+        <div class="card dashboard-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">قیمت کالاها</h3>
+                <button id="refreshCommodities" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% if commodities and commodities.GOLD %}
+                    <div class="col-md-12 mb-3">
+                        <div class="card commodity-card">
+                            <div class="card-body p-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="commodity-icon gold-bg">
+                                        <i class="fas fa-coins"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5 class="mb-1">طلا</h5>
+                                        <p class="text-muted mb-0">{{ commodities.GOLD.unit }}</p>
+                                    </div>
+                                    <div class="ms-auto text-end">
+                                        <h5 class="mb-0">${{ "%.2f"|format(commodities.GOLD.price) }}</h5>
+                                        <span class="badge {{ 'bg-success' if commodities.GOLD.change > 0 else 'bg-danger' }}">
+                                            {{ "%.2f"|format(commodities.GOLD.change) }}%
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if commodities and commodities.SILVER %}
+                    <div class="col-md-12 mb-3">
+                        <div class="card commodity-card">
+                            <div class="card-body p-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="commodity-icon silver-bg">
+                                        <i class="fas fa-medal"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5 class="mb-1">نقره</h5>
+                                        <p class="text-muted mb-0">{{ commodities.SILVER.unit }}</p>
+                                    </div>
+                                    <div class="ms-auto text-end">
+                                        <h5 class="mb-0">${{ "%.2f"|format(commodities.SILVER.price) }}</h5>
+                                        <span class="badge {{ 'bg-success' if commodities.SILVER.change > 0 else 'bg-danger' }}">
+                                            {{ "%.2f"|format(commodities.SILVER.change) }}%
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if commodities and commodities.OIL %}
+                    <div class="col-md-12 mb-3">
+                        <div class="card commodity-card">
+                            <div class="card-body p-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="commodity-icon oil-bg">
+                                        <i class="fas fa-gas-pump"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5 class="mb-1">نفت</h5>
+                                        <p class="text-muted mb-0">{{ commodities.OIL.unit }}</p>
+                                    </div>
+                                    <div class="ms-auto text-end">
+                                        <h5 class="mb-0">${{ "%.2f"|format(commodities.OIL.price) }}</h5>
+                                        <span class="badge {{ 'bg-success' if commodities.OIL.change > 0 else 'bg-danger' }}">
+                                            {{ "%.2f"|format(commodities.OIL.change) }}%
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if not commodities or commodities|length == 0 %}
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            در حال حاضر اطلاعات قیمت کالاها در دسترس نیست.
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- نرخ ارز -->
+    <div class="col-lg-4 mb-4">
+        <div class="card dashboard-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">نرخ ارز</h3>
+                <button id="refreshForex" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                {% if forex_rates and forex_rates|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table data-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ارز</th>
+                                    <th>نرخ</th>
+                                    <th>تغییر</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for symbol, data in forex_rates.items() %}
+                                <tr class="forex-row">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="ms-2">
+                                                <h6 class="mb-0">{{ data.name }}</h6>
+                                                <small class="text-muted">{{ symbol }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ "%.4f"|format(data.price) }}</td>
+                                    <td>
+                                        <span class="badge {{ 'bg-success' if data.change > 0 else 'bg-danger' }}">
+                                            {{ "%.2f"|format(data.change) }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        در حال حاضر اطلاعات نرخ ارز در دسترس نیست.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- شاخص‌های اقتصادی -->
+    <div class="col-lg-4 mb-4">
+        <div class="card dashboard-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">شاخص‌های اقتصادی</h3>
+                <button id="refreshEconomic" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                {% if economic_indicators and economic_indicators|length > 0 %}
+                    {% if economic_indicators.recession_risk %}
+                        <div class="economic-indicator {{ 'risk-low' if economic_indicators.recession_risk.value == 'کم' else ('risk-medium' if economic_indicators.recession_risk.value == 'متوسط' else 'risk-high') }}">
+                            <h5>ریسک رکود</h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">{{ economic_indicators.recession_risk.value }}</span>
+                                <span class="badge bg-secondary trend-{{ 'up' if economic_indicators.recession_risk.trend == 'رو به بالا' else ('down' if economic_indicators.recession_risk.trend == 'رو به پایین' else 'stable') }}">
+                                    {{ economic_indicators.recession_risk.trend }}
+                                </span>
+                            </div>
+                            <small class="text-muted">{{ economic_indicators.recession_risk.description }}</small>
+                        </div>
+                    {% endif %}
+                    
+                    {% if economic_indicators.global_markets %}
+                        <div class="economic-indicator">
+                            <h5>بازارهای جهانی</h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-{{ 'success' if economic_indicators.global_markets.status == 'مثبت' else ('danger' if economic_indicators.global_markets.status == 'منفی' else 'secondary') }}">
+                                    {{ economic_indicators.global_markets.status }}
+                                </span>
+                                <span class="badge bg-secondary trend-{{ 'up' if economic_indicators.global_markets.trend == 'رو به بالا' else ('down' if economic_indicators.global_markets.trend == 'رو به پایین' else 'stable') }}">
+                                    {{ economic_indicators.global_markets.trend }}
+                                </span>
+                            </div>
+                            <small class="text-muted">{{ economic_indicators.global_markets.description }}</small>
+                        </div>
+                    {% endif %}
+                    
+                    {% if economic_indicators.inflation %}
+                        <div class="economic-indicator">
+                            <h5>تورم جهانی</h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">{{ economic_indicators.inflation.value }}</span>
+                                <span class="badge bg-{{ 'success' if economic_indicators.inflation.trend == 'رو به پایین' else ('danger' if economic_indicators.inflation.trend == 'رو به بالا' else 'secondary') }} trend-{{ 'up' if economic_indicators.inflation.trend == 'رو به بالا' else ('down' if economic_indicators.inflation.trend == 'رو به پایین' else 'stable') }}">
+                                    {{ economic_indicators.inflation.trend }}
+                                </span>
+                            </div>
+                            <small class="text-muted">{{ economic_indicators.inflation.description }}</small>
+                        </div>
+                    {% endif %}
+                    
+                    {% if economic_indicators.interest_rates %}
+                        <div class="economic-indicator">
+                            <h5>نرخ بهره</h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">{{ economic_indicators.interest_rates.value }}</span>
+                                <span class="badge bg-secondary trend-{{ 'up' if economic_indicators.interest_rates.trend == 'رو به بالا' else ('down' if economic_indicators.interest_rates.trend == 'رو به پایین' else 'stable') }}">
+                                    {{ economic_indicators.interest_rates.trend }}
+                                </span>
+                            </div>
+                            <small class="text-muted">{{ economic_indicators.interest_rates.description }}</small>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        در حال حاضر اطلاعات شاخص‌های اقتصادی در دسترس نیست.
                     </div>
                 {% endif %}
             </div>
@@ -1049,5 +1390,138 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// بروزرسانی نرخ کالاها
+document.getElementById('refreshCommodities').addEventListener('click', function() {
+    const button = this;
+    const originalHtml = button.innerHTML;
+    
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
+    fetch('/api/commodities')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Commodities data:', data);
+            if (data && Object.keys(data).length > 0) {
+                location.reload();
+            } else {
+                showToast('خطا', 'متأسفانه دریافت اطلاعات کالاها با مشکل مواجه شد.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching commodities:', error);
+            showToast('خطا', 'متأسفانه دریافت اطلاعات کالاها با مشکل مواجه شد.', 'error');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        });
+});
+
+// بروزرسانی نرخ ارز
+document.getElementById('refreshForex').addEventListener('click', function() {
+    const button = this;
+    const originalHtml = button.innerHTML;
+    
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
+    fetch('/api/forex')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Forex data:', data);
+            if (data && Object.keys(data).length > 0) {
+                location.reload();
+            } else {
+                showToast('خطا', 'متأسفانه دریافت اطلاعات نرخ ارز با مشکل مواجه شد.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching forex rates:', error);
+            showToast('خطا', 'متأسفانه دریافت اطلاعات نرخ ارز با مشکل مواجه شد.', 'error');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        });
+});
+
+// بروزرسانی شاخص‌های اقتصادی
+document.getElementById('refreshEconomic').addEventListener('click', function() {
+    const button = this;
+    const originalHtml = button.innerHTML;
+    
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
+    fetch('/api/economic')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Economic indicators data:', data);
+            if (data && Object.keys(data).length > 0) {
+                location.reload();
+            } else {
+                showToast('خطا', 'متأسفانه دریافت اطلاعات شاخص‌های اقتصادی با مشکل مواجه شد.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching economic indicators:', error);
+            showToast('خطا', 'متأسفانه دریافت اطلاعات شاخص‌های اقتصادی با مشکل مواجه شد.', 'error');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        });
+});
+
+// نمایش اطلاعیه‌ها
+function showToast(title, message, type = 'info') {
+    const toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'position-fixed bottom-0 end-0 p-3';
+        container.style.zIndex = '1050';
+        document.body.appendChild(container);
+    }
+    
+    const toastId = 'toast-' + Date.now();
+    const bgClass = type === 'error' ? 'bg-danger' : 
+                    (type === 'success' ? 'bg-success' : 
+                    (type === 'warning' ? 'bg-warning' : 'bg-info'));
+                    
+    const toastHtml = `
+        <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header ${bgClass} text-white">
+                <strong class="me-auto">${title}</strong>
+                <small>${new Date().toLocaleTimeString('fa-IR')}</small>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('toast-container').innerHTML += toastHtml;
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
+    toast.show();
+    
+    // حذف اعلان پس از بسته شدن
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        toastElement.remove();
+    });
+}
+
+// اضافه کردن کانتینر اعلان‌ها به صفحه
+if (!document.getElementById('toast-container')) {
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'position-fixed bottom-0 end-0 p-3';
+    container.style.zIndex = '1050';
+    document.body.appendChild(container);
+}
 </script>
 {% endblock %}
