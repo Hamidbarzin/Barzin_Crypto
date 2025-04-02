@@ -1,0 +1,736 @@
+{% extends 'base.html' %}
+
+{% block title %}Crypto Trading Bot - Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .signal-strong-buy { background-color: #198754; color: white; }
+    .signal-buy { background-color: #20c997; color: white; }
+    .signal-neutral { background-color: #6c757d; color: white; }
+    .signal-sell { background-color: #fd7e14; color: white; }
+    .signal-strong-sell { background-color: #dc3545; color: white; }
+    
+    .news-positive { border-left: 4px solid #198754; }
+    .news-neutral { border-left: 4px solid #6c757d; }
+    .news-negative { border-left: 4px solid #dc3545; }
+    
+    .price-up { color: #20c997; }
+    .price-down { color: #dc3545; }
+    
+    .tab-content {
+        min-height: 300px;
+    }
+    
+    .loading-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        vertical-align: text-bottom;
+        border: 0.2em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: spinner-border .75s linear infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">
+    <i class="fas fa-tachometer-alt me-2"></i>
+    Dashboard
+    <button id="refreshBtn" class="btn btn-sm btn-outline-primary ms-2">
+        <i class="fas fa-sync-alt"></i> Refresh
+    </button>
+</h1>
+
+<!-- Current Prices Section -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Current Prices</h3>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="currencyDropdown" data-bs-toggle="dropdown">
+                        Add Currency
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="currencyDropdown">
+                        {% for currency in currencies %}
+                            {% if currency not in watched_currencies %}
+                            <li><a class="dropdown-item add-currency" href="#" data-currency="{{ currency }}">{{ currency }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Currency</th>
+                                <th>Price</th>
+                                <th>24h Change</th>
+                                <th>24h High</th>
+                                <th>24h Low</th>
+                                <th>24h Volume</th>
+                                <th>Signal</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="priceTableBody">
+                            {% for symbol in watched_currencies %}
+                                {% if symbol in prices %}
+                                    {% set price = prices[symbol] %}
+                                    {% set signal = signals[symbol] if symbol in signals else {'signal': 'N/A', 'strength': 0} %}
+                                    <tr data-symbol="{{ symbol }}">
+                                        <td>{{ symbol }}</td>
+                                        <td class="price-value">${{ "%.2f"|format(price.price) }}</td>
+                                        <td class="{% if price.change_24h > 0 %}price-up{% elif price.change_24h < 0 %}price-down{% endif %}">
+                                            {% if price.change_24h %}
+                                                {{ "%.2f"|format(price.change_24h) }}%
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
+                                        <td>${{ "%.2f"|format(price.high_24h) if price.high_24h else 'N/A' }}</td>
+                                        <td>${{ "%.2f"|format(price.low_24h) if price.low_24h else 'N/A' }}</td>
+                                        <td>{{ price.volume_24h|int if price.volume_24h else 'N/A' }}</td>
+                                        <td>
+                                            <span class="badge signal-{{ signal.signal|lower|replace(' ', '-') }}">
+                                                {{ signal.signal }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-info view-details" data-symbol="{{ symbol }}">
+                                                <i class="fas fa-chart-line"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger remove-currency" data-symbol="{{ symbol }}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Signals and Analysis Section -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Trading Signals</h3>
+            </div>
+            <div class="card-body">
+                {% if signals %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Currency</th>
+                                    <th>Signal</th>
+                                    <th>Strength</th>
+                                    <th>Trend</th>
+                                    <th>RSI</th>
+                                    <th>MACD</th>
+                                    <th>Momentum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for symbol, signal in signals.items() %}
+                                    <tr>
+                                        <td>{{ symbol }}</td>
+                                        <td>
+                                            <span class="badge signal-{{ signal.signal|lower|replace(' ', '-') }}">
+                                                {{ signal.signal }}
+                                            </span>
+                                        </td>
+                                        <td>{{ "%.2f"|format(signal.strength) }}</td>
+                                        <td>{{ "%.2f"|format(signal.factors.trend) }}</td>
+                                        <td>{{ "%.2f"|format(signal.factors.rsi) }}</td>
+                                        <td>{{ "%.2f"|format(signal.factors.macd) }}</td>
+                                        <td>{{ "%.2f"|format(signal.factors.momentum) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        No signals available. Add currencies to your watchlist to see trading signals.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Latest News</h3>
+            </div>
+            <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                {% if news %}
+                    {% for article in news %}
+                        <div class="card mb-3 news-{{ article.sentiment.label|lower }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ article.title }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">
+                                    {{ article.source }} - {{ article.date|replace('T', ' ')|replace('Z', '')|truncate(16, True, '') }}
+                                </h6>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <span class="badge bg-{{ 'success' if article.sentiment.label == 'Positive' else ('danger' if article.sentiment.label == 'Negative' else 'secondary') }}">
+                                        {{ article.sentiment.label }}
+                                    </span>
+                                    <a href="{{ article.url }}" target="_blank" class="btn btn-sm btn-outline-primary">Read more</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        No news articles available at the moment.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Technical Analysis Modal -->
+<div class="modal fade" id="technicalModal" tabindex="-1" aria-labelledby="technicalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="technicalModalLabel">Technical Analysis</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <h4 id="modalCurrency"></h4>
+                    <div class="btn-group" role="group">
+                        {% for tf_code, tf_name in timeframes.items() %}
+                            <button type="button" class="btn btn-outline-primary timeframe-btn" data-timeframe="{{ tf_code }}">{{ tf_name }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="text-center mb-3" id="taLoading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Loading technical analysis data...</p>
+                </div>
+                
+                <div id="taContent" style="display: none;">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">Summary</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="indicators-tab" data-bs-toggle="tab" data-bs-target="#indicators" type="button" role="tab">Indicators</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="moving-averages-tab" data-bs-toggle="tab" data-bs-target="#moving-averages" type="button" role="tab">Moving Averages</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="oscillators-tab" data-bs-toggle="tab" data-bs-target="#oscillators" type="button" role="tab">Oscillators</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content p-3 border border-top-0 rounded-bottom" id="myTabContent">
+                        <div class="tab-pane fade show active" id="summary" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card mb-3">
+                                        <div class="card-header">Current Price</div>
+                                        <div class="card-body">
+                                            <h3 class="text-center" id="ta-price"></h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card mb-3">
+                                        <div class="card-header">Signal</div>
+                                        <div class="card-body">
+                                            <h3 class="text-center" id="ta-signal"></h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card mb-3">
+                                <div class="card-header">Trend Analysis</div>
+                                <div class="card-body">
+                                    <p id="ta-trend-text"></p>
+                                </div>
+                            </div>
+                            <div class="card mb-3">
+                                <div class="card-header">Momentum</div>
+                                <div class="card-body">
+                                    <p id="ta-momentum-text"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="indicators" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Indicator</th>
+                                            <th>Value</th>
+                                            <th>Signal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ta-indicators-table">
+                                        <!-- Will be filled by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="moving-averages" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Period</th>
+                                            <th>Value</th>
+                                            <th>Trend</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ta-ma-table">
+                                        <!-- Will be filled by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="oscillators" role="tabpanel">
+                            <div class="card mb-3">
+                                <div class="card-header">RSI (Relative Strength Index)</div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Oversold</span>
+                                        <span>Neutral</span>
+                                        <span>Overbought</span>
+                                    </div>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30</div>
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">40</div>
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30</div>
+                                    </div>
+                                    <div class="progress">
+                                        <div id="rsi-indicator" class="progress-bar bg-dark" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <p class="mt-2" id="rsi-value">RSI: Loading...</p>
+                                </div>
+                            </div>
+                            <div class="card mb-3">
+                                <div class="card-header">MACD (Moving Average Convergence Divergence)</div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <p>MACD: <span id="macd-value">Loading...</span></p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>Signal: <span id="macd-signal">Loading...</span></p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>Histogram: <span id="macd-histogram">Loading...</span></p>
+                                        </div>
+                                    </div>
+                                    <p id="macd-interpretation">Loading interpretation...</p>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">Bollinger Bands</div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <p>Upper: <span id="bb-upper">Loading...</span></p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>Middle: <span id="bb-middle">Loading...</span></p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>Lower: <span id="bb-lower">Loading...</span></p>
+                                        </div>
+                                    </div>
+                                    <p id="bb-interpretation">Loading interpretation...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Refresh button functionality
+    document.getElementById('refreshBtn').addEventListener('click', function() {
+        location.reload();
+    });
+    
+    // View details button
+    document.querySelectorAll('.view-details').forEach(button => {
+        button.addEventListener('click', function() {
+            const symbol = this.getAttribute('data-symbol');
+            showTechnicalAnalysis(symbol, '1d');
+        });
+    });
+    
+    // Add currency functionality
+    document.querySelectorAll('.add-currency').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const currency = this.getAttribute('data-currency');
+            
+            // Send to server via fetch (you'd need to create this endpoint)
+            fetch('/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'currencies[]': currency
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                }
+            });
+        });
+    });
+    
+    // Remove currency functionality
+    document.querySelectorAll('.remove-currency').forEach(button => {
+        button.addEventListener('click', function() {
+            const symbol = this.getAttribute('data-symbol');
+            
+            if (confirm(`Are you sure you want to remove ${symbol} from your watchlist?`)) {
+                // Remove the row from the UI
+                const row = this.closest('tr');
+                row.remove();
+                
+                // You'd need to create a server endpoint to handle this
+                // For now, we'll just reload to restore any removed currencies
+                location.reload();
+            }
+        });
+    });
+    
+    // Timeframe buttons
+    document.querySelectorAll('.timeframe-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const timeframe = this.getAttribute('data-timeframe');
+            const symbol = document.getElementById('modalCurrency').textContent;
+            
+            // Reset active state
+            document.querySelectorAll('.timeframe-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            // Reload the technical analysis with the new timeframe
+            showTechnicalAnalysis(symbol, timeframe);
+        });
+    });
+    
+    // Show technical analysis modal function
+    function showTechnicalAnalysis(symbol, timeframe) {
+        // Set the modal title
+        document.getElementById('modalCurrency').textContent = symbol;
+        
+        // Reset active timeframe button
+        document.querySelectorAll('.timeframe-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-timeframe') === timeframe) {
+                btn.classList.add('active');
+            }
+        });
+        
+        // Show loading, hide content
+        document.getElementById('taLoading').style.display = 'block';
+        document.getElementById('taContent').style.display = 'none';
+        
+        // Open the modal
+        const technicalModal = new bootstrap.Modal(document.getElementById('technicalModal'));
+        technicalModal.show();
+        
+        // Fetch technical analysis data
+        fetch(`/api/technical/${symbol}/${timeframe}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateTechnicalAnalysis(data.data, symbol);
+                } else {
+                    alert('Error loading technical analysis: ' + data.message);
+                }
+                
+                // Hide loading, show content
+                document.getElementById('taLoading').style.display = 'none';
+                document.getElementById('taContent').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error loading technical analysis data. Please try again.');
+                
+                // Hide loading
+                document.getElementById('taLoading').style.display = 'none';
+            });
+    }
+    
+    // Update technical analysis content
+    function updateTechnicalAnalysis(data, symbol) {
+        // Summary tab
+        document.getElementById('ta-price').textContent = '$' + data.price.toFixed(2);
+        
+        // Signal display
+        let signalElement = document.getElementById('ta-signal');
+        signalElement.textContent = data.trend;
+        signalElement.className = ''; // Reset class
+        if (data.trend.includes('Bullish')) {
+            signalElement.classList.add('text-success');
+        } else if (data.trend.includes('Bearish')) {
+            signalElement.classList.add('text-danger');
+        } else {
+            signalElement.classList.add('text-muted');
+        }
+        
+        // Trend text
+        let trendText = `The current trend for ${symbol} is ${data.trend.toLowerCase()}. `;
+        if (data.moving_averages) {
+            const shortSMA = data.moving_averages.short.toFixed(2);
+            const mediumSMA = data.moving_averages.medium.toFixed(2);
+            const longSMA = data.moving_averages.long.toFixed(2);
+            
+            trendText += `The short-term SMA is $${shortSMA}, medium-term SMA is $${mediumSMA}, and long-term SMA is $${longSMA}. `;
+            
+            if (data.price > data.moving_averages.short) {
+                trendText += 'Price is currently trading above the short-term moving average, which is a bullish sign. ';
+            } else {
+                trendText += 'Price is currently trading below the short-term moving average, which is a bearish sign. ';
+            }
+        }
+        document.getElementById('ta-trend-text').textContent = trendText;
+        
+        // Momentum text
+        let momentumText = '';
+        if (data.momentum !== undefined) {
+            const momentum = data.momentum.toFixed(2);
+            momentumText = `The current price momentum is ${momentum}%. `;
+            
+            if (data.momentum > 5) {
+                momentumText += 'This indicates strong positive momentum, which could lead to further price increases.';
+            } else if (data.momentum > 2) {
+                momentumText += 'This indicates moderate positive momentum.';
+            } else if (data.momentum < -5) {
+                momentumText += 'This indicates strong negative momentum, which could lead to further price decreases.';
+            } else if (data.momentum < -2) {
+                momentumText += 'This indicates moderate negative momentum.';
+            } else {
+                momentumText += 'This indicates relatively neutral momentum.';
+            }
+        } else {
+            momentumText = 'Momentum data is not available.';
+        }
+        document.getElementById('ta-momentum-text').textContent = momentumText;
+        
+        // Indicators tab
+        const indicatorsTable = document.getElementById('ta-indicators-table');
+        indicatorsTable.innerHTML = '';
+        
+        // RSI
+        if (data.rsi) {
+            const rsiRow = document.createElement('tr');
+            const rsiValue = data.rsi.value.toFixed(2);
+            let rsiSignal = 'Neutral';
+            let rsiClass = 'text-secondary';
+            
+            if (rsiValue > 70) {
+                rsiSignal = 'Overbought (Sell)';
+                rsiClass = 'text-danger';
+            } else if (rsiValue < 30) {
+                rsiSignal = 'Oversold (Buy)';
+                rsiClass = 'text-success';
+            }
+            
+            rsiRow.innerHTML = `
+                <td>RSI (14)</td>
+                <td>${rsiValue}</td>
+                <td class="${rsiClass}">${rsiSignal}</td>
+            `;
+            indicatorsTable.appendChild(rsiRow);
+            
+            // Update RSI in oscillators tab
+            document.getElementById('rsi-value').textContent = `RSI: ${rsiValue}`;
+            const rsiIndicator = document.getElementById('rsi-indicator');
+            rsiIndicator.style.width = `${rsiValue}%`;
+            if (rsiValue > 70) {
+                rsiIndicator.className = 'progress-bar bg-danger';
+            } else if (rsiValue < 30) {
+                rsiIndicator.className = 'progress-bar bg-success';
+            } else {
+                rsiIndicator.className = 'progress-bar bg-warning';
+            }
+        }
+        
+        // MACD
+        if (data.macd) {
+            const macdRow = document.createElement('tr');
+            const macdValue = data.macd.value.toFixed(4);
+            const macdSignal = data.macd.signal.toFixed(4);
+            const macdDiff = data.macd.diff.toFixed(4);
+            let macdStatus = 'Neutral';
+            let macdClass = 'text-secondary';
+            
+            if (data.macd.condition === 'Bullish') {
+                macdStatus = 'Bullish (Buy)';
+                macdClass = 'text-success';
+            } else if (data.macd.condition === 'Bearish') {
+                macdStatus = 'Bearish (Sell)';
+                macdClass = 'text-danger';
+            }
+            
+            macdRow.innerHTML = `
+                <td>MACD</td>
+                <td>MACD: ${macdValue}<br>Signal: ${macdSignal}<br>Histogram: ${macdDiff}</td>
+                <td class="${macdClass}">${macdStatus}</td>
+            `;
+            indicatorsTable.appendChild(macdRow);
+            
+            // Update MACD in oscillators tab
+            document.getElementById('macd-value').textContent = macdValue;
+            document.getElementById('macd-signal').textContent = macdSignal;
+            document.getElementById('macd-histogram').textContent = macdDiff;
+            
+            let macdInterpretation = '';
+            if (data.macd.condition === 'Bullish') {
+                macdInterpretation = 'MACD is above the signal line, indicating bullish momentum.';
+            } else if (data.macd.condition === 'Bearish') {
+                macdInterpretation = 'MACD is below the signal line, indicating bearish momentum.';
+            } else {
+                macdInterpretation = 'MACD is near the signal line, indicating potential trend change or consolidation.';
+            }
+            document.getElementById('macd-interpretation').textContent = macdInterpretation;
+        }
+        
+        // Bollinger Bands
+        if (data.bollinger_bands) {
+            const bbRow = document.createElement('tr');
+            const bbUpper = data.bollinger_bands.upper.toFixed(2);
+            const bbMiddle = data.bollinger_bands.middle.toFixed(2);
+            const bbLower = data.bollinger_bands.lower.toFixed(2);
+            let bbStatus = 'Neutral';
+            let bbClass = 'text-secondary';
+            
+            if (data.bollinger_bands.condition === 'Overbought') {
+                bbStatus = 'Overbought (Sell)';
+                bbClass = 'text-danger';
+            } else if (data.bollinger_bands.condition === 'Oversold') {
+                bbStatus = 'Oversold (Buy)';
+                bbClass = 'text-success';
+            }
+            
+            bbRow.innerHTML = `
+                <td>Bollinger Bands</td>
+                <td>Upper: ${bbUpper}<br>Middle: ${bbMiddle}<br>Lower: ${bbLower}</td>
+                <td class="${bbClass}">${bbStatus}</td>
+            `;
+            indicatorsTable.appendChild(bbRow);
+            
+            // Update BB in oscillators tab
+            document.getElementById('bb-upper').textContent = bbUpper;
+            document.getElementById('bb-middle').textContent = bbMiddle;
+            document.getElementById('bb-lower').textContent = bbLower;
+            
+            let bbInterpretation = '';
+            if (data.bollinger_bands.condition === 'Overbought') {
+                bbInterpretation = 'Price is near or above the upper Bollinger Band, indicating potential overbought conditions. Consider taking profits or watching for reversal signs.';
+            } else if (data.bollinger_bands.condition === 'Oversold') {
+                bbInterpretation = 'Price is near or below the lower Bollinger Band, indicating potential oversold conditions. Consider looking for buying opportunities.';
+            } else {
+                bbInterpretation = 'Price is between the Bollinger Bands, indicating normal trading conditions.';
+            }
+            document.getElementById('bb-interpretation').textContent = bbInterpretation;
+        }
+        
+        // Moving Averages tab
+        const maTable = document.getElementById('ta-ma-table');
+        maTable.innerHTML = '';
+        
+        if (data.moving_averages) {
+            // Short-term MA
+            const shortRow = document.createElement('tr');
+            let shortSignal = 'Neutral';
+            let shortClass = 'text-secondary';
+            
+            if (data.price > data.moving_averages.short) {
+                shortSignal = 'Bullish';
+                shortClass = 'text-success';
+            } else if (data.price < data.moving_averages.short) {
+                shortSignal = 'Bearish';
+                shortClass = 'text-danger';
+            }
+            
+            shortRow.innerHTML = `
+                <td>Short-term (9)</td>
+                <td>${data.moving_averages.short.toFixed(2)}</td>
+                <td class="${shortClass}">${shortSignal}</td>
+            `;
+            maTable.appendChild(shortRow);
+            
+            // Medium-term MA
+            const mediumRow = document.createElement('tr');
+            let mediumSignal = 'Neutral';
+            let mediumClass = 'text-secondary';
+            
+            if (data.price > data.moving_averages.medium) {
+                mediumSignal = 'Bullish';
+                mediumClass = 'text-success';
+            } else if (data.price < data.moving_averages.medium) {
+                mediumSignal = 'Bearish';
+                mediumClass = 'text-danger';
+            }
+            
+            mediumRow.innerHTML = `
+                <td>Medium-term (20)</td>
+                <td>${data.moving_averages.medium.toFixed(2)}</td>
+                <td class="${mediumClass}">${mediumSignal}</td>
+            `;
+            maTable.appendChild(mediumRow);
+            
+            // Long-term MA
+            const longRow = document.createElement('tr');
+            let longSignal = 'Neutral';
+            let longClass = 'text-secondary';
+            
+            if (data.price > data.moving_averages.long) {
+                longSignal = 'Bullish';
+                longClass = 'text-success';
+            } else if (data.price < data.moving_averages.long) {
+                longSignal = 'Bearish';
+                longClass = 'text-danger';
+            }
+            
+            longRow.innerHTML = `
+                <td>Long-term (50)</td>
+                <td>${data.moving_averages.long.toFixed(2)}</td>
+                <td class="${longClass}">${longSignal}</td>
+            `;
+            maTable.appendChild(longRow);
+        }
+    }
+});
+</script>
+{% endblock %}

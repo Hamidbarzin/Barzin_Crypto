@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}Crypto Trading Bot - Settings{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">
+    <i class="fas fa-cog me-2"></i>
+    Settings
+</h1>
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="post" action="/settings">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="mb-0">Cryptocurrency Watchlist</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Select the cryptocurrencies you want to track and analyze:</p>
+                    
+                    <div class="row">
+                        {% for currency in currencies %}
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="currencies" value="{{ currency }}" id="currency-{{ loop.index }}"
+                                           {% if currency in watched_currencies %}checked{% endif %}>
+                                    <label class="form-check-label" for="currency-{{ loop.index }}">
+                                        {{ currency }}
+                                    </label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle me-2"></i>
+                        The bot will analyze these cryptocurrencies and generate trading signals based on technical analysis and news.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="mb-0">Email Notifications</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="email_enabled" id="email_enabled"
+                               {% if email_settings.enabled %}checked{% endif %}>
+                        <label class="form-check-label" for="email_enabled">
+                            Enable email notifications
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email_address" class="form-label">Email Address</label>
+                        <div class="input-group">
+                            <input type="email" class="form-control" id="email_address" name="email_address"
+                                   placeholder="your@email.com" value="{{ email_settings.email }}">
+                            <button type="button" class="btn btn-outline-primary" id="test_email_btn">Test</button>
+                        </div>
+                        <div class="form-text">Trading signals and alerts will be sent to this email address.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email_frequency" class="form-label">Notification Frequency</label>
+                        <select class="form-select" id="email_frequency" name="email_frequency">
+                            <option value="hourly" {% if email_settings.frequency == 'hourly' %}selected{% endif %}>Hourly</option>
+                            <option value="daily" {% if email_settings.frequency == 'daily' %}selected{% endif %}>Daily</option>
+                            <option value="weekly" {% if email_settings.frequency == 'weekly' %}selected{% endif %}>Weekly</option>
+                        </select>
+                        <div class="form-text">How often you want to receive email notifications with trading signals.</div>
+                    </div>
+                    
+                    <div class="alert alert-warning small">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        You will only receive notifications when there are actionable trading signals (Buy or Sell).
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="mb-0">Bot Scheduler</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="scheduler_enabled" id="scheduler_enabled"
+                               {% if scheduler_running %}checked{% endif %}>
+                        <label class="form-check-label" for="scheduler_enabled">
+                            Enable automatic analysis scheduler
+                        </label>
+                    </div>
+                    
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle me-2"></i>
+                        When enabled, the bot will automatically analyze cryptocurrencies and generate trading signals on a schedule.
+                    </div>
+                    
+                    <div class="alert alert-{% if scheduler_running %}success{% else %}secondary{% endif %}" id="scheduler_status_alert">
+                        <i class="fas {% if scheduler_running %}fa-check-circle{% else %}fa-times-circle{% endif %} me-2"></i>
+                        Scheduler is currently <span id="scheduler_status_text">{% if scheduler_running %}running{% else %}stopped{% endif %}</span>.
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>
+                    Save Settings
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">Help & Information</h3>
+            </div>
+            <div class="card-body">
+                <h5><i class="fas fa-chart-line me-2"></i>Technical Analysis</h5>
+                <p>The bot uses several technical indicators to generate trading signals:</p>
+                <ul>
+                    <li><strong>Moving Averages</strong> - Track price trends</li>
+                    <li><strong>RSI</strong> - Identify overbought/oversold conditions</li>
+                    <li><strong>MACD</strong> - Detect momentum changes</li>
+                    <li><strong>Bollinger Bands</strong> - Identify volatility and relative price levels</li>
+                </ul>
+                
+                <h5><i class="fas fa-newspaper me-2"></i>News Analysis</h5>
+                <p>The bot scans cryptocurrency news from trusted sources and performs sentiment analysis to identify potential market-moving events.</p>
+                
+                <h5><i class="fas fa-envelope me-2"></i>Email Notifications</h5>
+                <p>You'll receive detailed trading signals that include:</p>
+                <ul>
+                    <li>Buy/Sell recommendations</li>
+                    <li>Current price and technical levels</li>
+                    <li>Analysis of relevant news</li>
+                    <li>Reasoning behind the trading signal</li>
+                </ul>
+                
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Disclaimer:</strong> This bot provides analysis for informational purposes only and is not financial advice. Always do your own research before making investment decisions.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Test email button
+    document.getElementById('test_email_btn').addEventListener('click', function() {
+        const emailAddress = document.getElementById('email_address').value;
+        
+        if (!emailAddress) {
+            alert('Please enter an email address first.');
+            return;
+        }
+        
+        // Disable button and show loading
+        const button = this;
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="loading-spinner"></span> Sending...';
+        
+        // Send test email
+        fetch('/api/test-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'email_address': emailAddress
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Test email sent successfully! Please check your inbox.');
+            } else {
+                alert('Error: ' + data.message);
+            }
+            
+            // Restore button
+            button.disabled = false;
+            button.innerHTML = originalText;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while sending the test email. Please try again.');
+            
+            // Restore button
+            button.disabled = false;
+            button.innerHTML = originalText;
+        });
+    });
+    
+    // Scheduler status toggle
+    document.getElementById('scheduler_enabled').addEventListener('change', function() {
+        const statusAlert = document.getElementById('scheduler_status_alert');
+        const statusText = document.getElementById('scheduler_status_text');
+        
+        if (this.checked) {
+            statusAlert.className = 'alert alert-warning';
+            statusText.textContent = 'pending start (save settings to apply)';
+        } else {
+            statusAlert.className = 'alert alert-warning';
+            statusText.textContent = 'pending stop (save settings to apply)';
+        }
+    });
+});
+</script>
+{% endblock %}

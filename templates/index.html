@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Crypto Trading Bot - Home{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card bg-dark mb-4">
+            <div class="card-body text-center p-5">
+                <div class="mb-4">
+                    <i class="fas fa-robot fa-5x text-primary"></i>
+                </div>
+                <h1 class="display-4">Cryptocurrency Trading Bot</h1>
+                <p class="lead">
+                    Analyze market data, track technical indicators, and receive trading signals via email
+                </p>
+                <div class="mt-4">
+                    <a href="/dashboard" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-chart-line me-2"></i>Dashboard
+                    </a>
+                    <a href="/settings" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-cog me-2"></i>Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-bar fa-3x mb-3 text-primary"></i>
+                        <h3>Technical Analysis</h3>
+                        <p>
+                            Track key technical indicators including Moving Averages, RSI, MACD, and Bollinger Bands.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-newspaper fa-3x mb-3 text-info"></i>
+                        <h3>News Analysis</h3>
+                        <p>
+                            Stay updated with the latest cryptocurrency news and sentiment analysis from trusted sources.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-envelope fa-3x mb-3 text-success"></i>
+                        <h3>Email Notifications</h3>
+                        <p>
+                            Receive timely buy and sell signals directly to your email based on comprehensive analysis.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Features</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-dark">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Real-time price data from Binance and CoinGecko
+                            </li>
+                            <li class="list-group-item bg-dark">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Technical indicators (MA, RSI, MACD, Bollinger Bands)
+                            </li>
+                            <li class="list-group-item bg-dark">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                News sentiment analysis from reliable sources
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-dark">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Automated buy/sell signals based on multiple factors
+                            </li>
+                            <li class="list-group-item bg-dark">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Email notifications with actionable insights
+                            </li>
+                            <li class="list-group-item bg-dark">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Customizable cryptocurrency watchlist
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Getting Started</h3>
+            </div>
+            <div class="card-body">
+                <ol class="list-styled">
+                    <li class="mb-2">Go to the <a href="/settings">Settings</a> page to configure your watched cryptocurrencies</li>
+                    <li class="mb-2">Set up email notifications to receive trading signals</li>
+                    <li class="mb-2">Start the scheduler to enable automated analysis and notifications</li>
+                    <li class="mb-2">Visit the <a href="/dashboard">Dashboard</a> to view real-time market data and signals</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
