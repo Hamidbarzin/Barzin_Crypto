@@ -35,6 +35,8 @@ def initialize_session():
         session['watched_currencies'] = DEFAULT_CURRENCIES[:3]  # Start with BTC, ETH, XRP
     if 'scheduler_running' not in session:
         session['scheduler_running'] = False
+    if 'include_middle_east' not in session:
+        session['include_middle_east'] = True  # Default to including Middle Eastern news sources
 
 @app.route('/')
 def index():
@@ -50,8 +52,9 @@ def dashboard():
     for currency in watched_currencies:
         technical_data[currency] = get_technical_indicators(currency, '1d')
     
-    # Get latest news
-    news = get_latest_news(limit=5)
+    # Get latest news (use user's setting for Middle Eastern sources)
+    include_middle_east = session.get('include_middle_east', True)
+    news = get_latest_news(limit=5, include_middle_east=include_middle_east)
     
     # Generate signals
     signals = generate_signals(watched_currencies)
@@ -65,7 +68,8 @@ def dashboard():
         currencies=DEFAULT_CURRENCIES,
         watched_currencies=watched_currencies,
         timeframes=TIMEFRAMES,
-        scheduler_running=session.get('scheduler_running', False)
+        scheduler_running=session.get('scheduler_running', False),
+        include_middle_east=include_middle_east
     )
 
 @app.route('/settings', methods=['GET', 'POST'])
@@ -87,6 +91,10 @@ def settings():
             'frequency': email_frequency
         }
         
+        # Update Middle Eastern news sources setting
+        include_middle_east = 'include_middle_east' in request.form
+        session['include_middle_east'] = include_middle_east
+        
         # Update scheduler status
         scheduler_enabled = 'scheduler_enabled' in request.form
         
@@ -107,7 +115,8 @@ def settings():
         currencies=DEFAULT_CURRENCIES,
         watched_currencies=session.get('watched_currencies', []),
         email_settings=session.get('email_settings', {}),
-        scheduler_running=session.get('scheduler_running', False)
+        scheduler_running=session.get('scheduler_running', False),
+        include_middle_east=session.get('include_middle_east', True)
     )
 
 @app.route('/api/test-email', methods=['POST'])
@@ -147,8 +156,10 @@ def get_technical(symbol, timeframe):
 @app.route('/api/news')
 def get_news():
     limit = request.args.get('limit', 5, type=int)
+    include_middle_east = request.args.get('include_middle_east', 'true').lower() == 'true'
+    
     try:
-        news = get_latest_news(limit=limit)
+        news = get_latest_news(limit=limit, include_middle_east=include_middle_east)
         return jsonify({'success': True, 'data': news})
     except Exception as e:
         logger.error(f"Error getting news: {str(e)}")

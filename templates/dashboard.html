@@ -467,7 +467,10 @@
                     <div class="badge bg-success me-1"></div>
                     <span class="small text-secondary me-2">{{ news|selectattr('sentiment.label', 'eq', 'Positive')|list|length }}</span>
                     <div class="badge bg-danger me-1"></div>
-                    <span class="small text-secondary">{{ news|selectattr('sentiment.label', 'eq', 'Negative')|list|length }}</span>
+                    <span class="small text-secondary me-2">{{ news|selectattr('sentiment.label', 'eq', 'Negative')|list|length }}</span>
+                    {% if include_middle_east %}
+                        <span class="badge bg-info ms-2 small">منابع خاورمیانه فعال</span>
+                    {% endif %}
                 </div>
             </div>
             <div class="card-body" style="max-height: 500px; overflow-y: auto;">
@@ -477,7 +480,11 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ article.title }}</h5>
                                 <h6 class="card-subtitle mb-2 text-secondary small">
-                                    {{ article.source }} - {{ article.date|replace('T', ' ')|replace('Z', '')|truncate(16, True, '') }}
+                                    {{ article.source }} 
+                                    {% if article.sentiment.is_persian or 'ramzarz.news' in article.source or 'arzdigital.com' in article.source or 'menaherald.com' in article.source %}
+                                        <span class="badge bg-info ms-1 small">خاورمیانه</span> 
+                                    {% endif %}
+                                    - {{ article.date|replace('T', ' ')|replace('Z', '')|truncate(16, True, '') }}
                                 </h6>
                                 <div class="d-flex justify-content-between align-items-center mt-3">
                                     <span class="badge bg-{{ 'success' if article.sentiment.label == 'Positive' else ('danger' if article.sentiment.label == 'Negative' else 'secondary') }}">
@@ -725,7 +732,7 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const symbol = this.getAttribute('data-symbol');
             
-            if (confirm(`Are you sure you want to remove ${symbol} from your watchlist?`)) {
+            if (confirm(`آیا مطمئن هستید که می‌خواهید ${symbol} را از لیست تماشای خود حذف کنید؟`)) {
                 // Remove the row from the UI
                 const row = this.closest('tr');
                 row.remove();
@@ -782,7 +789,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     updateTechnicalAnalysis(data.data, symbol);
                 } else {
-                    alert('Error loading technical analysis: ' + data.message);
+                    alert('خطا در بارگذاری تحلیل تکنیکال: ' + data.message);
                 }
                 
                 // Hide loading, show content
@@ -791,7 +798,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error loading technical analysis data. Please try again.');
+                alert('خطا در بارگذاری داده‌های تحلیل تکنیکال. لطفا دوباره تلاش کنید.');
                 
                 // Hide loading
                 document.getElementById('taLoading').style.display = 'none';
@@ -816,18 +823,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Trend text
-        let trendText = `The current trend for ${symbol} is ${data.trend.toLowerCase()}. `;
+        let trendText = `روند فعلی برای ${symbol} ${data.trend.toLowerCase() === 'bullish' ? 'صعودی' : 
+                           data.trend.toLowerCase() === 'bearish' ? 'نزولی' : 
+                           data.trend.toLowerCase() === 'neutral' ? 'خنثی' : data.trend.toLowerCase()} است. `;
         if (data.moving_averages) {
             const shortSMA = data.moving_averages.short.toFixed(2);
             const mediumSMA = data.moving_averages.medium.toFixed(2);
             const longSMA = data.moving_averages.long.toFixed(2);
             
-            trendText += `The short-term SMA is $${shortSMA}, medium-term SMA is $${mediumSMA}, and long-term SMA is $${longSMA}. `;
+            trendText += `میانگین متحرک ساده کوتاه‌مدت $${shortSMA}، میانگین متحرک میان‌مدت $${mediumSMA}، و میانگین متحرک بلندمدت $${longSMA} است. `;
             
             if (data.price > data.moving_averages.short) {
-                trendText += 'Price is currently trading above the short-term moving average, which is a bullish sign. ';
+                trendText += 'قیمت در حال حاضر بالاتر از میانگین متحرک کوتاه‌مدت معامله می‌شود، که نشانه صعودی است. ';
             } else {
-                trendText += 'Price is currently trading below the short-term moving average, which is a bearish sign. ';
+                trendText += 'قیمت در حال حاضر پایین‌تر از میانگین متحرک کوتاه‌مدت معامله می‌شود، که نشانه نزولی است. ';
             }
         }
         document.getElementById('ta-trend-text').textContent = trendText;
@@ -836,21 +845,21 @@ document.addEventListener('DOMContentLoaded', function() {
         let momentumText = '';
         if (data.momentum !== undefined) {
             const momentum = data.momentum.toFixed(2);
-            momentumText = `The current price momentum is ${momentum}%. `;
+            momentumText = `مومنتوم قیمت فعلی ${momentum}% است. `;
             
             if (data.momentum > 5) {
-                momentumText += 'This indicates strong positive momentum, which could lead to further price increases.';
+                momentumText += 'این نشان‌دهنده مومنتوم مثبت قوی است که می‌تواند منجر به افزایش بیشتر قیمت شود.';
             } else if (data.momentum > 2) {
-                momentumText += 'This indicates moderate positive momentum.';
+                momentumText += 'این نشان‌دهنده مومنتوم مثبت متوسط است.';
             } else if (data.momentum < -5) {
-                momentumText += 'This indicates strong negative momentum, which could lead to further price decreases.';
+                momentumText += 'این نشان‌دهنده مومنتوم منفی قوی است که می‌تواند منجر به کاهش بیشتر قیمت شود.';
             } else if (data.momentum < -2) {
-                momentumText += 'This indicates moderate negative momentum.';
+                momentumText += 'این نشان‌دهنده مومنتوم منفی متوسط است.';
             } else {
-                momentumText += 'This indicates relatively neutral momentum.';
+                momentumText += 'این نشان‌دهنده مومنتوم نسبتاً خنثی است.';
             }
         } else {
-            momentumText = 'Momentum data is not available.';
+            momentumText = 'داده‌های مومنتوم در دسترس نیست.';
         }
         document.getElementById('ta-momentum-text').textContent = momentumText;
         

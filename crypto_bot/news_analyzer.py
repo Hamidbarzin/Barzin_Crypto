@@ -14,23 +14,42 @@ from crypto_bot.config import NEWS_API_KEY, NEWS_SOURCES, POSITIVE_KEYWORDS, NEG
 
 logger = logging.getLogger(__name__)
 
-def get_latest_news(limit=10):
+def get_latest_news(limit=10, include_middle_east=True):
     """
     Get the latest cryptocurrency news articles
     
     Args:
         limit (int): Maximum number of news articles to return
+        include_middle_east (bool): Whether to include Middle Eastern news sources
         
     Returns:
         list: List of news article dictionaries with title, source, url, date, and sentiment
     """
     try:
+        news_articles = []
+        
         # Try with NewsAPI if we have an API key
         if NEWS_API_KEY:
-            return get_news_from_newsapi(limit)
-        else:
-            # If no NEWS_API_KEY, scrape from cryptocurrency news websites
-            return scrape_crypto_news(limit)
+            news_articles.extend(get_news_from_newsapi(limit))
+        
+        # Even if we have NewsAPI, always scrape from global crypto sites to ensure coverage
+        news_articles.extend(scrape_crypto_news(limit, include_middle_east))
+        
+        # Remove duplicates based on URL
+        seen_urls = set()
+        unique_articles = []
+        
+        for article in news_articles:
+            if article['url'] not in seen_urls:
+                seen_urls.add(article['url'])
+                unique_articles.append(article)
+        
+        # Sort by date (newest first) and limit results
+        sorted_articles = sorted(unique_articles, 
+                                key=lambda x: x.get('date', ''), 
+                                reverse=True)
+                                
+        return sorted_articles[:limit]
     except Exception as e:
         logger.error(f"Error fetching news: {str(e)}")
         return []
@@ -82,13 +101,23 @@ def get_news_from_newsapi(limit=10):
     
     return result
 
-def scrape_crypto_news(limit=10):
+def scrape_crypto_news(limit=10, include_middle_east=True):
     """
     Scrape cryptocurrency news from popular websites when API is not available
+    
+    Args:
+        limit (int): Maximum number of news articles to return
+        include_middle_east (bool): Whether to include Middle Eastern news sources
+        
+    Returns:
+        list: List of news article dictionaries
     """
     result = []
     
-    # List of popular cryptocurrency news sites
+    # List of popular cryptocurrency news sites (global and Middle East)
+    # Define which sites are Middle Eastern
+    middle_east_domains = ['ramzarz.news', 'arzdigital.com', 'menaherald.com']
+    
     news_sites = [
         {
             'url': 'https://cointelegraph.com/',
@@ -101,10 +130,39 @@ def scrape_crypto_news(limit=10):
             'article_selector': 'div.article-card',
             'title_selector': 'h6.heading',
             'link_selector': 'a.card-title-link'
+        },
+        {
+            'url': 'https://ramzarz.news/',
+            'article_selector': 'article.jeg_post',
+            'title_selector': 'h3.jeg_post_title',
+            'link_selector': 'a'
+        },
+        {
+            'url': 'https://arzdigital.com/breaking/',
+            'article_selector': 'article.elementor-post',
+            'title_selector': 'h3.elementor-post__title',
+            'link_selector': 'a'
+        },
+        {
+            'url': 'https://www.menaherald.com/en/business/cryptocurrency',
+            'article_selector': '.views-row',
+            'title_selector': 'span.field-content',
+            'link_selector': 'a'
         }
     ]
     
+    filtered_sites = []
     for site in news_sites:
+        # Skip Middle Eastern sites if not requested
+        domain = site['url'].split('//')[1].split('/')[0].replace('www.', '')
+        is_middle_east = any(me_domain in domain for me_domain in middle_east_domains)
+        
+        if is_middle_east and not include_middle_east:
+            continue
+            
+        filtered_sites.append(site)
+    
+    for site in filtered_sites:
         if len(result) >= limit:
             break
             
@@ -190,7 +248,8 @@ def get_article_content(url):
 
 def analyze_sentiment(text):
     """
-    Simple rule-based sentiment analysis for cryptocurrency news
+    Simple rule-based sentiment analysis for cryptocurrency news.
+    Supports both English and Persian text.
     
     Args:
         text (str): Text to analyze
@@ -198,11 +257,24 @@ def analyze_sentiment(text):
     Returns:
         dict: Dictionary with sentiment score and label
     """
+    if not text:
+        return {
+            'score': 0,
+            'label': "Neutral",
+            'positive_count': 0,
+            'negative_count': 0
+        }
+        
+    # Convert to lowercase for case-insensitive matching
+    # Note: Persian doesn't have uppercase/lowercase but English does
     text = text.lower()
     
     # Count positive and negative keywords
     positive_count = sum(1 for keyword in POSITIVE_KEYWORDS if keyword.lower() in text)
     negative_count = sum(1 for keyword in NEGATIVE_KEYWORDS if keyword.lower() in text)
+    
+    # Detect language (simple check for Persian characters)
+    is_persian = any('\u0600' <= c <= '\u06FF' for c in text)
     
     # Calculate sentiment score (-1 to 1)
     total = positive_count + negative_count
@@ -213,15 +285,20 @@ def analyze_sentiment(text):
         
     # Determine sentiment label
     if score > 0.3:
-        label = "Positive"
+        label = "Positive" if not is_persian else "مثبت"
     elif score < -0.3:
-        label = "Negative"
+        label = "Negative" if not is_persian else "منفی"
     else:
-        label = "Neutral"
+        label = "Neutral" if not is_persian else "خنثی"
+    
+    # For consistency in the UI, always return English labels
+    display_label = "Positive" if label == "مثبت" else "Negative" if label == "منفی" else "Neutral"
         
     return {
         'score': score,
-        'label': label,
+        'label': display_label,
+        'persian_label': label if is_persian else None,
+        'is_persian': is_persian,
         'positive_count': positive_count,
         'negative_count': negative_count
     }

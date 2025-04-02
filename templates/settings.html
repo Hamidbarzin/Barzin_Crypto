@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Crypto Trading Bot - Settings{% endblock %}
+{% block title %}ربات معاملات ارز دیجیتال - تنظیمات{% endblock %}
 
 {% block content %}
 <h1 class="mb-4">
     <i class="fas fa-cog me-2"></i>
-    Settings
+    تنظیمات
 </h1>
 
 <div class="row">
@@ -13,10 +13,10 @@
         <form method="post" action="/settings">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h3 class="mb-0">Cryptocurrency Watchlist</h3>
+                    <h3 class="mb-0">لیست ارزهای دیجیتال</h3>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted mb-3">Select the cryptocurrencies you want to track and analyze:</p>
+                    <p class="text-muted mb-3">ارزهای دیجیتالی که می‌خواهید پیگیری و تحلیل کنید را انتخاب کنید:</p>
                     
                     <div class="row">
                         {% for currency in currencies %}
@@ -34,72 +34,101 @@
                     
                     <div class="alert alert-info small">
                         <i class="fas fa-info-circle me-2"></i>
-                        The bot will analyze these cryptocurrencies and generate trading signals based on technical analysis and news.
+                        ربات این ارزهای دیجیتال را تحلیل کرده و بر اساس تحلیل تکنیکال و اخبار، سیگنال‌های معاملاتی تولید می‌کند.
                     </div>
                 </div>
             </div>
 
             <div class="card mb-4">
                 <div class="card-header">
-                    <h3 class="mb-0">Email Notifications</h3>
+                    <h3 class="mb-0">اطلاع‌رسانی ایمیلی</h3>
                 </div>
                 <div class="card-body">
                     <div class="form-check form-switch mb-3">
                         <input class="form-check-input" type="checkbox" name="email_enabled" id="email_enabled"
                                {% if email_settings.enabled %}checked{% endif %}>
                         <label class="form-check-label" for="email_enabled">
-                            Enable email notifications
+                            فعال‌سازی اطلاع‌رسانی ایمیلی
                         </label>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="email_address" class="form-label">Email Address</label>
+                        <label for="email_address" class="form-label">آدرس ایمیل</label>
                         <div class="input-group">
                             <input type="email" class="form-control" id="email_address" name="email_address"
                                    placeholder="your@email.com" value="{{ email_settings.email }}">
-                            <button type="button" class="btn btn-outline-primary" id="test_email_btn">Test</button>
+                            <button type="button" class="btn btn-outline-primary" id="test_email_btn">تست</button>
                         </div>
-                        <div class="form-text">Trading signals and alerts will be sent to this email address.</div>
+                        <div class="form-text">سیگنال‌های معاملاتی و هشدارها به این آدرس ایمیل ارسال خواهند شد.</div>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="email_frequency" class="form-label">Notification Frequency</label>
+                        <label for="email_frequency" class="form-label">فرکانس اطلاع‌رسانی</label>
                         <select class="form-select" id="email_frequency" name="email_frequency">
-                            <option value="hourly" {% if email_settings.frequency == 'hourly' %}selected{% endif %}>Hourly</option>
-                            <option value="daily" {% if email_settings.frequency == 'daily' %}selected{% endif %}>Daily</option>
-                            <option value="weekly" {% if email_settings.frequency == 'weekly' %}selected{% endif %}>Weekly</option>
+                            <option value="hourly" {% if email_settings.frequency == 'hourly' %}selected{% endif %}>ساعتی</option>
+                            <option value="daily" {% if email_settings.frequency == 'daily' %}selected{% endif %}>روزانه</option>
+                            <option value="weekly" {% if email_settings.frequency == 'weekly' %}selected{% endif %}>هفتگی</option>
                         </select>
-                        <div class="form-text">How often you want to receive email notifications with trading signals.</div>
+                        <div class="form-text">چند وقت یکبار می‌خواهید ایمیل‌های حاوی سیگنال‌های معاملاتی را دریافت کنید.</div>
                     </div>
                     
                     <div class="alert alert-warning small">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        You will only receive notifications when there are actionable trading signals (Buy or Sell).
+                        شما فقط زمانی اطلاع‌رسانی دریافت خواهید کرد که سیگنال‌های معاملاتی قابل اجرا (خرید یا فروش) وجود داشته باشند.
                     </div>
                 </div>
             </div>
 
             <div class="card mb-4">
                 <div class="card-header">
-                    <h3 class="mb-0">Bot Scheduler</h3>
+                    <h3 class="mb-0">منابع خبری</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="include_middle_east" id="include_middle_east"
+                               {% if include_middle_east %}checked{% endif %}>
+                        <label class="form-check-label" for="include_middle_east">
+                            فعال‌سازی منابع خبری خاورمیانه
+                        </label>
+                    </div>
+                    
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle me-2"></i>
+                        با فعال‌سازی این گزینه، ربات اخبار ارزهای دیجیتال را از منابع خبری فارسی و خاورمیانه نیز جمع‌آوری می‌کند. این منابع دارای اخبار به زبان فارسی نیز هستند که با تحلیل احساسات فارسی پردازش می‌شوند.
+                    </div>
+                    
+                    <div class="mb-3">
+                        <p class="text-muted">منابع خبری خاورمیانه شامل:</p>
+                        <ul class="small">
+                            <li>رمزارز نیوز (ramzarz.news)</li>
+                            <li>ارزدیجیتال (arzdigital.com)</li>
+                            <li>مِنا هرالد (menaherald.com)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="mb-0">زمان‌بندی ربات</h3>
                 </div>
                 <div class="card-body">
                     <div class="form-check form-switch mb-3">
                         <input class="form-check-input" type="checkbox" name="scheduler_enabled" id="scheduler_enabled"
                                {% if scheduler_running %}checked{% endif %}>
                         <label class="form-check-label" for="scheduler_enabled">
-                            Enable automatic analysis scheduler
+                            فعال‌سازی زمان‌بندی تحلیل خودکار
                         </label>
                     </div>
                     
                     <div class="alert alert-info small">
                         <i class="fas fa-info-circle me-2"></i>
-                        When enabled, the bot will automatically analyze cryptocurrencies and generate trading signals on a schedule.
+                        در صورت فعال‌سازی، ربات به صورت خودکار و طبق برنامه زمانی، ارزهای دیجیتال را تحلیل کرده و سیگنال‌های معاملاتی تولید می‌کند.
                     </div>
                     
                     <div class="alert alert-{% if scheduler_running %}success{% else %}secondary{% endif %}" id="scheduler_status_alert">
                         <i class="fas {% if scheduler_running %}fa-check-circle{% else %}fa-times-circle{% endif %} me-2"></i>
-                        Scheduler is currently <span id="scheduler_status_text">{% if scheduler_running %}running{% else %}stopped{% endif %}</span>.
+                        زمان‌بندی در حال حاضر <span id="scheduler_status_text">{% if scheduler_running %}در حال اجرا{% else %}متوقف شده{% endif %}</span> است.
                     </div>
                 </div>
             </div>
@@ -107,7 +136,7 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save me-2"></i>
-                    Save Settings
+                    ذخیره تنظیمات
                 </button>
             </div>
         </form>
@@ -116,33 +145,33 @@
     <div class="col-lg-4">
         <div class="card mb-4">
             <div class="card-header">
-                <h3 class="mb-0">Help & Information</h3>
+                <h3 class="mb-0">راهنما و اطلاعات</h3>
             </div>
             <div class="card-body">
-                <h5><i class="fas fa-chart-line me-2"></i>Technical Analysis</h5>
-                <p>The bot uses several technical indicators to generate trading signals:</p>
+                <h5><i class="fas fa-chart-line me-2"></i>تحلیل تکنیکال</h5>
+                <p>ربات از چندین شاخص تکنیکال برای تولید سیگنال‌های معاملاتی استفاده می‌کند:</p>
                 <ul>
-                    <li><strong>Moving Averages</strong> - Track price trends</li>
-                    <li><strong>RSI</strong> - Identify overbought/oversold conditions</li>
-                    <li><strong>MACD</strong> - Detect momentum changes</li>
-                    <li><strong>Bollinger Bands</strong> - Identify volatility and relative price levels</li>
+                    <li><strong>میانگین‌های متحرک</strong> - پیگیری روندهای قیمت</li>
+                    <li><strong>RSI</strong> - شناسایی شرایط اشباع خرید/فروش</li>
+                    <li><strong>MACD</strong> - تشخیص تغییرات مومنتوم</li>
+                    <li><strong>باندهای بولینگر</strong> - شناسایی نوسانات و سطوح نسبی قیمت</li>
                 </ul>
                 
-                <h5><i class="fas fa-newspaper me-2"></i>News Analysis</h5>
-                <p>The bot scans cryptocurrency news from trusted sources and performs sentiment analysis to identify potential market-moving events.</p>
+                <h5><i class="fas fa-newspaper me-2"></i>تحلیل اخبار</h5>
+                <p>ربات اخبار ارزهای دیجیتال را از منابع معتبر بررسی کرده و تحلیل احساسات انجام می‌دهد تا رویدادهای بالقوه تأثیرگذار بر بازار را شناسایی کند.</p>
                 
-                <h5><i class="fas fa-envelope me-2"></i>Email Notifications</h5>
-                <p>You'll receive detailed trading signals that include:</p>
+                <h5><i class="fas fa-envelope me-2"></i>اطلاع‌رسانی ایمیلی</h5>
+                <p>شما سیگنال‌های معاملاتی دقیقی دریافت خواهید کرد که شامل موارد زیر است:</p>
                 <ul>
-                    <li>Buy/Sell recommendations</li>
-                    <li>Current price and technical levels</li>
-                    <li>Analysis of relevant news</li>
-                    <li>Reasoning behind the trading signal</li>
+                    <li>توصیه‌های خرید/فروش</li>
+                    <li>قیمت فعلی و سطوح تکنیکال</li>
+                    <li>تحلیل اخبار مربوطه</li>
+                    <li>دلایل پشت سیگنال معاملاتی</li>
                 </ul>
                 
                 <div class="alert alert-warning mt-3">
                     <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Disclaimer:</strong> This bot provides analysis for informational purposes only and is not financial advice. Always do your own research before making investment decisions.
+                    <strong>سلب مسئولیت:</strong> این ربات تحلیل‌ها را صرفاً برای اهداف اطلاع‌رسانی ارائه می‌دهد و توصیه مالی محسوب نمی‌شود. همیشه قبل از اتخاذ تصمیمات سرمایه‌گذاری، تحقیقات خود را انجام دهید.
                 </div>
             </div>
         </div>
@@ -158,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const emailAddress = document.getElementById('email_address').value;
         
         if (!emailAddress) {
-            alert('Please enter an email address first.');
+            alert('لطفا ابتدا یک آدرس ایمیل وارد کنید.');
             return;
         }
         
@@ -166,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const button = this;
         const originalText = button.innerHTML;
         button.disabled = true;
-        button.innerHTML = '<span class="loading-spinner"></span> Sending...';
+        button.innerHTML = '<span class="loading-spinner"></span> در حال ارسال...';
         
         // Send test email
         fetch('/api/test-email', {
@@ -181,9 +210,9 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Test email sent successfully! Please check your inbox.');
+                alert('ایمیل تست با موفقیت ارسال شد! لطفا صندوق ورودی خود را بررسی کنید.');
             } else {
-                alert('Error: ' + data.message);
+                alert('خطا: ' + data.message);
             }
             
             // Restore button
@@ -192,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while sending the test email. Please try again.');
+            alert('خطایی هنگام ارسال ایمیل تست رخ داد. لطفا دوباره تلاش کنید.');
             
             // Restore button
             button.disabled = false;
@@ -207,10 +236,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (this.checked) {
             statusAlert.className = 'alert alert-warning';
-            statusText.textContent = 'pending start (save settings to apply)';
+            statusText.textContent = 'در انتظار شروع (تنظیمات را ذخیره کنید تا اعمال شود)';
         } else {
             statusAlert.className = 'alert alert-warning';
-            statusText.textContent = 'pending stop (save settings to apply)';
+            statusText.textContent = 'در انتظار توقف (تنظیمات را ذخیره کنید تا اعمال شود)';
         }
     });
 });

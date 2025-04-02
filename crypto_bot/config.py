@@ -60,7 +60,10 @@ NEWS_SOURCES = [
     'coindesk.com',
     'decrypt.co',
     'cryptoslate.com',
-    'bitcoinist.com'
+    'bitcoinist.com',
+    'ramzarz.news',
+    'arzdigital.com',
+    'menaherald.com'
 ]
 
 # Signal thresholds - used to determine buy/sell signals
@@ -74,13 +77,21 @@ SIGNAL_THRESHOLDS = {
 
 # News sentiment analysis
 POSITIVE_KEYWORDS = [
+    # انگلیسی
     'bullish', 'surge', 'soar', 'gain', 'rally', 'jump', 'rise', 'up', 
-    'grow', 'positive', 'good', 'progress', 'adopt', 'support', 'partnership'
+    'grow', 'positive', 'good', 'progress', 'adopt', 'support', 'partnership',
+    # فارسی
+    'صعودی', 'افزایش', 'رشد', 'جهش', 'سود', 'مثبت', 'بالا', 'قوی',
+    'همکاری', 'پیشرفت', 'امیدوار', 'خوب', 'عالی', 'موفق', 'سرمایه‌گذاری'
 ]
 
 NEGATIVE_KEYWORDS = [
+    # انگلیسی
     'bearish', 'drop', 'fall', 'plunge', 'crash', 'decline', 'down', 
-    'decrease', 'negative', 'bad', 'risk', 'ban', 'regulate', 'hack', 'scam'
+    'decrease', 'negative', 'bad', 'risk', 'ban', 'regulate', 'hack', 'scam',
+    # فارسی
+    'نزولی', 'کاهش', 'سقوط', 'افت', 'ریزش', 'ضرر', 'منفی', 'پایین',
+    'ضعیف', 'خطر', 'ریسک', 'کلاهبرداری', 'هک', 'ممنوعیت', 'بد', 'قانون‌گذاری'
 ]
 
 # Scheduler settings
