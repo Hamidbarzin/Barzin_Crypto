@@ -1,33 +1,218 @@
 /* Custom CSS for Crypto Trading Bot */
 
+:root {
+    --primary-accent: #6366f1;
+    --secondary-accent: #8b5cf6;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --info-color: #3b82f6;
+    --light-bg: #1e293b;
+    --dark-bg: #0f172a;
+    --card-bg: #1e293b;
+    --surface-bg: #0f172a;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --transition-speed: 0.3s;
+}
+
+/* Global Styles */
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 1240px;
+}
+
+/* Navigation Bar */
+.navbar {
+    background: linear-gradient(90deg, var(--dark-bg), var(--light-bg)) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    padding: 0.75rem 1rem;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    border-radius: 0.5rem;
+    transition: all var(--transition-speed) ease;
+}
+
+.navbar-nav .nav-link:hover, 
+.navbar-nav .nav-link.active {
+    background-color: rgba(99, 102, 241, 0.1);
+    color: var(--primary-accent);
+}
+
+.navbar-nav .nav-link.active {
+    position: relative;
+}
+
+.navbar-nav .nav-link.active:after {
+    content: '';
+    position: absolute;
+    bottom: 0.25rem;
+    left: 1rem;
+    right: 1rem;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+    border-radius: 2px;
+}
+
+/* Cards */
+.card {
+    background-color: var(--card-bg);
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: var(--card-shadow);
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.card-header {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1rem 1.25rem;
+    font-weight: 700;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
 /* Dashboard styles */
 .signal-strong-buy, .signal-buy, .signal-neutral, .signal-sell, .signal-strong-sell {
     font-weight: 600;
+    padding: 0.4rem 0.75rem;
+    border-radius: 10px;
+}
+
+.signal-strong-buy { 
+    background-color: var(--success-color); 
+    color: white; 
+}
+
+.signal-buy { 
+    background-color: #4ade80; 
+    color: white; 
+}
+
+.signal-neutral { 
+    background-color: #6b7280; 
+    color: white; 
+}
+
+.signal-sell { 
+    background-color: #fb923c; 
+    color: white; 
+}
+
+.signal-strong-sell { 
+    background-color: var(--danger-color); 
+    color: white; 
 }
 
 /* Price change colors */
 .price-up {
-    color: #20c997;
+    color: var(--success-color);
+    font-weight: 600;
 }
 
 .price-down {
-    color: #dc3545;
+    color: var(--danger-color);
+    font-weight: 600;
+}
+
+/* Tables */
+.table {
+    border-collapse: separate;
+    border-spacing: 0 0.25rem;
+}
+
+.table thead th {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+    padding: 1rem;
+}
+
+.table tbody tr {
+    background-color: rgba(30, 41, 59, 0.5);
+    transition: background-color var(--transition-speed);
+}
+
+.table tbody tr:hover {
+    background-color: rgba(30, 41, 59, 0.8);
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border: none;
 }
 
 /* News article cards */
 .news-positive, .news-neutral, .news-negative {
-    transition: transform 0.2s;
+    transition: all var(--transition-speed);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.news-positive {
+    border-left: 4px solid var(--success-color);
+}
+
+.news-neutral {
+    border-left: 4px solid var(--info-color);
+}
+
+.news-negative {
+    border-left: 4px solid var(--danger-color);
 }
 
 .news-positive:hover, .news-neutral:hover, .news-negative:hover {
     transform: translateY(-5px);
+    box-shadow: var(--card-shadow-hover);
 }
 
 /* Loading spinner for async operations */
 .loading-spinner {
     display: inline-block;
-    width: 1rem;
-    height: 1rem;
+    width: 1.5rem;
+    height: 1.5rem;
     vertical-align: text-bottom;
     border: 0.2em solid currentColor;
     border-right-color: transparent;
@@ -37,33 +222,120 @@
 
 /* Dashboard cards */
 .dashboard-card {
-    transition: all 0.3s ease;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+    transition: all var(--transition-speed);
+    height: 100%;
 }
 
 .dashboard-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+    margin-bottom: 1.5rem;
+    color: white;
 }
 
 /* Currency symbol styles */
 .currency-symbol {
     font-weight: bold;
     font-size: 1.1em;
+    background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-/* Improve readability of technical analysis modal */
+/* Buttons */
+.btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all var(--transition-speed);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--primary-accent);
+    color: var(--primary-accent);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-accent);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Technical analysis modal */
+#technicalModal .modal-content {
+    background-color: var(--card-bg);
+    border-radius: 1rem;
+    border: none;
+    box-shadow: var(--card-shadow-hover);
+}
+
+#technicalModal .modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#technicalModal .nav-tabs {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 #technicalModal .nav-tabs .nav-link {
     font-weight: 600;
+    border: none;
+    color: var(--text-secondary);
+    padding: 1rem 1.5rem;
+    transition: all var(--transition-speed);
+}
+
+#technicalModal .nav-tabs .nav-link:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+#technicalModal .nav-tabs .nav-link.active {
+    color: var(--primary-accent);
+    background-color: transparent;
+    border-bottom: 2px solid var(--primary-accent);
 }
 
 #technicalModal .tab-content {
     min-height: 300px;
+    padding: 1.5rem 0;
 }
 
 /* Custom styling for progress bars */
 .progress {
-    height: 1.5rem;
+    height: 1.25rem;
     margin-bottom: 1rem;
+    background-color: rgba(30, 41, 59, 0.5);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
 }
 
 /* Settings page styles */
@@ -73,17 +345,52 @@
 }
 
 .form-switch .form-check-input:checked {
-    background-color: #198754;
-    border-color: #198754;
+    background-color: var(--primary-accent);
+    border-color: var(--primary-accent);
+}
+
+.form-control {
+    background-color: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+    background-color: rgba(30, 41, 59, 0.7);
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+    color: var(--text-primary);
+}
+
+/* Footer */
+.footer {
+    margin-top: auto;
+    background-color: var(--surface-bg);
+    padding: 1.5rem 0;
+}
+
+.footer .text-muted {
+    color: var(--text-secondary) !important;
 }
 
 /* Responsive improvements */
 @media (max-width: 768px) {
     .table-responsive {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
     
     .nav-tabs .nav-link {
-        padding: 0.5rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+    
+    .card-header h3 {
+        font-size: 1.1rem;
     }
 }
