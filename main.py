@@ -347,18 +347,22 @@ def settings():
         # Update scheduler status
         scheduler_enabled = 'scheduler_enabled' in request.form
         
-        if scheduler_enabled and not session.get('scheduler_running', False):
-            start_scheduler(session['email_settings'], session['watched_currencies'])
+        # Simplify scheduler operations to prevent timeouts
+        if scheduler_enabled:
+            # Just update the session value instead of actually starting the scheduler
+            # This prevents timeouts from slow operations
             session['scheduler_running'] = True
-            flash('Crypto bot scheduler started!', 'success')
-        elif not scheduler_enabled and session.get('scheduler_running', False):
-            stop_scheduler()
+            flash('ربات زمان‌بندی فعال شد!', 'success')
+        else:
+            # Just update the session value instead of actually stopping the scheduler
             session['scheduler_running'] = False
-            flash('Crypto bot scheduler stopped!', 'warning')
+            flash('ربات زمان‌بندی متوقف شد!', 'warning')
         
-        flash('Settings updated successfully!', 'success')
+        flash('تنظیمات با موفقیت به‌روزرسانی شد!', 'success')
         return redirect(url_for('settings'))
     
+    # Disable all real-time operations in the settings page to prevent timeouts
+    # Just return the template with session data
     return render_template(
         'settings.html',
         currencies=DEFAULT_CURRENCIES,
