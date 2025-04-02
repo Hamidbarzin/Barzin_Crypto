@@ -41,12 +41,17 @@ def initialize_session():
 
 @app.route('/')
 def index():
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('commodities_dashboard'))
 
 @app.route('/api_test')
 def api_test():
     """Render API test page"""
     return render_template('api_test.html')
+    
+@app.route('/commodities_dashboard')
+def commodities_dashboard():
+    """Render commodities dashboard page"""
+    return render_template('commodities_dashboard.html')
     
 @app.route('/test')
 def test_dashboard():
