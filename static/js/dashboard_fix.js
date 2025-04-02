@@ -3,6 +3,8 @@ console.log('dashboard_fix.js loaded');
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, running dashboard_fix.js');
+    // اجرای تابع اصلی داشبورد با تأخیر کوتاه تا اطمینان از بارگذاری کامل DOM
+    setTimeout(initializeDashboard, 500);
     
     // بروزرسانی بخش قیمت‌های جاری
     function updatePrices() {
@@ -540,6 +542,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
     
-    // شروع کار داشبورد
-    initializeDashboard();
+    // در اینجا تابع initializeDashboard به صورت خودکار با setTimeout در ابتدای کد فراخوانی می‌شود
+    
+    // اضافه کردن رویدادهای کلیک برای دکمه‌های بروزرسانی
+    document.addEventListener('click', function(event) {
+        if (event.target.id === 'refreshCommodities' || event.target.closest('#refreshCommodities')) {
+            console.log('Refresh commodities button clicked');
+            updateCommodities();
+        } else if (event.target.id === 'refreshForex' || event.target.closest('#refreshForex')) {
+            console.log('Refresh forex button clicked');
+            updateForex();
+        } else if (event.target.id === 'refreshEconomic' || event.target.closest('#refreshEconomic')) {
+            console.log('Refresh economic button clicked');
+            updateEconomic();
+        } else if (event.target.id === 'refreshBtn' || event.target.closest('#refreshBtn')) {
+            console.log('Main refresh button clicked');
+            updatePrices();
+            updateCommodities();
+            updateForex();
+            updateEconomic();
+        }
+    });
 });
