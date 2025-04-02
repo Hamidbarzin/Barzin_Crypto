@@ -321,187 +321,32 @@ document.addEventListener('DOMContentLoaded', function() {
     function fixMissingElements() {
         console.log('Checking for missing elements...');
         
-        // بخش کالاها
+        // بخش کالاها - فقط چک می‌کنیم و خطایی را لاگ می‌کنیم
+        // به جای تلاش برای اضافه کردن المنت‌ها، فقط بررسی می‌کنیم آیا وجود دارند یا خیر
         const commoditiesSection = document.querySelector('#commodities-section');
         if (!commoditiesSection) {
-            console.log('Creating commodities section...');
+            console.log('Commodities section not found. This is fine as it might be in the template.');
             
-            // پیدا کردن محل مناسب برای قرار دادن بخش کالاها
+            // پیدا کردن محل مناسب برای قرار دادن بخش کالاها - فقط برای اطلاع
             const container = document.querySelector('.container') || document.querySelector('.container-fluid');
             
             if (container) {
-                const newSection = document.createElement('div');
-                newSection.id = 'commodities-section';
-                newSection.className = 'row mb-4';
-                newSection.innerHTML = `
-                    <div class="col-12">
-                        <div class="card dashboard-card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h3 class="mb-0">کالاها و ارزهای جهانی</h3>
-                                <button id="refreshCommodities" class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-sync-alt ms-1"></i> بروزرسانی
-                                </button>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4 mb-4 mb-md-0">
-                                        <div class="card commodity-card h-100 shadow-sm">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <div class="commodity-icon gold-bg">
-                                                        <i class="fas fa-coins"></i>
-                                                    </div>
-                                                    <span class="badge gold-change bg-success">0.75%</span>
-                                                </div>
-                                                <h4 class="card-title">طلا - اونس</h4>
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <h5 class="mb-0 gold-price">$2250.50</h5>
-                                                    <small class="text-muted">XAU/USD</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 mb-4 mb-md-0">
-                                        <div class="card commodity-card h-100 shadow-sm">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <div class="commodity-icon silver-bg">
-                                                        <i class="fas fa-coins"></i>
-                                                    </div>
-                                                    <span class="badge silver-change bg-danger">-0.25%</span>
-                                                </div>
-                                                <h4 class="card-title">نقره - اونس</h4>
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <h5 class="mb-0 silver-price">$28.75</h5>
-                                                    <small class="text-muted">XAG/USD</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="card commodity-card h-100 shadow-sm">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <div class="commodity-icon oil-bg">
-                                                        <i class="fas fa-gas-pump"></i>
-                                                    </div>
-                                                    <span class="badge oil-change bg-success">1.2%</span>
-                                                </div>
-                                                <h4 class="card-title">نفت - بشکه</h4>
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <h5 class="mb-0 oil-price">$82.35</h5>
-                                                    <small class="text-muted">OIL/USD</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // افزودن بخش جدید به صفحه
-                const dashboardHeader = document.querySelector('.dashboard-header');
-                if (dashboardHeader && dashboardHeader.nextElementSibling) {
-                    container.insertBefore(newSection, dashboardHeader.nextElementSibling.nextElementSibling);
-                } else {
-                    container.appendChild(newSection);
-                }
+                console.log('Container found, but we won\'t modify DOM to prevent errors');
+                // به جای تلاش برای افزودن بخش‌های جدید، از بخش‌های موجود در تمپلیت استفاده می‌کنیم
             }
         }
         
         // بخش ارزهای جهانی
         const forexSection = document.querySelector('#forex-section');
         if (!forexSection) {
-            console.log('Creating forex section...');
+            console.log('Forex section not found. This is fine as it might be in the template.');
             
+            // پیدا کردن محل مناسب برای قرار دادن بخش ارزهای جهانی - فقط برای اطلاع
             const container = document.querySelector('.container') || document.querySelector('.container-fluid');
             
             if (container) {
-                const newSection = document.createElement('div');
-                newSection.id = 'forex-section';
-                newSection.className = 'row mb-4';
-                newSection.innerHTML = `
-                    <div class="col-lg-6">
-                        <div class="card dashboard-card h-100 mb-0">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h3 class="mb-0">ارز‌های جهانی</h3>
-                                <button id="refreshForex" class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-sync-alt ms-1"></i> بروزرسانی
-                                </button>
-                            </div>
-                            <div class="card-body p-0">
-                                <table class="table data-table forex-table mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>ارز</th>
-                                            <th>قیمت</th>
-                                            <th>تغییر</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- این بخش به صورت داینامیک پر می‌شود -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="card dashboard-card h-100 mb-0">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h3 class="mb-0">شاخص‌های اقتصادی</h3>
-                                <button id="refreshEconomic" class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-sync-alt ms-1"></i> بروزرسانی
-                                </button>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="economic-indicator risk-medium mb-3">
-                                            <h5 class="mb-2">وضعیت ریسک رکود</h5>
-                                            <div class="d-flex justify-content-between">
-                                                <span class="fw-bold">متوسط</span>
-                                                <span class="badge bg-secondary trend-stable">ثابت</span>
-                                            </div>
-                                        </div>
-                                        <div class="economic-indicator mb-3">
-                                            <h5 class="mb-2">وضعیت بازارهای جهانی</h5>
-                                            <div class="d-flex justify-content-between">
-                                                <span class="fw-bold text-success global-markets-status">مثبت</span>
-                                                <span class="badge bg-secondary trend-up global-markets-trend">رو به بالا</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="economic-indicator mb-3">
-                                            <h5 class="mb-2">نرخ تورم جهانی</h5>
-                                            <div class="d-flex justify-content-between">
-                                                <span class="fw-bold inflation-value">3.2%</span>
-                                                <span class="badge bg-success trend-down inflation-trend">رو به پایین</span>
-                                            </div>
-                                        </div>
-                                        <div class="economic-indicator mb-3">
-                                            <h5 class="mb-2">نرخ بهره</h5>
-                                            <div class="d-flex justify-content-between">
-                                                <span class="fw-bold interest-rates-value">5.25%</span>
-                                                <span class="badge bg-secondary trend-stable interest-rates-trend">ثابت</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // افزودن بخش جدید به صفحه
-                const commoditiesSection = document.querySelector('#commodities-section');
-                if (commoditiesSection) {
-                    container.insertBefore(newSection, commoditiesSection.nextElementSibling);
-                } else {
-                    container.appendChild(newSection);
-                }
+                console.log('Container found, but we won\'t modify DOM to prevent errors');
+                // به جای تلاش برای افزودن بخش‌های جدید، از بخش‌های موجود در تمپلیت استفاده می‌کنیم
             }
         }
         
