@@ -656,8 +656,8 @@
                                         <p class="text-muted mb-0">{{ commodities.GOLD.unit }}</p>
                                     </div>
                                     <div class="ms-auto text-end">
-                                        <h5 class="mb-0">${{ "%.2f"|format(commodities.GOLD.price) }}</h5>
-                                        <span class="badge {{ 'bg-success' if commodities.GOLD.change > 0 else 'bg-danger' }}">
+                                        <h5 class="mb-0 gold-price">${{ "%.2f"|format(commodities.GOLD.price) }}</h5>
+                                        <span class="badge gold-change {{ 'bg-success' if commodities.GOLD.change > 0 else 'bg-danger' }}">
                                             {{ "%.2f"|format(commodities.GOLD.change) }}%
                                         </span>
                                     </div>
@@ -680,8 +680,8 @@
                                         <p class="text-muted mb-0">{{ commodities.SILVER.unit }}</p>
                                     </div>
                                     <div class="ms-auto text-end">
-                                        <h5 class="mb-0">${{ "%.2f"|format(commodities.SILVER.price) }}</h5>
-                                        <span class="badge {{ 'bg-success' if commodities.SILVER.change > 0 else 'bg-danger' }}">
+                                        <h5 class="mb-0 silver-price">${{ "%.2f"|format(commodities.SILVER.price) }}</h5>
+                                        <span class="badge silver-change {{ 'bg-success' if commodities.SILVER.change > 0 else 'bg-danger' }}">
                                             {{ "%.2f"|format(commodities.SILVER.change) }}%
                                         </span>
                                     </div>
@@ -704,8 +704,8 @@
                                         <p class="text-muted mb-0">{{ commodities.OIL.unit }}</p>
                                     </div>
                                     <div class="ms-auto text-end">
-                                        <h5 class="mb-0">${{ "%.2f"|format(commodities.OIL.price) }}</h5>
-                                        <span class="badge {{ 'bg-success' if commodities.OIL.change > 0 else 'bg-danger' }}">
+                                        <h5 class="mb-0 oil-price">${{ "%.2f"|format(commodities.OIL.price) }}</h5>
+                                        <span class="badge oil-change {{ 'bg-success' if commodities.OIL.change > 0 else 'bg-danger' }}">
                                             {{ "%.2f"|format(commodities.OIL.change) }}%
                                         </span>
                                     </div>
@@ -740,7 +740,7 @@
             <div class="card-body">
                 {% if forex_rates and forex_rates|length > 0 %}
                     <div class="table-responsive">
-                        <table class="table data-table mb-0">
+                        <table class="table data-table forex-table mb-0">
                             <thead>
                                 <tr>
                                     <th>ارز</th>
@@ -808,10 +808,10 @@
                         <div class="economic-indicator">
                             <h5>بازارهای جهانی</h5>
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-bold text-{{ 'success' if economic_indicators.global_markets.status == 'مثبت' else ('danger' if economic_indicators.global_markets.status == 'منفی' else 'secondary') }}">
+                                <span class="fw-bold text-{{ 'success' if economic_indicators.global_markets.status == 'مثبت' else ('danger' if economic_indicators.global_markets.status == 'منفی' else 'secondary') }} global-markets-status">
                                     {{ economic_indicators.global_markets.status }}
                                 </span>
-                                <span class="badge bg-secondary trend-{{ 'up' if economic_indicators.global_markets.trend == 'رو به بالا' else ('down' if economic_indicators.global_markets.trend == 'رو به پایین' else 'stable') }}">
+                                <span class="badge bg-secondary trend-{{ 'up' if economic_indicators.global_markets.trend == 'رو به بالا' else ('down' if economic_indicators.global_markets.trend == 'رو به پایین' else 'stable') }} global-markets-trend">
                                     {{ economic_indicators.global_markets.trend }}
                                 </span>
                             </div>
@@ -823,8 +823,8 @@
                         <div class="economic-indicator">
                             <h5>تورم جهانی</h5>
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-bold">{{ economic_indicators.inflation.value }}</span>
-                                <span class="badge bg-{{ 'success' if economic_indicators.inflation.trend == 'رو به پایین' else ('danger' if economic_indicators.inflation.trend == 'رو به بالا' else 'secondary') }} trend-{{ 'up' if economic_indicators.inflation.trend == 'رو به بالا' else ('down' if economic_indicators.inflation.trend == 'رو به پایین' else 'stable') }}">
+                                <span class="fw-bold inflation-value">{{ economic_indicators.inflation.value }}</span>
+                                <span class="badge bg-{{ 'success' if economic_indicators.inflation.trend == 'رو به پایین' else ('danger' if economic_indicators.inflation.trend == 'رو به بالا' else 'secondary') }} trend-{{ 'up' if economic_indicators.inflation.trend == 'رو به بالا' else ('down' if economic_indicators.inflation.trend == 'رو به پایین' else 'stable') }} inflation-trend">
                                     {{ economic_indicators.inflation.trend }}
                                 </span>
                             </div>
@@ -836,8 +836,8 @@
                         <div class="economic-indicator">
                             <h5>نرخ بهره</h5>
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-bold">{{ economic_indicators.interest_rates.value }}</span>
-                                <span class="badge bg-secondary trend-{{ 'up' if economic_indicators.interest_rates.trend == 'رو به بالا' else ('down' if economic_indicators.interest_rates.trend == 'رو به پایین' else 'stable') }}">
+                                <span class="fw-bold interest-rates-value">{{ economic_indicators.interest_rates.value }}</span>
+                                <span class="badge bg-secondary trend-{{ 'up' if economic_indicators.interest_rates.trend == 'رو به بالا' else ('down' if economic_indicators.interest_rates.trend == 'رو به پایین' else 'stable') }} interest-rates-trend">
                                     {{ economic_indicators.interest_rates.trend }}
                                 </span>
                             </div>

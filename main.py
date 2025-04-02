@@ -60,24 +60,95 @@ def dashboard():
     # Generate signals
     signals = generate_signals(watched_currencies)
     
-    # Get commodity prices, forex rates, and economic indicators
-    try:
-        commodities = get_commodity_prices()
-    except Exception as e:
-        logger.error(f"Error getting commodity prices: {str(e)}")
-        commodities = {}
+    # Define hardcoded data for commodities, forex rates, and economic indicators
+    # to avoid making external API calls
+    commodities = {
+        'GOLD': {
+            'price': 2250.50,
+            'change': 0.75,
+            'symbol': 'XAU/USD',
+            'name': 'طلا',
+            'unit': 'اونس',
+            'source': 'Sample Data',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'SILVER': {
+            'price': 28.75,
+            'change': -0.25,
+            'symbol': 'XAG/USD',
+            'name': 'نقره',
+            'unit': 'اونس',
+            'source': 'Sample Data',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'OIL': {
+            'price': 82.35,
+            'change': 1.2,
+            'symbol': 'OIL/USD',
+            'name': 'نفت',
+            'unit': 'بشکه',
+            'source': 'Sample Data',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+    }
     
-    try:
-        forex_rates = get_forex_rates()
-    except Exception as e:
-        logger.error(f"Error getting forex rates: {str(e)}")
-        forex_rates = {}
+    # Hardcoded forex rates data
+    forex_rates = {
+        'EUR/USD': {
+            'price': 1.0825,
+            'change': 0.15,
+            'name': 'یورو به دلار',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'GBP/USD': {
+            'price': 1.2634,
+            'change': -0.25,
+            'name': 'پوند به دلار',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'USD/JPY': {
+            'price': 151.68,
+            'change': 0.32,
+            'name': 'دلار به ین',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'USD/CHF': {
+            'price': 0.9042,
+            'change': -0.13,
+            'name': 'دلار به فرانک',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'USD/CAD': {
+            'price': 1.3552,
+            'change': 0.05,
+            'name': 'دلار به دلار کانادا',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+    }
     
-    try:
-        economic_indicators = get_economic_indicators()
-    except Exception as e:
-        logger.error(f"Error getting economic indicators: {str(e)}")
-        economic_indicators = {}
+    # Hardcoded economic indicators data
+    economic_indicators = {
+        'recession_risk': {
+            'value': 'متوسط',  # Low, Medium, High
+            'trend': 'ثابت',   # Rising, Steady, Falling
+            'description': 'خطر رکود جهانی در حال حاضر در سطح متوسط ارزیابی می‌شود.'
+        },
+        'global_markets': {
+            'status': 'مثبت',  # Positive, Neutral, Negative
+            'trend': 'رو به بالا', # Up, Stable, Down
+            'description': 'بازارهای جهانی روند صعودی دارند با شاخص‌های اصلی در مسیر مثبت.'
+        },
+        'inflation': {
+            'value': '3.2%',
+            'trend': 'رو به پایین', # Rising, Steady, Falling
+            'description': 'نرخ تورم جهانی در حال کاهش است.'
+        },
+        'interest_rates': {
+            'value': '5.25%',
+            'trend': 'ثابت', # Rising, Steady, Falling
+            'description': 'نرخ بهره در بانک‌های مرکزی اصلی ثابت مانده است.'
+        }
+    }
     
     return render_template(
         'dashboard.html',
@@ -203,30 +274,101 @@ def get_signals():
 
 @app.route('/api/commodities')
 def get_commodities():
-    try:
-        commodities = get_commodity_prices()
-        return jsonify({'success': True, 'data': commodities})
-    except Exception as e:
-        logger.error(f"Error getting commodity prices: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)})
+    # Return static commodity data
+    commodities = {
+        'GOLD': {
+            'price': 2250.50,
+            'change': 0.75,
+            'symbol': 'XAU/USD',
+            'name': 'طلا',
+            'unit': 'اونس',
+            'source': 'Sample Data',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'SILVER': {
+            'price': 28.75,
+            'change': -0.25,
+            'symbol': 'XAG/USD',
+            'name': 'نقره',
+            'unit': 'اونس',
+            'source': 'Sample Data',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'OIL': {
+            'price': 82.35,
+            'change': 1.2,
+            'symbol': 'OIL/USD',
+            'name': 'نفت',
+            'unit': 'بشکه',
+            'source': 'Sample Data',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+    }
+    return jsonify({'success': True, 'data': commodities})
 
 @app.route('/api/forex')
 def get_forex():
-    try:
-        forex_rates = get_forex_rates()
-        return jsonify({'success': True, 'data': forex_rates})
-    except Exception as e:
-        logger.error(f"Error getting forex rates: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)})
+    # Return static forex data
+    forex_rates = {
+        'EUR/USD': {
+            'price': 1.0825,
+            'change': 0.15,
+            'name': 'یورو به دلار',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'GBP/USD': {
+            'price': 1.2634,
+            'change': -0.25,
+            'name': 'پوند به دلار',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'USD/JPY': {
+            'price': 151.68,
+            'change': 0.32,
+            'name': 'دلار به ین',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'USD/CHF': {
+            'price': 0.9042,
+            'change': -0.13,
+            'name': 'دلار به فرانک',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'USD/CAD': {
+            'price': 1.3552,
+            'change': 0.05,
+            'name': 'دلار به دلار کانادا',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+    }
+    return jsonify({'success': True, 'data': forex_rates})
 
 @app.route('/api/economic')
 def get_economic():
-    try:
-        indicators = get_economic_indicators()
-        return jsonify({'success': True, 'data': indicators})
-    except Exception as e:
-        logger.error(f"Error getting economic indicators: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)})
+    # Return static economic indicators
+    indicators = {
+        'recession_risk': {
+            'value': 'متوسط',  # Low, Medium, High
+            'trend': 'ثابت',   # Rising, Steady, Falling
+            'description': 'خطر رکود جهانی در حال حاضر در سطح متوسط ارزیابی می‌شود.'
+        },
+        'global_markets': {
+            'status': 'مثبت',  # Positive, Neutral, Negative
+            'trend': 'رو به بالا', # Up, Stable, Down
+            'description': 'بازارهای جهانی روند صعودی دارند با شاخص‌های اصلی در مسیر مثبت.'
+        },
+        'inflation': {
+            'value': '3.2%',
+            'trend': 'رو به پایین', # Rising, Steady, Falling
+            'description': 'نرخ تورم جهانی در حال کاهش است.'
+        },
+        'interest_rates': {
+            'value': '5.25%',
+            'trend': 'ثابت', # Rising, Steady, Falling
+            'description': 'نرخ بهره در بانک‌های مرکزی اصلی ثابت مانده است.'
+        }
+    }
+    return jsonify({'success': True, 'data': indicators})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
