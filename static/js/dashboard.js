@@ -262,40 +262,76 @@ function refreshEconomic() {
 
 // Initialize auto-refresh
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Dashboard DOM loaded, initializing components...');
+    
     // Set up price auto-refresh (every 30 seconds)
     setInterval(updatePrices, 30000);
+    
+    // Immediately refresh all sections on page load
+    console.log('Auto-refreshing all sections...');
+    refreshCommodities();
+    refreshForex();
+    refreshEconomic();
     
     // Set up refresh buttons for new sections
     const refreshCommoditiesBtn = document.getElementById('refreshCommodities');
     if (refreshCommoditiesBtn) {
+        console.log('Setting up refreshCommodities button');
         refreshCommoditiesBtn.addEventListener('click', function() {
             refreshCommodities();
             this.disabled = true;
             setTimeout(() => { this.disabled = false; }, 3000); // Prevent spam clicks
         });
+    } else {
+        console.warn('refreshCommodities button not found');
     }
     
     const refreshForexBtn = document.getElementById('refreshForex');
     if (refreshForexBtn) {
+        console.log('Setting up refreshForex button');
         refreshForexBtn.addEventListener('click', function() {
             refreshForex();
             this.disabled = true;
             setTimeout(() => { this.disabled = false; }, 3000);
         });
+    } else {
+        console.warn('refreshForex button not found');
     }
     
     const refreshEconomicBtn = document.getElementById('refreshEconomic');
     if (refreshEconomicBtn) {
+        console.log('Setting up refreshEconomic button');
         refreshEconomicBtn.addEventListener('click', function() {
             refreshEconomic();
             this.disabled = true;
             setTimeout(() => { this.disabled = false; }, 3000);
         });
+    } else {
+        console.warn('refreshEconomic button not found');
+    }
+    
+    // Set up main refresh button to refresh everything
+    const mainRefreshBtn = document.getElementById('refreshBtn');
+    if (mainRefreshBtn) {
+        console.log('Setting up main refresh button');
+        mainRefreshBtn.addEventListener('click', function() {
+            console.log('Main refresh button clicked, refreshing all sections');
+            updatePrices();
+            refreshCommodities();
+            refreshForex();
+            refreshEconomic();
+        });
+    } else {
+        console.warn('Main refresh button not found');
     }
     
     // Enable tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function(tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    try {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    } catch (e) {
+        console.error('Error initializing tooltips:', e);
+    }
 });
