@@ -41,12 +41,148 @@ def initialize_session():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return redirect(url_for('dashboard'))
+
+@app.route('/api_test')
+def api_test():
+    """Render API test page"""
+    return render_template('api_test.html')
     
 @app.route('/test')
 def test_dashboard():
     """Render test dashboard page to debug API and JavaScript issues"""
     return render_template('test_dashboard.html')
+
+@app.route('/dashboard_new')
+def dashboard_new():
+    # Initialize session if not already set
+    if not session.get('initialized', False):
+        session['initialized'] = True
+    
+    watched_currencies = session.get('watched_currencies', DEFAULT_CURRENCIES[:3])
+    current_prices = get_current_prices(watched_currencies)
+    
+    # Get technical indicators for display
+    technical_data = {}
+    for currency in watched_currencies:
+        technical_data[currency] = get_technical_indicators(currency, '1d')
+    
+    # Get latest news (use user's setting for Middle Eastern sources)
+    include_middle_east = session.get('include_middle_east', True)
+    news = get_latest_news(limit=5, include_middle_east=include_middle_east)
+    
+    # Generate signals
+    signals = generate_signals(watched_currencies)
+    
+    # Define hardcoded data for commodities, forex rates, and economic indicators
+    # to avoid making external API calls
+    commodities = {
+        'GOLD': {
+            'price': 2250.50,
+            'change': 0.75,
+            'symbol': 'XAU/USD',
+            'name': 'طلا',
+            'unit': 'اونس',
+            'source': 'Sample Data',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'SILVER': {
+            'price': 28.75,
+            'change': -0.25,
+            'symbol': 'XAG/USD',
+            'name': 'نقره',
+            'unit': 'اونس',
+            'source': 'Sample Data',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'OIL': {
+            'price': 82.35,
+            'change': 1.2,
+            'symbol': 'OIL/USD',
+            'name': 'نفت',
+            'unit': 'بشکه',
+            'source': 'Sample Data',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+    }
+    
+    # Hardcoded forex rates data
+    forex_rates = {
+        'EUR/USD': {
+            'price': 1.0825,
+            'change': 0.15,
+            'name': 'یورو به دلار',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'GBP/USD': {
+            'price': 1.2634,
+            'change': -0.25,
+            'name': 'پوند به دلار',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'USD/JPY': {
+            'price': 151.68,
+            'change': 0.32,
+            'name': 'دلار به ین',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'USD/CHF': {
+            'price': 0.9042,
+            'change': -0.13,
+            'name': 'دلار به فرانک',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'USD/CAD': {
+            'price': 1.3552,
+            'change': 0.05,
+            'name': 'دلار به دلار کانادا',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+    }
+    
+    # Hardcoded economic indicators data
+    economic_indicators = {
+        'recession_risk': {
+            'value': 'متوسط',  # Low, Medium, High
+            'trend': 'ثابت',   # Rising, Steady, Falling
+            'description': 'خطر رکود جهانی در حال حاضر در سطح متوسط ارزیابی می‌شود.'
+        },
+        'global_markets': {
+            'status': 'مثبت',  # Positive, Neutral, Negative
+            'trend': 'رو به بالا', # Up, Stable, Down
+            'description': 'بازارهای جهانی روند صعودی دارند با شاخص‌های اصلی در مسیر مثبت.'
+        },
+        'inflation': {
+            'value': '3.2%',
+            'trend': 'رو به پایین', # Rising, Steady, Falling
+            'description': 'نرخ تورم جهانی در حال کاهش است.'
+        },
+        'interest_rates': {
+            'value': '5.25%',
+            'trend': 'ثابت', # Rising, Steady, Falling
+            'description': 'نرخ بهره در بانک‌های مرکزی اصلی ثابت مانده است.'
+        }
+    }
+    
+    # Log debug information
+    logger.debug(f"Dashboard_new rendering - Session initialized: {session.get('initialized', False)}")
+    logger.debug(f"Watched currencies: {watched_currencies}")
+    
+    return render_template(
+        'dashboard_new.html',
+        prices=current_prices,
+        technical_data=technical_data,
+        news=news,
+        signals=signals,
+        currencies=DEFAULT_CURRENCIES,
+        watched_currencies=watched_currencies,
+        timeframes=TIMEFRAMES,
+        scheduler_running=session.get('scheduler_running', False),
+        include_middle_east=include_middle_east,
+        commodities=commodities,
+        forex_rates=forex_rates,
+        economic_indicators=economic_indicators
+    )
 
 @app.route('/dashboard')
 def dashboard():

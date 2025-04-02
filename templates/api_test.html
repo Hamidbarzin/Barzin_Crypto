@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}تست API‌ها - ربات معامله ارز دیجیتال{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">صفحه تست API‌ها</h1>
+    
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>کالاها (طلا، نقره، نفت)</h3>
+                </div>
+                <div class="card-body">
+                    <button id="getCommodities" class="btn btn-primary mb-3">دریافت داده‌های کالاها</button>
+                    <div id="commoditiesResult" class="mt-3">
+                        <pre class="bg-dark text-light p-3 rounded">نتایج اینجا نمایش داده خواهد شد...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>ارزهای جهانی</h3>
+                </div>
+                <div class="card-body">
+                    <button id="getForex" class="btn btn-primary mb-3">دریافت داده‌های ارزهای جهانی</button>
+                    <div id="forexResult" class="mt-3">
+                        <pre class="bg-dark text-light p-3 rounded">نتایج اینجا نمایش داده خواهد شد...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>شاخص‌های اقتصادی</h3>
+                </div>
+                <div class="card-body">
+                    <button id="getEconomic" class="btn btn-primary mb-3">دریافت داده‌های شاخص‌های اقتصادی</button>
+                    <div id="economicResult" class="mt-3">
+                        <pre class="bg-dark text-light p-3 rounded">نتایج اینجا نمایش داده خواهد شد...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // کالاها
+    document.getElementById('getCommodities').addEventListener('click', function() {
+        fetch('/api/commodities')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('commoditiesResult').innerHTML = 
+                    `<pre class="bg-dark text-light p-3 rounded">${JSON.stringify(data, null, 2)}</pre>`;
+            })
+            .catch(error => {
+                document.getElementById('commoditiesResult').innerHTML = 
+                    `<pre class="bg-danger text-light p-3 rounded">خطا: ${error}</pre>`;
+            });
+    });
+    
+    // ارزهای جهانی
+    document.getElementById('getForex').addEventListener('click', function() {
+        fetch('/api/forex')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('forexResult').innerHTML = 
+                    `<pre class="bg-dark text-light p-3 rounded">${JSON.stringify(data, null, 2)}</pre>`;
+            })
+            .catch(error => {
+                document.getElementById('forexResult').innerHTML = 
+                    `<pre class="bg-danger text-light p-3 rounded">خطا: ${error}</pre>`;
+            });
+    });
+    
+    // شاخص‌های اقتصادی
+    document.getElementById('getEconomic').addEventListener('click', function() {
+        fetch('/api/economic')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('economicResult').innerHTML = 
+                    `<pre class="bg-dark text-light p-3 rounded">${JSON.stringify(data, null, 2)}</pre>`;
+            })
+            .catch(error => {
+                document.getElementById('economicResult').innerHTML = 
+                    `<pre class="bg-danger text-light p-3 rounded">خطا: ${error}</pre>`;
+            });
+    });
+});
+</script>
+{% endblock %}
