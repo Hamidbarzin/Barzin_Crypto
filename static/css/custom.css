@@ -1,20 +1,20 @@
-/* Custom CSS for Crypto Trading Bot */
+/* Custom CSS for Crypto Trading Bot - Binance Style */
 
 :root {
-    --primary-accent: #6366f1;
-    --secondary-accent: #8b5cf6;
-    --success-color: #10b981;
-    --danger-color: #ef4444;
-    --warning-color: #f59e0b;
-    --info-color: #3b82f6;
-    --light-bg: #1e293b;
-    --dark-bg: #0f172a;
-    --card-bg: #1e293b;
-    --surface-bg: #0f172a;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --primary-accent: #F0B90B;      /* Binance Yellow */
+    --secondary-accent: #F8D12F;    /* Lighter Binance Yellow */
+    --success-color: #02C076;       /* Binance Green */
+    --danger-color: #F6465D;        /* Binance Red */
+    --warning-color: #F0B90B;       /* Binance Yellow */
+    --info-color: #0ECAF0;          /* Binance Blue */
+    --light-bg: #181A20;            /* Binance Secondary Background */
+    --dark-bg: #0B0E11;             /* Binance Primary Background */
+    --card-bg: #181A20;             /* Binance Card Background */
+    --surface-bg: #0B0E11;          /* Binance Surface Background */
+    --text-primary: #EAECEF;        /* Binance Primary Text */
+    --text-secondary: #848E9C;      /* Binance Secondary Text */
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+    --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
     --transition-speed: 0.3s;
 }
 
@@ -58,7 +58,7 @@ body {
 
 .navbar-nav .nav-link:hover, 
 .navbar-nav .nav-link.active {
-    background-color: rgba(99, 102, 241, 0.1);
+    background-color: transparent;
     color: var(--primary-accent);
 }
 
@@ -69,33 +69,33 @@ body {
 .navbar-nav .nav-link.active:after {
     content: '';
     position: absolute;
-    bottom: 0.25rem;
-    left: 1rem;
-    right: 1rem;
-    height: 2px;
-    background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
-    border-radius: 2px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--primary-accent);
+    border-radius: 0;
 }
 
 /* Cards */
 .card {
     background-color: var(--card-bg);
-    border: none;
-    border-radius: 0.75rem;
-    box-shadow: var(--card-shadow);
-    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+    border: 1px solid rgba(43, 47, 54, 0.5); /* Binance card border */
+    border-radius: 0.5rem;  /* Binance uses more subtle rounded corners */
+    box-shadow: none;       /* Binance doesn't use heavy shadows */
+    transition: all var(--transition-speed);
     overflow: hidden;
     margin-bottom: 1.5rem;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-3px);
+    border-color: rgba(240, 185, 11, 0.3); /* Subtle Binance yellow border on hover */
 }
 
 .card-header {
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: rgba(30, 32, 38, 0.5); /* Binance card header background */
+    border-bottom: 1px solid rgba(43, 47, 54, 0.8);
     padding: 1rem 1.25rem;
     font-weight: 700;
 }
@@ -110,36 +110,43 @@ body {
     padding: 1.5rem;
 }
 
-/* Dashboard styles */
+/* Dashboard styles - Binance style signals */
 .signal-strong-buy, .signal-buy, .signal-neutral, .signal-sell, .signal-strong-sell {
     font-weight: 600;
-    padding: 0.4rem 0.75rem;
-    border-radius: 10px;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
 }
 
 .signal-strong-buy { 
-    background-color: var(--success-color); 
-    color: white; 
+    background-color: rgba(2, 192, 118, 0.2); 
+    color: var(--success-color); 
+    border: 1px solid var(--success-color);
 }
 
 .signal-buy { 
-    background-color: #4ade80; 
-    color: white; 
+    background-color: rgba(2, 192, 118, 0.1); 
+    color: var(--success-color); 
+    border: 1px solid var(--success-color);
 }
 
 .signal-neutral { 
-    background-color: #6b7280; 
-    color: white; 
+    background-color: rgba(132, 142, 156, 0.1); 
+    color: var(--text-secondary); 
+    border: 1px solid var(--text-secondary);
 }
 
 .signal-sell { 
-    background-color: #fb923c; 
-    color: white; 
+    background-color: rgba(246, 70, 93, 0.1); 
+    color: var(--danger-color); 
+    border: 1px solid var(--danger-color);
 }
 
 .signal-strong-sell { 
-    background-color: var(--danger-color); 
-    color: white; 
+    background-color: rgba(246, 70, 93, 0.2); 
+    color: var(--danger-color); 
+    border: 1px solid var(--danger-color);
 }
 
 /* Price change colors */
@@ -153,35 +160,39 @@ body {
     font-weight: 600;
 }
 
-/* Tables */
+/* Tables - Binance style */
 .table {
     border-collapse: separate;
-    border-spacing: 0 0.25rem;
+    border-spacing: 0;
+    width: 100%;
+    margin-bottom: 0;
 }
 
 .table thead th {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(43, 47, 54, 0.8);
     color: var(--text-secondary);
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    font-size: 0.75rem;
-    padding: 1rem;
+    font-size: 0.7rem;
+    padding: 0.75rem 1rem;
+    background-color: rgba(30, 32, 38, 0.5);
 }
 
 .table tbody tr {
-    background-color: rgba(30, 41, 59, 0.5);
+    border-bottom: 1px solid rgba(43, 47, 54, 0.5);
     transition: background-color var(--transition-speed);
 }
 
 .table tbody tr:hover {
-    background-color: rgba(30, 41, 59, 0.8);
+    background-color: rgba(30, 32, 38, 0.8);
 }
 
 .table tbody td {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
     vertical-align: middle;
     border: none;
+    font-size: 0.9rem;
 }
 
 /* News article cards */
@@ -254,35 +265,41 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
-/* Buttons */
+/* Buttons - Binance style */
 .btn {
     padding: 0.5rem 1.25rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    font-size: 0.9rem;
     transition: all var(--transition-speed);
+    text-transform: uppercase;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+    background: var(--primary-accent);
     border: none;
+    color: #000; /* Binance uses black text on yellow buttons */
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
-    opacity: 0.9;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background: var(--secondary-accent);
+    opacity: 1;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .btn-outline-primary {
-    border: 2px solid var(--primary-accent);
+    border: 1px solid var(--primary-accent);
     color: var(--primary-accent);
+    background-color: transparent;
 }
 
 .btn-outline-primary:hover {
-    background-color: var(--primary-accent);
-    color: white;
-    transform: translateY(-2px);
+    background-color: rgba(240, 185, 11, 0.1);
+    color: var(--primary-accent);
+    border-color: var(--primary-accent);
+    transform: translateY(-1px);
 }
 
 /* Technical analysis modal */
