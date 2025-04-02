@@ -61,32 +61,64 @@ function formatNumber(num) {
 
 // Function to refresh commodity data
 function refreshCommodities() {
+    console.log('Refreshing commodities...');
     fetch('/api/commodities')
         .then(response => response.json())
         .then(data => {
+            console.log('Commodities data received:', data);
             if (data.success) {
                 // Update gold
                 if (data.data.GOLD) {
-                    document.querySelector('.gold-price').textContent = '$' + data.data.GOLD.price.toFixed(2);
+                    const goldPrice = document.querySelector('.gold-price');
+                    if (goldPrice) {
+                        goldPrice.textContent = '$' + data.data.GOLD.price.toFixed(2);
+                    } else {
+                        console.error('Element with class gold-price not found');
+                    }
+                    
                     const goldChange = document.querySelector('.gold-change');
-                    goldChange.textContent = data.data.GOLD.change.toFixed(2) + '%';
-                    goldChange.className = 'badge ' + (data.data.GOLD.change > 0 ? 'bg-success' : 'bg-danger');
+                    if (goldChange) {
+                        goldChange.textContent = data.data.GOLD.change.toFixed(2) + '%';
+                        goldChange.className = 'badge gold-change ' + (data.data.GOLD.change > 0 ? 'bg-success' : 'bg-danger');
+                    } else {
+                        console.error('Element with class gold-change not found');
+                    }
                 }
                 
                 // Update silver
                 if (data.data.SILVER) {
-                    document.querySelector('.silver-price').textContent = '$' + data.data.SILVER.price.toFixed(2);
+                    const silverPrice = document.querySelector('.silver-price');
+                    if (silverPrice) {
+                        silverPrice.textContent = '$' + data.data.SILVER.price.toFixed(2);
+                    } else {
+                        console.error('Element with class silver-price not found');
+                    }
+                    
                     const silverChange = document.querySelector('.silver-change');
-                    silverChange.textContent = data.data.SILVER.change.toFixed(2) + '%';
-                    silverChange.className = 'badge ' + (data.data.SILVER.change > 0 ? 'bg-success' : 'bg-danger');
+                    if (silverChange) {
+                        silverChange.textContent = data.data.SILVER.change.toFixed(2) + '%';
+                        silverChange.className = 'badge silver-change ' + (data.data.SILVER.change > 0 ? 'bg-success' : 'bg-danger');
+                    } else {
+                        console.error('Element with class silver-change not found');
+                    }
                 }
                 
                 // Update oil
                 if (data.data.OIL) {
-                    document.querySelector('.oil-price').textContent = '$' + data.data.OIL.price.toFixed(2);
+                    const oilPrice = document.querySelector('.oil-price');
+                    if (oilPrice) {
+                        oilPrice.textContent = '$' + data.data.OIL.price.toFixed(2);
+                    } else {
+                        console.error('Element with class oil-price not found');
+                    }
+                    
                     const oilChange = document.querySelector('.oil-change');
-                    oilChange.textContent = data.data.OIL.change.toFixed(2) + '%';
-                    oilChange.className = 'badge ' + (data.data.OIL.change > 0 ? 'bg-success' : 'bg-danger');
+                    if (oilChange) {
+                        oilChange.textContent = data.data.OIL.change.toFixed(2) + '%';
+                        oilChange.className = 'badge oil-change ' + (data.data.OIL.change > 0 ? 'bg-success' : 'bg-danger');
+                    } else {
+                        console.error('Element with class oil-change not found');
+                    }
                 }
             }
         })
@@ -95,12 +127,15 @@ function refreshCommodities() {
 
 // Function to refresh forex rates
 function refreshForex() {
+    console.log('Refreshing forex rates...');
     fetch('/api/forex')
         .then(response => response.json())
         .then(data => {
+            console.log('Forex data received:', data);
             if (data.success && data.data) {
                 const forexTableBody = document.querySelector('.forex-table tbody');
                 if (forexTableBody) {
+                    console.log('Forex table body found, updating...');
                     forexTableBody.innerHTML = '';
                     
                     for (const [symbol, info] of Object.entries(data.data)) {
@@ -124,6 +159,8 @@ function refreshForex() {
                         `;
                         forexTableBody.appendChild(row);
                     }
+                } else {
+                    console.error('Forex table body not found');
                 }
             }
         })
@@ -132,14 +169,17 @@ function refreshForex() {
 
 // Function to refresh economic indicators
 function refreshEconomic() {
+    console.log('Refreshing economic indicators...');
     fetch('/api/economic')
         .then(response => response.json())
         .then(data => {
+            console.log('Economic data received:', data);
             if (data.success && data.data) {
                 // Update recession risk
                 if (data.data.recession_risk) {
                     const element = document.querySelector('.economic-indicator.risk-low, .economic-indicator.risk-medium, .economic-indicator.risk-high');
                     if (element) {
+                        console.log('Recession risk element found, updating...');
                         // Update class based on risk level
                         element.className = 'economic-indicator ' + 
                             (data.data.recession_risk.value === 'کم' ? 'risk-low' : 
@@ -156,6 +196,8 @@ function refreshEconomic() {
                                 (data.data.recession_risk.trend === 'رو به بالا' ? 'up' : 
                                     (data.data.recession_risk.trend === 'رو به پایین' ? 'down' : 'stable'));
                         }
+                    } else {
+                        console.error('Recession risk element not found');
                     }
                 }
                 
@@ -163,28 +205,55 @@ function refreshEconomic() {
                 // Global markets
                 if (data.data.global_markets) {
                     const status = document.querySelector('.global-markets-status');
-                    if (status) status.textContent = data.data.global_markets.status;
+                    if (status) {
+                        console.log('Global markets status element found, updating...');
+                        status.textContent = data.data.global_markets.status;
+                    } else {
+                        console.error('Global markets status element not found');
+                    }
                     
                     const trend = document.querySelector('.global-markets-trend');
-                    if (trend) trend.textContent = data.data.global_markets.trend;
+                    if (trend) {
+                        trend.textContent = data.data.global_markets.trend;
+                    } else {
+                        console.error('Global markets trend element not found');
+                    }
                 }
                 
                 // Inflation
                 if (data.data.inflation) {
                     const value = document.querySelector('.inflation-value');
-                    if (value) value.textContent = data.data.inflation.value;
+                    if (value) {
+                        console.log('Inflation value element found, updating...');
+                        value.textContent = data.data.inflation.value;
+                    } else {
+                        console.error('Inflation value element not found');
+                    }
                     
                     const trend = document.querySelector('.inflation-trend');
-                    if (trend) trend.textContent = data.data.inflation.trend;
+                    if (trend) {
+                        trend.textContent = data.data.inflation.trend;
+                    } else {
+                        console.error('Inflation trend element not found');
+                    }
                 }
                 
                 // Interest rates
                 if (data.data.interest_rates) {
                     const value = document.querySelector('.interest-rates-value');
-                    if (value) value.textContent = data.data.interest_rates.value;
+                    if (value) {
+                        console.log('Interest rates value element found, updating...');
+                        value.textContent = data.data.interest_rates.value;
+                    } else {
+                        console.error('Interest rates value element not found');
+                    }
                     
                     const trend = document.querySelector('.interest-rates-trend');
-                    if (trend) trend.textContent = data.data.interest_rates.trend;
+                    if (trend) {
+                        trend.textContent = data.data.interest_rates.trend;
+                    } else {
+                        console.error('Interest rates trend element not found');
+                    }
                 }
             }
         })
