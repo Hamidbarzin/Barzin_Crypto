@@ -50,6 +50,10 @@ def test_dashboard():
 
 @app.route('/dashboard')
 def dashboard():
+    # Initialize session if not already set
+    if not session.get('initialized', False):
+        session['initialized'] = True
+    
     watched_currencies = session.get('watched_currencies', DEFAULT_CURRENCIES[:3])
     current_prices = get_current_prices(watched_currencies)
     
@@ -154,6 +158,10 @@ def dashboard():
             'description': 'نرخ بهره در بانک‌های مرکزی اصلی ثابت مانده است.'
         }
     }
+    
+    # Log debug information
+    logger.debug(f"Dashboard rendering - Session initialized: {session.get('initialized', False)}")
+    logger.debug(f"Watched currencies: {watched_currencies}")
     
     return render_template(
         'dashboard.html',
