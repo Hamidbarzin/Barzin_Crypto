@@ -66,19 +66,165 @@ def dashboard_new():
         session['initialized'] = True
     
     watched_currencies = session.get('watched_currencies', DEFAULT_CURRENCIES[:3])
-    current_prices = get_current_prices(watched_currencies)
     
-    # Get technical indicators for display
+    # Create sample current prices instead of trying to get real data
+    current_prices = {}
+    for symbol in watched_currencies:
+        coin = symbol.split('/')[0] if '/' in symbol else symbol.split('-')[0]
+        
+        # Create sample price data with variety
+        if coin.lower() == 'btc':
+            price = 82500
+            change = 0.8
+        elif coin.lower() == 'eth': 
+            price = 3200
+            change = -1.2
+        elif coin.lower() == 'bnb':
+            price = 560
+            change = 0.5
+        elif coin.lower() == 'xrp':
+            price = 0.52
+            change = 2.1
+        elif coin.lower() == 'sol':
+            price = 145
+            change = -0.7
+        elif coin.lower() == 'doge':
+            price = 0.15
+            change = 0.9
+        else:
+            price = 100.0
+            change = random.uniform(-2.0, 2.0)
+        
+        current_prices[symbol] = {
+            'price': price,
+            'change_24h': change,
+            'high_24h': price * 1.05,
+            'low_24h': price * 0.95,
+            'volume_24h': price * 1000 * random.uniform(5, 20),
+            'is_sample_data': True,
+            'source': 'sample_data',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+    
+    # Create sample technical data
     technical_data = {}
-    for currency in watched_currencies:
-        technical_data[currency] = get_technical_indicators(currency, '1d')
+    for symbol in watched_currencies:
+        technical_data[symbol] = {
+            'rsi': round(random.uniform(30, 70), 2),
+            'macd': {
+                'macd': round(random.uniform(-10, 10), 2),
+                'signal': round(random.uniform(-10, 10), 2),
+                'histogram': round(random.uniform(-5, 5), 2)
+            },
+            'bollinger_bands': {
+                'upper': round(current_prices[symbol]['price'] * 1.05, 2),
+                'middle': round(current_prices[symbol]['price'], 2),
+                'lower': round(current_prices[symbol]['price'] * 0.95, 2)
+            },
+            'sma_50': round(current_prices[symbol]['price'] * random.uniform(0.98, 1.02), 2),
+            'sma_200': round(current_prices[symbol]['price'] * random.uniform(0.95, 1.05), 2),
+            'is_sample_data': True
+        }
     
-    # Get latest news (use user's setting for Middle Eastern sources)
-    include_middle_east = session.get('include_middle_east', True)
-    news = get_latest_news(limit=5, include_middle_east=include_middle_east)
+    # Create sample news data
+    news = [
+        {
+            'title': 'بیت‌کوین به بالاترین قیمت در تاریخ رسید',
+            'source': 'خبرگزاری ارز دیجیتال',
+            'url': '#',
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'sentiment': {'score': 0.8, 'label': 'مثبت'},
+            'is_sample_data': True
+        },
+        {
+            'title': 'اتریوم در آستانه تغییرات بزرگ قرار دارد',
+            'source': 'تحلیل‌گران بازار',
+            'url': '#',
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'sentiment': {'score': 0.6, 'label': 'مثبت'},
+            'is_sample_data': True
+        },
+        {
+            'title': 'تحلیل‌گران: احتمال اصلاح بازار در ماه آینده',
+            'source': 'اخبار اقتصادی',
+            'url': '#',
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'sentiment': {'score': -0.3, 'label': 'منفی'},
+            'is_sample_data': True
+        },
+        {
+            'title': 'معرفی ارزهای دیجیتال جدید در بازار',
+            'source': 'دنیای رمزارز',
+            'url': '#',
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'sentiment': {'score': 0.2, 'label': 'خنثی'},
+            'is_sample_data': True
+        },
+        {
+            'title': 'همکاری بزرگ بین شرکت‌های فناوری و پروژه‌های بلاکچین',
+            'source': 'اخبار فناوری',
+            'url': '#',
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'sentiment': {'score': 0.7, 'label': 'مثبت'},
+            'is_sample_data': True
+        }
+    ]
     
-    # Generate signals
-    signals = generate_signals(watched_currencies)
+    # Create sample signals data
+    signals = {}
+    for symbol in watched_currencies:
+        # Extract coin name from symbol
+        coin = symbol.split('/')[0] if '/' in symbol else symbol.split('-')[0]
+        
+        # Determine signal type based on coin (just for variety in samples)
+        if coin.lower() in ['btc', 'eth', 'bnb']:
+            signal = 'Buy'
+            farsi_signal = 'خرید'
+            strength = 0.35
+            recommendation = "Consider swing trade (long)"
+            farsi_recommendation = "پیشنهاد معامله نوسانی (صعودی)"
+        elif coin.lower() in ['xrp', 'sol', 'ada']:
+            signal = 'Strong Buy'
+            farsi_signal = 'خرید قوی'
+            strength = 0.65
+            recommendation = "Good swing entry for long position"
+            farsi_recommendation = "نقطه ورود مناسب برای معامله نوسانی صعودی"
+        elif coin.lower() in ['doge', 'shib', 'trx']:
+            signal = 'Sell'
+            farsi_signal = 'فروش'
+            strength = -0.35
+            recommendation = "Consider swing trade (short)"
+            farsi_recommendation = "پیشنهاد معامله نوسانی (نزولی)"
+        else:
+            signal = 'Neutral'
+            farsi_signal = 'خنثی'
+            strength = 0.05
+            recommendation = "Wait for clearer signals"
+            farsi_recommendation = "منتظر سیگنال‌های واضح‌تر باشید"
+        
+        # Create sample signal data
+        signals[symbol] = {
+            'symbol': symbol,
+            'price': current_prices[symbol]['price'],
+            'signal': signal,
+            'farsi_signal': farsi_signal,
+            'strength': strength,
+            'factors': {
+                'trend': round(random.uniform(-0.5, 0.5), 2),
+                'rsi': round(random.uniform(-0.5, 0.5), 2),
+                'macd': round(random.uniform(-0.5, 0.5), 2),
+                'bollinger': round(random.uniform(-0.5, 0.5), 2),
+                'momentum': round(random.uniform(-0.5, 0.5), 2),
+                'volatility': round(random.uniform(0.1, 0.3), 2),
+                'swing_trade': round(random.uniform(-0.5, 0.5), 2),
+                'news': round(random.uniform(-0.3, 0.3), 2)
+            },
+            'swing_recommendation': recommendation,
+            'farsi_swing_recommendation': farsi_recommendation,
+            'volatility': round(random.uniform(0.1, 0.3), 2),
+            'timestamp': datetime.now().isoformat(),
+            'is_sample_data': True
+        }
     
     # Define hardcoded data for commodities, forex rates, and economic indicators
     # to avoid making external API calls
@@ -171,7 +317,7 @@ def dashboard_new():
     }
     
     # Log debug information
-    logger.debug(f"Dashboard_new rendering - Session initialized: {session.get('initialized', False)}")
+    logger.debug(f"Dashboard_new rendering - using sample data for better performance")
     logger.debug(f"Watched currencies: {watched_currencies}")
     
     return render_template(
@@ -184,7 +330,7 @@ def dashboard_new():
         watched_currencies=watched_currencies,
         timeframes=TIMEFRAMES,
         scheduler_running=session.get('scheduler_running', False),
-        include_middle_east=include_middle_east,
+        include_middle_east=session.get('include_middle_east', True),
         commodities=commodities,
         forex_rates=forex_rates,
         economic_indicators=economic_indicators
@@ -197,19 +343,165 @@ def dashboard():
         session['initialized'] = True
     
     watched_currencies = session.get('watched_currencies', DEFAULT_CURRENCIES[:3])
-    current_prices = get_current_prices(watched_currencies)
     
-    # Get technical indicators for display
+    # Create sample current prices instead of trying to get real data
+    current_prices = {}
+    for symbol in watched_currencies:
+        coin = symbol.split('/')[0] if '/' in symbol else symbol.split('-')[0]
+        
+        # Create sample price data with variety
+        if coin.lower() == 'btc':
+            price = 82500
+            change = 0.8
+        elif coin.lower() == 'eth': 
+            price = 3200
+            change = -1.2
+        elif coin.lower() == 'bnb':
+            price = 560
+            change = 0.5
+        elif coin.lower() == 'xrp':
+            price = 0.52
+            change = 2.1
+        elif coin.lower() == 'sol':
+            price = 145
+            change = -0.7
+        elif coin.lower() == 'doge':
+            price = 0.15
+            change = 0.9
+        else:
+            price = 100.0
+            change = random.uniform(-2.0, 2.0)
+        
+        current_prices[symbol] = {
+            'price': price,
+            'change_24h': change,
+            'high_24h': price * 1.05,
+            'low_24h': price * 0.95,
+            'volume_24h': price * 1000 * random.uniform(5, 20),
+            'is_sample_data': True,
+            'source': 'sample_data',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+    
+    # Create sample technical data
     technical_data = {}
-    for currency in watched_currencies:
-        technical_data[currency] = get_technical_indicators(currency, '1d')
+    for symbol in watched_currencies:
+        technical_data[symbol] = {
+            'rsi': round(random.uniform(30, 70), 2),
+            'macd': {
+                'macd': round(random.uniform(-10, 10), 2),
+                'signal': round(random.uniform(-10, 10), 2),
+                'histogram': round(random.uniform(-5, 5), 2)
+            },
+            'bollinger_bands': {
+                'upper': round(current_prices[symbol]['price'] * 1.05, 2),
+                'middle': round(current_prices[symbol]['price'], 2),
+                'lower': round(current_prices[symbol]['price'] * 0.95, 2)
+            },
+            'sma_50': round(current_prices[symbol]['price'] * random.uniform(0.98, 1.02), 2),
+            'sma_200': round(current_prices[symbol]['price'] * random.uniform(0.95, 1.05), 2),
+            'is_sample_data': True
+        }
     
-    # Get latest news (use user's setting for Middle Eastern sources)
-    include_middle_east = session.get('include_middle_east', True)
-    news = get_latest_news(limit=5, include_middle_east=include_middle_east)
+    # Create sample news data
+    news = [
+        {
+            'title': 'بیت‌کوین به بالاترین قیمت در تاریخ رسید',
+            'source': 'خبرگزاری ارز دیجیتال',
+            'url': '#',
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'sentiment': {'score': 0.8, 'label': 'مثبت'},
+            'is_sample_data': True
+        },
+        {
+            'title': 'اتریوم در آستانه تغییرات بزرگ قرار دارد',
+            'source': 'تحلیل‌گران بازار',
+            'url': '#',
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'sentiment': {'score': 0.6, 'label': 'مثبت'},
+            'is_sample_data': True
+        },
+        {
+            'title': 'تحلیل‌گران: احتمال اصلاح بازار در ماه آینده',
+            'source': 'اخبار اقتصادی',
+            'url': '#',
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'sentiment': {'score': -0.3, 'label': 'منفی'},
+            'is_sample_data': True
+        },
+        {
+            'title': 'معرفی ارزهای دیجیتال جدید در بازار',
+            'source': 'دنیای رمزارز',
+            'url': '#',
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'sentiment': {'score': 0.2, 'label': 'خنثی'},
+            'is_sample_data': True
+        },
+        {
+            'title': 'همکاری بزرگ بین شرکت‌های فناوری و پروژه‌های بلاکچین',
+            'source': 'اخبار فناوری',
+            'url': '#',
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'sentiment': {'score': 0.7, 'label': 'مثبت'},
+            'is_sample_data': True
+        }
+    ]
     
-    # Generate signals
-    signals = generate_signals(watched_currencies)
+    # Create sample signals data
+    signals = {}
+    for symbol in watched_currencies:
+        # Extract coin name from symbol
+        coin = symbol.split('/')[0] if '/' in symbol else symbol.split('-')[0]
+        
+        # Determine signal type based on coin (just for variety in samples)
+        if coin.lower() in ['btc', 'eth', 'bnb']:
+            signal = 'Buy'
+            farsi_signal = 'خرید'
+            strength = 0.35
+            recommendation = "Consider swing trade (long)"
+            farsi_recommendation = "پیشنهاد معامله نوسانی (صعودی)"
+        elif coin.lower() in ['xrp', 'sol', 'ada']:
+            signal = 'Strong Buy'
+            farsi_signal = 'خرید قوی'
+            strength = 0.65
+            recommendation = "Good swing entry for long position"
+            farsi_recommendation = "نقطه ورود مناسب برای معامله نوسانی صعودی"
+        elif coin.lower() in ['doge', 'shib', 'trx']:
+            signal = 'Sell'
+            farsi_signal = 'فروش'
+            strength = -0.35
+            recommendation = "Consider swing trade (short)"
+            farsi_recommendation = "پیشنهاد معامله نوسانی (نزولی)"
+        else:
+            signal = 'Neutral'
+            farsi_signal = 'خنثی'
+            strength = 0.05
+            recommendation = "Wait for clearer signals"
+            farsi_recommendation = "منتظر سیگنال‌های واضح‌تر باشید"
+        
+        # Create sample signal data
+        signals[symbol] = {
+            'symbol': symbol,
+            'price': current_prices[symbol]['price'],
+            'signal': signal,
+            'farsi_signal': farsi_signal,
+            'strength': strength,
+            'factors': {
+                'trend': round(random.uniform(-0.5, 0.5), 2),
+                'rsi': round(random.uniform(-0.5, 0.5), 2),
+                'macd': round(random.uniform(-0.5, 0.5), 2),
+                'bollinger': round(random.uniform(-0.5, 0.5), 2),
+                'momentum': round(random.uniform(-0.5, 0.5), 2),
+                'volatility': round(random.uniform(0.1, 0.3), 2),
+                'swing_trade': round(random.uniform(-0.5, 0.5), 2),
+                'news': round(random.uniform(-0.3, 0.3), 2)
+            },
+            'swing_recommendation': recommendation,
+            'farsi_swing_recommendation': farsi_recommendation,
+            'volatility': round(random.uniform(0.1, 0.3), 2),
+            'timestamp': datetime.now().isoformat(),
+            'is_sample_data': True
+        }
     
     # Define hardcoded data for commodities, forex rates, and economic indicators
     # to avoid making external API calls
@@ -302,7 +594,7 @@ def dashboard():
     }
     
     # Log debug information
-    logger.debug(f"Dashboard rendering - Session initialized: {session.get('initialized', False)}")
+    logger.debug(f"Dashboard rendering - using sample data for better performance")
     logger.debug(f"Watched currencies: {watched_currencies}")
     
     return render_template(
@@ -315,7 +607,7 @@ def dashboard():
         watched_currencies=watched_currencies,
         timeframes=TIMEFRAMES,
         scheduler_running=session.get('scheduler_running', False),
-        include_middle_east=include_middle_east,
+        include_middle_east=session.get('include_middle_east', True),
         commodities=commodities,
         forex_rates=forex_rates,
         economic_indicators=economic_indicators
