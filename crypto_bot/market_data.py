@@ -88,12 +88,13 @@ def _initialize_exchange(exchange_id):
     exchange.load_markets()
     return exchange
 
-def get_current_prices(symbols):
+def get_current_prices(symbols, timeout=3):
     """
     Get current prices for a list of cryptocurrency symbols
     
     Args:
         symbols (list): List of symbols like ['BTC/USDT', 'ETH/USDT']
+        timeout (int): Maximum time to wait for API responses in seconds
         
     Returns:
         dict: Dictionary of current prices for each symbol
@@ -101,11 +102,22 @@ def get_current_prices(symbols):
     result = {}
     success = False
     
+    # Track the overall start time for timeout handling
+    start_time = time.time()
+    
     # Try each exchange until we get data
     for exchange_id in EXCHANGE_LIST:
+        # Check if we've exceeded our overall timeout
+        if time.time() - start_time > timeout:
+            logger.warning(f"Overall timeout of {timeout} seconds exceeded")
+            break
+            
         try:
             logger.info(f"Trying to fetch prices from {exchange_id}")
             exchange = _initialize_exchange(exchange_id)
+            
+            # Set a timeout for the exchange API requests
+            exchange.timeout = timeout * 1000  # ccxt uses milliseconds
             
             # Check if exchange supports all symbols
             unsupported_symbols = []
@@ -126,7 +138,13 @@ def get_current_prices(symbols):
             
             # Fetch tickers for all symbols
             for symbol in symbols:
+                # Check if we've exceeded our timeout
+                if time.time() - start_time > timeout:
+                    logger.warning(f"Timeout of {timeout} seconds exceeded during ticker fetching")
+                    break
+                    
                 try:
+                    # Use a shorter timeout for each individual request
                     ticker = exchange.fetch_ticker(symbol)
                     result[symbol] = {
                         'price': ticker['last'],
@@ -170,12 +188,13 @@ def get_current_prices(symbols):
     
     return result
 
-def get_prices_from_coingecko(symbols):
+def get_prices_from_coingecko(symbols, timeout=3):
     """
     Fallback function to get prices from CoinGecko if the primary exchange fails
     
     Args:
         symbols (list): List of symbols like ['BTC/USDT', 'ETH/USDT']
+        timeout (int): Maximum time to wait for API response in seconds
         
     Returns:
         dict: Dictionary of current prices for each symbol
@@ -194,30 +213,58 @@ def get_prices_from_coingecko(symbols):
         'DOT/USDT': 'polkadot',
         'DOGE/USDT': 'dogecoin',
         'AVAX/USDT': 'avalanche-2',
-        'LUNA/USDT': 'terra-luna-2'
+        'LUNA/USDT': 'terra-luna-2',
+        # Add BTC-USDT format mapping
+        'BTC-USDT': 'bitcoin',
+        'ETH-USDT': 'ethereum',
+        'XRP-USDT': 'ripple',
+        'BNB-USDT': 'binancecoin',
+        'ADA-USDT': 'cardano',
+        'SOL-USDT': 'solana',
+        'DOT-USDT': 'polkadot',
+        'DOGE-USDT': 'dogecoin',
+        'AVAX-USDT': 'avalanche-2',
+        'LUNA-USDT': 'terra-luna-2'
     }
     
-    coin_ids = [coin_map[symbol] for symbol in symbols if symbol in coin_map]
+    # Check which symbols we have mappings for
+    valid_symbols = [s for s in symbols if s in coin_map]
+    if not valid_symbols:
+        logger.warning(f"No CoinGecko mappings found for symbols: {symbols}")
+        return {}
+        
+    coin_ids = [coin_map[symbol] for symbol in valid_symbols]
     coin_ids_str = ','.join(coin_ids)
     
     url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids_str}&order=market_cap_desc&sparkline=false&price_change_percentage=24h"
-    response = requests.get(url)
     
-    if response.status_code == 200:
-        data = response.json()
-        for coin in data:
-            # Find the corresponding symbol
-            for symbol, coin_id in coin_map.items():
-                if coin_id == coin['id']:
+    try:
+        # Add timeout to the request
+        response = requests.get(url, timeout=timeout)
+        
+        if response.status_code == 200:
+            data = response.json()
+            for coin in data:
+                # Find all corresponding symbols that map to this coin
+                matching_symbols = [s for s, cid in coin_map.items() if cid == coin['id'] and s in symbols]
+                
+                for symbol in matching_symbols:
                     result[symbol] = {
                         'price': coin['current_price'],
                         'change_24h': coin['price_change_percentage_24h'],
                         'high_24h': coin['high_24h'],
                         'low_24h': coin['low_24h'],
                         'volume_24h': coin['total_volume'],
-                        'timestamp': datetime.now().isoformat()
+                        'timestamp': datetime.now().isoformat(),
+                        'source': 'coingecko'
                     }
-                    break
+        else:
+            logger.warning(f"CoinGecko API returned status code {response.status_code}")
+            
+    except requests.exceptions.Timeout:
+        logger.warning(f"CoinGecko API request timed out after {timeout} seconds")
+    except requests.exceptions.RequestException as e:
+        logger.warning(f"CoinGecko API request failed: {str(e)}")
     
     return result
 

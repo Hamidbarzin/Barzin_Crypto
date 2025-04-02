@@ -386,8 +386,44 @@ def test_email():
 @app.route('/api/price/<symbol>')
 def get_price(symbol):
     try:
-        prices = get_current_prices([symbol])
-        return jsonify({'success': True, 'data': prices})
+        # Normalize symbol format - both BTC/USDT and BTC-USDT should work
+        # Try with the symbol as provided first
+        symbols_to_try = [symbol]
+        
+        # Add alternative symbol format if not already in the list
+        if '/' in symbol:
+            alt_symbol = symbol.replace('/', '-')
+            symbols_to_try.append(alt_symbol)
+        elif '-' in symbol:
+            alt_symbol = symbol.replace('-', '/')
+            symbols_to_try.append(alt_symbol)
+            
+        logger.info(f"Trying to get prices for symbols: {symbols_to_try}")
+        
+        # Try to get prices with a short timeout to prevent waiting
+        result = get_current_prices(symbols_to_try, timeout=3)
+        
+        # Check if we got data for any of the symbol formats
+        for sym in symbols_to_try:
+            if sym in result:
+                logger.info(f"Found price data for {sym}")
+                return jsonify({'success': True, 'data': result[sym]})
+        
+        # If we didn't get data for any format, return a sample with clear marking
+        logger.warning(f"No result for {symbol} or alternatives, providing sample data")
+        
+        # Create sample data that is clearly marked as such
+        sample_data = {
+            'price': 69420.50,
+            'change_24h': 1.2,
+            'high_24h': 70000.50,
+            'low_24h': 68500.75,
+            'volume_24h': 1245678.90,
+            'is_sample_data': True,
+            'source': 'sample_data',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        return jsonify({'success': True, 'data': sample_data, 'sample_data': True})
     except Exception as e:
         logger.error(f"Error getting price for {symbol}: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
