@@ -77,21 +77,37 @@ SIGNAL_THRESHOLDS = {
 
 # News sentiment analysis
 POSITIVE_KEYWORDS = [
-    # انگلیسی
+    # انگلیسی - English positive keywords
     'bullish', 'surge', 'soar', 'gain', 'rally', 'jump', 'rise', 'up', 
     'grow', 'positive', 'good', 'progress', 'adopt', 'support', 'partnership',
-    # فارسی
+    'breakthrough', 'advance', 'optimistic', 'innovation', 'boost',
+    'potential', 'opportunity', 'recovery', 'promising', 'successful',
+    'achievement', 'milestone', 'adoption', 'momentum', 'expanding',
+    
+    # فارسی - Persian positive keywords
     'صعودی', 'افزایش', 'رشد', 'جهش', 'سود', 'مثبت', 'بالا', 'قوی',
-    'همکاری', 'پیشرفت', 'امیدوار', 'خوب', 'عالی', 'موفق', 'سرمایه‌گذاری'
+    'همکاری', 'پیشرفت', 'امیدوار', 'خوب', 'عالی', 'موفق', 'سرمایه‌گذاری',
+    'فرصت', 'بهبود', 'توسعه', 'قدرتمند', 'تقویت', 'اوج', 'شکوفایی', 'محبوب',
+    'حمایت', 'شکستن مقاومت', 'جذب سرمایه', 'برتر', 'پتانسیل', 'دستاورد',
+    'گسترش', 'بازدهی', 'سوددهی', 'ارزشمند', 'ارزنده', 'استقبال', 'موفقیت‌آمیز',
+    'خوش‌بینی', 'نوآوری', 'پذیرش', 'استراتژی', 'نقدینگی', 'نویدبخش'
 ]
 
 NEGATIVE_KEYWORDS = [
-    # انگلیسی
+    # انگلیسی - English negative keywords
     'bearish', 'drop', 'fall', 'plunge', 'crash', 'decline', 'down', 
     'decrease', 'negative', 'bad', 'risk', 'ban', 'regulate', 'hack', 'scam',
-    # فارسی
+    'warning', 'threat', 'concern', 'problem', 'issue', 'uncertainty',
+    'volatile', 'tumble', 'weak', 'collapse', 'dump', 'sell-off', 'liquidation',
+    'restriction', 'penalty', 'downturn', 'bearish', 'pressure', 'fear',
+    
+    # فارسی - Persian negative keywords
     'نزولی', 'کاهش', 'سقوط', 'افت', 'ریزش', 'ضرر', 'منفی', 'پایین',
-    'ضعیف', 'خطر', 'ریسک', 'کلاهبرداری', 'هک', 'ممنوعیت', 'بد', 'قانون‌گذاری'
+    'ضعیف', 'خطر', 'ریسک', 'کلاهبرداری', 'هک', 'ممنوعیت', 'بد', 'قانون‌گذاری',
+    'هشدار', 'نگرانی', 'مشکل', 'تهدید', 'شکست', 'بحران', 'بی‌ثباتی', 'محدودیت',
+    'جریمه', 'رکود', 'فشار', 'ترس', 'عدم اطمینان', 'بی‌اعتمادی', 'خطرناک',
+    'تحریم', 'شکستن حمایت', 'خروج سرمایه', 'فروش', 'نقدشوندگی', 'اصلاح قیمت',
+    'فروش هیجانی', 'زیان', 'عرضه‌های سنگین', 'دامپ', 'حفره امنیتی', 'پرخطر'
 ]
 
 # Scheduler settings

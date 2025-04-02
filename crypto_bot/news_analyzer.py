@@ -116,10 +116,11 @@ def scrape_crypto_news(limit=10, include_middle_east=True):
     
     # List of popular cryptocurrency news sites (global and Middle East)
     # Define which sites are Middle Eastern
-    middle_east_domains = ['ramzarz.news', 'arzdigital.com', 'menaherald.com']
+    middle_east_domains = ['ramzarz.news', 'arzdigital.com', 'menaherald.com', 'wallex.ir', 'iranfintech.com', 'irbitex.com', 'tejaratnews.com', 'donya-e-eqtesad.com']
     
     # Updated selectors to match current website structures
     news_sites = [
+        # سایت‌های خبری انگلیسی
         {
             'url': 'https://cointelegraph.com/',
             'article_selector': 'article',  # Simplified selector
@@ -133,21 +134,52 @@ def scrape_crypto_news(limit=10, include_middle_east=True):
             'link_selector': 'a'
         },
         {
-            'url': 'https://ramzarz.news/',
+            'url': 'https://decrypt.co/',  # Alternative site
             'article_selector': 'article',  # Simplified selector
+            'title_selector': 'h3,h2,h4',  # Try multiple possible heading tags
+            'link_selector': 'a'
+        },
+        # سایت‌های خبری فارسی
+        {
+            'url': 'https://ramzarz.news/',
+            'article_selector': 'article,.post-item',  # Simplified selector
             'title_selector': 'h3,h2,h4',  # Try multiple possible heading tags
             'link_selector': 'a'
         },
         {
             'url': 'https://arzdigital.com/breaking/',
-            'article_selector': 'article',  # Simplified selector
+            'article_selector': 'article,.post-card',  # Simplified selector
             'title_selector': 'h3,h2,h4',  # Try multiple possible heading tags
             'link_selector': 'a'
         },
         {
-            'url': 'https://decrypt.co/',  # Alternative site
-            'article_selector': 'article',  # Simplified selector
-            'title_selector': 'h3,h2,h4',  # Try multiple possible heading tags
+            'url': 'https://wallex.ir/blog/',
+            'article_selector': 'article,.blog-card,.post',
+            'title_selector': 'h3,h2,h4,h5',
+            'link_selector': 'a'
+        },
+        {
+            'url': 'https://iranfintech.com/category/رمز-ارزها/',
+            'article_selector': 'article,.post-item',
+            'title_selector': 'h3,h2,h4,h5',
+            'link_selector': 'a'
+        },
+        {
+            'url': 'https://irbitex.com/blog/',
+            'article_selector': 'article,.blog-post,.card',
+            'title_selector': 'h3,h2,h4,h5',
+            'link_selector': 'a'
+        },
+        {
+            'url': 'https://tejaratnews.com/cryptocurrency',
+            'article_selector': 'article,.news-item',
+            'title_selector': 'h3,h2,h4,h5',
+            'link_selector': 'a'
+        },
+        {
+            'url': 'https://donya-e-eqtesad.com/بخش-رمز-ارز-177',
+            'article_selector': 'article,.news-item,.news-box',
+            'title_selector': 'h3,h2,h4,h5,a.title',
             'link_selector': 'a'
         }
     ]
@@ -223,10 +255,17 @@ def scrape_crypto_news(limit=10, include_middle_east=True):
                         
                         # Handle different element types for links
                         link = None
-                        if hasattr(link_element, 'get') and callable(link_element.get):
-                            link = link_element.get('href')
-                        elif hasattr(link_element, 'attrs') and 'href' in link_element.attrs:
-                            link = link_element.attrs['href']
+                        try:
+                            # Handle beautifulsoup Tag objects
+                            if hasattr(link_element, 'name'):
+                                # If it's a bs4.Tag
+                                link = link_element.get('href')
+                            else:
+                                # Try direct access 
+                                link = link_element['href']
+                        except (TypeError, KeyError, AttributeError):
+                            # If all fails, try other approaches or skip this link
+                            pass
                         
                         # Make relative URLs absolute
                         if link and isinstance(link, str) and not link.startswith('http'):
@@ -286,7 +325,13 @@ def scrape_crypto_news(limit=10, include_middle_east=True):
 
 def get_article_content(url):
     """
-    Extract the main content from a news article
+    Extract the main content from a news article using trafilatura
+    
+    Args:
+        url (str): URL of the article
+        
+    Returns:
+        str: Main content of the article
     """
     try:
         # Using trafilatura for effective content extraction
@@ -297,21 +342,51 @@ def get_article_content(url):
             # Fallback to simple extraction
             response = requests.get(url, headers={
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            })
+            }, timeout=10)
             
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
                 
-                # Remove script and style elements
-                for script in soup(["script", "style"]):
-                    script.extract()
-                    
-                text = soup.get_text()
-                # Break into lines and remove leading/trailing whitespace
-                lines = (line.strip() for line in text.splitlines())
-                # Join lines into paragraphs, breaking on blank lines
-                text = '\n'.join(line for line in lines if line)
+                # Try common content container selectors first
+                content_selectors = [
+                    'article', 'main', '.article-content', '.post-content',
+                    '.entry-content', '#article-body', '.story-body', '.content-body',
+                    '.article', '.post', '.news-item', '.news-content', '.article-body',
+                    '[itemprop="articleBody"]', '[class*="article"]', '[class*="content"]',
+                ]
                 
+                article_content = ""
+                for selector in content_selectors:
+                    content = soup.select_one(selector)
+                    if content:
+                        # Extract text from paragraphs
+                        paragraphs = content.find_all('p')
+                        if paragraphs:
+                            article_content = '\n'.join([p.get_text().strip() for p in paragraphs])
+                            break
+                
+                # If we found content from selectors, use it
+                if article_content:
+                    text = article_content
+                else:
+                    # Remove unwanted elements
+                    for script in soup(["script", "style", "header", "footer", "nav", "aside", "iframe"]):
+                        script.extract()
+                        
+                    # Get all text
+                    text = soup.get_text()
+                    # Break into lines and remove leading/trailing whitespace
+                    lines = (line.strip() for line in text.splitlines())
+                    # Join lines into paragraphs, breaking on blank lines
+                    text = '\n'.join(line for line in lines if line)
+                
+        # Remove excess whitespace and normalize
+        if text:
+            text = ' '.join(text.split())
+            # Split into sentences and rejoin with proper spacing
+            sentences = text.replace('. ', '.\n').replace('! ', '!\n').replace('? ', '?\n')
+            text = sentences
+            
         return text or ""
     except Exception as e:
         logger.error(f"Error extracting content from {url}: {str(e)}")
@@ -319,8 +394,8 @@ def get_article_content(url):
 
 def analyze_sentiment(text):
     """
-    Simple rule-based sentiment analysis for cryptocurrency news.
-    Supports both English and Persian text.
+    Enhanced rule-based sentiment analysis for cryptocurrency news.
+    Supports both English and Persian text with weighted keyword matching.
     
     Args:
         text (str): Text to analyze
@@ -340,30 +415,96 @@ def analyze_sentiment(text):
     # Note: Persian doesn't have uppercase/lowercase but English does
     text = text.lower()
     
-    # Count positive and negative keywords
-    positive_count = sum(1 for keyword in POSITIVE_KEYWORDS if keyword.lower() in text)
-    negative_count = sum(1 for keyword in NEGATIVE_KEYWORDS if keyword.lower() in text)
-    
     # Detect language (simple check for Persian characters)
     is_persian = any('\u0600' <= c <= '\u06FF' for c in text)
     
+    # Weight modifiers - give more importance to certain patterns
+    strong_modifiers = {
+        # انگلیسی - English modifiers
+        'significant': 1.5, 'major': 1.5, 'huge': 1.5, 'massive': 1.5, 'critical': 1.5, 
+        'extremely': 1.5, 'substantially': 1.5, 'dramatic': 1.5, 'serious': 1.5,
+        # فارسی - Persian modifiers
+        'بسیار': 1.5, 'شدید': 1.5, 'قابل توجه': 1.5, 'چشمگیر': 1.5, 'عظیم': 1.5,
+        'فوق‌العاده': 1.5, 'قابل ملاحظه': 1.5, 'به‌شدت': 1.5, 'اساسی': 1.5
+    }
+    
+    # Apply weight to sentiment based on presence of modifiers
+    weight_multiplier = 1.0
+    for modifier, weight in strong_modifiers.items():
+        if modifier in text:
+            weight_multiplier = max(weight_multiplier, weight)
+    
+    # Enhanced keyword matching (count and track occurrences)
+    positive_matches = []
+    negative_matches = []
+    
+    # Analyze text in chunks to better handle long texts
+    chunks = [text[i:i+200] for i in range(0, len(text), 200)]
+    
+    for chunk in chunks:
+        # Count positive and negative keywords with position info
+        for keyword in POSITIVE_KEYWORDS:
+            if keyword.lower() in chunk:
+                positive_matches.append({
+                    'keyword': keyword,
+                    'weight': 1.0  # base weight
+                })
+        
+        for keyword in NEGATIVE_KEYWORDS:
+            if keyword.lower() in chunk:
+                negative_matches.append({
+                    'keyword': keyword,
+                    'weight': 1.0  # base weight
+                })
+    
+    # Calculate weighted counts
+    positive_count = sum(match['weight'] for match in positive_matches)
+    negative_count = sum(match['weight'] for match in negative_matches)
+    
+    # Apply weight multiplier from modifiers
+    positive_weighted = positive_count * weight_multiplier
+    negative_weighted = negative_count * weight_multiplier
+    
+    # Add title emphasis - keywords in title are more important
+    title_end = min(100, len(text))  # Assume first 100 chars might be title
+    title_text = text[:title_end]
+    
+    title_positive = sum(1 for keyword in POSITIVE_KEYWORDS if keyword.lower() in title_text)
+    title_negative = sum(1 for keyword in NEGATIVE_KEYWORDS if keyword.lower() in title_text)
+    
+    # Add title weights (keywords in title count extra)
+    positive_weighted += title_positive * 0.5
+    negative_weighted += title_negative * 0.5
+    
     # Calculate sentiment score (-1 to 1)
-    total = positive_count + negative_count
+    total = positive_weighted + negative_weighted
     if total == 0:
         score = 0  # Neutral if no keywords found
     else:
-        score = (positive_count - negative_count) / total
-        
-    # Determine sentiment label
-    if score > 0.3:
+        score = (positive_weighted - negative_weighted) / total
+    
+    # Determine sentiment label with more granular categories
+    if score > 0.6:
+        label = "Very Positive" if not is_persian else "بسیار مثبت"
+        display_label = "Very Positive"
+    elif score > 0.2:
         label = "Positive" if not is_persian else "مثبت"
-    elif score < -0.3:
+        display_label = "Positive"
+    elif score < -0.6:
+        label = "Very Negative" if not is_persian else "بسیار منفی"
+        display_label = "Very Negative"
+    elif score < -0.2:
         label = "Negative" if not is_persian else "منفی"
+        display_label = "Negative"
     else:
         label = "Neutral" if not is_persian else "خنثی"
+        display_label = "Neutral"
     
-    # For consistency in the UI, always return English labels
-    display_label = "Positive" if label == "مثبت" else "Negative" if label == "منفی" else "Neutral"
+    # Additional info for debugging and UI display
+    keyword_details = {
+        'positive': [match['keyword'] for match in positive_matches[:5]],  # Return top 5 matches
+        'negative': [match['keyword'] for match in negative_matches[:5]]   # Return top 5 matches
+    }
         
     return {
         'score': score,
@@ -371,5 +512,7 @@ def analyze_sentiment(text):
         'persian_label': label if is_persian else None,
         'is_persian': is_persian,
         'positive_count': positive_count,
-        'negative_count': negative_count
+        'negative_count': negative_count,
+        'keyword_details': keyword_details,
+        'strength': abs(score)  # How strong is the sentiment (0-1)
     }
