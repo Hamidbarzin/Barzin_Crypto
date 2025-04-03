@@ -490,58 +490,89 @@ def test_menu():
     """Render test menu page to debug navigation issues"""
     return render_template('test_menu.html')
 
-@app.route('/app_settings', methods=['GET', 'POST'])
+@app.route('/app_settings')
 def app_settings():
-    """صفحه تنظیمات برای پیکربندی برنامه"""
-    # بارگذاری تنظیمات فعلی از سشن
-    email_settings = session.get('email_settings', {
-        'enabled': False,
-        'email': '',
-        'frequency': 'daily'
-    })
-    
-    watched_currencies = session.get('watched_currencies', DEFAULT_CURRENCIES[:3])
-    include_middle_east = session.get('include_middle_east', True)
-    
-    # پردازش درخواست POST برای ذخیره تنظیمات
-    if request.method == 'POST':
-        # تنظیمات ایمیل
-        email_settings['enabled'] = 'email_enabled' in request.form
-        email_settings['email'] = request.form.get('email', '')
-        email_settings['frequency'] = request.form.get('frequency', 'daily')
-        session['email_settings'] = email_settings
+    """صفحه تنظیمات ساده برای پیکربندی برنامه"""
+    template = """
+    <!DOCTYPE html>
+    <html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>تنظیمات ساده</title>
+        <style>
+            body {
+                font-family: Tahoma, Arial, sans-serif;
+                background-color: #181A20;
+                color: #EAECEF;
+                padding: 20px;
+                direction: rtl;
+            }
+            h1 {
+                color: #FCD535;
+                border-bottom: 1px solid #333;
+                padding-bottom: 10px;
+            }
+            .menu {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            .menu a {
+                background-color: #2b3139;
+                color: #FCD535;
+                padding: 8px 15px;
+                text-decoration: none;
+                border-radius: 4px;
+            }
+            .settings-group {
+                background-color: #2b3139;
+                border-radius: 5px;
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            h2 {
+                color: #FCD535;
+                margin-top: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>تنظیمات ربات معاملاتی</h1>
         
-        # ارزهای تحت نظر
-        selected_currencies = request.form.getlist('currencies')
-        if selected_currencies:
-            session['watched_currencies'] = selected_currencies
-            watched_currencies = selected_currencies
+        <div class="menu">
+            <a href="/">داشبورد</a>
+            <a href="/dashboard">داشبورد کامل</a>
+            <a href="/dashboard_new">داشبورد جدید</a>
+            <a href="/app_settings">تنظیمات</a>
+        </div>
         
-        # منابع خبری
-        include_middle_east = 'include_middle_east' in request.form
-        session['include_middle_east'] = include_middle_east
+        <div class="settings-group">
+            <h2>ارزهای دیجیتال تحت نظر</h2>
+            <p>بیت‌کوین (BTC)، اتریوم (ETH)، ریپل (XRP)</p>
+        </div>
         
-        # برنامه زمانبندی
-        scheduler_enabled = 'scheduler_enabled' in request.form
-        if scheduler_enabled and not session.get('scheduler_running', False):
-            start_scheduler(email_settings, watched_currencies)
-            session['scheduler_running'] = True
-        elif not scheduler_enabled and session.get('scheduler_running', False):
-            stop_scheduler()
-            session['scheduler_running'] = False
+        <div class="settings-group">
+            <h2>تنظیمات اعلان‌های ایمیلی</h2>
+            <p>اعلان‌های ایمیلی: غیرفعال</p>
+            <p>تناوب ارسال: روزانه</p>
+        </div>
         
-        flash('تنظیمات با موفقیت ذخیره شد', 'success')
-        return redirect(url_for('app_settings'))
-    
-    # رندر صفحه تنظیمات
-    return render_template(
-        'settings.html',
-        currencies=DEFAULT_CURRENCIES,
-        watched_currencies=watched_currencies,
-        email_settings=email_settings,
-        include_middle_east=include_middle_east,
-        scheduler_running=session.get('scheduler_running', False)
-    )
+        <div class="settings-group">
+            <h2>منابع خبری</h2>
+            <p>شامل اخبار خاورمیانه: فعال</p>
+        </div>
+        
+        <div class="settings-group">
+            <h2>برنامه زمانبندی</h2>
+            <p>ارسال خودکار سیگنال‌ها: غیرفعال</p>
+        </div>
+        
+        <p style="text-align: center; color: #848E9C;">این نسخه ساده شده تنظیمات است.</p>
+    </body>
+    </html>
+    """
+    return render_template_string(template)
 
 @app.route('/dashboard_new')
 def dashboard_new():
