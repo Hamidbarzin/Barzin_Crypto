@@ -468,111 +468,32 @@ def index():
 @app.route('/simple')
 def simple_home():
     """A simplified home page with direct links to all pages"""
-    return render_template('simple_home.html')
+    return redirect(url_for('index'))
 
 @app.route('/api_test')
 def api_test():
     """Render API test page"""
-    return render_template('api_test.html')
+    return redirect(url_for('index'))
     
 @app.route('/commodities_dashboard')
 def commodities_dashboard():
     """Render commodities dashboard page"""
-    return render_template('commodities_dashboard.html')
+    return redirect(url_for('index'))
     
 @app.route('/test')
 def test_dashboard():
     """Render test dashboard page to debug API and JavaScript issues"""
-    return render_template('test_dashboard.html')
+    return redirect(url_for('index'))
     
 @app.route('/test-menu')
 def test_menu():
     """Render test menu page to debug navigation issues"""
-    return render_template('test_menu.html')
+    return redirect(url_for('index'))
 
 @app.route('/app_settings')
 def app_settings():
-    """صفحه تنظیمات ساده برای پیکربندی برنامه"""
-    template = """
-    <!DOCTYPE html>
-    <html lang="fa" dir="rtl">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>تنظیمات ساده</title>
-        <style>
-            body {
-                font-family: Tahoma, Arial, sans-serif;
-                background-color: #181A20;
-                color: #EAECEF;
-                padding: 20px;
-                direction: rtl;
-            }
-            h1 {
-                color: #FCD535;
-                border-bottom: 1px solid #333;
-                padding-bottom: 10px;
-            }
-            .menu {
-                display: flex;
-                gap: 10px;
-                margin-bottom: 20px;
-            }
-            .menu a {
-                background-color: #2b3139;
-                color: #FCD535;
-                padding: 8px 15px;
-                text-decoration: none;
-                border-radius: 4px;
-            }
-            .settings-group {
-                background-color: #2b3139;
-                border-radius: 5px;
-                padding: 15px;
-                margin-bottom: 15px;
-            }
-            h2 {
-                color: #FCD535;
-                margin-top: 0;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>تنظیمات ربات معاملاتی</h1>
-        
-        <div class="menu">
-            <a href="/">داشبورد</a>
-            <a href="/dashboard">داشبورد کامل</a>
-            <a href="/dashboard_new">داشبورد جدید</a>
-            <a href="/app_settings">تنظیمات</a>
-        </div>
-        
-        <div class="settings-group">
-            <h2>ارزهای دیجیتال تحت نظر</h2>
-            <p>بیت‌کوین (BTC)، اتریوم (ETH)، ریپل (XRP)</p>
-        </div>
-        
-        <div class="settings-group">
-            <h2>تنظیمات اعلان‌های ایمیلی</h2>
-            <p>اعلان‌های ایمیلی: غیرفعال</p>
-            <p>تناوب ارسال: روزانه</p>
-        </div>
-        
-        <div class="settings-group">
-            <h2>منابع خبری</h2>
-            <p>شامل اخبار خاورمیانه: فعال</p>
-        </div>
-        
-        <div class="settings-group">
-            <h2>برنامه زمانبندی</h2>
-            <p>ارسال خودکار سیگنال‌ها: غیرفعال</p>
-        </div>
-        
-        <p style="text-align: center; color: #848E9C;">این نسخه ساده شده تنظیمات است.</p>
-    </body>
-    </html>
-    """
-    return render_template_string(template)
+    """صفحه تنظیمات ساده"""
+    return redirect(url_for('index'))
 
 @app.route('/dashboard_new')
 def dashboard_new():
@@ -1131,62 +1052,32 @@ def dashboard():
 @app.route('/email-sample')
 def email_sample():
     """Display a sample email that would be sent by the trading bot"""
-    from datetime import datetime
-    email_settings = session.get('email_settings', {'email': ''})
-    context = {
-        'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'email_address': email_settings.get('email', '')
-    }
-    return render_template('email_sample.html', **context)
+    return redirect(url_for('index'))
 
 @app.route('/email-preview')
 def email_preview():
     """Display a standalone preview of a sample email that would be sent by the trading bot"""
-    from datetime import datetime
-    context = {
-        'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'now': datetime.now()
-    }
-    return render_template('direct_email_sample.html', **context)
+    return redirect(url_for('index'))
 
 @app.route('/demo_email')
 def demo_email():
     """Alternative route for email sample display"""
-    from datetime import datetime
-    context = {
-        'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'now': datetime.now()
-    }
-    return render_template('direct_email_sample.html', **context)
+    return redirect(url_for('index'))
 
 @app.route('/simple_email')
 def simple_email():
     """Ultra simple route for email display when other routes fail"""
-    from datetime import datetime
-    context = {
-        'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'now': datetime.now()
-    }
-    return render_template('simple_email.html', **context)
+    return redirect(url_for('index'))
     
 @app.route('/minimal')
 def minimal_email():
     """Extremely minimal email display with almost no styling"""
-    from datetime import datetime
-    context = {
-        'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'now': datetime.now()
-    }
-    return render_template('minimal_email.html', **context)
+    return redirect(url_for('index'))
     
 @app.route('/ultra')
 def ultra_simple():
     """Ultra simplified home page with just plain links"""
-    from datetime import datetime
-    context = {
-        'now': datetime.now()
-    }
-    return render_template('ultra_simple.html', **context)
+    return redirect(url_for('index'))
 
 # Renamed settings route to avoid conflict 
 @app.route('/user_settings', methods=['GET', 'POST'])
