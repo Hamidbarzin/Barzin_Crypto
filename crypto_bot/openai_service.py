@@ -133,20 +133,20 @@ def analyze_news_sentiment(news_items):
         {json.dumps(limited_news, ensure_ascii=False, indent=2)}
         
         لطفاً پاسخ را در قالب JSON با ساختار زیر برگردانید:
-        {
-            "overall_sentiment": "نمره کلی احساسات (-1 تا 1)",
-            "sentiment_label": "برچسب احساسات (منفی، خنثی، مثبت)",
+        {{
+            "overall_sentiment": -0.5,
+            "sentiment_label": "منفی",
             "sentiment_description": "توضیح مختصر وضعیت",
             "news_analysis": [
-                {
+                {{
                     "title": "عنوان خبر",
-                    "sentiment": "احساسات (منفی، خنثی، مثبت)",
-                    "impact": "تأثیر بر بازار (کم، متوسط، زیاد)",
+                    "sentiment": "منفی",
+                    "impact": "متوسط",
                     "key_points": ["نکته کلیدی 1", "نکته کلیدی 2"]
-                }
+                }}
             ],
             "keywords": ["کلمه کلیدی 1", "کلمه کلیدی 2", "کلمه کلیدی 3"]
-        }
+        }}
         """
         
         # ارسال درخواست به OpenAI
@@ -202,19 +202,19 @@ def suggest_trading_strategy(symbol, price_data, technical_indicators, risk_leve
         {json.dumps(technical_indicators, ensure_ascii=False, indent=2)}
         
         لطفاً پاسخ را در قالب JSON با ساختار زیر برگردانید:
-        {
-            "strategy_name": "نام استراتژی",
-            "strategy_type": "نوع استراتژی (روند، نوسانی، معکوس و...)",
-            "timeframe": "بازه زمانی پیشنهادی",
-            "entry_points": ["نقطه ورود 1", "نقطه ورود 2"],
-            "exit_points": ["نقطه خروج 1", "نقطه خروج 2"],
-            "stop_loss": "پیشنهاد حد ضرر",
-            "take_profit": "پیشنهاد حد سود",
-            "risk_reward_ratio": "نسبت ریسک به پاداش",
-            "key_indicators": ["شاخص کلیدی 1", "شاخص کلیدی 2"],
-            "strategy_description": "توضیح مختصر استراتژی",
-            "confidence": "میزان اطمینان استراتژی (0 تا 1)"
-        }
+        {{
+            "strategy_name": "تقاطع میانگین متحرک",
+            "strategy_type": "روند",
+            "timeframe": "روزانه",
+            "entry_points": ["تقاطع صعودی MA20 و MA50", "RSI زیر 30"],
+            "exit_points": ["تقاطع نزولی MA20 و MA50", "RSI بالای 70"],
+            "stop_loss": "5% زیر قیمت ورود",
+            "take_profit": "15% بالای قیمت ورود",
+            "risk_reward_ratio": "1:3",
+            "key_indicators": ["MA", "RSI", "حجم معاملات"],
+            "strategy_description": "استراتژی بر اساس تقاطع میانگین‌های متحرک و تأیید با RSI",
+            "confidence": 0.8
+        }}
         """
         
         # ارسال درخواست به OpenAI
@@ -268,20 +268,27 @@ def detect_price_patterns(symbol, price_data, timeframe="1d"):
         {json.dumps(price_data, ensure_ascii=False, indent=2)}
         
         لطفاً پاسخ را در قالب JSON با ساختار زیر برگردانید:
-        {
-            "patterns_found": true/false,
-            "pattern_count": "تعداد الگوهای شناسایی شده",
+        {{
+            "patterns_found": true,
+            "pattern_count": 2,
             "identified_patterns": [
-                {
-                    "pattern_name": "نام الگو",
-                    "completion_percentage": "درصد تکمیل الگو",
-                    "signal": "سیگنال (خرید، فروش، خنثی)",
-                    "confidence": "میزان اطمینان (0 تا 1)",
-                    "description": "توضیح مختصر الگو"
-                }
+                {{
+                    "pattern_name": "سر و شانه",
+                    "completion_percentage": 85,
+                    "signal": "فروش",
+                    "confidence": 0.75,
+                    "description": "الگوی برگشتی که پایان روند صعودی را نشان می‌دهد"
+                }},
+                {{
+                    "pattern_name": "کف دوگانه",
+                    "completion_percentage": 90,
+                    "signal": "خرید",
+                    "confidence": 0.8,
+                    "description": "الگوی برگشتی که پایان روند نزولی را نشان می‌دهد"
+                }}
             ],
-            "chart_areas": ["ناحیه مهم 1", "ناحیه مهم 2"]
-        }
+            "chart_areas": ["حمایت اصلی در محدوده 5% زیر قیمت فعلی", "مقاومت کلیدی در محدوده 8% بالای قیمت فعلی"]
+        }}
         """
         
         # ارسال درخواست به OpenAI
