@@ -939,10 +939,15 @@ def get_economic():
 @app.route('/api/email-message')
 def get_email_message():
     """Get the last email message that would have been sent"""
+    from crypto_bot.email_service import last_email_content, DISABLE_REAL_EMAIL
+    
+    # Directly access the variables from the module
+    has_message = last_email_content['recipient'] is not None
+    
     status = {
         'email_system_enabled': not DISABLE_REAL_EMAIL,
-        'has_message': last_email_content['recipient'] is not None,
-        'last_message': last_email_content if last_email_content['recipient'] is not None else None
+        'has_message': has_message,
+        'last_message': last_email_content if has_message else None
     }
     return jsonify({'success': True, 'data': status})
 
