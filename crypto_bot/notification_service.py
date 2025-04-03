@@ -62,13 +62,24 @@ def send_sms_notification(to_phone_number, message):
     try:
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         
-        message = client.messages.create(
-            body=message,
-            from_=TWILIO_PHONE_NUMBER,
-            to=formatted_phone
-        )
+        # استفاده از واتساپ اگر شماره با شماره Twilio یکسان باشد
+        # (به ازای هر شماره Twilio، یک شماره واتساپ متناظر می‌توان استفاده کرد)
+        if formatted_phone == TWILIO_PHONE_NUMBER:
+            logger.info("استفاده از واتساپ به عنوان جایگزین برای ارسال پیام به شماره یکسان")
+            message_obj = client.messages.create(
+                body=message,
+                from_=f"whatsapp:{TWILIO_PHONE_NUMBER}",
+                to=f"whatsapp:{formatted_phone}"
+            )
+        else:
+            # ارسال پیامک معمولی
+            message_obj = client.messages.create(
+                body=message,
+                from_=TWILIO_PHONE_NUMBER,
+                to=formatted_phone
+            )
         
-        logger.info(f"پیام با شناسه {message.sid} ارسال شد")
+        logger.info(f"پیام با شناسه {message_obj.sid} ارسال شد")
         return True
     except TwilioRestException as e:
         logger.error(f"خطا در ارسال پیام: {str(e)}")
@@ -167,12 +178,23 @@ def send_test_notification(to_phone_number):
     formatted_phone = '+' + formatted_phone
     
     if formatted_phone == TWILIO_PHONE_NUMBER:
-        logger.warning("شماره تلفن ارسال‌کننده و دریافت‌کننده یکسان است. Twilio اجازه ارسال از یک شماره به همان شماره را نمی‌دهد.")
-        # وانمود می‌کنیم که ارسال موفقیت‌آمیز بوده است
-        return {
-            "success": False,
-            "message": "شماره تلفن ارسال‌کننده و دریافت‌کننده یکسان است. لطفاً شماره دیگری وارد کنید."
-        }
+        logger.info("شماره تلفن ارسال‌کننده و دریافت‌کننده یکسان است. استفاده از WhatsApp برای ارسال پیام.")
+        
+        message = "🤖 پیام تست از ربات معامله ارز دیجیتال\n"
+        message += "سیستم اعلان‌های واتساپ فعال است.\n"
+        message += f"⏰ زمان: {get_current_persian_time()}"
+        
+        result = send_sms_notification(to_phone_number, message)
+        if result:
+            return {
+                "success": True,
+                "message": "پیام تست با موفقیت از طریق واتساپ ارسال شد."
+            }
+        else:
+            return {
+                "success": False,
+                "message": "خطا در ارسال پیام تست. لطفاً تنظیمات را بررسی کنید."
+            }
     
     message = "🤖 پیام تست از ربات معامله ارز دیجیتال\n"
     message += "سیستم اعلان‌های پیامکی فعال است.\n"
