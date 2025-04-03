@@ -2,6 +2,21 @@
 
 {% block title %}داشبورد هوش مصنوعی{% endblock %}
 
+{% block extra_css %}
+<style>
+    .crypto-button.active {
+        background-color: #ffc107 !important;
+        border-color: #ffc107 !important;
+        color: #000 !important;
+    }
+    
+    .sentiment-chart {
+        border-radius: 50%;
+        background: conic-gradient(#e9ecef 0%, #e9ecef 100%);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
     <div class="mb-4">
@@ -301,6 +316,10 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="/static/js/ai-dashboard.js"></script>
+{% endblock %}
+
+{% block extra_js_unused %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         let selectedSymbol = "BTC/USDT";
