@@ -51,7 +51,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/ai_dashboard' %}active{% endif %}" href="/ai_dashboard">
+                        <a class="nav-link {% if request.path == '/ai_dashboard' or request.path == '/ai-dashboard' or request.path == '/ai' %}active{% endif %}" href="/ai">
                             <i class="fas fa-brain me-1"></i> هوش مصنوعی
                         </a>
                     </li>

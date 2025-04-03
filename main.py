@@ -531,6 +531,7 @@ def trading_opportunities():
 
 @app.route('/ai')
 @app.route('/ai_dashboard')
+@app.route('/ai-dashboard')
 def ai_dashboard():
     """
     داشبورد هوش مصنوعی برای تحلیل و پیش‌بینی قیمت ارزهای دیجیتال
