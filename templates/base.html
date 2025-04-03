@@ -51,6 +51,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/email-sample' %}active{% endif %}" href="/email-sample">
+                            <i class="fas fa-envelope me-1"></i> نمونه ایمیل
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if request.path == '/settings' %}active{% endif %}" href="/settings">
                             <i class="fas fa-cog me-1"></i> تنظیمات
                         </a>
