@@ -39,6 +39,9 @@ def send_email(recipient, subject, html_content, text_content=None):
     """
     # Store the email content in the global variable for display in UI
     global last_email_content
+    
+    # Make sure we always create and set the email content object
+    # with the current time stamp - this is critical for UI display
     last_email_content = {
         'recipient': recipient,
         'subject': subject,
