@@ -156,11 +156,39 @@ def send_test_notification(to_phone_number):
     Returns:
         bool: آیا ارسال موفقیت‌آمیز بود
     """
+    # بررسی اینکه آیا شماره تلفن دریافت‌کننده با شماره تلفن ارسال‌کننده یکسان است
+    # این کار را می‌کنیم چون Twilio امکان ارسال پیامک از یک شماره به همان شماره را نمی‌دهد
+    formatted_phone = to_phone_number.strip()
+    formatted_phone = ''.join(c for c in formatted_phone if c.isdigit() or c == '+')
+    if formatted_phone.startswith('+'):
+        formatted_phone = formatted_phone[1:]
+    if formatted_phone.startswith('0'):
+        formatted_phone = formatted_phone[1:]
+    formatted_phone = '+' + formatted_phone
+    
+    if formatted_phone == TWILIO_PHONE_NUMBER:
+        logger.warning("شماره تلفن ارسال‌کننده و دریافت‌کننده یکسان است. Twilio اجازه ارسال از یک شماره به همان شماره را نمی‌دهد.")
+        # وانمود می‌کنیم که ارسال موفقیت‌آمیز بوده است
+        return {
+            "success": False,
+            "message": "شماره تلفن ارسال‌کننده و دریافت‌کننده یکسان است. لطفاً شماره دیگری وارد کنید."
+        }
+    
     message = "🤖 پیام تست از ربات معامله ارز دیجیتال\n"
     message += "سیستم اعلان‌های پیامکی فعال است.\n"
     message += f"⏰ زمان: {get_current_persian_time()}"
     
-    return send_sms_notification(to_phone_number, message)
+    result = send_sms_notification(to_phone_number, message)
+    if result:
+        return {
+            "success": True,
+            "message": "پیام تست با موفقیت ارسال شد."
+        }
+    else:
+        return {
+            "success": False,
+            "message": "خطا در ارسال پیام تست. لطفاً تنظیمات را بررسی کنید."
+        }
 
 def get_current_persian_time():
     """

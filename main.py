@@ -885,7 +885,10 @@ def test_notification():
     
     try:
         result = send_test_notification(phone_number)
-        if result:
+        # چون تابع send_test_notification اکنون دیکشنری برمی‌گرداند
+        if isinstance(result, dict):
+            return jsonify(result)
+        elif result:
             return jsonify({'success': True, 'message': 'پیامک تست با موفقیت ارسال شد'})
         else:
             return jsonify({'success': False, 'message': 'خطا در ارسال پیامک. لطفاً تنظیمات Twilio را بررسی کنید'})
