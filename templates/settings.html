@@ -210,61 +210,102 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Test email button
-    document.getElementById('test_email_btn').addEventListener('click', function() {
-        const emailAddress = document.getElementById('email_address').value;
-        
-        if (!emailAddress) {
-            alert('لطفا ابتدا یک آدرس ایمیل وارد کنید.');
-            return;
-        }
-        
-        // Disable button and show loading
-        const button = this;
-        const originalText = button.innerHTML;
-        button.disabled = true;
-        button.innerHTML = '<span class="loading-spinner"></span> در حال ارسال...';
-        
-        // Send test email
-        fetch('/api/test-email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                'email_address': emailAddress
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('ایمیل تست با موفقیت ارسال شد! لطفا صندوق ورودی خود را بررسی کنید.');
-                // Show email preview after sending test email
-                loadEmailPreview();
-            } else {
-                alert('خطا: ' + data.message);
+    const testEmailBtn = document.getElementById('test_email_btn');
+    if (testEmailBtn) {
+        testEmailBtn.addEventListener('click', function() {
+            const emailAddress = document.getElementById('email_address').value;
+            
+            if (!emailAddress) {
+                alert('لطفا ابتدا یک آدرس ایمیل وارد کنید.');
+                return;
             }
             
-            // Restore button
-            button.disabled = false;
-            button.innerHTML = originalText;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('خطایی هنگام ارسال ایمیل تست رخ داد. لطفا دوباره تلاش کنید.');
+            // Disable button and show loading
+            const button = this;
+            const originalText = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<span class="loading-spinner"></span> در حال ارسال...';
             
-            // Restore button
-            button.disabled = false;
-            button.innerHTML = originalText;
+            // Send test email
+            fetch('/api/test-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'email_address': emailAddress
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('ایمیل تست با موفقیت ارسال شد! لطفا صندوق ورودی خود را بررسی کنید.');
+                    // Show email preview after sending test email
+                    loadEmailPreview();
+                } else {
+                    alert('خطا: ' + data.message);
+                }
+                
+                // Restore button
+                button.disabled = false;
+                button.innerHTML = originalText;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('خطایی هنگام ارسال ایمیل تست رخ داد. لطفا دوباره تلاش کنید.');
+                
+                // Restore button
+                button.disabled = false;
+                button.innerHTML = originalText;
+            });
         });
-    });
+    } else {
+        console.error('Test email button not found');
+    }
+    
+    // Scheduler status toggle
+    const schedulerSwitch = document.getElementById('scheduler_enabled');
+    if (schedulerSwitch) {
+        schedulerSwitch.addEventListener('change', function() {
+            const statusAlert = document.getElementById('scheduler_status_alert');
+            const statusText = document.getElementById('scheduler_status_text');
+            
+            if (this.checked) {
+                statusAlert.className = 'alert alert-warning';
+                statusText.textContent = 'در انتظار شروع (تنظیمات را ذخیره کنید تا اعمال شود)';
+            } else {
+                statusAlert.className = 'alert alert-warning';
+                statusText.textContent = 'در انتظار توقف (تنظیمات را ذخیره کنید تا اعمال شود)';
+            }
+        });
+    } else {
+        console.error('Scheduler switch not found');
+    }
+});
+</script>
+
+<!-- کد جاوا اسکریپت مشاهده ایمیل - جدا شده برای اطمینان از کارکرد صحیح -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Debug info
+    console.log('Email preview script loaded');
     
     // View email button
-    document.getElementById('view_email_btn').addEventListener('click', function() {
+    const viewEmailBtn = document.getElementById('view_email_btn');
+    if (!viewEmailBtn) {
+        console.error('View email button not found');
+        return;
+    }
+    
+    console.log('Adding click event to view email button');
+    viewEmailBtn.addEventListener('click', function() {
+        console.log('View email button clicked');
         loadEmailPreview();
     });
     
     // Function to load email preview
     function loadEmailPreview() {
+        console.log('Loading email preview...');
         const previewContainer = document.getElementById('email_preview_container');
         const previewError = document.getElementById('email_preview_error');
         const previewSubject = document.getElementById('email_preview_subject');
@@ -272,9 +313,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const previewContent = document.getElementById('email_preview_content');
         const previewRecipient = document.getElementById('email_preview_recipient');
         
+        if (!previewContainer || !previewError || !previewSubject || 
+            !previewTime || !previewContent || !previewRecipient) {
+            console.error('One or more preview elements not found');
+            alert('خطا در بارگیری عناصر پیش‌نمایش ایمیل');
+            return;
+        }
+        
         fetch('/api/email-message')
-        .then(response => response.json())
+        .then(response => {
+            console.log('API response received');
+            return response.json();
+        })
         .then(data => {
+            console.log('Email data:', data);
             if (data.success && data.data.has_message) {
                 const message = data.data.last_message;
                 
@@ -287,15 +339,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show preview container, hide error
                 previewContainer.classList.remove('d-none');
                 previewError.classList.add('d-none');
+                console.log('Email preview displayed');
             } else {
                 // Hide preview container, show error
                 previewContainer.classList.add('d-none');
                 previewError.classList.remove('d-none');
                 previewError.textContent = "هنوز هیچ ایمیلی ارسال نشده است یا سیستم ایمیل فعال نیست.";
+                console.log('No email message available');
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error loading email:', error);
             // Hide preview container, show error
             previewContainer.classList.add('d-none');
             previewError.classList.remove('d-none');
@@ -303,19 +357,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Scheduler status toggle
-    document.getElementById('scheduler_enabled').addEventListener('change', function() {
-        const statusAlert = document.getElementById('scheduler_status_alert');
-        const statusText = document.getElementById('scheduler_status_text');
-        
-        if (this.checked) {
-            statusAlert.className = 'alert alert-warning';
-            statusText.textContent = 'در انتظار شروع (تنظیمات را ذخیره کنید تا اعمال شود)';
-        } else {
-            statusAlert.className = 'alert alert-warning';
-            statusText.textContent = 'در انتظار توقف (تنظیمات را ذخیره کنید تا اعمال شود)';
-        }
-    });
+    // Try auto-load on page load
+    try {
+        setTimeout(function() {
+            console.log('Auto-checking for email...');
+            fetch('/api/email-message')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data.has_message) {
+                    console.log('Email exists, auto-loading preview');
+                    loadEmailPreview();
+                }
+            })
+            .catch(e => console.error('Auto-check error:', e));
+        }, 1000);
+    } catch (e) {
+        console.error('Auto-load error:', e);
+    }
 });
 </script>
 {% endblock %}
