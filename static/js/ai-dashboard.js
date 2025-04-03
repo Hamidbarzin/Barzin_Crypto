@@ -140,8 +140,13 @@ document.addEventListener('DOMContentLoaded', function() {
      * دریافت پیش‌بینی قیمت
      */
     function fetchPricePrediction(symbol, timeframe) {
-        return fetch(`/api/ai/price-prediction/${symbol}?timeframe=${timeframe}`)
-            .then(response => response.json())
+        return fetch(`/api/ai/price-prediction/${encodeURIComponent(symbol)}?timeframe=${timeframe}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     updatePricePredictionUI(data.data, timeframe);
@@ -158,8 +163,13 @@ document.addEventListener('DOMContentLoaded', function() {
      * دریافت الگوهای قیمت
      */
     function fetchPricePatterns(symbol) {
-        return fetch(`/api/ai/price-patterns/${symbol}`)
-            .then(response => response.json())
+        return fetch(`/api/ai/price-patterns/${encodeURIComponent(symbol)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     updatePatternsUI(data.data);
@@ -194,8 +204,13 @@ document.addEventListener('DOMContentLoaded', function() {
      * دریافت استراتژی معاملاتی
      */
     function fetchTradingStrategy(symbol, riskLevel, timeframe) {
-        return fetch(`/api/ai/trading-strategy/${symbol}?risk_level=${riskLevel}&timeframe=${timeframe}`)
-            .then(response => response.json())
+        return fetch(`/api/ai/trading-strategy/${encodeURIComponent(symbol)}?risk_level=${riskLevel}&timeframe=${timeframe}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     updateStrategyUI(data.data);
