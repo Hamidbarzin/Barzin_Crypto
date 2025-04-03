@@ -56,94 +56,144 @@ def index():
         <style>
             body {
                 font-family: Tahoma, Arial, sans-serif;
-                margin: 20px;
+                margin: 0;
                 line-height: 1.5;
-                background-color: #f9f9f9;
+                background-color: #181A20;
+                color: #eaecef;
+                padding: 20px;
             }
             h1, h2 {
-                color: #333;
-                border-bottom: 1px solid #ddd;
-                padding-bottom: 5px;
+                color: #FCD535;
+                border-bottom: 1px solid #2b2f36;
+                padding-bottom: 10px;
+                margin-top: 25px;
             }
             table {
                 border-collapse: collapse;
                 width: 100%;
-                margin-bottom: 20px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                margin-bottom: 25px;
+                box-shadow: 0 1px 8px rgba(0,0,0,0.2);
+                border-radius: 5px;
+                overflow: hidden;
             }
             th, td {
-                border: 1px solid #ddd;
-                padding: 10px;
+                border: 1px solid #2b2f36;
+                padding: 12px;
                 text-align: right;
             }
             th {
-                background-color: #f2f2f2;
+                background-color: #2b3139;
                 font-weight: bold;
+                color: #FCD535;
             }
-            tr:nth-child(even) {
-                background-color: #f8f8f8;
+            tr {
+                background-color: #181A20;
+                transition: background-color 0.2s;
+            }
+            tr:hover {
+                background-color: #2b3139;
             }
             .positive {
-                color: green;
+                color: #0ECB81;
                 font-weight: bold;
             }
             .negative {
-                color: red;
+                color: #F6465D;
                 font-weight: bold;
             }
             a {
-                color: #0066cc;
+                color: #FCD535;
                 text-decoration: none;
+                transition: color 0.2s;
             }
             a:hover {
-                text-decoration: underline;
+                color: #F0B90B;
             }
             .update-time {
                 font-style: italic;
-                color: #666;
+                color: #848E9C;
                 margin-bottom: 20px;
             }
             .refresh-btn {
-                background-color: #4CAF50;
-                color: white;
-                padding: 10px 15px;
+                background-color: #F0B90B;
+                color: #000;
+                padding: 10px 20px;
                 border: none;
                 border-radius: 4px;
                 cursor: pointer;
                 font-size: 16px;
                 margin-bottom: 20px;
+                font-weight: bold;
+                transition: background-color 0.2s;
+                display: inline-block;
             }
             .refresh-btn:hover {
-                background-color: #45a049;
+                background-color: #FCD535;
             }
             .signal-buy {
-                background-color: rgba(0, 128, 0, 0.1);
+                background-color: rgba(14, 203, 129, 0.1);
             }
             .signal-sell {
-                background-color: rgba(255, 0, 0, 0.1);
+                background-color: rgba(246, 70, 93, 0.1);
             }
             .signal-neutral {
-                background-color: rgba(128, 128, 128, 0.1);
+                background-color: rgba(132, 142, 156, 0.1);
+            }
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #2b2f36;
+            }
+            .logo {
+                color: #F0B90B;
+                font-size: 28px;
+                font-weight: bold;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .nav-links {
+                display: flex;
+                gap: 15px;
+                margin: 15px 0;
+            }
+            .nav-links a {
+                background-color: #2b3139;
+                padding: 8px 15px;
+                border-radius: 4px;
+                transition: all 0.2s;
+            }
+            .nav-links a:hover {
+                background-color: #F0B90B;
+                color: #000;
             }
         </style>
         <meta http-equiv="refresh" content="300"> <!-- Auto refresh every 5 minutes -->
     </head>
     <body>
-        <h1>ربات ساده ارز دیجیتال</h1>
-        <p class="update-time">آخرین به‌روزرسانی: {{ current_time }}</p>
-        <a href="/" class="refresh-btn">به‌روزرسانی اطلاعات</a>
+        <div class="container">
+            <div class="header">
+                <div class="logo">بایننس</div>
+                <a href="/" class="refresh-btn">به‌روزرسانی اطلاعات</a>
+            </div>
+            
+            <p class="update-time">آخرین به‌روزرسانی: {{ current_time }}</p>
+            
+            <div class="nav-links">
+                <a href="/ultra">صفحه اصلی</a>
+                <a href="/simple">صفحه ساده</a>
+                <a href="/minimal">نمونه ایمیل</a>
+                <a href="/simple_email">ایمیل ساده</a>
+                <a href="/email_sample">ایمیل کامل</a>
+                <a href="/test_menu">منوی تست</a>
+            </div>
         
-        <h2>لینک‌های مهم</h2>
-        <ul>
-            <li><a href="/ultra">صفحه اصلی بسیار ساده</a></li>
-            <li><a href="/simple">صفحه اصلی ساده</a></li>
-            <li><a href="/minimal">نمونه ایمیل (بسیار ساده)</a></li>
-            <li><a href="/simple_email">نمونه ایمیل (ساده)</a></li>
-            <li><a href="/email_sample">نمونه ایمیل (کامل)</a></li>
-            <li><a href="/test_menu">منوی آزمایشی</a></li>
-        </ul>
-        
-        <h2>قیمت ارزهای دیجیتال</h2>
+            <h2>قیمت ارزهای دیجیتال</h2>
         <table>
             <tr>
                 <th>ارز</th>
@@ -190,13 +240,13 @@ def index():
             {% endfor %}
         </table>
         
-        <h2>قیمت کالاها</h2>
-        <table>
-            <tr>
-                <th>کالا</th>
-                <th>قیمت (USD)</th>
-                <th>تغییر</th>
-            </tr>
+            <h2>قیمت کالاها</h2>
+            <table>
+                <tr>
+                    <th>کالا</th>
+                    <th>قیمت (USD)</th>
+                    <th>تغییر</th>
+                </tr>
             {% if commodities and 'GOLD' in commodities %}
                 <tr>
                     <td>طلا</td>
@@ -246,13 +296,13 @@ def index():
             {% endif %}
         </table>
         
-        <h2>نرخ ارزهای جهانی</h2>
-        <table>
-            <tr>
-                <th>ارز</th>
-                <th>نرخ</th>
-                <th>تغییر</th>
-            </tr>
+            <h2>نرخ ارزهای جهانی</h2>
+            <table>
+                <tr>
+                    <th>ارز</th>
+                    <th>نرخ</th>
+                    <th>تغییر</th>
+                </tr>
             {% for symbol, data in forex_rates.items() %}
                 <tr>
                     <td>{{ data.get('name', symbol) }}</td>
@@ -280,14 +330,14 @@ def index():
             {% endfor %}
         </table>
         
-        <h2>سیگنال‌های معاملاتی</h2>
-        <table>
-            <tr>
-                <th>ارز</th>
-                <th>قیمت</th>
-                <th>سیگنال</th>
-                <th>توصیه</th>
-            </tr>
+            <h2>سیگنال‌های معاملاتی</h2>
+            <table>
+                <tr>
+                    <th>ارز</th>
+                    <th>قیمت</th>
+                    <th>سیگنال</th>
+                    <th>توصیه</th>
+                </tr>
             {% for symbol, data in signals.items() %}
                 <tr class="signal-{{ 'buy' if 'buy' in data.get('signal', '').lower() else 'sell' if 'sell' in data.get('signal', '').lower() else 'neutral' }}">
                     <td>{{ symbol }}</td>
