@@ -56,6 +56,16 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/trading-opportunities' %}active{% endif %}" href="/trading-opportunities">
+                            <i class="fas fa-exchange-alt me-1"></i> فرصت‌های معاملاتی
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/notifications' %}active{% endif %}" href="/notifications">
+                            <i class="fas fa-bell me-1"></i> اعلان‌ها
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if request.path == '/email-sample' %}active{% endif %}" href="/email-sample">
                             <i class="fas fa-envelope me-1"></i> نمونه ایمیل
                         </a>

@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+
+{% block title %}تنظیمات اعلان‌ها - ربات معامله ارز دیجیتال{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bell text-warning me-2"></i>
+                        تنظیمات اعلان‌ها
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="notificationSettingsForm" method="post" action="/api/update-notification-settings">
+                        <!-- تنظیمات اعلان‌های پیامکی -->
+                        <div class="section-title mb-3 border-bottom pb-2">
+                            <h5>اعلان‌های پیامکی</h5>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="sms_enabled" name="sms_enabled" 
+                                           {% if notification_settings.sms_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="sms_enabled">فعال‌سازی اعلان‌های پیامکی</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone_number" class="form-label">شماره موبایل</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                        <input type="text" class="form-control" id="phone_number" name="phone_number" 
+                                               placeholder="+989123456789" value="{{ notification_settings.phone_number }}">
+                                    </div>
+                                    <div class="form-text">شماره را با کد کشور وارد کنید (مثال: 989123456789+)</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">ارسال تست پیامک</label>
+                                    <button type="button" class="btn btn-outline-warning w-100" id="testSmsButton">
+                                        <i class="fas fa-paper-plane me-2"></i>
+                                        ارسال پیامک تست
+                                    </button>
+                                </div>
+                                <div id="testSmsResult" class="alert alert-info d-none mt-2">
+                                    نتیجه تست پیامک اینجا نمایش داده می‌شود
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- تنظیمات اعلان‌های فرصت‌های خرید و فروش -->
+                        <div class="section-title mb-3 border-bottom pb-2">
+                            <h5>فرصت‌های خرید و فروش</h5>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="buy_sell_enabled" name="buy_sell_enabled" 
+                                           {% if notification_settings.buy_sell_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="buy_sell_enabled">دریافت اعلان‌های فرصت خرید و فروش</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="buy_sell_sensitivity" class="form-label">حساسیت تشخیص</label>
+                                    <select class="form-select" id="buy_sell_sensitivity" name="buy_sell_sensitivity">
+                                        <option value="low" {% if notification_settings.buy_sell_sensitivity == 'low' %}selected{% endif %}>کم (فقط فرصت‌های بسیار واضح)</option>
+                                        <option value="medium" {% if notification_settings.buy_sell_sensitivity == 'medium' %}selected{% endif %}>متوسط</option>
+                                        <option value="high" {% if notification_settings.buy_sell_sensitivity == 'high' %}selected{% endif %}>زیاد (اعلان‌های بیشتر)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="buy_sell_frequency" class="form-label">حداکثر تعداد اعلان در روز</label>
+                                    <select class="form-select" id="buy_sell_frequency" name="buy_sell_frequency">
+                                        <option value="1" {% if notification_settings.buy_sell_frequency == '1' %}selected{% endif %}>حداکثر 1 اعلان در روز</option>
+                                        <option value="3" {% if notification_settings.buy_sell_frequency == '3' %}selected{% endif %}>حداکثر 3 اعلان در روز</option>
+                                        <option value="5" {% if notification_settings.buy_sell_frequency == '5' %}selected{% endif %}>حداکثر 5 اعلان در روز</option>
+                                        <option value="10" {% if notification_settings.buy_sell_frequency == '10' %}selected{% endif %}>حداکثر 10 اعلان در روز</option>
+                                        <option value="unlimited" {% if notification_settings.buy_sell_frequency == 'unlimited' %}selected{% endif %}>بدون محدودیت</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">ساعات دریافت اعلان</label>
+                                    <div class="d-flex">
+                                        <select class="form-select me-2" id="start_hour" name="start_hour">
+                                            {% for hour in range(24) %}
+                                                <option value="{{ hour }}" {% if notification_settings.start_hour == hour %}selected{% endif %}>{{ '%02d'|format(hour) }}:00</option>
+                                            {% endfor %}
+                                        </select>
+                                        <span class="align-self-center">تا</span>
+                                        <select class="form-select ms-2" id="end_hour" name="end_hour">
+                                            {% for hour in range(24) %}
+                                                <option value="{{ hour }}" {% if notification_settings.end_hour == hour %}selected{% endif %}>{{ '%02d'|format(hour) }}:00</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- تنظیمات اعلان‌های نوسانات بازار -->
+                        <div class="section-title mb-3 border-bottom pb-2">
+                            <h5>تشخیص نوسانات بازار</h5>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="volatility_enabled" name="volatility_enabled" 
+                                           {% if notification_settings.volatility_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="volatility_enabled">دریافت اعلان‌های نوسانات قیمت</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="volatility_threshold" class="form-label">آستانه حساسیت</label>
+                                    <select class="form-select" id="volatility_threshold" name="volatility_threshold">
+                                        <option value="low" {% if notification_settings.volatility_threshold == 'low' %}selected{% endif %}>کم (تغییرات بیش از 1%)</option>
+                                        <option value="medium" {% if notification_settings.volatility_threshold == 'medium' %}selected{% endif %}>متوسط (تغییرات بیش از 3%)</option>
+                                        <option value="high" {% if notification_settings.volatility_threshold == 'high' %}selected{% endif %}>زیاد (تغییرات بیش از 5%)</option>
+                                        <option value="extreme" {% if notification_settings.volatility_threshold == 'extreme' %}selected{% endif %}>بسیار زیاد (تغییرات بیش از 10%)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="volatility_timeframe" class="form-label">بازه زمانی بررسی</label>
+                                    <select class="form-select" id="volatility_timeframe" name="volatility_timeframe">
+                                        <option value="5m" {% if notification_settings.volatility_timeframe == '5m' %}selected{% endif %}>5 دقیقه</option>
+                                        <option value="15m" {% if notification_settings.volatility_timeframe == '15m' %}selected{% endif %}>15 دقیقه</option>
+                                        <option value="1h" {% if notification_settings.volatility_timeframe == '1h' %}selected{% endif %}>1 ساعت</option>
+                                        <option value="4h" {% if notification_settings.volatility_timeframe == '4h' %}selected{% endif %}>4 ساعت</option>
+                                        <option value="1d" {% if notification_settings.volatility_timeframe == '1d' %}selected{% endif %}>1 روز</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="volatility_frequency" class="form-label">حداکثر تعداد اعلان در روز</label>
+                                    <select class="form-select" id="volatility_frequency" name="volatility_frequency">
+                                        <option value="3" {% if notification_settings.volatility_frequency == '3' %}selected{% endif %}>حداکثر 3 اعلان در روز</option>
+                                        <option value="5" {% if notification_settings.volatility_frequency == '5' %}selected{% endif %}>حداکثر 5 اعلان در روز</option>
+                                        <option value="10" {% if notification_settings.volatility_frequency == '10' %}selected{% endif %}>حداکثر 10 اعلان در روز</option>
+                                        <option value="unlimited" {% if notification_settings.volatility_frequency == 'unlimited' %}selected{% endif %}>بدون محدودیت</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- تنظیمات اعلان روند کلی بازار -->
+                        <div class="section-title mb-3 border-bottom pb-2">
+                            <h5>اعلان روند کلی بازار</h5>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="market_trend_enabled" name="market_trend_enabled" 
+                                           {% if notification_settings.market_trend_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="market_trend_enabled">دریافت اعلان‌های روند کلی بازار</label>
+                                </div>
+                                <div class="form-text mb-3">
+                                    این اعلان‌ها شامل تحلیل روند کلی بازار و اخبار مهم تأثیرگذار هستند
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="market_trend_frequency" class="form-label">تناوب اعلان‌ها</label>
+                                    <select class="form-select" id="market_trend_frequency" name="market_trend_frequency">
+                                        <option value="daily" {% if notification_settings.market_trend_frequency == 'daily' %}selected{% endif %}>روزانه</option>
+                                        <option value="significant" {% if notification_settings.market_trend_frequency == 'significant' %}selected{% endif %}>فقط تغییرات مهم</option>
+                                        <option value="weekly" {% if notification_settings.market_trend_frequency == 'weekly' %}selected{% endif %}>هفتگی</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- دکمه‌های ذخیره تغییرات -->
+                        <div class="row mt-4">
+                            <div class="col-md-6 offset-md-3">
+                                <button type="submit" class="btn btn-warning w-100">
+                                    <i class="fas fa-save me-2"></i>
+                                    ذخیره تنظیمات
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // فرم تنظیمات اعلان‌ها
+    const notificationForm = document.getElementById('notificationSettingsForm');
+    if (notificationForm) {
+        notificationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // جمع‌آوری داده‌های فرم
+            const formData = new FormData(notificationForm);
+            const settings = {};
+            
+            // تبدیل چک‌باکس‌ها به بولین
+            settings.sms_enabled = formData.get('sms_enabled') === 'on';
+            settings.buy_sell_enabled = formData.get('buy_sell_enabled') === 'on';
+            settings.volatility_enabled = formData.get('volatility_enabled') === 'on';
+            settings.market_trend_enabled = formData.get('market_trend_enabled') === 'on';
+            
+            // اضافه کردن سایر فیلدها
+            settings.phone_number = formData.get('phone_number');
+            settings.buy_sell_sensitivity = formData.get('buy_sell_sensitivity');
+            settings.buy_sell_frequency = formData.get('buy_sell_frequency');
+            settings.start_hour = parseInt(formData.get('start_hour'));
+            settings.end_hour = parseInt(formData.get('end_hour'));
+            settings.volatility_threshold = formData.get('volatility_threshold');
+            settings.volatility_timeframe = formData.get('volatility_timeframe');
+            settings.volatility_frequency = formData.get('volatility_frequency');
+            settings.market_trend_frequency = formData.get('market_trend_frequency');
+            
+            // ارسال به سرور
+            fetch('/api/update-notification-settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(settings)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // نمایش پیام موفقیت
+                    const alertHtml = `
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            تنظیمات اعلان‌ها با موفقیت ذخیره شد
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+                    document.querySelector('.card-body').insertAdjacentHTML('afterbegin', alertHtml);
+                } else {
+                    // نمایش پیام خطا
+                    const alertHtml = `
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-times-circle me-2"></i>
+                            خطا در ذخیره تنظیمات: ${data.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+                    document.querySelector('.card-body').insertAdjacentHTML('afterbegin', alertHtml);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving notification settings:', error);
+                // نمایش پیام خطا
+                const alertHtml = `
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-times-circle me-2"></i>
+                        خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                document.querySelector('.card-body').insertAdjacentHTML('afterbegin', alertHtml);
+            });
+        });
+    }
+    
+    // دکمه ارسال پیامک تست
+    const testSmsButton = document.getElementById('testSmsButton');
+    const testSmsResult = document.getElementById('testSmsResult');
+    if (testSmsButton && testSmsResult) {
+        testSmsButton.addEventListener('click', function() {
+            const phoneNumber = document.getElementById('phone_number').value;
+            if (!phoneNumber) {
+                testSmsResult.textContent = 'لطفاً ابتدا شماره موبایل را وارد کنید';
+                testSmsResult.classList.remove('d-none', 'alert-success', 'alert-info');
+                testSmsResult.classList.add('alert-danger');
+                return;
+            }
+            
+            // نمایش وضعیت در حال پردازش
+            testSmsResult.textContent = 'در حال ارسال پیامک تست...';
+            testSmsResult.classList.remove('d-none', 'alert-success', 'alert-danger');
+            testSmsResult.classList.add('alert-info');
+            
+            // ارسال درخواست
+            fetch('/api/test-notification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ phone_number: phoneNumber })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // نمایش پیام موفقیت
+                    testSmsResult.textContent = 'پیامک تست با موفقیت ارسال شد';
+                    testSmsResult.classList.remove('alert-info', 'alert-danger');
+                    testSmsResult.classList.add('alert-success');
+                } else {
+                    // نمایش پیام خطا
+                    testSmsResult.textContent = `خطا در ارسال پیامک: ${data.message}`;
+                    testSmsResult.classList.remove('alert-info', 'alert-success');
+                    testSmsResult.classList.add('alert-danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending test SMS:', error);
+                testSmsResult.textContent = 'خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.';
+                testSmsResult.classList.remove('alert-info', 'alert-success');
+                testSmsResult.classList.add('alert-danger');
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

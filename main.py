@@ -496,10 +496,38 @@ def app_settings():
     """صفحه تنظیمات ساده"""
     return redirect(url_for('dashboard'))
 
+@app.route('/notifications')
+def notification_settings():
+    """صفحه تنظیمات اعلان‌ها"""
+    # تنظیمات پیش‌فرض اعلان‌ها
+    default_settings = {
+        'sms_enabled': session.get('sms_enabled', False),
+        'phone_number': session.get('phone_number', ''),
+        'buy_sell_enabled': session.get('buy_sell_enabled', True),
+        'buy_sell_sensitivity': session.get('buy_sell_sensitivity', 'medium'),
+        'buy_sell_frequency': session.get('buy_sell_frequency', '3'),
+        'start_hour': session.get('start_hour', 8),
+        'end_hour': session.get('end_hour', 22),
+        'volatility_enabled': session.get('volatility_enabled', True),
+        'volatility_threshold': session.get('volatility_threshold', 'medium'),
+        'volatility_timeframe': session.get('volatility_timeframe', '1h'),
+        'volatility_frequency': session.get('volatility_frequency', '5'),
+        'market_trend_enabled': session.get('market_trend_enabled', True),
+        'market_trend_frequency': session.get('market_trend_frequency', 'significant')
+    }
+    
+    return render_template('notification_settings.html', notification_settings=default_settings)
+
 @app.route('/dashboard_new')
 def dashboard_new():
     """Redirect to main dashboard"""
     return redirect(url_for('dashboard'))
+
+@app.route('/trading-opportunities')
+def trading_opportunities():
+    """صفحه فرصت‌های معاملاتی و نوسانات بازار"""
+    watched_currencies = session.get('watched_currencies', DEFAULT_CURRENCIES[:5])
+    return render_template('trading_opportunities.html', watched_currencies=watched_currencies)
 
 @app.route('/ai')
 @app.route('/ai_dashboard')
@@ -844,6 +872,27 @@ def test_email():
         logger.error(f"Error sending test email: {str(e)}")
         return jsonify({'success': False, 'message': f'Error: {str(e)}'})
 
+@app.route('/api/test-notification', methods=['POST'])
+def test_notification():
+    """ارسال پیامک تست برای بررسی عملکرد اعلان‌ها"""
+    from crypto_bot.notification_service import send_test_notification
+    
+    data = request.get_json()
+    phone_number = data.get('phone_number')
+    
+    if not phone_number:
+        return jsonify({'success': False, 'message': 'شماره موبایل الزامی است'})
+    
+    try:
+        result = send_test_notification(phone_number)
+        if result:
+            return jsonify({'success': True, 'message': 'پیامک تست با موفقیت ارسال شد'})
+        else:
+            return jsonify({'success': False, 'message': 'خطا در ارسال پیامک. لطفاً تنظیمات Twilio را بررسی کنید'})
+    except Exception as e:
+        logger.error(f"خطا در ارسال پیامک تست: {str(e)}")
+        return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
+
 @app.route('/api/price/<symbol>')
 def get_price(symbol):
     try:
@@ -1158,6 +1207,99 @@ def ai_trading_strategy(symbol):
         return jsonify({'success': True, 'data': strategy})
     except Exception as e:
         logger.error(f"خطا در پیشنهاد استراتژی معاملاتی {symbol}: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/update-notification-settings', methods=['POST'])
+def update_notification_settings():
+    """بروزرسانی تنظیمات اعلان‌ها"""
+    try:
+        # دریافت داده‌های ارسال شده
+        settings = request.get_json()
+        
+        # ذخیره تنظیمات در سشن
+        session['sms_enabled'] = settings.get('sms_enabled', False)
+        session['phone_number'] = settings.get('phone_number', '')
+        session['buy_sell_enabled'] = settings.get('buy_sell_enabled', True)
+        session['buy_sell_sensitivity'] = settings.get('buy_sell_sensitivity', 'medium')
+        session['buy_sell_frequency'] = settings.get('buy_sell_frequency', '3')
+        session['start_hour'] = settings.get('start_hour', 8)
+        session['end_hour'] = settings.get('end_hour', 22)
+        session['volatility_enabled'] = settings.get('volatility_enabled', True)
+        session['volatility_threshold'] = settings.get('volatility_threshold', 'medium')
+        session['volatility_timeframe'] = settings.get('volatility_timeframe', '1h')
+        session['volatility_frequency'] = settings.get('volatility_frequency', '5')
+        session['market_trend_enabled'] = settings.get('market_trend_enabled', True)
+        session['market_trend_frequency'] = settings.get('market_trend_frequency', 'significant')
+        
+        return jsonify({'success': True, 'message': 'تنظیمات با موفقیت ذخیره شد'})
+    except Exception as e:
+        logger.error(f"خطا در ذخیره تنظیمات اعلان‌ها: {str(e)}")
+        return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
+
+@app.route('/api/buy-sell-opportunities')
+def get_buy_sell_opportunities():
+    """دریافت فرصت‌های خرید و فروش"""
+    from crypto_bot.market_detector import detect_buy_sell_opportunities
+    
+    try:
+        # دریافت ارزهای مورد نظر از پارامترهای درخواست
+        symbols = request.args.getlist('symbols')
+        sensitivity = request.args.get('sensitivity', 'medium')
+        
+        # استفاده از ارزهای پیش‌فرض اگر هیچ ارزی مشخص نشده باشد
+        if not symbols:
+            symbols = session.get('watched_currencies', DEFAULT_CURRENCIES[:5])
+        
+        # شناسایی فرصت‌های خرید و فروش
+        opportunities = detect_buy_sell_opportunities(symbols, sensitivity=sensitivity)
+        
+        return jsonify({'success': True, 'data': opportunities})
+    except Exception as e:
+        logger.error(f"خطا در شناسایی فرصت‌های خرید/فروش: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/market-volatility')
+def get_market_volatility():
+    """دریافت نوسانات بازار"""
+    from crypto_bot.market_detector import detect_market_volatility
+    
+    try:
+        # دریافت پارامترهای درخواست
+        symbols = request.args.getlist('symbols')
+        timeframe = request.args.get('timeframe', '1h')
+        threshold = request.args.get('threshold', 'medium')
+        
+        # استفاده از ارزهای پیش‌فرض اگر هیچ ارزی مشخص نشده باشد
+        if not symbols:
+            symbols = session.get('watched_currencies', DEFAULT_CURRENCIES[:5])
+        
+        # شناسایی نوسانات بازار
+        volatility = detect_market_volatility(symbols, timeframe=timeframe, threshold=threshold)
+        
+        return jsonify({'success': True, 'data': volatility})
+    except Exception as e:
+        logger.error(f"خطا در شناسایی نوسانات بازار: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/market-trend')
+def get_market_trend():
+    """دریافت روند کلی بازار"""
+    from crypto_bot.market_detector import analyze_market_trend
+    
+    try:
+        # دریافت ارزهای مورد نظر از پارامترهای درخواست
+        symbols = request.args.getlist('symbols')
+        
+        # استفاده از ارزهای پیش‌فرض اگر هیچ ارزی مشخص نشده باشد
+        if not symbols:
+            symbols = None  # تابع analyze_market_trend از مقادیر پیش‌فرض خود استفاده می‌کند
+        
+        # تحلیل روند بازار
+        trend = analyze_market_trend(symbols)
+        
+        return jsonify({'success': True, 'data': trend})
+    except Exception as e:
+        logger.error(f"خطا در تحلیل روند بازار: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
 
 @app.route('/api/email-message')

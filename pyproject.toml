@@ -18,4 +18,5 @@ dependencies = [
     "schedule>=1.2.2",
     "ta>=0.11.0",
     "trafilatura>=2.0.0",
+    "twilio>=9.5.1",
 ]

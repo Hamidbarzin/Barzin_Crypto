@@ -1,0 +1,506 @@
+{% extends 'base.html' %}
+
+{% block title %}فرصت‌های معاملاتی - ربات معامله ارز دیجیتال{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- هدر صفحه -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-chart-line text-warning me-2"></i>
+                    فرصت‌های معاملاتی و نوسانات بازار
+                </h2>
+                <div>
+                    <button id="refreshDataBtn" class="btn btn-outline-secondary">
+                        <i class="fas fa-sync-alt me-1"></i>
+                        بروزرسانی
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- بخش روند کلی بازار -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-globe text-warning me-2"></i>
+                        تحلیل روند کلی بازار
+                    </h5>
+                    <span id="marketTrendTimestamp" class="text-muted small"></span>
+                </div>
+                <div class="card-body" id="marketTrendContainer">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border text-warning" role="status">
+                            <span class="visually-hidden">در حال بارگذاری...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- بخش فرصت‌های خرید و فروش -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exchange-alt text-warning me-2"></i>
+                        فرصت‌های خرید و فروش
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <label for="sensitivitySelect" class="me-2">حساسیت:</label>
+                        <select id="sensitivitySelect" class="form-select form-select-sm" style="width: auto;">
+                            <option value="low">کم</option>
+                            <option value="medium" selected>متوسط</option>
+                            <option value="high">زیاد</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body" id="buyOppContainer">
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        در حال تحلیل فرصت‌های معاملاتی... این فرایند ممکن است چند لحظه طول بکشد.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- بخش نوسانات بازار -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar text-warning me-2"></i>
+                        نوسانات اخیر بازار
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <label for="timeframeSelect" class="me-2">بازه زمانی:</label>
+                            <select id="timeframeSelect" class="form-select form-select-sm" style="width: auto;">
+                                <option value="5m">5 دقیقه</option>
+                                <option value="15m">15 دقیقه</option>
+                                <option value="1h" selected>1 ساعت</option>
+                                <option value="4h">4 ساعت</option>
+                                <option value="1d">1 روز</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="thresholdSelect" class="me-2">آستانه:</label>
+                            <select id="thresholdSelect" class="form-select form-select-sm" style="width: auto;">
+                                <option value="low">کم (1%)</option>
+                                <option value="medium" selected>متوسط (3%)</option>
+                                <option value="high">زیاد (5%)</option>
+                                <option value="extreme">بسیار زیاد (10%)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body" id="volatilityContainer">
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        در حال بررسی نوسانات بازار... این فرایند ممکن است چند لحظه طول بکشد.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- بخش اعلان‌های پیامکی -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bell text-warning me-2"></i>
+                        دریافت اعلان‌های پیامکی
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>برای دریافت اعلان‌های خرید، فروش و نوسانات بازار از طریق پیامک، تنظیمات اعلان‌ها را پیکربندی کنید.</p>
+                    <div class="text-center">
+                        <a href="/notifications" class="btn btn-warning">
+                            <i class="fas fa-cog me-2"></i>
+                            تنظیمات اعلان‌ها
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // تنظیم متغیرهای کاربر
+    let currentSymbols = {{ watched_currencies|tojson }};
+    let sensitivity = document.getElementById('sensitivitySelect').value;
+    let timeframe = document.getElementById('timeframeSelect').value;
+    let threshold = document.getElementById('thresholdSelect').value;
+    
+    // لود اولیه داده‌ها
+    loadMarketTrend();
+    loadBuySellOpportunities();
+    loadVolatility();
+    
+    // رویداد‌های تغییر فیلتر
+    document.getElementById('sensitivitySelect').addEventListener('change', function() {
+        sensitivity = this.value;
+        loadBuySellOpportunities();
+    });
+    
+    document.getElementById('timeframeSelect').addEventListener('change', function() {
+        timeframe = this.value;
+        loadVolatility();
+    });
+    
+    document.getElementById('thresholdSelect').addEventListener('change', function() {
+        threshold = this.value;
+        loadVolatility();
+    });
+    
+    // دکمه بروزرسانی
+    document.getElementById('refreshDataBtn').addEventListener('click', function() {
+        loadMarketTrend();
+        loadBuySellOpportunities();
+        loadVolatility();
+    });
+    
+    // بارگذاری روند کلی بازار
+    function loadMarketTrend() {
+        const container = document.getElementById('marketTrendContainer');
+        container.innerHTML = `
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border text-warning" role="status">
+                    <span class="visually-hidden">در حال بارگذاری...</span>
+                </div>
+            </div>
+        `;
+        
+        fetch('/api/market-trend')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderMarketTrend(data.data);
+                } else {
+                    container.innerHTML = `
+                        <div class="alert alert-danger mb-0">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            خطا در دریافت تحلیل روند بازار: ${data.message}
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                container.innerHTML = `
+                    <div class="alert alert-danger mb-0">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.
+                    </div>
+                `;
+                console.error('Error fetching market trend:', error);
+            });
+    }
+    
+    // نمایش روند کلی بازار
+    function renderMarketTrend(trend) {
+        const container = document.getElementById('marketTrendContainer');
+        const timestampEl = document.getElementById('marketTrendTimestamp');
+        
+        // تنظیم زمان آخرین بروزرسانی
+        if (trend.timestamp) {
+            const date = new Date(trend.timestamp);
+            timestampEl.textContent = `آخرین بروزرسانی: ${date.toLocaleString('fa-IR')}`;
+        }
+        
+        // انتخاب رنگ و آیکون متناسب با روند
+        let trendColor, trendIcon;
+        if (trend.trend === 'صعودی') {
+            trendColor = 'success';
+            trendIcon = 'fa-arrow-up';
+        } else if (trend.trend === 'نزولی') {
+            trendColor = 'danger';
+            trendIcon = 'fa-arrow-down';
+        } else {
+            trendColor = 'secondary';
+            trendIcon = 'fa-arrows-alt-h';
+        }
+        
+        // ساخت لیست ارزهای تحت تأثیر
+        let affectedCoinsHtml = '';
+        if (trend.affected_coins && trend.affected_coins.length > 0) {
+            affectedCoinsHtml = `
+                <div class="mt-3">
+                    <h6>ارزهای تحت تأثیر:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        ${trend.affected_coins.map(coin => `<span class="badge bg-secondary">${coin}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // ساخت HTML روند
+        const html = `
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center mb-3 mb-md-0">
+                    <div class="bg-${trendColor} bg-opacity-10 p-4 rounded-3">
+                        <i class="fas ${trendIcon} fa-2x text-${trendColor} mb-2"></i>
+                        <h3 class="mb-0 text-${trendColor}">
+                            ${trend.trend}
+                        </h3>
+                        <div class="text-muted small">
+                            قدرت سیگنال: ${Math.abs(trend.sentiment_score * 100).toFixed(0)}%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="ps-0 ps-md-3">
+                        <h5>تحلیل وضعیت بازار</h5>
+                        <p>${trend.reason || 'اطلاعات تحلیلی در دسترس نیست.'}</p>
+                        ${affectedCoinsHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+    
+    // بارگذاری فرصت‌های خرید و فروش
+    function loadBuySellOpportunities() {
+        const container = document.getElementById('buyOppContainer');
+        container.innerHTML = `
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                در حال تحلیل فرصت‌های معاملاتی... این فرایند ممکن است چند لحظه طول بکشد.
+            </div>
+        `;
+        
+        fetch(`/api/buy-sell-opportunities?sensitivity=${sensitivity}&symbols=${currentSymbols.join(',')}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderBuySellOpportunities(data.data);
+                } else {
+                    container.innerHTML = `
+                        <div class="alert alert-danger mb-0">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            خطا در دریافت فرصت‌های معاملاتی: ${data.message}
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                container.innerHTML = `
+                    <div class="alert alert-danger mb-0">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.
+                    </div>
+                `;
+                console.error('Error fetching buy/sell opportunities:', error);
+            });
+    }
+    
+    // نمایش فرصت‌های خرید و فروش
+    function renderBuySellOpportunities(opportunities) {
+        const container = document.getElementById('buyOppContainer');
+        
+        if (!opportunities || opportunities.length === 0) {
+            container.innerHTML = `
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    در حال حاضر فرصت معاملاتی قابل توجهی شناسایی نشده است.
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '<div class="row">';
+        
+        opportunities.forEach(opp => {
+            // تعیین رنگ و استایل بر اساس نوع سیگنال
+            let cardClass, actionClass, actionIcon;
+            if (opp.action === 'خرید') {
+                cardClass = 'border-success';
+                actionClass = 'bg-success';
+                actionIcon = 'fa-arrow-up';
+            } else {
+                cardClass = 'border-danger';
+                actionClass = 'bg-danger';
+                actionIcon = 'fa-arrow-down';
+            }
+            
+            // محاسبه قدرت سیگنال به صورت درصد
+            const strengthPercent = Math.round(opp.strength * 100);
+            
+            // افزودن کارت فرصت
+            html += `
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 ${cardClass}">
+                        <div class="card-header d-flex justify-content-between align-items-center ${actionClass} text-white">
+                            <h5 class="mb-0">
+                                <i class="fas ${actionIcon} me-2"></i>
+                                ${opp.symbol}
+                            </h5>
+                            <span class="badge bg-white text-${actionClass === 'bg-success' ? 'success' : 'danger'}">
+                                ${opp.action}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>قیمت:</span>
+                                    <span class="fw-bold">${opp.price.toLocaleString()} USDT</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>قدرت سیگنال:</span>
+                                    <span class="fw-bold">${strengthPercent}%</span>
+                                </div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar ${actionClass}" role="progressbar" 
+                                         style="width: ${strengthPercent}%" 
+                                         aria-valuenow="${strengthPercent}" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="small">
+                                ${opp.message}
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-grid">
+                                <button class="btn btn-sm ${actionClass === 'bg-success' ? 'btn-outline-success' : 'btn-outline-danger'}">
+                                    <i class="fas fa-bell me-1"></i>
+                                    دریافت اعلان
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        container.innerHTML = html;
+    }
+    
+    // بارگذاری نوسانات بازار
+    function loadVolatility() {
+        const container = document.getElementById('volatilityContainer');
+        container.innerHTML = `
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                در حال بررسی نوسانات بازار... این فرایند ممکن است چند لحظه طول بکشد.
+            </div>
+        `;
+        
+        fetch(`/api/market-volatility?timeframe=${timeframe}&threshold=${threshold}&symbols=${currentSymbols.join(',')}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderVolatility(data.data);
+                } else {
+                    container.innerHTML = `
+                        <div class="alert alert-danger mb-0">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            خطا در دریافت نوسانات بازار: ${data.message}
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                container.innerHTML = `
+                    <div class="alert alert-danger mb-0">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.
+                    </div>
+                `;
+                console.error('Error fetching market volatility:', error);
+            });
+    }
+    
+    // نمایش نوسانات بازار
+    function renderVolatility(volatility) {
+        const container = document.getElementById('volatilityContainer');
+        
+        if (!volatility || volatility.length === 0) {
+            container.innerHTML = `
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    در بازه زمانی و آستانه انتخاب شده، نوسان قابل توجهی شناسایی نشده است.
+                </div>
+            `;
+            return;
+        }
+        
+        let html = `
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ارز</th>
+                            <th>قیمت فعلی</th>
+                            <th>تغییرات</th>
+                            <th>بازه زمانی</th>
+                            <th>زمان شناسایی</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        volatility.forEach(vol => {
+            // تعیین کلاس و آیکون براساس نوع تغییر
+            const changeClass = vol.change_percent > 0 ? 'text-success' : 'text-danger';
+            const changeIcon = vol.change_percent > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+            
+            // فرمت زمان
+            let detectedTime = 'نامشخص';
+            if (vol.detected_at) {
+                const date = new Date(vol.detected_at);
+                detectedTime = date.toLocaleString('fa-IR');
+            }
+            
+            // افزودن ردیف جدول
+            html += `
+                <tr>
+                    <td>
+                        <strong>${vol.symbol}</strong>
+                    </td>
+                    <td>${vol.price.toLocaleString()} USDT</td>
+                    <td class="${changeClass}">
+                        <i class="fas ${changeIcon} me-1"></i>
+                        ${Math.abs(vol.change_percent).toFixed(2)}%
+                    </td>
+                    <td>${vol.timeframe}</td>
+                    <td>${detectedTime}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-warning">
+                            <i class="fas fa-bell me-1"></i>
+                            اعلان
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+});
+</script>
+{% endblock %}
