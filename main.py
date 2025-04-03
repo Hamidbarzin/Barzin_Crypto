@@ -42,8 +42,8 @@ def initialize_session():
 
 @app.route('/')
 def index():
-    """Main page with direct minimal HTML rendering"""
-    from flask import render_template_string
+    """Main page redirects to dashboard"""
+    return redirect(url_for('dashboard'))
     
     # بررسی کدام ارز دیجیتال انتخاب شده است
     selected_crypto = request.args.get('crypto', 'BTC')
@@ -493,7 +493,7 @@ def test_menu():
 @app.route('/app_settings')
 def app_settings():
     """صفحه تنظیمات ساده"""
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
 
 @app.route('/dashboard_new')
 def dashboard_new():
@@ -780,38 +780,38 @@ def dashboard():
 @app.route('/email-sample')
 def email_sample():
     """Display a sample email that would be sent by the trading bot"""
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
 
 @app.route('/email-preview')
 def email_preview():
     """Display a standalone preview of a sample email that would be sent by the trading bot"""
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
 
 @app.route('/demo_email')
 def demo_email():
     """Alternative route for email sample display"""
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
 
 @app.route('/simple_email')
 def simple_email():
     """Ultra simple route for email display when other routes fail"""
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
     
 @app.route('/minimal')
 def minimal_email():
     """Extremely minimal email display with almost no styling"""
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
     
 @app.route('/ultra')
 def ultra_simple():
     """Ultra simplified home page with just plain links"""
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
 
 # Renamed settings route to avoid conflict 
 @app.route('/user_settings', methods=['GET', 'POST'])
 def user_settings():
     """Settings page is no longer used"""
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
 
 @app.route('/api/test-email', methods=['POST'])
 def test_email():
