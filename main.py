@@ -634,7 +634,18 @@ def email_preview():
     """Display a standalone preview of a sample email that would be sent by the trading bot"""
     from datetime import datetime
     context = {
-        'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'now': datetime.now()
+    }
+    return render_template('direct_email_sample.html', **context)
+
+@app.route('/demo_email')
+def demo_email():
+    """Alternative route for email sample display"""
+    from datetime import datetime
+    context = {
+        'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'now': datetime.now()
     }
     return render_template('direct_email_sample.html', **context)
 
