@@ -396,6 +396,7 @@
         
         // دریافت پیش‌بینی قیمت
         function getPricePrediction() {
+            // استفاده از آدرس صحیح API - بدون تغییر نماد ارز
             return fetch(`/api/ai/price-prediction/${selectedSymbol}?timeframe=${selectedTimeframe}`)
                 .then(response => response.json())
                 .then(data => {
@@ -403,11 +404,15 @@
                         const prediction = data.data;
                         updatePricePredictionUI(prediction);
                     }
+                })
+                .catch(error => {
+                    console.error("خطا در دریافت پیش‌بینی قیمت:", error);
                 });
         }
         
         // دریافت الگوهای قیمت
         function getPricePatterns() {
+            // استفاده از آدرس صحیح API - بدون تغییر نماد ارز
             return fetch(`/api/ai/price-patterns/${selectedSymbol}`)
                 .then(response => response.json())
                 .then(data => {
@@ -415,11 +420,15 @@
                         const patterns = data.data;
                         updatePricePatternsUI(patterns);
                     }
+                })
+                .catch(error => {
+                    console.error("خطا در دریافت الگوهای قیمت:", error);
                 });
         }
         
         // دریافت تحلیل احساسات بازار
         function getMarketSentiment() {
+            // استفاده از آدرس صحیح API - بدون تغییر نماد ارز
             return fetch(`/api/ai/market-sentiment?symbol=${selectedSymbol}`)
                 .then(response => response.json())
                 .then(data => {
@@ -427,11 +436,15 @@
                         const sentiment = data.data;
                         updateSentimentUI(sentiment);
                     }
+                })
+                .catch(error => {
+                    console.error("خطا در دریافت تحلیل احساسات:", error);
                 });
         }
         
         // دریافت استراتژی معاملاتی
         function getTradingStrategy() {
+            // استفاده از آدرس صحیح API - بدون تغییر نماد ارز
             return fetch(`/api/ai/trading-strategy/${selectedSymbol}?risk_level=${selectedRisk}&timeframe=${selectedStrategyTimeframe}`)
                 .then(response => response.json())
                 .then(data => {
@@ -439,6 +452,9 @@
                         const strategy = data.data;
                         updateStrategyUI(strategy);
                     }
+                })
+                .catch(error => {
+                    console.error("خطا در دریافت استراتژی معاملاتی:", error);
                 });
         }
         
