@@ -11,6 +11,7 @@ from crypto_bot.news_analyzer import get_latest_news
 from crypto_bot.signal_generator import generate_signals
 from crypto_bot.email_service import send_test_email, update_email_settings, last_email_content, DISABLE_REAL_EMAIL
 from crypto_bot.commodity_data import get_commodity_prices, get_forex_rates, get_economic_indicators
+from crypto_bot.ai_module import get_price_prediction, get_market_sentiment, get_price_patterns, get_trading_strategy
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -499,6 +500,20 @@ def app_settings():
 def dashboard_new():
     """Redirect to main dashboard"""
     return redirect(url_for('dashboard'))
+
+@app.route('/ai')
+@app.route('/ai_dashboard')
+def ai_dashboard():
+    """
+    داشبورد هوش مصنوعی برای تحلیل و پیش‌بینی قیمت ارزهای دیجیتال
+    """
+    watched_currencies = session.get('watched_currencies', DEFAULT_CURRENCIES[:3])
+    
+    return render_template(
+        'ai_dashboard.html',
+        watched_currencies=DEFAULT_CURRENCIES,
+        timeframes=TIMEFRAMES
+    )
 
 @app.route('/dashboard')
 def dashboard():
@@ -1084,6 +1099,66 @@ def get_economic():
         }
     }
     return jsonify({'success': True, 'data': indicators})
+    
+# روت‌های مربوط به هوش مصنوعی و یادگیری ماشین
+
+@app.route('/api/ai/price-prediction/<symbol>')
+def ai_price_prediction(symbol):
+    """
+    پیش‌بینی قیمت با استفاده از هوش مصنوعی
+    """
+    timeframe = request.args.get('timeframe', '24h')
+    
+    try:
+        prediction = get_price_prediction(symbol, timeframe)
+        return jsonify({'success': True, 'data': prediction})
+    except Exception as e:
+        logger.error(f"خطا در پیش‌بینی قیمت {symbol}: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/ai/market-sentiment')
+def ai_market_sentiment():
+    """
+    تحلیل احساسات بازار با استفاده از هوش مصنوعی
+    """
+    symbol = request.args.get('symbol')
+    include_middle_east = request.args.get('include_middle_east', 'true').lower() == 'true'
+    
+    try:
+        sentiment = get_market_sentiment(symbol, include_middle_east)
+        return jsonify({'success': True, 'data': sentiment})
+    except Exception as e:
+        logger.error(f"خطا در تحلیل احساسات بازار: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/ai/price-patterns/<symbol>')
+def ai_price_patterns(symbol):
+    """
+    شناسایی الگوهای قیمت با استفاده از هوش مصنوعی
+    """
+    timeframe = request.args.get('timeframe', '1d')
+    
+    try:
+        patterns = get_price_patterns(symbol, timeframe)
+        return jsonify({'success': True, 'data': patterns})
+    except Exception as e:
+        logger.error(f"خطا در شناسایی الگوهای قیمت {symbol}: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/ai/trading-strategy/<symbol>')
+def ai_trading_strategy(symbol):
+    """
+    پیشنهاد استراتژی معاملاتی با استفاده از هوش مصنوعی
+    """
+    risk_level = request.args.get('risk_level', 'متوسط')
+    timeframe = request.args.get('timeframe', 'کوتاه‌مدت')
+    
+    try:
+        strategy = get_trading_strategy(symbol, risk_level, timeframe)
+        return jsonify({'success': True, 'data': strategy})
+    except Exception as e:
+        logger.error(f"خطا در پیشنهاد استراتژی معاملاتی {symbol}: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
 
 @app.route('/api/email-message')
 def get_email_message():

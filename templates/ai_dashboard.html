@@ -1,0 +1,761 @@
+{% extends "base.html" %}
+
+{% block title %}داشبورد هوش مصنوعی{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="mb-4">
+        <h1 class="display-5 fw-bold mb-4 text-primary">داشبورد هوش مصنوعی</h1>
+        <p class="fs-5">سیستم هوشمند تحلیل و پیش‌بینی بازار ارزهای دیجیتال با استفاده از الگوریتم‌های یادگیری ماشین</p>
+    </div>
+
+    <!-- انتخاب ارز -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">انتخاب ارز دیجیتال</h5>
+        </div>
+        <div class="card-body">
+            <div class="row gap-2" id="currency-buttons">
+                {% for symbol in watched_currencies %}
+                <div class="col-auto">
+                    <button class="btn btn-outline-warning crypto-button" data-symbol="{{ symbol }}">{{ symbol }}</button>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="mt-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark text-white">نماد ارز دیجیتال</span>
+                    <input type="text" class="form-control" id="symbol-input" placeholder="مثال: BTC/USDT">
+                    <button class="btn btn-warning" id="analyze-button">تحلیل</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- بخش در حال بارگذاری -->
+    <div id="loading-section" class="text-center py-5 d-none">
+        <div class="spinner-border text-warning" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">در حال بارگذاری...</span>
+        </div>
+        <p class="mt-3">در حال تحلیل و پیش‌بینی با استفاده از الگوریتم‌های هوش مصنوعی...</p>
+    </div>
+
+    <!-- پیش‌بینی قیمت -->
+    <div class="card mb-4 shadow-sm border-0 d-none" id="price-prediction-section">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">پیش‌بینی قیمت - <span class="selected-symbol"></span></h5>
+            <div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-light timeframe-btn" data-timeframe="24h">24 ساعت</button>
+                    <button type="button" class="btn btn-sm btn-outline-light timeframe-btn" data-timeframe="7d">7 روز</button>
+                    <button type="button" class="btn btn-sm btn-outline-light timeframe-btn" data-timeframe="30d">30 روز</button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="m-0">قیمت فعلی:</h6>
+                            <h5 class="m-0 current-price">0</h5>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="m-0">قیمت پیش‌بینی شده:</h6>
+                            <h5 class="m-0 predicted-price">0</h5>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="m-0">روند پیش‌بینی:</h6>
+                            <h5 class="m-0 prediction-trend">نامشخص</h5>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="m-0">افق زمانی:</h6>
+                            <span class="time-horizon">24 ساعت آینده</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="m-0">دقت مدل:</h6>
+                            <div class="d-flex align-items-center">
+                                <div class="progress me-2" style="width: 100px; height: 10px;">
+                                    <div class="model-accuracy progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <span class="model-accuracy-text">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- نمودار محدوده قیمت -->
+                    <div class="mt-4">
+                        <h6>محدوده قیمت پیش‌بینی شده:</h6>
+                        <div class="price-range-chart p-3 bg-dark rounded">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>حد بالا:</span>
+                                <span class="upper-bound">0</span>
+                            </div>
+                            <div class="progress mb-2" style="height: 30px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 30%" id="price-range-lower"></div>
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 40%" id="price-range-current"></div>
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 30%" id="price-range-upper"></div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>حد پایین:</span>
+                                <span class="lower-bound">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h6>عوامل مؤثر در پیش‌بینی:</h6>
+                    <div class="prediction-factors">
+                        <!-- اینجا نمودارهای عوامل مؤثر نمایش داده می‌شود -->
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>تحلیل تکنیکال:</span>
+                                <span class="factor-technical">0%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary factor-technical-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>احساسات بازار:</span>
+                                <span class="factor-sentiment">0%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-info factor-sentiment-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>تأثیر اخبار:</span>
+                                <span class="factor-news">0%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning factor-news-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>حجم معاملات:</span>
+                                <span class="factor-volume">0%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success factor-volume-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>الگوهای تاریخی:</span>
+                                <span class="factor-historical">0%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-secondary factor-historical-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="alert prediction-alert" role="alert">
+                            <h6 class="alert-heading">توصیه هوش مصنوعی:</h6>
+                            <div class="prediction-recommendation">در حال تحلیل...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- شناسایی الگوهای قیمت -->
+    <div class="card mb-4 shadow-sm border-0 d-none" id="patterns-section">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">شناسایی الگوهای قیمت - <span class="selected-symbol"></span></h5>
+        </div>
+        <div class="card-body">
+            <div class="patterns-container">
+                <div class="text-center patterns-empty d-none">
+                    <p class="my-4">هیچ الگویی شناسایی نشده است.</p>
+                </div>
+                <div class="row patterns-list">
+                    <!-- الگوهای شناسایی شده اینجا قرار می‌گیرند -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- تحلیل احساسات بازار -->
+    <div class="card mb-4 shadow-sm border-0 d-none" id="sentiment-section">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">تحلیل احساسات بازار - <span class="selected-symbol"></span></h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="text-center mb-4">
+                        <div class="sentiment-chart mx-auto position-relative" style="width: 150px; height: 150px;">
+                            <div class="position-absolute top-50 start-50 translate-middle">
+                                <h3 class="sentiment-score m-0">0</h3>
+                                <div class="sentiment-label">نامشخص</div>
+                            </div>
+                        </div>
+                        <div class="mt-2 sentiment-description">
+                            در حال تحلیل احساسات بازار...
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h6>احساسات منابع مختلف:</h6>
+                    <div class="source-sentiments">
+                        <!-- نمودارهای منابع مختلف اینجا قرار می‌گیرند -->
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>اخبار:</span>
+                                <span class="sentiment-news">0</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-primary sentiment-news-bar" role="progressbar" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>شبکه‌های اجتماعی:</span>
+                                <span class="sentiment-social">0</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-info sentiment-social-bar" role="progressbar" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>فروم‌های تخصصی:</span>
+                                <span class="sentiment-forums">0</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-warning sentiment-forums-bar" role="progressbar" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>داده‌های بازار:</span>
+                                <span class="sentiment-market">0</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-success sentiment-market-bar" role="progressbar" style="width: 50%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h6>کلمات کلیدی مرتبط:</h6>
+                    <div class="sentiment-keywords d-flex flex-wrap gap-2 mt-3">
+                        <!-- کلمات کلیدی اینجا قرار می‌گیرند -->
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6>آمار تحلیل شده:</h6>
+                        <ul class="sentiment-stats list-unstyled">
+                            <li class="mb-2"><i class="fas fa-newspaper me-2"></i> <span class="news-count">0</span> خبر تحلیل شده</li>
+                            <li class="mb-2"><i class="fas fa-chart-line me-2"></i> تاریخ به‌روزرسانی: <span class="sentiment-date">-</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- استراتژی معاملاتی -->
+    <div class="card mb-4 shadow-sm border-0 d-none" id="strategy-section">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">استراتژی معاملاتی - <span class="selected-symbol"></span></h5>
+            <div class="d-flex mt-2 gap-3">
+                <div>
+                    <label class="form-label text-white-50 mb-0 small">سطح ریسک:</label>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-sm btn-outline-light risk-btn" data-risk="کم">کم</button>
+                        <button type="button" class="btn btn-sm btn-outline-light risk-btn active" data-risk="متوسط">متوسط</button>
+                        <button type="button" class="btn btn-sm btn-outline-light risk-btn" data-risk="زیاد">زیاد</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label text-white-50 mb-0 small">افق زمانی:</label>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-sm btn-outline-light strategy-timeframe-btn active" data-timeframe="کوتاه‌مدت">کوتاه‌مدت</button>
+                        <button type="button" class="btn btn-sm btn-outline-light strategy-timeframe-btn" data-timeframe="میان‌مدت">میان‌مدت</button>
+                        <button type="button" class="btn btn-sm btn-outline-light strategy-timeframe-btn" data-timeframe="بلندمدت">بلندمدت</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="strategies-container">
+                <div class="text-center strategies-empty d-none">
+                    <p class="my-4">هیچ استراتژی معاملاتی پیشنهاد نشده است.</p>
+                </div>
+                <div class="strategies-list">
+                    <!-- استراتژی‌های پیشنهادی اینجا قرار می‌گیرند -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let selectedSymbol = "BTC/USDT";
+        let selectedTimeframe = "24h";
+        let selectedRisk = "متوسط";
+        let selectedStrategyTimeframe = "کوتاه‌مدت";
+        
+        // انتخاب ارز دیجیتال
+        document.querySelectorAll('.crypto-button').forEach(button => {
+            button.addEventListener('click', function() {
+                selectedSymbol = this.dataset.symbol;
+                document.getElementById('symbol-input').value = selectedSymbol;
+                analyzeSymbol();
+            });
+        });
+        
+        // دکمه تحلیل
+        document.getElementById('analyze-button').addEventListener('click', function() {
+            const inputValue = document.getElementById('symbol-input').value.trim();
+            if (inputValue) {
+                selectedSymbol = inputValue;
+                analyzeSymbol();
+            }
+        });
+        
+        // دکمه‌های بازه زمانی پیش‌بینی
+        document.querySelectorAll('.timeframe-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.timeframe-btn').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                selectedTimeframe = this.dataset.timeframe;
+                getPricePrediction();
+            });
+        });
+        
+        // دکمه‌های سطح ریسک
+        document.querySelectorAll('.risk-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.risk-btn').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                selectedRisk = this.dataset.risk;
+                getTradingStrategy();
+            });
+        });
+        
+        // دکمه‌های بازه زمانی استراتژی
+        document.querySelectorAll('.strategy-timeframe-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.strategy-timeframe-btn').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                selectedStrategyTimeframe = this.dataset.timeframe;
+                getTradingStrategy();
+            });
+        });
+        
+        // تابع اصلی تحلیل ارز
+        function analyzeSymbol() {
+            // نمایش بخش در حال بارگذاری
+            document.getElementById('loading-section').classList.remove('d-none');
+            
+            // مخفی کردن بخش‌های نتایج
+            document.getElementById('price-prediction-section').classList.add('d-none');
+            document.getElementById('patterns-section').classList.add('d-none');
+            document.getElementById('sentiment-section').classList.add('d-none');
+            document.getElementById('strategy-section').classList.add('d-none');
+            
+            // به‌روزرسانی نماد ارز در همه بخش‌ها
+            document.querySelectorAll('.selected-symbol').forEach(el => {
+                el.textContent = selectedSymbol;
+            });
+            
+            // فراخوانی همه API‌ها
+            Promise.all([
+                getPricePrediction(),
+                getPricePatterns(),
+                getMarketSentiment(),
+                getTradingStrategy()
+            ]).then(() => {
+                // مخفی کردن بخش در حال بارگذاری
+                document.getElementById('loading-section').classList.add('d-none');
+                
+                // نمایش بخش‌های نتایج
+                document.getElementById('price-prediction-section').classList.remove('d-none');
+                document.getElementById('patterns-section').classList.remove('d-none');
+                document.getElementById('sentiment-section').classList.remove('d-none');
+                document.getElementById('strategy-section').classList.remove('d-none');
+            }).catch(error => {
+                console.error("خطا در دریافت داده‌ها:", error);
+                document.getElementById('loading-section').classList.add('d-none');
+                alert("خطا در دریافت داده‌ها. لطفاً دوباره تلاش کنید.");
+            });
+        }
+        
+        // دریافت پیش‌بینی قیمت
+        function getPricePrediction() {
+            return fetch(`/api/ai/price-prediction/${selectedSymbol}?timeframe=${selectedTimeframe}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        const prediction = data.data;
+                        updatePricePredictionUI(prediction);
+                    }
+                });
+        }
+        
+        // دریافت الگوهای قیمت
+        function getPricePatterns() {
+            return fetch(`/api/ai/price-patterns/${selectedSymbol}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        const patterns = data.data;
+                        updatePricePatternsUI(patterns);
+                    }
+                });
+        }
+        
+        // دریافت تحلیل احساسات بازار
+        function getMarketSentiment() {
+            return fetch(`/api/ai/market-sentiment?symbol=${selectedSymbol}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        const sentiment = data.data;
+                        updateSentimentUI(sentiment);
+                    }
+                });
+        }
+        
+        // دریافت استراتژی معاملاتی
+        function getTradingStrategy() {
+            return fetch(`/api/ai/trading-strategy/${selectedSymbol}?risk_level=${selectedRisk}&timeframe=${selectedStrategyTimeframe}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        const strategy = data.data;
+                        updateStrategyUI(strategy);
+                    }
+                });
+        }
+        
+        // به‌روزرسانی رابط کاربری پیش‌بینی قیمت
+        function updatePricePredictionUI(prediction) {
+            // مقادیر اصلی
+            document.querySelector('.current-price').textContent = formatPrice(prediction.current_price);
+            document.querySelector('.predicted-price').textContent = formatPrice(prediction.predicted_price);
+            document.querySelector('.time-horizon').textContent = prediction.time_horizon;
+            
+            // روند
+            const trendElement = document.querySelector('.prediction-trend');
+            trendElement.textContent = prediction.trend;
+            if (prediction.trend === "صعودی") {
+                trendElement.classList.add('text-success');
+                trendElement.classList.remove('text-danger', 'text-secondary');
+            } else if (prediction.trend === "نزولی") {
+                trendElement.classList.add('text-danger');
+                trendElement.classList.remove('text-success', 'text-secondary');
+            } else {
+                trendElement.classList.add('text-secondary');
+                trendElement.classList.remove('text-success', 'text-danger');
+            }
+            
+            // دقت مدل
+            document.querySelector('.model-accuracy').style.width = `${prediction.model_accuracy}%`;
+            document.querySelector('.model-accuracy-text').textContent = `${prediction.model_accuracy}%`;
+            
+            // محدوده قیمت
+            document.querySelector('.upper-bound').textContent = formatPrice(prediction.upper_bound);
+            document.querySelector('.lower-bound').textContent = formatPrice(prediction.lower_bound);
+            
+            // نمودار محدوده قیمت
+            const range = prediction.upper_bound - prediction.lower_bound;
+            const lowerPercent = Math.max(5, Math.min(45, Math.round((prediction.current_price - prediction.lower_bound) / range * 100) - 5));
+            const upperPercent = Math.max(5, Math.min(45, Math.round((prediction.upper_bound - prediction.predicted_price) / range * 100) - 5));
+            const currentPercent = 100 - lowerPercent - upperPercent;
+            
+            document.getElementById('price-range-lower').style.width = `${lowerPercent}%`;
+            document.getElementById('price-range-current').style.width = `${currentPercent}%`;
+            document.getElementById('price-range-upper').style.width = `${upperPercent}%`;
+            
+            // عوامل مؤثر
+            const factors = prediction.prediction_factors;
+            updateFactorBar('technical', factors.technical_analysis);
+            updateFactorBar('sentiment', factors.market_sentiment);
+            updateFactorBar('news', factors.news_impact);
+            updateFactorBar('volume', factors.trading_volume);
+            updateFactorBar('historical', factors.historical_patterns);
+            
+            // توصیه
+            const alertElement = document.querySelector('.prediction-alert');
+            const recommendationElement = document.querySelector('.prediction-recommendation');
+            let recommendation = "";
+            
+            if (prediction.trend === "صعودی") {
+                alertElement.classList.add('alert-success');
+                alertElement.classList.remove('alert-danger', 'alert-warning');
+                if (prediction.trend_probability > 0.8) {
+                    recommendation = `احتمال قوی افزایش قیمت در ${prediction.time_horizon} با اطمینان ${Math.round(prediction.confidence * 100)}%`;
+                } else {
+                    recommendation = `احتمال افزایش قیمت در ${prediction.time_horizon} با اطمینان ${Math.round(prediction.confidence * 100)}%`;
+                }
+            } else if (prediction.trend === "نزولی") {
+                alertElement.classList.add('alert-danger');
+                alertElement.classList.remove('alert-success', 'alert-warning');
+                if (prediction.trend_probability > 0.8) {
+                    recommendation = `احتمال قوی کاهش قیمت در ${prediction.time_horizon} با اطمینان ${Math.round(prediction.confidence * 100)}%`;
+                } else {
+                    recommendation = `احتمال کاهش قیمت در ${prediction.time_horizon} با اطمینان ${Math.round(prediction.confidence * 100)}%`;
+                }
+            } else {
+                alertElement.classList.add('alert-warning');
+                alertElement.classList.remove('alert-success', 'alert-danger');
+                recommendation = "نوسان قیمت در محدوده فعلی محتمل است";
+            }
+            
+            recommendationElement.textContent = recommendation;
+        }
+        
+        // به‌روزرسانی نوار پیشرفت عوامل مؤثر
+        function updateFactorBar(factorName, value) {
+            const percentage = Math.round(value * 100);
+            document.querySelector(`.factor-${factorName}`).textContent = `${percentage}%`;
+            document.querySelector(`.factor-${factorName}-bar`).style.width = `${percentage}%`;
+        }
+        
+        // به‌روزرسانی رابط کاربری الگوهای قیمت
+        function updatePricePatternsUI(patterns) {
+            const patternsContainer = document.querySelector('.patterns-list');
+            patternsContainer.innerHTML = '';
+            
+            if (!patterns.patterns_found || patterns.pattern_count === 0) {
+                document.querySelector('.patterns-empty').classList.remove('d-none');
+                return;
+            }
+            
+            document.querySelector('.patterns-empty').classList.add('d-none');
+            
+            patterns.identified_patterns.forEach(pattern => {
+                let cardColor = 'secondary';
+                if (pattern.signal === 'خرید') {
+                    cardColor = 'success';
+                } else if (pattern.signal === 'فروش') {
+                    cardColor = 'danger';
+                }
+                
+                const patternCard = `
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-${cardColor}">
+                            <div class="card-header bg-${cardColor} bg-opacity-10">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="m-0 text-${cardColor}">${pattern.pattern_name}</h6>
+                                    <span class="badge bg-${cardColor}">${pattern.signal}</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <div class="d-flex justify-content-between">
+                                        <span>تکمیل الگو:</span>
+                                        <span>${pattern.completion_percentage}%</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar bg-${cardColor}" role="progressbar" style="width: ${pattern.completion_percentage}%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <div class="d-flex justify-content-between">
+                                        <span>بازه زمانی:</span>
+                                        <span>${pattern.timeframe}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>اطمینان سیگنال:</span>
+                                        <span>${Math.round(pattern.confidence * 100)}%</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-${cardColor}" role="progressbar" style="width: ${pattern.confidence * 100}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                patternsContainer.innerHTML += patternCard;
+            });
+        }
+        
+        // به‌روزرسانی رابط کاربری تحلیل احساسات
+        function updateSentimentUI(sentiment) {
+            // نمره کلی احساسات
+            const score = sentiment.overall_sentiment;
+            const normalizedScore = Math.round((score + 1) * 50); // تبدیل محدوده -1 تا 1 به 0 تا 100
+            document.querySelector('.sentiment-score').textContent = score.toFixed(2);
+            
+            // برچسب احساسات
+            const labelElement = document.querySelector('.sentiment-label');
+            labelElement.textContent = sentiment.sentiment_label;
+            
+            if (sentiment.sentiment_label === "مثبت") {
+                labelElement.className = 'sentiment-label text-success';
+                document.querySelector('.sentiment-chart').style.background = `conic-gradient(#198754 ${normalizedScore}%, #e9ecef 0)`;
+            } else if (sentiment.sentiment_label === "منفی") {
+                labelElement.className = 'sentiment-label text-danger';
+                document.querySelector('.sentiment-chart').style.background = `conic-gradient(#dc3545 ${normalizedScore}%, #e9ecef 0)`;
+            } else {
+                labelElement.className = 'sentiment-label text-warning';
+                document.querySelector('.sentiment-chart').style.background = `conic-gradient(#ffc107 ${normalizedScore}%, #e9ecef 0)`;
+            }
+            
+            // توضیحات
+            document.querySelector('.sentiment-description').textContent = sentiment.sentiment_description;
+            
+            // احساسات منابع مختلف
+            const sources = sentiment.source_sentiments;
+            updateSentimentSourceBar('news', sources.اخبار);
+            updateSentimentSourceBar('social', sources['شبکه‌های اجتماعی']);
+            updateSentimentSourceBar('forums', sources['فروم‌های تخصصی']);
+            updateSentimentSourceBar('market', sources['داده‌های بازار']);
+            
+            // کلمات کلیدی
+            const keywordsContainer = document.querySelector('.sentiment-keywords');
+            keywordsContainer.innerHTML = '';
+            
+            sentiment.related_keywords.forEach(keyword => {
+                const badgeColor = keyword === sentiment.symbol?.split('/')[0] ? 'primary' : 
+                                  sentiment.sentiment_label === "مثبت" ? 'success' : 
+                                  sentiment.sentiment_label === "منفی" ? 'danger' : 'warning';
+                
+                const keywordBadge = `<span class="badge bg-${badgeColor} bg-opacity-75">${keyword}</span>`;
+                keywordsContainer.innerHTML += keywordBadge;
+            });
+            
+            // آمار
+            document.querySelector('.news-count').textContent = sentiment.news_count;
+            document.querySelector('.sentiment-date').textContent = sentiment.timestamp;
+        }
+        
+        // به‌روزرسانی نوار پیشرفت منابع احساسات
+        function updateSentimentSourceBar(sourceName, value) {
+            const normalizedValue = ((value + 1) / 2) * 100; // تبدیل محدوده -1 تا 1 به 0 تا 100
+            document.querySelector(`.sentiment-${sourceName}`).textContent = value.toFixed(2);
+            
+            const barElement = document.querySelector(`.sentiment-${sourceName}-bar`);
+            barElement.style.width = `${normalizedValue}%`;
+            
+            if (value > 0.3) {
+                barElement.className = 'progress-bar bg-success';
+            } else if (value < -0.3) {
+                barElement.className = 'progress-bar bg-danger';
+            } else {
+                barElement.className = 'progress-bar bg-warning';
+            }
+        }
+        
+        // به‌روزرسانی رابط کاربری استراتژی معاملاتی
+        function updateStrategyUI(strategy) {
+            const strategiesContainer = document.querySelector('.strategies-list');
+            strategiesContainer.innerHTML = '';
+            
+            if (!strategy.strategy_count || strategy.strategy_count === 0) {
+                document.querySelector('.strategies-empty').classList.remove('d-none');
+                return;
+            }
+            
+            document.querySelector('.strategies-empty').classList.add('d-none');
+            
+            strategy.recommended_strategies.forEach(s => {
+                // تعیین رنگ کارت بر اساس نوع استراتژی
+                let cardColor;
+                if (s.strategy_name.includes('خرید') || s.strategy_name.includes('صعودی') || s.strategy_name.includes('بلندمدت')) {
+                    cardColor = 'success';
+                } else if (s.strategy_name.includes('فروش') || s.strategy_name.includes('نزولی') || s.strategy_name.includes('برگشتی')) {
+                    cardColor = 'danger';
+                } else {
+                    cardColor = 'primary';
+                }
+                
+                const strategyCard = `
+                    <div class="card mb-3 border-${cardColor}">
+                        <div class="card-header bg-${cardColor} bg-opacity-10">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="m-0 text-${cardColor}">${s.strategy_name}</h5>
+                                <span class="badge bg-${cardColor}">اطمینان: ${Math.round(s.confidence * 100)}%</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <p>${s.description}</p>
+                                    
+                                    <div class="mb-3">
+                                        <h6>شاخص‌های کلیدی:</h6>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            ${s.key_indicators.map(indicator => `<span class="badge bg-secondary">${indicator}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between">
+                                            <span>سود مورد انتظار:</span>
+                                            <span class="text-success">${s.expected_profit}</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between">
+                                            <span>حد ضرر:</span>
+                                            <span class="text-danger">${s.stop_loss}</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between">
+                                            <span>حد سود:</span>
+                                            <span class="text-success">${s.take_profit}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>افق زمانی:</span>
+                                            <span>${s.time_horizon}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                strategiesContainer.innerHTML += strategyCard;
+            });
+        }
+        
+        // فرمت‌کردن قیمت
+        function formatPrice(price) {
+            if (price >= 1000) {
+                return new Intl.NumberFormat('fa-IR').format(Math.round(price));
+            } else if (price >= 100) {
+                return new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(price);
+            } else if (price >= 1) {
+                return new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 2 }).format(price);
+            } else {
+                return new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 4 }).format(price);
+            }
+        }
+        
+        // تحلیل اولیه با ارز پیش‌فرض
+        document.querySelector('.crypto-button[data-symbol="BTC/USDT"]')?.classList.add('active');
+        document.getElementById('symbol-input').value = selectedSymbol;
+        document.querySelector('.timeframe-btn[data-timeframe="24h"]')?.classList.add('active');
+        
+        // تاخیر در تحلیل اولیه
+        setTimeout(() => {
+            analyzeSymbol();
+        }, 500);
+    });
+</script>
+{% endblock %}
