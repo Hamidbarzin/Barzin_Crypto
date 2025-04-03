@@ -311,8 +311,25 @@
         // انتخاب ارز دیجیتال
         document.querySelectorAll('.crypto-button').forEach(button => {
             button.addEventListener('click', function() {
+                // پاکسازی کلاس active از همه دکمه‌ها
+                document.querySelectorAll('.crypto-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // افزودن کلاس active به دکمه انتخاب شده
+                this.classList.add('active');
+                
+                // ذخیره نماد انتخاب شده و تحلیل
                 selectedSymbol = this.dataset.symbol;
                 document.getElementById('symbol-input').value = selectedSymbol;
+                console.log("ارز انتخاب شده:", selectedSymbol);
+                
+                // به‌روزرسانی وضعیت خطایابی
+                if (document.getElementById('debug-info')) {
+                    document.getElementById('debug-info').innerHTML = `<strong>وضعیت خطایابی:</strong> ارز ${selectedSymbol} انتخاب شد`;
+                }
+                
+                // تحلیل ارز
                 analyzeSymbol();
             });
         });
@@ -358,6 +375,15 @@
         
         // تابع اصلی تحلیل ارز
         function analyzeSymbol() {
+            console.log("تابع analyzeSymbol فراخوانی شد برای ارز:", selectedSymbol);
+            
+            // اضافه کردن بخش خطایابی
+            const debugInfo = document.createElement('div');
+            debugInfo.id = 'debug-info';
+            debugInfo.className = 'alert alert-info mt-3';
+            debugInfo.innerHTML = `<strong>وضعیت خطایابی:</strong> در حال تحلیل ${selectedSymbol}`;
+            document.querySelector('.container').prepend(debugInfo);
+            
             // نمایش بخش در حال بارگذاری
             document.getElementById('loading-section').classList.remove('d-none');
             
@@ -764,14 +790,34 @@
         }
         
         // تحلیل اولیه با ارز پیش‌فرض
-        document.querySelector('.crypto-button[data-symbol="BTC/USDT"]')?.classList.add('active');
-        document.getElementById('symbol-input').value = selectedSymbol;
-        document.querySelector('.timeframe-btn[data-timeframe="24h"]')?.classList.add('active');
+        const defaultButton = document.querySelector('.crypto-button[data-symbol="BTC/USDT"]');
+        if (defaultButton) {
+            defaultButton.classList.add('active');
+            selectedSymbol = "BTC/USDT";
+            document.getElementById('symbol-input').value = selectedSymbol;
+            
+            // اضافه کردن یک پیام وضعیت برای کاربر
+            const statusMessage = document.createElement('div');
+            statusMessage.className = 'alert alert-warning mt-3 mb-3';
+            statusMessage.id = 'openai-status';
+            statusMessage.innerHTML = '<strong>توجه:</strong> برای استفاده از قابلیت‌های هوش مصنوعی، نیاز به کلید API اوپن‌ای (OpenAI) است. در حال حاضر، داده‌های نمونه نمایش داده می‌شود.';
+            document.querySelector('.container').prepend(statusMessage);
+            
+            // فعال کردن دکمه‌های پیش‌فرض
+            document.querySelector('.timeframe-btn[data-timeframe="24h"]')?.classList.add('active');
+            document.querySelector('.risk-btn[data-risk="متوسط"]')?.classList.add('active');
+            document.querySelector('.strategy-timeframe-btn[data-timeframe="کوتاه‌مدت"]')?.classList.add('active');
+            
+            // تحلیل اولیه
+            console.log("شروع تحلیل اولیه برای BTC/USDT");
+            setTimeout(() => {
+                analyzeSymbol();
+            }, 500);
+        } else {
+            console.error("دکمه ارز پیش‌فرض یافت نشد");
+        }
         
-        // تاخیر در تحلیل اولیه
-        setTimeout(() => {
-            analyzeSymbol();
-        }, 500);
+
     });
 </script>
 {% endblock %}
