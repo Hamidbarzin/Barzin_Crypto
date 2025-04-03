@@ -1,478 +1,182 @@
-{% extends 'base.html' %}
 
-{% block title %}ربات معاملات ارز دیجیتال - تنظیمات{% endblock %}
-
-{% block content %}
-<h1 class="mb-4">
-    <i class="fas fa-cog me-2"></i>
-    تنظیمات
-</h1>
-
-<div class="row">
-    <div class="col-lg-8">
-        <form method="post" action="/settings">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3 class="mb-0">لیست ارزهای دیجیتال</h3>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted mb-3">ارزهای دیجیتالی که می‌خواهید پیگیری و تحلیل کنید را انتخاب کنید:</p>
-                    
-                    <div class="row">
-                        {% for currency in currencies %}
-                            <div class="col-md-4 mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="currencies" value="{{ currency }}" id="currency-{{ loop.index }}"
-                                           {% if currency in watched_currencies %}checked{% endif %}>
-                                    <label class="form-check-label" for="currency-{{ loop.index }}">
-                                        {{ currency }}
-                                    </label>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="alert alert-info small">
-                        <i class="fas fa-info-circle me-2"></i>
-                        ربات این ارزهای دیجیتال را تحلیل کرده و بر اساس تحلیل تکنیکال و اخبار، سیگنال‌های معاملاتی تولید می‌کند.
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3 class="mb-0">اطلاع‌رسانی ایمیلی</h3>
-                </div>
-                <div class="card-body">
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" name="email_enabled" id="email_enabled"
-                               {% if email_settings.enabled %}checked{% endif %}>
-                        <label class="form-check-label" for="email_enabled">
-                            فعال‌سازی اطلاع‌رسانی ایمیلی
-                        </label>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="email_address" class="form-label">آدرس ایمیل</label>
-                        <div class="input-group">
-                            <input type="email" class="form-control" id="email_address" name="email_address"
-                                   placeholder="your@email.com" value="{{ email_settings.email }}">
-                            <button type="button" class="btn btn-outline-primary" id="test_email_btn">تست</button>
-                        </div>
-                        <div class="form-text">سیگنال‌های معاملاتی و هشدارها به این آدرس ایمیل ارسال خواهند شد.</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="email_frequency" class="form-label">فرکانس اطلاع‌رسانی</label>
-                        <select class="form-select" id="email_frequency" name="email_frequency">
-                            <option value="hourly" {% if email_settings.frequency == 'hourly' %}selected{% endif %}>ساعتی</option>
-                            <option value="daily" {% if email_settings.frequency == 'daily' %}selected{% endif %}>روزانه</option>
-                            <option value="weekly" {% if email_settings.frequency == 'weekly' %}selected{% endif %}>هفتگی</option>
-                        </select>
-                        <div class="form-text">چند وقت یکبار می‌خواهید ایمیل‌های حاوی سیگنال‌های معاملاتی را دریافت کنید.</div>
-                    </div>
-                    
-                    <div class="alert alert-warning small mb-3">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        شما فقط زمانی اطلاع‌رسانی دریافت خواهید کرد که سیگنال‌های معاملاتی قابل اجرا (خرید یا فروش) وجود داشته باشند.
-                    </div>
-                    
-                    <!-- آخرین پیام ایمیل -->
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label class="form-label mb-0">آخرین پیام ایمیل</label>
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-outline-info" id="view_email_btn">
-                                    <i class="fas fa-envelope me-1"></i> مشاهده آخرین پیام
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-warning" id="view_sample_email_btn">
-                                    <i class="fas fa-eye me-1"></i> نمایش نمونه
-                                </button>
-                                <a href="/email-sample" class="btn btn-sm btn-outline-success">
-                                    <i class="fas fa-external-link-alt me-1"></i> صفحه کامل
-                                </a>
-                            </div>
-                        </div>
-                        <div id="email_preview_container" class="d-none">
-                            <div class="card border-light">
-                                <div class="card-header bg-light d-flex justify-content-between">
-                                    <span id="email_preview_subject">موضوع ایمیل</span>
-                                    <small id="email_preview_time" class="text-muted">زمان</small>
-                                </div>
-                                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
-                                    <div id="email_preview_content">محتوا در حال بارگذاری...</div>
-                                </div>
-                                <div class="card-footer bg-light text-end">
-                                    <small class="text-muted">گیرنده: <span id="email_preview_recipient">-</span></small>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="email_preview_error" class="alert alert-info d-none">
-                            هنوز هیچ ایمیلی ارسال نشده است.
-                        </div>
-                        
-                        <div class="mt-3 text-center">
-                            <a href="/email-preview" class="btn btn-primary" target="_blank">
-                                <i class="fas fa-envelope me-1"></i>
-                                مشاهده نمونه ایمیل در صفحه مستقل
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3 class="mb-0">منابع خبری</h3>
-                </div>
-                <div class="card-body">
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" name="include_middle_east" id="include_middle_east"
-                               {% if include_middle_east %}checked{% endif %}>
-                        <label class="form-check-label" for="include_middle_east">
-                            فعال‌سازی منابع خبری خاورمیانه
-                        </label>
-                    </div>
-                    
-                    <div class="alert alert-info small">
-                        <i class="fas fa-info-circle me-2"></i>
-                        با فعال‌سازی این گزینه، ربات اخبار ارزهای دیجیتال را از منابع خبری فارسی و خاورمیانه نیز جمع‌آوری می‌کند. این منابع دارای اخبار به زبان فارسی نیز هستند که با تحلیل احساسات فارسی پردازش می‌شوند.
-                    </div>
-                    
-                    <div class="mb-3">
-                        <p class="text-muted">منابع خبری خاورمیانه شامل:</p>
-                        <ul class="small">
-                            <li>رمزارز نیوز (ramzarz.news)</li>
-                            <li>ارزدیجیتال (arzdigital.com)</li>
-                            <li>مِنا هرالد (menaherald.com)</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3 class="mb-0">زمان‌بندی ربات</h3>
-                </div>
-                <div class="card-body">
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" name="scheduler_enabled" id="scheduler_enabled"
-                               {% if scheduler_running %}checked{% endif %}>
-                        <label class="form-check-label" for="scheduler_enabled">
-                            فعال‌سازی زمان‌بندی تحلیل خودکار
-                        </label>
-                    </div>
-                    
-                    <div class="alert alert-info small">
-                        <i class="fas fa-info-circle me-2"></i>
-                        در صورت فعال‌سازی، ربات به صورت خودکار و طبق برنامه زمانی، ارزهای دیجیتال را تحلیل کرده و سیگنال‌های معاملاتی تولید می‌کند.
-                    </div>
-                    
-                    <div class="alert alert-{% if scheduler_running %}success{% else %}secondary{% endif %}" id="scheduler_status_alert">
-                        <i class="fas {% if scheduler_running %}fa-check-circle{% else %}fa-times-circle{% endif %} me-2"></i>
-                        زمان‌بندی در حال حاضر <span id="scheduler_status_text">{% if scheduler_running %}در حال اجرا{% else %}متوقف شده{% endif %}</span> است.
-                    </div>
-                </div>
-            </div>
-
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save me-2"></i>
-                    ذخیره تنظیمات
-                </button>
-            </div>
-        </form>
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تنظیمات ربات معاملاتی</title>
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #181A20;
+            color: #EAECEF;
+            direction: rtl;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #FCD535;
+            border-bottom: 1px solid #2b3139;
+            padding-bottom: 10px;
+            margin-top: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="email"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #2b3139;
+            border-radius: 4px;
+            background-color: #2b3139;
+            color: #EAECEF;
+            margin-top: 5px;
+        }
+        .checkbox-group {
+            margin: 15px 0;
+        }
+        .checkbox-item {
+            margin-bottom: 10px;
+        }
+        .btn {
+            background-color: #FCD535;
+            color: #181A20;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #F0B90B;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background-color: rgba(14, 203, 129, 0.1);
+            border: 1px solid #0ECB81;
+            color: #0ECB81;
+        }
+        .alert-danger {
+            background-color: rgba(246, 70, 93, 0.1);
+            border: 1px solid #F6465D;
+            color: #F6465D;
+        }
+        a {
+            color: #FCD535;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .menu {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .menu a {
+            padding: 8px 15px;
+            background-color: #2b3139;
+            color: #FCD535;
+            text-decoration: none;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .menu a:hover {
+            background-color: #393E46;
+        }
+    </style>
+</head>
+<body>
+    <h1>تنظیمات ربات معاملاتی</h1>
+    
+    <div class="menu">
+        <a href="/">داشبورد</a>
+        <a href="/dashboard">داشبورد کامل</a>
+        <a href="/dashboard_new">داشبورد جدید</a>
+        <a href="/app_settings">تنظیمات</a>
+        <a href="/test_email">ارسال ایمیل آزمایشی</a>
     </div>
     
-    <div class="col-lg-4">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3 class="mb-0">راهنما و اطلاعات</h3>
-            </div>
-            <div class="card-body">
-                <h5><i class="fas fa-chart-line me-2"></i>تحلیل تکنیکال</h5>
-                <p>ربات از چندین شاخص تکنیکال برای تولید سیگنال‌های معاملاتی استفاده می‌کند:</p>
-                <ul>
-                    <li><strong>میانگین‌های متحرک</strong> - پیگیری روندهای قیمت</li>
-                    <li><strong>RSI</strong> - شناسایی شرایط اشباع خرید/فروش</li>
-                    <li><strong>MACD</strong> - تشخیص تغییرات مومنتوم</li>
-                    <li><strong>باندهای بولینگر</strong> - شناسایی نوسانات و سطوح نسبی قیمت</li>
-                </ul>
-                
-                <h5><i class="fas fa-newspaper me-2"></i>تحلیل اخبار</h5>
-                <p>ربات اخبار ارزهای دیجیتال را از منابع معتبر بررسی کرده و تحلیل احساسات انجام می‌دهد تا رویدادهای بالقوه تأثیرگذار بر بازار را شناسایی کند.</p>
-                
-                <h5><i class="fas fa-envelope me-2"></i>اطلاع‌رسانی ایمیلی</h5>
-                <p>شما سیگنال‌های معاملاتی دقیقی دریافت خواهید کرد که شامل موارد زیر است:</p>
-                <ul>
-                    <li>توصیه‌های خرید/فروش</li>
-                    <li>قیمت فعلی و سطوح تکنیکال</li>
-                    <li>تحلیل اخبار مربوطه</li>
-                    <li>دلایل پشت سیگنال معاملاتی</li>
-                </ul>
-                
-                <div class="alert alert-warning mt-3">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>سلب مسئولیت:</strong> این ربات تحلیل‌ها را صرفاً برای اهداف اطلاع‌رسانی ارائه می‌دهد و توصیه مالی محسوب نمی‌شود. همیشه قبل از اتخاذ تصمیمات سرمایه‌گذاری، تحقیقات خود را انجام دهید.
-                </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <form method="post">
+        <h2>تنظیمات اصلی</h2>
+        
+        <div class="form-group">
+            <h3>ارزهای دیجیتال قابل پیگیری</h3>
+            <div class="checkbox-group">
+                {% for currency in currencies %}
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="currency_{{ loop.index }}" name="currencies" value="{{ currency }}" {% if currency in watched_currencies %}checked{% endif %}>
+                        <label for="currency_{{ loop.index }}">{{ currency }}</label>
+                    </div>
+                {% endfor %}
             </div>
         </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Test email button
-    const testEmailBtn = document.getElementById('test_email_btn');
-    if (testEmailBtn) {
-        testEmailBtn.addEventListener('click', function() {
-            const emailAddress = document.getElementById('email_address').value;
-            
-            if (!emailAddress) {
-                alert('لطفا ابتدا یک آدرس ایمیل وارد کنید.');
-                return;
-            }
-            
-            // Disable button and show loading
-            const button = this;
-            const originalText = button.innerHTML;
-            button.disabled = true;
-            button.innerHTML = '<span class="loading-spinner"></span> در حال ارسال...';
-            
-            // Send test email
-            fetch('/api/test-email', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    'email_address': emailAddress
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('ایمیل تست با موفقیت ارسال شد! لطفا صندوق ورودی خود را بررسی کنید.');
-                    // Show email preview after sending test email
-                    loadEmailPreview();
-                } else {
-                    alert('خطا: ' + data.message);
-                }
-                
-                // Restore button
-                button.disabled = false;
-                button.innerHTML = originalText;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('خطایی هنگام ارسال ایمیل تست رخ داد. لطفا دوباره تلاش کنید.');
-                
-                // Restore button
-                button.disabled = false;
-                button.innerHTML = originalText;
-            });
-        });
-    } else {
-        console.error('Test email button not found');
-    }
-    
-    // Scheduler status toggle
-    const schedulerSwitch = document.getElementById('scheduler_enabled');
-    if (schedulerSwitch) {
-        schedulerSwitch.addEventListener('change', function() {
-            const statusAlert = document.getElementById('scheduler_status_alert');
-            const statusText = document.getElementById('scheduler_status_text');
-            
-            if (this.checked) {
-                statusAlert.className = 'alert alert-warning';
-                statusText.textContent = 'در انتظار شروع (تنظیمات را ذخیره کنید تا اعمال شود)';
-            } else {
-                statusAlert.className = 'alert alert-warning';
-                statusText.textContent = 'در انتظار توقف (تنظیمات را ذخیره کنید تا اعمال شود)';
-            }
-        });
-    } else {
-        console.error('Scheduler switch not found');
-    }
-});
-</script>
-
-<!-- کد جاوا اسکریپت مشاهده ایمیل - جدا شده برای اطمینان از کارکرد صحیح -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Debug info
-    console.log('Email preview script loaded');
-    
-    // View email button
-    const viewEmailBtn = document.getElementById('view_email_btn');
-    if (!viewEmailBtn) {
-        console.error('View email button not found');
-        return;
-    }
-    
-    // Sample email button
-    const viewSampleEmailBtn = document.getElementById('view_sample_email_btn');
-    if (!viewSampleEmailBtn) {
-        console.error('Sample email button not found');
-        return;
-    }
-    
-    console.log('Adding click events to buttons');
-    viewEmailBtn.addEventListener('click', function() {
-        console.log('View email button clicked');
-        loadEmailPreview();
-    });
-    
-    viewSampleEmailBtn.addEventListener('click', function() {
-        console.log('Sample email button clicked');
-        showSampleEmail();
-    });
-    
-    // Function to show a sample email without checking the server
-    function showSampleEmail() {
-        console.log('Showing sample email...');
-        const previewContainer = document.getElementById('email_preview_container');
-        const previewError = document.getElementById('email_preview_error');
-        const previewSubject = document.getElementById('email_preview_subject');
-        const previewTime = document.getElementById('email_preview_time');
-        const previewContent = document.getElementById('email_preview_content');
-        const previewRecipient = document.getElementById('email_preview_recipient');
         
-        if (!previewContainer || !previewError || !previewSubject || 
-            !previewTime || !previewContent || !previewRecipient) {
-            console.error('One or more preview elements not found');
-            alert('خطا در بارگیری عناصر پیش‌نمایش ایمیل');
-            return;
-        }
-        
-        // Create sample email content
-        const currentTime = new Date().toLocaleString('fa-IR');
-        const sampleHtml = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-                <h2 style="color: #f0b90b;">سیگنال‌های معاملاتی ارزهای دیجیتال</h2>
-                <p>سیگنال‌های معاملاتی جدید برای ارزهای دیجیتال زیر نظر:</p>
-                
-                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                    <tr style="background-color: #f2f2f2;">
-                        <th style="padding: 8px; text-align: right; border-bottom: 1px solid #ddd;">ارز</th>
-                        <th style="padding: 8px; text-align: right; border-bottom: 1px solid #ddd;">سیگنال</th>
-                        <th style="padding: 8px; text-align: right; border-bottom: 1px solid #ddd;">قیمت</th>
-                        <th style="padding: 8px; text-align: right; border-bottom: 1px solid #ddd;">قدرت</th>
-                    </tr>
-                    <tr style="background-color: #e8f5e9;">
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">BTC/USDT</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">خرید</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">$67,234.55</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">0.65</td>
-                    </tr>
-                    <tr style="background-color: #d4edda;">
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">ETH/USDT</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">خرید قوی</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">$3,542.21</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">0.82</td>
-                    </tr>
-                    <tr style="background-color: #feecec;">
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">XRP/USDT</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">فروش</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">$0.52</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">-0.45</td>
-                    </tr>
-                </table>
-                
-                <div style="margin-top: 20px;">
-                    <h3>اخبار مهم:</h3>
-                    <ul>
-                        <li>بایننس تایید کرد که از توکن جدید ارز دیجیتال XYZ پشتیبانی خواهد کرد.</li>
-                        <li>اتریوم در حال آماده‌سازی برای به‌روزرسانی شبکه‌ای بزرگ در ماه آینده است.</li>
-                    </ul>
-                </div>
-                
-                <p style="margin-top: 20px;">تحلیل‌های بیشتر در داشبورد ربات قابل مشاهده است.</p>
-                
-                <hr>
-                <p style="font-size: 12px; color: #777;">
-                    این یک پیام خودکار از ربات معاملاتی ارزهای دیجیتال است.
-                    این سیگنال‌ها بر اساس تحلیل تکنیکال هستند و توصیه مالی محسوب نمی‌شوند.
-                    لطفاً قبل از اتخاذ هرگونه تصمیم سرمایه‌گذاری، تحقیقات خود را انجام دهید.
-                </p>
+        <div class="form-group">
+            <h3>منابع خبری</h3>
+            <div class="checkbox-item">
+                <input type="checkbox" id="include_middle_east" name="include_middle_east" {% if include_middle_east %}checked{% endif %}>
+                <label for="include_middle_east">شامل اخبار خاورمیانه باشد</label>
             </div>
-        `;
+        </div>
         
-        // Update preview elements
-        previewSubject.textContent = "سیگنال‌های معاملاتی ارزهای دیجیتال - " + currentTime;
-        previewTime.textContent = currentTime;
-        previewContent.innerHTML = sampleHtml;
-        previewRecipient.textContent = document.getElementById('email_address').value || "you@example.com";
+        <h2>تنظیمات اعلان</h2>
         
-        // Show preview container, hide error
-        previewContainer.classList.remove('d-none');
-        previewError.classList.add('d-none');
-        console.log('Sample email preview displayed');
-    }
-    
-    // Function to load email preview from server
-    function loadEmailPreview() {
-        console.log('Loading email preview...');
-        const previewContainer = document.getElementById('email_preview_container');
-        const previewError = document.getElementById('email_preview_error');
-        const previewSubject = document.getElementById('email_preview_subject');
-        const previewTime = document.getElementById('email_preview_time');
-        const previewContent = document.getElementById('email_preview_content');
-        const previewRecipient = document.getElementById('email_preview_recipient');
+        <div class="form-group">
+            <div class="checkbox-item">
+                <input type="checkbox" id="email_enabled" name="email_enabled" {% if email_settings.enabled %}checked{% endif %}>
+                <label for="email_enabled">فعال‌سازی اعلان‌های ایمیلی</label>
+            </div>
+        </div>
         
-        if (!previewContainer || !previewError || !previewSubject || 
-            !previewTime || !previewContent || !previewRecipient) {
-            console.error('One or more preview elements not found');
-            alert('خطا در بارگیری عناصر پیش‌نمایش ایمیل');
-            return;
-        }
+        <div class="form-group">
+            <label for="email">آدرس ایمیل:</label>
+            <input type="email" id="email" name="email" value="{{ email_settings.email }}">
+        </div>
         
-        fetch('/api/email-message')
-        .then(response => {
-            console.log('API response received');
-            return response.json();
-        })
-        .then(data => {
-            console.log('Email data:', data);
-            if (data.success && data.data.has_message) {
-                const message = data.data.last_message;
-                
-                // Update preview elements
-                previewSubject.textContent = message.subject;
-                previewTime.textContent = message.time;
-                previewContent.innerHTML = message.html_content;
-                previewRecipient.textContent = message.recipient;
-                
-                // Show preview container, hide error
-                previewContainer.classList.remove('d-none');
-                previewError.classList.add('d-none');
-                console.log('Email preview displayed');
-            } else {
-                // If real email fails, show sample email instead
-                console.log('No real email available, showing sample instead');
-                showSampleEmail();
-            }
-        })
-        .catch(error => {
-            console.error('Error loading email:', error);
-            // Show sample email as fallback
-            console.log('Error fetching real email, showing sample instead');
-            showSampleEmail();
-        });
-    }
-    
-    // Try auto-load on page load
-    try {
-        setTimeout(function() {
-            console.log('Auto-checking for email...');
-            // Skip auto-loading to improve page load performance
-            // We'll only load emails when the user clicks the buttons now
-        }, 1000);
-    } catch (e) {
-        console.error('Auto-load error:', e);
-    }
-});
-</script>
-{% endblock %}
+        <div class="form-group">
+            <label for="frequency">تناوب ارسال اعلان:</label>
+            <select id="frequency" name="frequency">
+                <option value="daily" {% if email_settings.frequency == "daily" %}selected{% endif %}>روزانه</option>
+                <option value="hourly" {% if email_settings.frequency == "hourly" %}selected{% endif %}>ساعتی</option>
+                <option value="signals" {% if email_settings.frequency == "signals" %}selected{% endif %}>فقط در صورت سیگنال جدید</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <div class="checkbox-item">
+                <input type="checkbox" id="scheduler_enabled" name="scheduler_enabled" {% if scheduler_running %}checked{% endif %}>
+                <label for="scheduler_enabled">فعال‌سازی برنامه زمانبندی (ارسال خودکار سیگنال‌ها)</label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn">ذخیره تنظیمات</button>
+            <a href="/test_email" class="btn" style="background-color: #2b3139; margin-right: 10px;">ارسال ایمیل آزمایشی</a>
+        </div>
+    </form>
+</body>
+</html>
