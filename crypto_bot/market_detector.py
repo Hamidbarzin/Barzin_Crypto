@@ -169,9 +169,15 @@ def analyze_market_trend(symbols=None):
         
         # تحلیل روند بر اساس معیارهای فوق
         trend = "neutral"
-        if overall_sentiment > 0.3 and btc_technical.get('rsi', 50) > 60:
+        # اطمینان از اینکه rsi یک عدد است
+        rsi_value = 50
+        if isinstance(btc_technical, dict) and 'rsi' in btc_technical:
+            if isinstance(btc_technical['rsi'], (int, float)):
+                rsi_value = btc_technical['rsi']
+            
+        if overall_sentiment > 0.3 and rsi_value > 60:
             trend = "bullish"
-        elif overall_sentiment < -0.3 and btc_technical.get('rsi', 50) < 40:
+        elif overall_sentiment < -0.3 and rsi_value < 40:
             trend = "bearish"
         
         # ارزهای تحت تأثیر
