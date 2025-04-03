@@ -663,6 +663,25 @@ def simple_email():
         'now': datetime.now()
     }
     return render_template('simple_email.html', **context)
+    
+@app.route('/minimal')
+def minimal_email():
+    """Extremely minimal email display with almost no styling"""
+    from datetime import datetime
+    context = {
+        'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'now': datetime.now()
+    }
+    return render_template('minimal_email.html', **context)
+    
+@app.route('/ultra')
+def ultra_simple():
+    """Ultra simplified home page with just plain links"""
+    from datetime import datetime
+    context = {
+        'now': datetime.now()
+    }
+    return render_template('ultra_simple.html', **context)
 
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
