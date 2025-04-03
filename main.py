@@ -45,6 +45,10 @@ def index():
     """Main page with direct minimal HTML rendering"""
     from flask import render_template_string
     
+    # بررسی کدام ارز دیجیتال انتخاب شده است
+    selected_crypto = request.args.get('crypto', 'BTC')
+    tv_symbol = f"BINANCE:{selected_crypto}USDT"
+    
     # Template string for direct rendering - ultra simple
     template = """
     <!DOCTYPE html>
@@ -196,64 +200,21 @@ def index():
             <h2>نمودار و قیمت ارزهای دیجیتال</h2>
             
             <!-- TradingView Widget BEGIN -->
-            <div class="tradingview-widget-container" style="margin-bottom: 20px;">
-              <div id="tradingview_chart"></div>
-              <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-              <script type="text/javascript">
-              new TradingView.widget(
-              {
-                "width": "100%",
-                "height": 500,
-                "symbol": "BINANCE:BTCUSDT",
-                "interval": "15",
-                "timezone": "Asia/Tehran",
-                "theme": "dark",
-                "style": "1",
-                "locale": "en",
-                "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false,
-                "save_image": false,
-                "container_id": "tradingview_chart",
-                "hide_side_toolbar": false,
-                "backgroundColor": "#181A20",
-                "allow_symbol_change": true,
-                "watchlist": ["BINANCE:BTCUSDT", "BINANCE:ETHUSDT", "BINANCE:BNBUSDT", "BINANCE:XRPUSDT", "BINANCE:SOLUSDT", "BINANCE:ADAUSDT", "BINANCE:DOGEUSDT"],
-                "details": true,
-                "studies": [
-                  "MASimple@tv-basicstudies",
-                  "RSI@tv-basicstudies",
-                  "MACD@tv-basicstudies"
-                ],
-                "show_popup_button": true,
-                "popup_width": "1000",
-                "popup_height": "650"
-              }
-              );
-              </script>
+            <div style="margin-bottom: 20px;">
+              <!-- Simple Embedded TradingView Widget -->
+              <iframe id="tradingview_iframe" src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_d7cc5&symbol={{ tv_symbol }}&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Asia%2FTehran&withdateranges=1" style="width:100%; height:500px; border: none;"></iframe>
             </div>
             <!-- TradingView Widget END -->
             
-            <div class="market-buttons" style="display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px;">
-                <button class="market-button" onclick="changeTVSymbol('BINANCE:BTCUSDT')" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">BTC/USDT</button>
-                <button class="market-button" onclick="changeTVSymbol('BINANCE:ETHUSDT')" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">ETH/USDT</button>
-                <button class="market-button" onclick="changeTVSymbol('BINANCE:BNBUSDT')" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">BNB/USDT</button>
-                <button class="market-button" onclick="changeTVSymbol('BINANCE:XRPUSDT')" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">XRP/USDT</button>
-                <button class="market-button" onclick="changeTVSymbol('BINANCE:SOLUSDT')" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">SOL/USDT</button>
-                <button class="market-button" onclick="changeTVSymbol('BINANCE:ADAUSDT')" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">ADA/USDT</button>
-                <button class="market-button" onclick="changeTVSymbol('BINANCE:DOGEUSDT')" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">DOGE/USDT</button>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px;">
+                <a href="/?crypto=BTC" class="binance-button" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block;">BTC/USDT</a>
+                <a href="/?crypto=ETH" class="binance-button" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block;">ETH/USDT</a>
+                <a href="/?crypto=BNB" class="binance-button" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block;">BNB/USDT</a>
+                <a href="/?crypto=XRP" class="binance-button" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block;">XRP/USDT</a>
+                <a href="/?crypto=SOL" class="binance-button" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block;">SOL/USDT</a>
+                <a href="/?crypto=ADA" class="binance-button" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block;">ADA/USDT</a>
+                <a href="/?crypto=DOGE" class="binance-button" style="background-color: #2b3139; color: #FCD535; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block;">DOGE/USDT</a>
             </div>
-            
-            <script>
-                function changeTVSymbol(symbol) {
-                    if (window.tvWidget) {
-                        window.tvWidget.setSymbol(symbol, '15', function() {
-                            console.log('Symbol changed to: ' + symbol);
-                        });
-                    } else {
-                        console.error('TradingView widget not initialized');
-                    }
-                }
-            </script>
             
             <table>
             <tr>
@@ -500,7 +461,8 @@ def index():
         signals={},
         format_price=format_price,
         format_change=format_change,
-        crypto_names=crypto_names
+        crypto_names=crypto_names,
+        tv_symbol=tv_symbol
     )
     
 @app.route('/simple')
