@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fa" data-bs-theme="dark" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نمونه ایمیل توصیه‌های معاملاتی</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    
+    <!-- Vazirmatn Font (Persian) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    
+    <!-- RTL override for Bootstrap -->
+    <style>
+        body {
+            font-family: 'Vazirmatn', 'Tahoma', sans-serif;
+            background-color: #0a1929;
+            color: #e6e6e6;
+        }
+        
+        .email-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background-color: #132f4c;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        
+        .email-header {
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .email-section {
+            margin-bottom: 2rem;
+        }
+        
+        .signal {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .signal-strong-buy {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+        }
+        
+        .signal-buy {
+            background-color: rgba(56, 193, 114, 0.15);
+            color: #38c172;
+        }
+        
+        .signal-neutral {
+            background-color: rgba(108, 117, 125, 0.15);
+            color: #6c757d;
+        }
+        
+        .signal-sell {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+        }
+        
+        .signal-strong-sell {
+            background-color: rgba(191, 42, 42, 0.15);
+            color: #bf2a2a;
+        }
+        
+        .nav-container {
+            max-width: 800px;
+            margin: 1rem auto;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .nav-button {
+            margin: 0 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-container">
+        <a href="/" class="btn btn-primary nav-button">
+            <i class="fas fa-home me-1"></i> خانه
+        </a>
+        <a href="/dashboard" class="btn btn-primary nav-button">
+            <i class="fas fa-chart-line me-1"></i> داشبورد
+        </a>
+        <a href="/settings" class="btn btn-primary nav-button">
+            <i class="fas fa-cog me-1"></i> تنظیمات
+        </a>
+    </div>
+
+    <div class="email-container">
+        <div class="email-header">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0v6XpZ7-qKUuLc9zz-SJ8_fkRBgwcdvPAsA&usqp=CAU" alt="تحلیلگر ارز دیجیتال" width="120" class="mb-3">
+            <h1>توصیه‌های معاملاتی ارز دیجیتال</h1>
+            <p class="text-muted">{{ current_time }}</p>
+        </div>
+        
+        <div class="email-section">
+            <h3 class="mb-3">خلاصه وضعیت بازار</h3>
+            <p>در ۲۴ ساعت گذشته، بازار ارزهای دیجیتال روند صعودی داشته است. بیت‌کوین با افزایش ۲.۵٪ به محدوده ۸۲,۰۰۰ دلار رسیده و اتریوم نیز رشد مشابهی داشته است.</p>
+            <p>در بخش خبری، اعلام همکاری چند شرکت بزرگ فناوری با پروژه‌های بلاکچینی تأثیر مثبتی بر بازار داشته است.</p>
+        </div>
+        
+        <div class="email-section">
+            <h3 class="mb-3">سیگنال‌های معاملاتی امروز</h3>
+            
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="m-0">بیت‌کوین (BTC/USDT)</h4>
+                        <span class="signal signal-buy">خرید</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>قیمت فعلی:</strong> $82,500</p>
+                            <p class="mb-2"><strong>محدوده خرید پیشنهادی:</strong> $80,000 - $83,000</p>
+                            <p class="mb-2"><strong>هدف قیمتی اول:</strong> $85,000</p>
+                            <p class="mb-2"><strong>هدف قیمتی دوم:</strong> $88,000</p>
+                            <p class="mb-2"><strong>حد ضرر:</strong> $79,000</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>شاخص RSI:</strong> 58 (خنثی)</p>
+                            <p class="mb-2"><strong>MACD:</strong> صعودی</p>
+                            <p class="mb-2"><strong>میانگین متحرک:</strong> بالای MA200</p>
+                            <p class="mb-2"><strong>حجم معاملات:</strong> افزایشی</p>
+                            <p class="mb-2"><strong>باندهای بولینگر:</strong> نزدیک به خط میانی</p>
+                        </div>
+                    </div>
+                    <p class="mt-3"><strong>توصیه معاملاتی:</strong> معامله نوسانی صعودی با اهداف مشخص شده. استراتژی خرید در محدوده حمایت و فروش در محدوده مقاومت.</p>
+                </div>
+            </div>
+            
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="m-0">اتریوم (ETH/USDT)</h4>
+                        <span class="signal signal-strong-buy">خرید قوی</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>قیمت فعلی:</strong> $3,200</p>
+                            <p class="mb-2"><strong>محدوده خرید پیشنهادی:</strong> $3,150 - $3,250</p>
+                            <p class="mb-2"><strong>هدف قیمتی اول:</strong> $3,400</p>
+                            <p class="mb-2"><strong>هدف قیمتی دوم:</strong> $3,550</p>
+                            <p class="mb-2"><strong>حد ضرر:</strong> $3,050</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>شاخص RSI:</strong> 65 (خنثی)</p>
+                            <p class="mb-2"><strong>MACD:</strong> صعودی قوی</p>
+                            <p class="mb-2"><strong>میانگین متحرک:</strong> بالای MA50 و MA200</p>
+                            <p class="mb-2"><strong>حجم معاملات:</strong> افزایشی قوی</p>
+                            <p class="mb-2"><strong>باندهای بولینگر:</strong> نزدیک به باند بالایی</p>
+                        </div>
+                    </div>
+                    <p class="mt-3"><strong>توصیه معاملاتی:</strong> نقطه ورود مناسب برای معامله میان‌مدت. علائم تکنیکال و بنیادی قوی برای ادامه روند صعودی.</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="m-0">ریپل (XRP/USDT)</h4>
+                        <span class="signal signal-neutral">خنثی</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>قیمت فعلی:</strong> $0.52</p>
+                            <p class="mb-2"><strong>محدوده خرید پیشنهادی:</strong> $0.48 - $0.52</p>
+                            <p class="mb-2"><strong>هدف قیمتی اول:</strong> $0.58</p>
+                            <p class="mb-2"><strong>هدف قیمتی دوم:</strong> $0.65</p>
+                            <p class="mb-2"><strong>حد ضرر:</strong> $0.46</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>شاخص RSI:</strong> 48 (خنثی)</p>
+                            <p class="mb-2"><strong>MACD:</strong> خنثی با احتمال صعودی</p>
+                            <p class="mb-2"><strong>میانگین متحرک:</strong> نزدیک به MA50</p>
+                            <p class="mb-2"><strong>حجم معاملات:</strong> متوسط</p>
+                            <p class="mb-2"><strong>باندهای بولینگر:</strong> تنگ شدن باندها</p>
+                        </div>
+                    </div>
+                    <p class="mt-3"><strong>توصیه معاملاتی:</strong> منتظر سیگنال‌های واضح‌تر باشید. در صورت شکست مقاومت $0.54، احتمال صعود افزایش می‌یابد.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="email-section">
+            <h3 class="mb-3">اخبار تأثیرگذار</h3>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <h5>همکاری بزرگ بین شرکت‌های فناوری و پروژه‌های بلاکچین</h5>
+                    <p class="mb-0">چند شرکت بزرگ فناوری اعلام کردند که قصد دارند در حوزه بلاکچین سرمایه‌گذاری کنند. این خبر می‌تواند تأثیر مثبتی بر بازار داشته باشد.</p>
+                    <span class="badge bg-success mt-2">تأثیر: مثبت</span>
+                </li>
+                <li class="list-group-item">
+                    <h5>بیت‌کوین به بالاترین قیمت در تاریخ رسید</h5>
+                    <p class="mb-0">بیت‌کوین با عبور از مرز 82 هزار دلار، رکورد جدیدی ثبت کرد. این افزایش قیمت با حجم معاملات بالا همراه بوده است.</p>
+                    <span class="badge bg-success mt-2">تأثیر: مثبت</span>
+                </li>
+                <li class="list-group-item">
+                    <h5>تحلیل‌گران: احتمال اصلاح بازار در ماه آینده</h5>
+                    <p class="mb-0">برخی از تحلیل‌گران معتقدند که پس از این رشد قیمت، احتمال یک اصلاح قیمت در ماه آینده وجود دارد. توصیه می‌شود با احتیاط معامله کنید.</p>
+                    <span class="badge bg-danger mt-2">تأثیر: منفی</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="email-section">
+            <h3 class="mb-3">وضعیت کالاها و ارزهای جهانی</h3>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">طلا (XAU/USD)</h5>
+                            <h2 class="my-3">$2,250.50</h2>
+                            <p class="mb-0 text-success">↑ 0.75%</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">نفت (OIL/USD)</h5>
+                            <h2 class="my-3">$82.35</h2>
+                            <p class="mb-0 text-success">↑ 1.2%</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">یورو/دلار (EUR/USD)</h5>
+                            <h2 class="my-3">1.0825</h2>
+                            <p class="mb-0 text-success">↑ 0.15%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="email-section border-top pt-4">
+            <div class="text-center">
+                <p>این ایمیل به صورت خودکار برای شما ارسال شده است.</p>
+                <p>برای تغییر تنظیمات ارسال ایمیل، به <a href="/settings">بخش تنظیمات</a> مراجعه کنید.</p>
+                <p class="text-muted">© {{ now.year }} ربات معامله ارز دیجیتال</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

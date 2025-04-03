@@ -629,6 +629,15 @@ def email_sample():
     }
     return render_template('email_sample.html', **context)
 
+@app.route('/email-preview')
+def email_preview():
+    """Display a standalone preview of a sample email that would be sent by the trading bot"""
+    from datetime import datetime
+    context = {
+        'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    return render_template('direct_email_sample.html', **context)
+
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     if request.method == 'POST':
