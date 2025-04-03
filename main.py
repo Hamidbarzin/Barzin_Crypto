@@ -613,6 +613,17 @@ def dashboard():
         economic_indicators=economic_indicators
     )
 
+@app.route('/email-sample')
+def email_sample():
+    """Display a sample email that would be sent by the trading bot"""
+    from datetime import datetime
+    email_settings = session.get('email_settings', {'email': ''})
+    context = {
+        'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'email_address': email_settings.get('email', '')
+    }
+    return render_template('email_sample.html', **context)
+
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     if request.method == 'POST':

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}نمونه ایمیل سیگنال معاملاتی{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white d-flex justify-content-between">
+                    <h3 class="mb-0">نمونه ایمیل سیگنال معاملاتی</h3>
+                    <a href="/settings" class="btn btn-sm btn-outline-light">بازگشت به تنظیمات</a>
+                </div>
+                <div class="card-body">
+                    <div class="email-preview">
+                        <div class="email-header mb-3 border-bottom pb-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">موضوع: سیگنال‌های معاملاتی ارزهای دیجیتال - {{ current_time }}</span>
+                                <small class="text-muted">{{ current_time }}</small>
+                            </div>
+                            <small class="text-muted">به: {{ email_address or "you@example.com" }}</small>
+                        </div>
+                        
+                        <div class="email-content" style="direction: rtl; text-align: right;">
+                            <div style="font-family: Arial, sans-serif; max-width: 100%; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+                                <h2 style="color: #f0b90b;">سیگنال‌های معاملاتی ارزهای دیجیتال</h2>
+                                <p>سیگنال‌های معاملاتی جدید برای ارزهای دیجیتال زیر نظر:</p>
+                                
+                                <table class="table table-striped">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" style="text-align: right;">ارز</th>
+                                            <th scope="col" style="text-align: right;">سیگنال</th>
+                                            <th scope="col" style="text-align: right;">قیمت</th>
+                                            <th scope="col" style="text-align: right;">قدرت</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="table-success">
+                                            <td>BTC/USDT</td>
+                                            <td><span class="badge bg-success">خرید</span></td>
+                                            <td>$67,234.55</td>
+                                            <td>0.65</td>
+                                        </tr>
+                                        <tr class="table-success">
+                                            <td>ETH/USDT</td>
+                                            <td><span class="badge bg-success">خرید قوی</span></td>
+                                            <td>$3,542.21</td>
+                                            <td>0.82</td>
+                                        </tr>
+                                        <tr class="table-danger">
+                                            <td>XRP/USDT</td>
+                                            <td><span class="badge bg-danger">فروش</span></td>
+                                            <td>$0.52</td>
+                                            <td>-0.45</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <div class="mt-4">
+                                    <h4>اخبار مهم:</h4>
+                                    <ul>
+                                        <li>بایننس تایید کرد که از توکن جدید ارز دیجیتال XYZ پشتیبانی خواهد کرد.</li>
+                                        <li>اتریوم در حال آماده‌سازی برای به‌روزرسانی شبکه‌ای بزرگ در ماه آینده است.</li>
+                                    </ul>
+                                </div>
+                                
+                                <p class="mt-3">تحلیل‌های بیشتر در داشبورد ربات قابل مشاهده است.</p>
+                                
+                                <hr>
+                                <p class="text-muted small">
+                                    این یک پیام خودکار از ربات معاملاتی ارزهای دیجیتال است.
+                                    این سیگنال‌ها بر اساس تحلیل تکنیکال هستند و توصیه مالی محسوب نمی‌شوند.
+                                    لطفاً قبل از اتخاذ هرگونه تصمیم سرمایه‌گذاری، تحقیقات خود را انجام دهید.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        این یک نمونه از ایمیل‌های سیگنال معاملاتی است که توسط ربات ارسال می‌شود. پس از فعال‌سازی اطلاع‌رسانی ایمیلی، ایمیل‌های مشابه به آدرس ایمیل شما ارسال خواهند شد.
+                    </div>
+                    <a href="/settings" class="btn btn-primary">
+                        <i class="fas fa-cog me-1"></i> بازگشت به تنظیمات
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
