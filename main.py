@@ -490,6 +490,235 @@ def test_menu():
     """Render test menu page to debug navigation issues"""
     return render_template('test_menu.html')
 
+@app.route('/app_settings', methods=['GET', 'POST'])
+def app_settings():
+    """صفحه تنظیمات برای پیکربندی برنامه"""
+    # بارگذاری تنظیمات فعلی از سشن
+    email_settings = session.get('email_settings', {
+        'enabled': False,
+        'email': '',
+        'frequency': 'daily'
+    })
+    
+    watched_currencies = session.get('watched_currencies', DEFAULT_CURRENCIES[:3])
+    include_middle_east = session.get('include_middle_east', True)
+    
+    # پردازش درخواست POST برای ذخیره تنظیمات
+    if request.method == 'POST':
+        # تنظیمات ایمیل
+        email_settings['enabled'] = 'email_enabled' in request.form
+        email_settings['email'] = request.form.get('email', '')
+        email_settings['frequency'] = request.form.get('frequency', 'daily')
+        session['email_settings'] = email_settings
+        
+        # ارزهای تحت نظر
+        selected_currencies = request.form.getlist('currencies')
+        if selected_currencies:
+            session['watched_currencies'] = selected_currencies
+            watched_currencies = selected_currencies
+        
+        # منابع خبری
+        include_middle_east = 'include_middle_east' in request.form
+        session['include_middle_east'] = include_middle_east
+        
+        # برنامه زمانبندی
+        scheduler_enabled = 'scheduler_enabled' in request.form
+        if scheduler_enabled and not session.get('scheduler_running', False):
+            start_scheduler(email_settings, watched_currencies)
+            session['scheduler_running'] = True
+        elif not scheduler_enabled and session.get('scheduler_running', False):
+            stop_scheduler()
+            session['scheduler_running'] = False
+        
+        flash('تنظیمات با موفقیت ذخیره شد', 'success')
+        return redirect(url_for('app_settings'))
+    
+    # رندر صفحه تنظیمات
+    return render_template_string('''
+    <!DOCTYPE html>
+    <html dir="rtl" lang="fa">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>تنظیمات ربات معاملاتی</title>
+        <style>
+            body {
+                font-family: Tahoma, Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #181A20;
+                color: #EAECEF;
+                direction: rtl;
+                padding: 20px;
+                line-height: 1.6;
+            }
+            h1, h2 {
+                color: #FCD535;
+                border-bottom: 1px solid #2b3139;
+                padding-bottom: 10px;
+                margin-top: 25px;
+            }
+            .form-group {
+                margin-bottom: 20px;
+            }
+            label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+            input[type="text"], input[type="email"], select {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #2b3139;
+                border-radius: 4px;
+                background-color: #2b3139;
+                color: #EAECEF;
+                margin-top: 5px;
+            }
+            .checkbox-group {
+                margin: 15px 0;
+            }
+            .checkbox-item {
+                margin-bottom: 10px;
+            }
+            .btn {
+                background-color: #FCD535;
+                color: #181A20;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+                font-size: 16px;
+                transition: background-color 0.3s;
+            }
+            .btn:hover {
+                background-color: #F0B90B;
+            }
+            .alert {
+                padding: 15px;
+                margin-bottom: 20px;
+                border-radius: 4px;
+            }
+            .alert-success {
+                background-color: rgba(14, 203, 129, 0.1);
+                border: 1px solid #0ECB81;
+                color: #0ECB81;
+            }
+            .alert-danger {
+                background-color: rgba(246, 70, 93, 0.1);
+                border: 1px solid #F6465D;
+                color: #F6465D;
+            }
+            a {
+                color: #FCD535;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+            .menu {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 20px;
+                overflow-x: auto;
+                padding-bottom: 5px;
+            }
+            .menu a {
+                padding: 8px 15px;
+                background-color: #2b3139;
+                color: #FCD535;
+                text-decoration: none;
+                border-radius: 4px;
+                white-space: nowrap;
+            }
+            .menu a:hover {
+                background-color: #393E46;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>تنظیمات ربات معاملاتی</h1>
+        
+        <div class="menu">
+            <a href="/">داشبورد</a>
+            <a href="/dashboard">داشبورد کامل</a>
+            <a href="/dashboard_new">داشبورد جدید</a>
+            <a href="/app_settings">تنظیمات</a>
+            <a href="/test_email">ارسال ایمیل آزمایشی</a>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="post">
+            <h2>تنظیمات اصلی</h2>
+            
+            <div class="form-group">
+                <h3>ارزهای دیجیتال قابل پیگیری</h3>
+                <div class="checkbox-group">
+                    {% for currency in currencies %}
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="currency_{{ loop.index }}" name="currencies" value="{{ currency }}" {% if currency in watched_currencies %}checked{% endif %}>
+                            <label for="currency_{{ loop.index }}">{{ currency }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h3>منابع خبری</h3>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="include_middle_east" name="include_middle_east" {% if include_middle_east %}checked{% endif %}>
+                    <label for="include_middle_east">شامل اخبار خاورمیانه باشد</label>
+                </div>
+            </div>
+            
+            <h2>تنظیمات اعلان</h2>
+            
+            <div class="form-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="email_enabled" name="email_enabled" {% if email_settings.enabled %}checked{% endif %}>
+                    <label for="email_enabled">فعال‌سازی اعلان‌های ایمیلی</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">آدرس ایمیل:</label>
+                <input type="email" id="email" name="email" value="{{ email_settings.email }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="frequency">تناوب ارسال اعلان:</label>
+                <select id="frequency" name="frequency">
+                    <option value="daily" {% if email_settings.frequency == 'daily' %}selected{% endif %}>روزانه</option>
+                    <option value="hourly" {% if email_settings.frequency == 'hourly' %}selected{% endif %}>ساعتی</option>
+                    <option value="signals" {% if email_settings.frequency == 'signals' %}selected{% endif %}>فقط در صورت سیگنال جدید</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="scheduler_enabled" name="scheduler_enabled" {% if session.get('scheduler_running', False) %}checked{% endif %}>
+                    <label for="scheduler_enabled">فعال‌سازی برنامه زمانبندی (ارسال خودکار سیگنال‌ها)</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn">ذخیره تنظیمات</button>
+                <a href="/test_email" class="btn" style="background-color: #2b3139; margin-right: 10px;">ارسال ایمیل آزمایشی</a>
+            </div>
+        </form>
+    </body>
+    </html>
+    ''', currencies=DEFAULT_CURRENCIES, watched_currencies=watched_currencies, 
+    email_settings=email_settings, include_middle_east=include_middle_east)
+
 @app.route('/dashboard_new')
 def dashboard_new():
     # Initialize session if not already set
@@ -1104,8 +1333,9 @@ def ultra_simple():
     }
     return render_template('ultra_simple.html', **context)
 
-@app.route('/settings', methods=['GET', 'POST'])
-def settings():
+# Renamed settings route to avoid conflict 
+@app.route('/user_settings', methods=['GET', 'POST'])
+def user_settings():
     if request.method == 'POST':
         # Update watched currencies
         watched_currencies = request.form.getlist('currencies')
@@ -1142,7 +1372,7 @@ def settings():
             flash('ربات زمان‌بندی متوقف شد!', 'warning')
         
         flash('تنظیمات با موفقیت به‌روزرسانی شد!', 'success')
-        return redirect(url_for('settings'))
+        return redirect(url_for('user_settings'))
     
     # Disable all real-time operations in the settings page to prevent timeouts
     # Just return the template with session data
