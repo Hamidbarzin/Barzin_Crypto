@@ -42,7 +42,168 @@ def initialize_session():
 
 @app.route('/')
 def index():
-    return redirect(url_for('commodities_dashboard'))
+    """Main page with direct minimal HTML rendering"""
+    from flask import render_template_string
+    
+    # Template string for direct rendering - ultra simple
+    template = """
+    <!DOCTYPE html>
+    <html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ربات ساده ارز دیجیتال</title>
+        <style>
+            body {
+                font-family: Tahoma, Arial, sans-serif;
+                margin: 20px;
+                line-height: 1.5;
+            }
+            h1, h2 {
+                color: #333;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: right;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+            .positive {
+                color: green;
+            }
+            .negative {
+                color: red;
+            }
+            a {
+                color: #0066cc;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>ربات ساده ارز دیجیتال</h1>
+        <p>آخرین به‌روزرسانی: {{ current_time }}</p>
+        
+        <h2>لینک‌های مهم</h2>
+        <ul>
+            <li><a href="/ultra">صفحه اصلی بسیار ساده</a></li>
+            <li><a href="/simple">صفحه اصلی ساده</a></li>
+            <li><a href="/minimal">نمونه ایمیل (بسیار ساده)</a></li>
+            <li><a href="/simple_email">نمونه ایمیل (ساده)</a></li>
+            <li><a href="/email_sample">نمونه ایمیل (کامل)</a></li>
+            <li><a href="/test_menu">منوی آزمایشی</a></li>
+        </ul>
+        
+        <h2>قیمت ارزهای دیجیتال</h2>
+        <table>
+            <tr>
+                <th>ارز</th>
+                <th>قیمت (USDT)</th>
+                <th>تغییر 24 ساعته</th>
+            </tr>
+            <tr>
+                <td>بیت‌کوین (BTC)</td>
+                <td>82,500</td>
+                <td class="positive">+2.5%</td>
+            </tr>
+            <tr>
+                <td>اتریوم (ETH)</td>
+                <td>3,200</td>
+                <td class="positive">+1.8%</td>
+            </tr>
+            <tr>
+                <td>بایننس کوین (BNB)</td>
+                <td>560</td>
+                <td class="negative">-0.5%</td>
+            </tr>
+            <tr>
+                <td>ریپل (XRP)</td>
+                <td>0.52</td>
+                <td class="positive">+0.2%</td>
+            </tr>
+            <tr>
+                <td>سولانا (SOL)</td>
+                <td>145</td>
+                <td class="positive">+3.1%</td>
+            </tr>
+        </table>
+        
+        <h2>قیمت کالاها</h2>
+        <table>
+            <tr>
+                <th>کالا</th>
+                <th>قیمت (USD)</th>
+                <th>تغییر</th>
+            </tr>
+            <tr>
+                <td>طلا</td>
+                <td>2,250.50</td>
+                <td class="positive">+0.75%</td>
+            </tr>
+            <tr>
+                <td>نقره</td>
+                <td>28.75</td>
+                <td class="negative">-0.25%</td>
+            </tr>
+            <tr>
+                <td>نفت</td>
+                <td>82.35</td>
+                <td class="positive">+1.2%</td>
+            </tr>
+        </table>
+        
+        <h2>سیگنال‌های معاملاتی</h2>
+        <table>
+            <tr>
+                <th>ارز</th>
+                <th>قیمت</th>
+                <th>سیگنال</th>
+                <th>توصیه</th>
+            </tr>
+            <tr>
+                <td>BTC/USDT</td>
+                <td>82,500</td>
+                <td>خرید</td>
+                <td>پیشنهاد معامله نوسانی (صعودی)</td>
+            </tr>
+            <tr>
+                <td>ETH/USDT</td>
+                <td>3,200</td>
+                <td>خرید قوی</td>
+                <td>نقطه ورود مناسب برای معامله نوسانی صعودی</td>
+            </tr>
+            <tr>
+                <td>SOL/USDT</td>
+                <td>145</td>
+                <td>خرید</td>
+                <td>روند صعودی قوی</td>
+            </tr>
+            <tr>
+                <td>XRP/USDT</td>
+                <td>0.52</td>
+                <td>فروش</td>
+                <td>احتمال اصلاح قیمت</td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    """
+    
+    # رندر کردن قالب با داده‌های پایه
+    return render_template_string(
+        template,
+        current_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    )
     
 @app.route('/simple')
 def simple_home():
