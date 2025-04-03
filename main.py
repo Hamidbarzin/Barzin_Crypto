@@ -58,6 +58,11 @@ def commodities_dashboard():
 def test_dashboard():
     """Render test dashboard page to debug API and JavaScript issues"""
     return render_template('test_dashboard.html')
+    
+@app.route('/test-menu')
+def test_menu():
+    """Render test menu page to debug navigation issues"""
+    return render_template('test_menu.html')
 
 @app.route('/dashboard_new')
 def dashboard_new():
