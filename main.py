@@ -1198,7 +1198,7 @@ def get_economic():
     
 # روت‌های مربوط به هوش مصنوعی و یادگیری ماشین
 
-@app.route('/api/ai/price-prediction/<symbol>')
+@app.route('/api/ai/price-prediction/<path:symbol>')
 def ai_price_prediction(symbol):
     """
     پیش‌بینی قیمت با استفاده از هوش مصنوعی
@@ -1239,7 +1239,7 @@ def ai_market_sentiment():
         logger.error(f"خطا در تحلیل احساسات بازار: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
 
-@app.route('/api/ai/price-patterns/<symbol>')
+@app.route('/api/ai/price-patterns/<path:symbol>')
 def ai_price_patterns(symbol):
     """
     شناسایی الگوهای قیمت با استفاده از هوش مصنوعی
@@ -1257,7 +1257,7 @@ def ai_price_patterns(symbol):
         logger.error(f"خطا در شناسایی الگوهای قیمت {symbol}: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
 
-@app.route('/api/ai/trading-strategy/<symbol>')
+@app.route('/api/ai/trading-strategy/<path:symbol>')
 def ai_trading_strategy(symbol):
     """
     پیشنهاد استراتژی معاملاتی با استفاده از هوش مصنوعی
