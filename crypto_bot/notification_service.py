@@ -30,13 +30,18 @@ def send_sms_notification(to_phone_number, message):
         logger.error("تنظیمات Twilio کامل نیست")
         return False
     
+    # اطمینان از فرمت صحیح شماره تلفن (باید با + شروع شود)
+    formatted_phone = to_phone_number.strip()
+    if not formatted_phone.startswith('+'):
+        formatted_phone = '+' + formatted_phone
+    
     try:
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         
         message = client.messages.create(
             body=message,
             from_=TWILIO_PHONE_NUMBER,
-            to=to_phone_number
+            to=formatted_phone
         )
         
         logger.info(f"پیام با شناسه {message.sid} ارسال شد")

@@ -893,6 +893,49 @@ def test_notification():
         logger.error(f"خطا در ارسال پیامک تست: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
 
+@app.route('/api/opportunities')
+def get_buy_sell_opportunities():
+    """دریافت فرصت‌های خرید و فروش"""
+    from crypto_bot.market_detector import detect_buy_sell_opportunities
+    
+    sensitivity = request.args.get('sensitivity', 'medium')
+    watched_currencies = session.get('watched_currencies', DEFAULT_CURRENCIES[:5])
+    
+    try:
+        opportunities = detect_buy_sell_opportunities(watched_currencies, sensitivity)
+        return jsonify({'success': True, 'data': opportunities})
+    except Exception as e:
+        logger.error(f"خطا در دریافت فرصت‌های خرید و فروش: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/volatility')
+def get_market_volatility():
+    """دریافت نوسانات بازار"""
+    from crypto_bot.market_detector import detect_market_volatility
+    
+    timeframe = request.args.get('timeframe', '1h')
+    threshold = request.args.get('threshold', 'medium')
+    watched_currencies = session.get('watched_currencies', DEFAULT_CURRENCIES[:5])
+    
+    try:
+        volatility = detect_market_volatility(watched_currencies, timeframe, threshold)
+        return jsonify({'success': True, 'data': volatility})
+    except Exception as e:
+        logger.error(f"خطا در دریافت نوسانات بازار: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/market-trend')
+def get_market_trend():
+    """دریافت روند کلی بازار"""
+    from crypto_bot.market_detector import analyze_market_trend
+    
+    try:
+        trend = analyze_market_trend()
+        return jsonify({'success': True, 'data': trend})
+    except Exception as e:
+        logger.error(f"خطا در دریافت روند بازار: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+
 @app.route('/api/price/<symbol>')
 def get_price(symbol):
     try:
@@ -1236,71 +1279,14 @@ def update_notification_settings():
         logger.error(f"خطا در ذخیره تنظیمات اعلان‌ها: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
 
-@app.route('/api/buy-sell-opportunities')
-def get_buy_sell_opportunities():
-    """دریافت فرصت‌های خرید و فروش"""
-    from crypto_bot.market_detector import detect_buy_sell_opportunities
-    
-    try:
-        # دریافت ارزهای مورد نظر از پارامترهای درخواست
-        symbols = request.args.getlist('symbols')
-        sensitivity = request.args.get('sensitivity', 'medium')
-        
-        # استفاده از ارزهای پیش‌فرض اگر هیچ ارزی مشخص نشده باشد
-        if not symbols:
-            symbols = session.get('watched_currencies', DEFAULT_CURRENCIES[:5])
-        
-        # شناسایی فرصت‌های خرید و فروش
-        opportunities = detect_buy_sell_opportunities(symbols, sensitivity=sensitivity)
-        
-        return jsonify({'success': True, 'data': opportunities})
-    except Exception as e:
-        logger.error(f"خطا در شناسایی فرصت‌های خرید/فروش: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)})
+# این نسخه تکراری از تابع get_buy_sell_opportunities است و حذف شد
+# زیرا قبلاً در مسیر '/api/opportunities' تعریف شده است
 
-@app.route('/api/market-volatility')
-def get_market_volatility():
-    """دریافت نوسانات بازار"""
-    from crypto_bot.market_detector import detect_market_volatility
-    
-    try:
-        # دریافت پارامترهای درخواست
-        symbols = request.args.getlist('symbols')
-        timeframe = request.args.get('timeframe', '1h')
-        threshold = request.args.get('threshold', 'medium')
-        
-        # استفاده از ارزهای پیش‌فرض اگر هیچ ارزی مشخص نشده باشد
-        if not symbols:
-            symbols = session.get('watched_currencies', DEFAULT_CURRENCIES[:5])
-        
-        # شناسایی نوسانات بازار
-        volatility = detect_market_volatility(symbols, timeframe=timeframe, threshold=threshold)
-        
-        return jsonify({'success': True, 'data': volatility})
-    except Exception as e:
-        logger.error(f"خطا در شناسایی نوسانات بازار: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)})
+# این نسخه تکراری از تابع get_market_volatility است و حذف شد
+# زیرا قبلاً در مسیر '/api/volatility' تعریف شده است
 
-@app.route('/api/market-trend')
-def get_market_trend():
-    """دریافت روند کلی بازار"""
-    from crypto_bot.market_detector import analyze_market_trend
-    
-    try:
-        # دریافت ارزهای مورد نظر از پارامترهای درخواست
-        symbols = request.args.getlist('symbols')
-        
-        # استفاده از ارزهای پیش‌فرض اگر هیچ ارزی مشخص نشده باشد
-        if not symbols:
-            symbols = None  # تابع analyze_market_trend از مقادیر پیش‌فرض خود استفاده می‌کند
-        
-        # تحلیل روند بازار
-        trend = analyze_market_trend(symbols)
-        
-        return jsonify({'success': True, 'data': trend})
-    except Exception as e:
-        logger.error(f"خطا در تحلیل روند بازار: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)})
+# این نسخه تکراری از تابع get_market_trend است و حذف شد
+# زیرا قبلاً در مسیر '/api/market-trend' تعریف شده است
 
 @app.route('/api/email-message')
 def get_email_message():
