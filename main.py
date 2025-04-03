@@ -43,6 +43,11 @@ def initialize_session():
 @app.route('/')
 def index():
     return redirect(url_for('commodities_dashboard'))
+    
+@app.route('/simple')
+def simple_home():
+    """A simplified home page with direct links to all pages"""
+    return render_template('simple_home.html')
 
 @app.route('/api_test')
 def api_test():
@@ -648,6 +653,16 @@ def demo_email():
         'now': datetime.now()
     }
     return render_template('direct_email_sample.html', **context)
+
+@app.route('/simple_email')
+def simple_email():
+    """Ultra simple route for email display when other routes fail"""
+    from datetime import datetime
+    context = {
+        'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'now': datetime.now()
+    }
+    return render_template('simple_email.html', **context)
 
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
