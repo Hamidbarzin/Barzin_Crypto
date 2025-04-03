@@ -9,7 +9,7 @@ from crypto_bot.scheduler import start_scheduler, stop_scheduler
 from crypto_bot.technical_analysis import get_technical_indicators
 from crypto_bot.news_analyzer import get_latest_news
 from crypto_bot.signal_generator import generate_signals
-from crypto_bot.email_service import send_test_email, update_email_settings
+from crypto_bot.email_service import send_test_email, update_email_settings, last_email_content, DISABLE_REAL_EMAIL
 from crypto_bot.commodity_data import get_commodity_prices, get_forex_rates, get_economic_indicators
 
 # Setup logging
@@ -935,6 +935,16 @@ def get_economic():
         }
     }
     return jsonify({'success': True, 'data': indicators})
+
+@app.route('/api/email-message')
+def get_email_message():
+    """Get the last email message that would have been sent"""
+    status = {
+        'email_system_enabled': not DISABLE_REAL_EMAIL,
+        'has_message': last_email_content['recipient'] is not None,
+        'last_message': last_email_content if last_email_content['recipient'] is not None else None
+    }
+    return jsonify({'success': True, 'data': status})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

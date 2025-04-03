@@ -24,8 +24,9 @@ NEWS_API_KEY = os.environ.get('NEWS_API_KEY', '')
 # Email settings
 EMAIL_USER = os.environ.get('EMAIL_USER', '')
 EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
-EMAIL_SERVER = os.environ.get('EMAIL_SERVER', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+# Default to SMTP2GO which is more permissive for automation
+EMAIL_SERVER = os.environ.get('EMAIL_SERVER', 'mail.smtp2go.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 2525))  # SMTP2GO standard port
 
 # Default settings
 DEFAULT_CURRENCIES = [

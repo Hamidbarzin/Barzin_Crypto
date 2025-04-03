@@ -72,9 +72,36 @@
                         <div class="form-text">چند وقت یکبار می‌خواهید ایمیل‌های حاوی سیگنال‌های معاملاتی را دریافت کنید.</div>
                     </div>
                     
-                    <div class="alert alert-warning small">
+                    <div class="alert alert-warning small mb-3">
                         <i class="fas fa-exclamation-triangle me-2"></i>
                         شما فقط زمانی اطلاع‌رسانی دریافت خواهید کرد که سیگنال‌های معاملاتی قابل اجرا (خرید یا فروش) وجود داشته باشند.
+                    </div>
+                    
+                    <!-- آخرین پیام ایمیل -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0">آخرین پیام ایمیل</label>
+                            <button type="button" class="btn btn-sm btn-outline-info" id="view_email_btn">
+                                <i class="fas fa-envelope me-1"></i> مشاهده آخرین پیام
+                            </button>
+                        </div>
+                        <div id="email_preview_container" class="d-none">
+                            <div class="card border-light">
+                                <div class="card-header bg-light d-flex justify-content-between">
+                                    <span id="email_preview_subject">موضوع ایمیل</span>
+                                    <small id="email_preview_time" class="text-muted">زمان</small>
+                                </div>
+                                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                    <div id="email_preview_content">محتوا در حال بارگذاری...</div>
+                                </div>
+                                <div class="card-footer bg-light text-end">
+                                    <small class="text-muted">گیرنده: <span id="email_preview_recipient">-</span></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="email_preview_error" class="alert alert-info d-none">
+                            هنوز هیچ ایمیلی ارسال نشده است.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -211,6 +238,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 alert('ایمیل تست با موفقیت ارسال شد! لطفا صندوق ورودی خود را بررسی کنید.');
+                // Show email preview after sending test email
+                loadEmailPreview();
             } else {
                 alert('خطا: ' + data.message);
             }
@@ -228,6 +257,51 @@ document.addEventListener('DOMContentLoaded', function() {
             button.innerHTML = originalText;
         });
     });
+    
+    // View email button
+    document.getElementById('view_email_btn').addEventListener('click', function() {
+        loadEmailPreview();
+    });
+    
+    // Function to load email preview
+    function loadEmailPreview() {
+        const previewContainer = document.getElementById('email_preview_container');
+        const previewError = document.getElementById('email_preview_error');
+        const previewSubject = document.getElementById('email_preview_subject');
+        const previewTime = document.getElementById('email_preview_time');
+        const previewContent = document.getElementById('email_preview_content');
+        const previewRecipient = document.getElementById('email_preview_recipient');
+        
+        fetch('/api/email-message')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data.has_message) {
+                const message = data.data.last_message;
+                
+                // Update preview elements
+                previewSubject.textContent = message.subject;
+                previewTime.textContent = message.time;
+                previewContent.innerHTML = message.html_content;
+                previewRecipient.textContent = message.recipient;
+                
+                // Show preview container, hide error
+                previewContainer.classList.remove('d-none');
+                previewError.classList.add('d-none');
+            } else {
+                // Hide preview container, show error
+                previewContainer.classList.add('d-none');
+                previewError.classList.remove('d-none');
+                previewError.textContent = "هنوز هیچ ایمیلی ارسال نشده است یا سیستم ایمیل فعال نیست.";
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Hide preview container, show error
+            previewContainer.classList.add('d-none');
+            previewError.classList.remove('d-none');
+            previewError.textContent = "خطا در بارگذاری محتوای ایمیل";
+        });
+    }
     
     // Scheduler status toggle
     document.getElementById('scheduler_enabled').addEventListener('change', function() {

@@ -11,6 +11,17 @@ from datetime import datetime
 
 from crypto_bot.config import EMAIL_USER, EMAIL_PASSWORD, EMAIL_SERVER, EMAIL_PORT
 
+# Global variable to store the last email message when real email sending is disabled
+last_email_content = {
+    'recipient': None,
+    'subject': None,
+    'html_content': None,
+    'time': None
+}
+
+# Set this to True to show messages in the UI instead of sending actual emails
+DISABLE_REAL_EMAIL = True
+
 logger = logging.getLogger(__name__)
 
 def send_email(recipient, subject, html_content, text_content=None):
@@ -26,6 +37,22 @@ def send_email(recipient, subject, html_content, text_content=None):
     Returns:
         bool: True if email was sent successfully, False otherwise
     """
+    # Store the email content in the global variable for display in UI
+    global last_email_content
+    last_email_content = {
+        'recipient': recipient,
+        'subject': subject,
+        'html_content': html_content,
+        'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    
+    # If real email sending is disabled, just log success and return
+    if DISABLE_REAL_EMAIL:
+        logger.info(f"[SIMULATED EMAIL] To: {recipient}, Subject: {subject}")
+        logger.info("Real email sending is disabled, but message was stored for UI display")
+        return True
+    
+    # Continue with real email sending
     if not EMAIL_USER or not EMAIL_PASSWORD:
         logger.error("Email credentials not configured. Check EMAIL_USER and EMAIL_PASSWORD environment variables.")
         return False
@@ -48,14 +75,37 @@ def send_email(recipient, subject, html_content, text_content=None):
         msg.attach(text_part)
         msg.attach(html_part)
         
-        with smtplib.SMTP(EMAIL_SERVER, EMAIL_PORT) as server:
-            server.starttls()
-            server.login(EMAIL_USER, EMAIL_PASSWORD)
-            server.send_message(msg)
+        # Different handling for various email providers
+        try:
+            # First try with TLS (most common)
+            with smtplib.SMTP(EMAIL_SERVER, EMAIL_PORT) as server:
+                # Some servers don't use TLS but use SSL instead
+                try:
+                    server.starttls()
+                except smtplib.SMTPNotSupportedError:
+                    logger.info("TLS not supported by the server, continuing without TLS")
+                except Exception as e:
+                    logger.warning(f"TLS error (continuing anyway): {str(e)}")
+                
+                server.login(EMAIL_USER, EMAIL_PASSWORD)
+                server.send_message(msg)
+                logger.info(f"Email sent to {recipient} using TLS")
+                return True
+                
+        except Exception as e:
+            logger.warning(f"TLS connection failed: {str(e)}, trying SSL...")
             
-        logger.info(f"Email sent to {recipient}")
-        return True
-        
+            # If TLS fails, try with SSL
+            try:
+                with smtplib.SMTP_SSL(EMAIL_SERVER, EMAIL_PORT) as server:
+                    server.login(EMAIL_USER, EMAIL_PASSWORD)
+                    server.send_message(msg)
+                    logger.info(f"Email sent to {recipient} using SSL")
+                    return True
+            except Exception as e2:
+                logger.error(f"SSL connection also failed: {str(e2)}")
+                raise e2
+            
     except Exception as e:
         logger.error(f"Error sending email: {str(e)}")
         return False
