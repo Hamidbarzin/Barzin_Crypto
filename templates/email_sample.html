@@ -15,47 +15,49 @@
                     <div class="email-preview">
                         <div class="email-header mb-3 border-bottom pb-2">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-bold">موضوع: سیگنال‌های معاملاتی ارزهای دیجیتال - {{ current_time }}</span>
-                                <small class="text-muted">{{ current_time }}</small>
+                                <span class="fw-bold">موضوع: سیگنال‌های معاملاتی ارزهای دیجیتال</span>
+                                <small class="text-muted">۱۴۰۴/۰۱/۱۵ ۱۲:۰۰:۰۰</small>
                             </div>
-                            <small class="text-muted">به: {{ email_address or "you@example.com" }}</small>
+                            <small class="text-muted">به: you@example.com</small>
                         </div>
                         
                         <div class="email-content" style="direction: rtl; text-align: right;">
-                            <div style="font-family: Arial, sans-serif; max-width: 100%; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+                            <div style="font-family: 'Vazirmatn', Arial, sans-serif; max-width: 100%; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #222;">
                                 <h2 style="color: #f0b90b;">سیگنال‌های معاملاتی ارزهای دیجیتال</h2>
                                 <p>سیگنال‌های معاملاتی جدید برای ارزهای دیجیتال زیر نظر:</p>
                                 
-                                <table class="table table-striped">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th scope="col" style="text-align: right;">ارز</th>
-                                            <th scope="col" style="text-align: right;">سیگنال</th>
-                                            <th scope="col" style="text-align: right;">قیمت</th>
-                                            <th scope="col" style="text-align: right;">قدرت</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="table-success">
-                                            <td>BTC/USDT</td>
-                                            <td><span class="badge bg-success">خرید</span></td>
-                                            <td>$67,234.55</td>
-                                            <td>0.65</td>
-                                        </tr>
-                                        <tr class="table-success">
-                                            <td>ETH/USDT</td>
-                                            <td><span class="badge bg-success">خرید قوی</span></td>
-                                            <td>$3,542.21</td>
-                                            <td>0.82</td>
-                                        </tr>
-                                        <tr class="table-danger">
-                                            <td>XRP/USDT</td>
-                                            <td><span class="badge bg-danger">فروش</span></td>
-                                            <td>$0.52</td>
-                                            <td>-0.45</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align: right;">ارز</th>
+                                                <th style="text-align: right;">سیگنال</th>
+                                                <th style="text-align: right;">قیمت</th>
+                                                <th style="text-align: right;">قدرت</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>BTC/USDT</td>
+                                                <td><span class="badge bg-success">خرید</span></td>
+                                                <td>$67,234.55</td>
+                                                <td>0.65</td>
+                                            </tr>
+                                            <tr>
+                                                <td>ETH/USDT</td>
+                                                <td><span class="badge bg-success">خرید قوی</span></td>
+                                                <td>$3,542.21</td>
+                                                <td>0.82</td>
+                                            </tr>
+                                            <tr>
+                                                <td>XRP/USDT</td>
+                                                <td><span class="badge bg-danger">فروش</span></td>
+                                                <td>$0.52</td>
+                                                <td>-0.45</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                                 
                                 <div class="mt-4">
                                     <h4>اخبار مهم:</h4>
@@ -82,9 +84,14 @@
                         <i class="fas fa-info-circle me-2"></i>
                         این یک نمونه از ایمیل‌های سیگنال معاملاتی است که توسط ربات ارسال می‌شود. پس از فعال‌سازی اطلاع‌رسانی ایمیلی، ایمیل‌های مشابه به آدرس ایمیل شما ارسال خواهند شد.
                     </div>
-                    <a href="/settings" class="btn btn-primary">
-                        <i class="fas fa-cog me-1"></i> بازگشت به تنظیمات
-                    </a>
+                    <div class="d-flex gap-2">
+                        <a href="/settings" class="btn btn-primary">
+                            <i class="fas fa-cog me-1"></i> بازگشت به تنظیمات
+                        </a>
+                        <a href="/dashboard" class="btn btn-info">
+                            <i class="fas fa-chart-line me-1"></i> مشاهده داشبورد
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
