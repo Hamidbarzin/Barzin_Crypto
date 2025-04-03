@@ -58,28 +58,38 @@ def index():
                 font-family: Tahoma, Arial, sans-serif;
                 margin: 20px;
                 line-height: 1.5;
+                background-color: #f9f9f9;
             }
             h1, h2 {
                 color: #333;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 5px;
             }
             table {
                 border-collapse: collapse;
                 width: 100%;
                 margin-bottom: 20px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             }
             th, td {
                 border: 1px solid #ddd;
-                padding: 8px;
+                padding: 10px;
                 text-align: right;
             }
             th {
                 background-color: #f2f2f2;
+                font-weight: bold;
+            }
+            tr:nth-child(even) {
+                background-color: #f8f8f8;
             }
             .positive {
                 color: green;
+                font-weight: bold;
             }
             .negative {
                 color: red;
+                font-weight: bold;
             }
             a {
                 color: #0066cc;
@@ -88,11 +98,40 @@ def index():
             a:hover {
                 text-decoration: underline;
             }
+            .update-time {
+                font-style: italic;
+                color: #666;
+                margin-bottom: 20px;
+            }
+            .refresh-btn {
+                background-color: #4CAF50;
+                color: white;
+                padding: 10px 15px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+            .refresh-btn:hover {
+                background-color: #45a049;
+            }
+            .signal-buy {
+                background-color: rgba(0, 128, 0, 0.1);
+            }
+            .signal-sell {
+                background-color: rgba(255, 0, 0, 0.1);
+            }
+            .signal-neutral {
+                background-color: rgba(128, 128, 128, 0.1);
+            }
         </style>
+        <meta http-equiv="refresh" content="300"> <!-- Auto refresh every 5 minutes -->
     </head>
     <body>
         <h1>ربات ساده ارز دیجیتال</h1>
-        <p>آخرین به‌روزرسانی: {{ current_time }}</p>
+        <p class="update-time">آخرین به‌روزرسانی: {{ current_time }}</p>
+        <a href="/" class="refresh-btn">به‌روزرسانی اطلاعات</a>
         
         <h2>لینک‌های مهم</h2>
         <ul>
@@ -111,31 +150,44 @@ def index():
                 <th>قیمت (USDT)</th>
                 <th>تغییر 24 ساعته</th>
             </tr>
-            <tr>
-                <td>بیت‌کوین (BTC)</td>
-                <td>82,500</td>
-                <td class="positive">+2.5%</td>
-            </tr>
-            <tr>
-                <td>اتریوم (ETH)</td>
-                <td>3,200</td>
-                <td class="positive">+1.8%</td>
-            </tr>
-            <tr>
-                <td>بایننس کوین (BNB)</td>
-                <td>560</td>
-                <td class="negative">-0.5%</td>
-            </tr>
-            <tr>
-                <td>ریپل (XRP)</td>
-                <td>0.52</td>
-                <td class="positive">+0.2%</td>
-            </tr>
-            <tr>
-                <td>سولانا (SOL)</td>
-                <td>145</td>
-                <td class="positive">+3.1%</td>
-            </tr>
+            {% for symbol in crypto_prices %}
+                <tr>
+                    <td>{{ crypto_names.get(symbol.split('/')[0], symbol) }}</td>
+                    <td>{{ format_price(crypto_prices[symbol]['price']) }}</td>
+                    <td class="{{ 'positive' if crypto_prices[symbol]['change_24h'] > 0 else 'negative' }}">
+                        {{ format_change(crypto_prices[symbol]['change_24h']) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="3">در حال تلاش برای دریافت اطلاعات ارزها...</td>
+                </tr>
+                <tr>
+                    <td>بیت‌کوین (BTC)</td>
+                    <td>82,500</td>
+                    <td class="positive">+2.5%</td>
+                </tr>
+                <tr>
+                    <td>اتریوم (ETH)</td>
+                    <td>3,200</td>
+                    <td class="positive">+1.8%</td>
+                </tr>
+                <tr>
+                    <td>بایننس کوین (BNB)</td>
+                    <td>560</td>
+                    <td class="negative">-0.5%</td>
+                </tr>
+                <tr>
+                    <td>ریپل (XRP)</td>
+                    <td>0.52</td>
+                    <td class="positive">+0.2%</td>
+                </tr>
+                <tr>
+                    <td>سولانا (SOL)</td>
+                    <td>145</td>
+                    <td class="positive">+3.1%</td>
+                </tr>
+            {% endfor %}
         </table>
         
         <h2>قیمت کالاها</h2>
@@ -145,21 +197,87 @@ def index():
                 <th>قیمت (USD)</th>
                 <th>تغییر</th>
             </tr>
+            {% if commodities and 'GOLD' in commodities %}
+                <tr>
+                    <td>طلا</td>
+                    <td>{{ format_price(commodities['GOLD']['price']) }}</td>
+                    <td class="{{ 'positive' if commodities['GOLD']['change'] > 0 else 'negative' }}">
+                        {{ format_change(commodities['GOLD']['change']) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td>طلا</td>
+                    <td>2,250.50</td>
+                    <td class="positive">+0.75%</td>
+                </tr>
+            {% endif %}
+            
+            {% if commodities and 'SILVER' in commodities %}
+                <tr>
+                    <td>نقره</td>
+                    <td>{{ format_price(commodities['SILVER']['price']) }}</td>
+                    <td class="{{ 'positive' if commodities['SILVER']['change'] > 0 else 'negative' }}">
+                        {{ format_change(commodities['SILVER']['change']) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td>نقره</td>
+                    <td>28.75</td>
+                    <td class="negative">-0.25%</td>
+                </tr>
+            {% endif %}
+            
+            {% if commodities and 'OIL' in commodities %}
+                <tr>
+                    <td>نفت</td>
+                    <td>{{ format_price(commodities['OIL']['price']) }}</td>
+                    <td class="{{ 'positive' if commodities['OIL']['change'] > 0 else 'negative' }}">
+                        {{ format_change(commodities['OIL']['change']) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td>نفت</td>
+                    <td>82.35</td>
+                    <td class="positive">+1.2%</td>
+                </tr>
+            {% endif %}
+        </table>
+        
+        <h2>نرخ ارزهای جهانی</h2>
+        <table>
             <tr>
-                <td>طلا</td>
-                <td>2,250.50</td>
-                <td class="positive">+0.75%</td>
+                <th>ارز</th>
+                <th>نرخ</th>
+                <th>تغییر</th>
             </tr>
-            <tr>
-                <td>نقره</td>
-                <td>28.75</td>
-                <td class="negative">-0.25%</td>
-            </tr>
-            <tr>
-                <td>نفت</td>
-                <td>82.35</td>
-                <td class="positive">+1.2%</td>
-            </tr>
+            {% for symbol, data in forex_rates.items() %}
+                <tr>
+                    <td>{{ data.get('name', symbol) }}</td>
+                    <td>{{ format_price(data['price']) }}</td>
+                    <td class="{{ 'positive' if data['change'] > 0 else 'negative' }}">
+                        {{ format_change(data['change']) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td>یورو به دلار</td>
+                    <td>1.0825</td>
+                    <td class="positive">+0.15%</td>
+                </tr>
+                <tr>
+                    <td>پوند به دلار</td>
+                    <td>1.2634</td>
+                    <td class="negative">-0.25%</td>
+                </tr>
+                <tr>
+                    <td>دلار به ین</td>
+                    <td>151.68</td>
+                    <td class="positive">+0.32%</td>
+                </tr>
+            {% endfor %}
         </table>
         
         <h2>سیگنال‌های معاملاتی</h2>
@@ -170,39 +288,108 @@ def index():
                 <th>سیگنال</th>
                 <th>توصیه</th>
             </tr>
-            <tr>
-                <td>BTC/USDT</td>
-                <td>82,500</td>
-                <td>خرید</td>
-                <td>پیشنهاد معامله نوسانی (صعودی)</td>
-            </tr>
-            <tr>
-                <td>ETH/USDT</td>
-                <td>3,200</td>
-                <td>خرید قوی</td>
-                <td>نقطه ورود مناسب برای معامله نوسانی صعودی</td>
-            </tr>
-            <tr>
-                <td>SOL/USDT</td>
-                <td>145</td>
-                <td>خرید</td>
-                <td>روند صعودی قوی</td>
-            </tr>
-            <tr>
-                <td>XRP/USDT</td>
-                <td>0.52</td>
-                <td>فروش</td>
-                <td>احتمال اصلاح قیمت</td>
-            </tr>
+            {% for symbol, data in signals.items() %}
+                <tr class="signal-{{ 'buy' if 'buy' in data.get('signal', '').lower() else 'sell' if 'sell' in data.get('signal', '').lower() else 'neutral' }}">
+                    <td>{{ symbol }}</td>
+                    <td>{{ format_price(data.get('price', 0)) }}</td>
+                    <td>{{ data.get('farsi_signal', data.get('signal', 'نامشخص')) }}</td>
+                    <td>{{ data.get('farsi_swing_recommendation', data.get('swing_recommendation', 'نامشخص')) }}</td>
+                </tr>
+            {% else %}
+                <tr class="signal-buy">
+                    <td>BTC/USDT</td>
+                    <td>82,500</td>
+                    <td>خرید</td>
+                    <td>پیشنهاد معامله نوسانی (صعودی)</td>
+                </tr>
+                <tr class="signal-buy">
+                    <td>ETH/USDT</td>
+                    <td>3,200</td>
+                    <td>خرید قوی</td>
+                    <td>نقطه ورود مناسب برای معامله نوسانی صعودی</td>
+                </tr>
+                <tr class="signal-buy">
+                    <td>SOL/USDT</td>
+                    <td>145</td>
+                    <td>خرید</td>
+                    <td>روند صعودی قوی</td>
+                </tr>
+                <tr class="signal-sell">
+                    <td>XRP/USDT</td>
+                    <td>0.52</td>
+                    <td>فروش</td>
+                    <td>احتمال اصلاح قیمت</td>
+                </tr>
+            {% endfor %}
         </table>
     </body>
     </html>
     """
     
+    # Helper functions for template
+    def format_price(price):
+        """Format price with commas and appropriate decimal places"""
+        if price is None:
+            return "نامشخص"
+            
+        if isinstance(price, str):
+            try:
+                price = float(price)
+            except:
+                return price
+                
+        if price >= 1000:
+            return f"{price:,.0f}"
+        elif price >= 100:
+            return f"{price:,.1f}"
+        elif price >= 1:
+            return f"{price:,.2f}"
+        else:
+            return f"{price:,.4f}"
+    
+    def format_change(change):
+        """Format change as percentage with sign"""
+        if change is None:
+            return "نامشخص"
+            
+        if isinstance(change, str):
+            try:
+                change = float(change)
+            except:
+                return change
+                
+        sign = "+" if change > 0 else ""
+        return f"{sign}{change:.2f}%"
+    
+    # Crypto currency names in Persian
+    crypto_names = {
+        'BTC': 'بیت‌کوین (BTC)',
+        'ETH': 'اتریوم (ETH)',
+        'BNB': 'بایننس کوین (BNB)',
+        'XRP': 'ریپل (XRP)',
+        'SOL': 'سولانا (SOL)',
+        'ADA': 'کاردانو (ADA)',
+        'DOGE': 'دوج‌کوین (DOGE)',
+        'SHIB': 'شیبا اینو (SHIB)',
+        'TRX': 'ترون (TRX)',
+        'DOT': 'پولکادات (DOT)',
+        'AVAX': 'آوالانچ (AVAX)',
+        'MATIC': 'پلیگان (MATIC)',
+        'UNI': 'یونی‌سواپ (UNI)',
+        'LINK': 'چین‌لینک (LINK)'
+    }
+    
     # رندر کردن قالب با داده‌های پایه
     return render_template_string(
         template,
-        current_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        crypto_prices={},
+        commodities={},
+        forex_rates={},
+        signals={},
+        format_price=format_price,
+        format_change=format_change,
+        crypto_names=crypto_names
     )
     
 @app.route('/simple')
