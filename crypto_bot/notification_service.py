@@ -30,24 +30,32 @@ def send_sms_notification(to_phone_number, message):
         logger.error("تنظیمات Twilio کامل نیست")
         return False
     
-    # اطمینان از فرمت صحیح شماره تلفن (باید با + شروع شود)
+    # اطمینان از فرمت صحیح شماره تلفن
     formatted_phone = to_phone_number.strip()
     
     # حذف فرمت‌های اضافی مانند پرانتز، خط تیره یا فاصله
     formatted_phone = ''.join(c for c in formatted_phone if c.isdigit() or c == '+')
     
-    # حذف صفر ابتدایی اگر وجود داشته باشد و شماره با کد کشور شروع نشود
-    if not formatted_phone.startswith('+') and formatted_phone.startswith('0'):
+    # حذف کاراکتر + اگر وجود داشته باشد
+    if formatted_phone.startswith('+'):
         formatted_phone = formatted_phone[1:]
-    
-    # اضافه کردن + در ابتدای شماره اگر وجود نداشته باشد
-    if not formatted_phone.startswith('+'):
-        formatted_phone = '+' + formatted_phone
         
-    # اطمینان از اینکه فرمت شماره برای آمریکا/کانادا صحیح است (برای مثال +1XXXXXXXXXX)
-    # اگر شماره با +001 شروع شود، آن را به +1 تبدیل می‌کنیم
-    if formatted_phone.startswith('+001'):
-        formatted_phone = '+1' + formatted_phone[4:]
+    # حذف صفر ابتدایی اگر وجود داشته باشد
+    if formatted_phone.startswith('0'):
+        formatted_phone = formatted_phone[1:]
+        
+    # اصلاح فرمت شماره آمریکا/کانادا
+    # اگر با 01 شروع شود، آن را به 1 تبدیل می‌کنیم
+    if formatted_phone.startswith('01'):
+        formatted_phone = '1' + formatted_phone[2:]
+        
+    # اصلاح فرمت شماره آمریکا/کانادا
+    # اگر با 001 شروع شود، آن را به 1 تبدیل می‌کنیم
+    if formatted_phone.startswith('001'):
+        formatted_phone = '1' + formatted_phone[3:]
+    
+    # اضافه کردن + در ابتدای شماره
+    formatted_phone = '+' + formatted_phone
     
     logger.info(f"شماره تلفن اصلاح شده: {formatted_phone}")
     
