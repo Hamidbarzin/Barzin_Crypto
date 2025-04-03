@@ -1205,6 +1205,38 @@ def ai_price_prediction(symbol):
     timeframe = request.args.get('timeframe', '24h')
     
     try:
+        # بررسی دسترسی به OpenAI و استفاده از آن در صورت امکان
+        if os.environ.get("OPENAI_API_KEY"):
+            try:
+                from crypto_bot import openai_service, market_data
+                
+                # دریافت داده‌های قیمت برای تحلیل
+                price_data = {}
+                current_prices = market_data.get_current_prices([symbol])
+                if current_prices:
+                    price_data["current_price"] = current_prices.get(symbol, 0)
+                
+                # دریافت داده‌های تکنیکال
+                technical_data = {}
+                try:
+                    from crypto_bot.technical_analysis import get_technical_indicators
+                    technical_data = get_technical_indicators(symbol, '1d')
+                except Exception as te:
+                    logger.warning(f"خطا در دریافت داده‌های تکنیکال: {str(te)}")
+                
+                # ترکیب داده‌ها برای آنالیز
+                analysis_data = {**price_data, **technical_data}
+                
+                # استفاده از OpenAI برای تحلیل
+                logger.info(f"استفاده از OpenAI برای تحلیل {symbol}")
+                analysis = openai_service.analyze_market_data(symbol, analysis_data, timeframe=timeframe)
+                if analysis:
+                    return jsonify({'success': True, 'data': analysis})
+            except Exception as oe:
+                logger.error(f"خطا در استفاده از OpenAI: {str(oe)}")
+                # ادامه اجرا با روش پشتیبان
+        
+        # روش پشتیبان: استفاده از ماژول داخلی
         prediction = get_price_prediction(symbol, timeframe)
         return jsonify({'success': True, 'data': prediction})
     except Exception as e:
@@ -1220,6 +1252,24 @@ def ai_market_sentiment():
     include_middle_east = request.args.get('include_middle_east', 'true').lower() == 'true'
     
     try:
+        # بررسی دسترسی به OpenAI و استفاده از آن در صورت امکان
+        if os.environ.get("OPENAI_API_KEY"):
+            try:
+                from crypto_bot import openai_service
+                
+                # دریافت اخبار برای تحلیل
+                news_data = get_latest_news(20)
+                
+                # استفاده از OpenAI برای تحلیل احساسات
+                logger.info("استفاده از OpenAI برای تحلیل احساسات بازار")
+                sentiment = openai_service.analyze_news_sentiment(news_data)
+                if sentiment:
+                    return jsonify({'success': True, 'data': sentiment})
+            except Exception as oe:
+                logger.error(f"خطا در استفاده از OpenAI برای تحلیل احساسات: {str(oe)}")
+                # ادامه اجرا با روش پشتیبان
+                
+        # روش پشتیبان: استفاده از ماژول داخلی
         sentiment = get_market_sentiment(symbol, include_middle_east)
         return jsonify({'success': True, 'data': sentiment})
     except Exception as e:
@@ -1234,6 +1284,27 @@ def ai_price_patterns(symbol):
     timeframe = request.args.get('timeframe', '1d')
     
     try:
+        # بررسی دسترسی به OpenAI و استفاده از آن در صورت امکان
+        if os.environ.get("OPENAI_API_KEY"):
+            try:
+                from crypto_bot import openai_service, market_data
+                
+                # دریافت داده‌های تاریخی قیمت
+                historical_data = market_data.get_historical_data(symbol, timeframe, limit=30)
+                if historical_data is not None and not historical_data.empty:
+                    # تبدیل به قالب مناسب برای API
+                    price_data = historical_data.to_dict(orient='records')
+                    
+                    # استفاده از OpenAI برای شناسایی الگوها
+                    logger.info(f"استفاده از OpenAI برای شناسایی الگوهای قیمت {symbol}")
+                    pattern_analysis = openai_service.detect_price_patterns(symbol, price_data, timeframe)
+                    if pattern_analysis:
+                        return jsonify({'success': True, 'data': pattern_analysis})
+            except Exception as oe:
+                logger.error(f"خطا در استفاده از OpenAI برای شناسایی الگوها: {str(oe)}")
+                # ادامه اجرا با روش پشتیبان
+        
+        # روش پشتیبان: استفاده از ماژول داخلی
         patterns = get_price_patterns(symbol, timeframe)
         return jsonify({'success': True, 'data': patterns})
     except Exception as e:
@@ -1249,6 +1320,33 @@ def ai_trading_strategy(symbol):
     timeframe = request.args.get('timeframe', 'کوتاه‌مدت')
     
     try:
+        # بررسی دسترسی به OpenAI و استفاده از آن در صورت امکان
+        if os.environ.get("OPENAI_API_KEY"):
+            try:
+                from crypto_bot import openai_service, market_data
+                from crypto_bot.technical_analysis import get_technical_indicators
+                
+                # دریافت داده‌های قیمت فعلی
+                price_data = market_data.get_current_prices([symbol])
+                
+                # دریافت شاخص‌های تکنیکال
+                technical_data = get_technical_indicators(symbol, '1d')
+                
+                # استفاده از OpenAI برای پیشنهاد استراتژی
+                logger.info(f"استفاده از OpenAI برای پیشنهاد استراتژی معاملاتی {symbol}")
+                strategy = openai_service.suggest_trading_strategy(
+                    symbol, 
+                    price_data, 
+                    technical_data, 
+                    risk_level
+                )
+                if strategy:
+                    return jsonify({'success': True, 'data': strategy})
+            except Exception as oe:
+                logger.error(f"خطا در استفاده از OpenAI برای پیشنهاد استراتژی: {str(oe)}")
+                # ادامه اجرا با روش پشتیبان
+        
+        # روش پشتیبان: استفاده از ماژول داخلی
         strategy = get_trading_strategy(symbol, risk_level, timeframe)
         return jsonify({'success': True, 'data': strategy})
     except Exception as e:
