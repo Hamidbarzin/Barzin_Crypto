@@ -24,8 +24,8 @@ logger = logging.getLogger(__name__)
 # دریافت اطلاعات ایمیل از متغیرهای محیطی
 EMAIL_USER = os.environ.get("EMAIL_USER")
 EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
-EMAIL_SERVER = os.environ.get("EMAIL_SERVER", "mail.smtp2go.com")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 2525))
+EMAIL_SERVER = os.environ.get("EMAIL_SERVER", "smtp.gmail.com")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
 
 # تنظیمات SendGrid
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
