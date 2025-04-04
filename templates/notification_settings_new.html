@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+
+{% block title %}تنظیمات اعلان‌ها - ربات معامله ارز دیجیتال{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bell text-warning me-2"></i>
+                        تنظیمات اعلان‌ها
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="notificationSettingsForm" method="post" action="/api/update-notification-settings">
+                        <!-- تنظیمات اعلان‌های تلگرام -->
+                        <div class="section-title mb-3 border-bottom pb-2">
+                            <h5>اعلان‌های تلگرام</h5>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="telegram_enabled" name="telegram_enabled" 
+                                           {% if notification_settings.telegram_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="telegram_enabled">فعال‌سازی اعلان‌های تلگرام</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="telegram_chat_id" class="form-label">شناسه چت تلگرام</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fab fa-telegram"></i></span>
+                                        <input type="text" class="form-control" id="telegram_chat_id" name="telegram_chat_id" 
+                                               placeholder="123456789" value="{{ notification_settings.telegram_chat_id }}">
+                                    </div>
+                                    <div class="form-text">شناسه چت خود را از بات <span id="botUsername" class="text-info">@GrowthFinderBot</span> دریافت کنید.</div>
+                                </div>
+                                <div id="telegramBotInfo" class="alert alert-info mb-3">
+                                    <p class="mb-2"><i class="fab fa-telegram me-2"></i> بات تلگرام: <strong id="botName">در حال بارگذاری...</strong></p>
+                                    <p class="mb-0">برای دریافت اعلان‌ها، با بات <a href="#" id="botLink" target="_blank">کلیک کنید</a> چت کنید و دستور /start را ارسال کنید.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">ارسال پیام تست تلگرام</label>
+                                    <button type="button" class="btn btn-outline-primary w-100" id="testTelegramButton">
+                                        <i class="fab fa-telegram me-2"></i>
+                                        ارسال پیام تست
+                                    </button>
+                                </div>
+                                <div id="testTelegramResult" class="alert alert-info d-none mt-2">
+                                    نتیجه تست تلگرام اینجا نمایش داده می‌شود
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- تنظیمات اعلان‌های فرصت‌های خرید و فروش -->
+                        <div class="section-title mb-3 border-bottom pb-2">
+                            <h5>فرصت‌های خرید و فروش</h5>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="buy_sell_enabled" name="buy_sell_enabled" 
+                                           {% if notification_settings.buy_sell_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="buy_sell_enabled">دریافت اعلان‌های فرصت خرید و فروش</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="buy_sell_sensitivity" class="form-label">حساسیت تشخیص</label>
+                                    <select class="form-select" id="buy_sell_sensitivity" name="buy_sell_sensitivity">
+                                        <option value="low" {% if notification_settings.buy_sell_sensitivity == 'low' %}selected{% endif %}>کم (فقط فرصت‌های بسیار واضح)</option>
+                                        <option value="medium" {% if notification_settings.buy_sell_sensitivity == 'medium' %}selected{% endif %}>متوسط</option>
+                                        <option value="high" {% if notification_settings.buy_sell_sensitivity == 'high' %}selected{% endif %}>زیاد (اعلان‌های بیشتر)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="buy_sell_frequency" class="form-label">حداکثر تعداد اعلان در روز</label>
+                                    <select class="form-select" id="buy_sell_frequency" name="buy_sell_frequency">
+                                        <option value="1" {% if notification_settings.buy_sell_frequency == '1' %}selected{% endif %}>حداکثر 1 اعلان در روز</option>
+                                        <option value="3" {% if notification_settings.buy_sell_frequency == '3' %}selected{% endif %}>حداکثر 3 اعلان در روز</option>
+                                        <option value="5" {% if notification_settings.buy_sell_frequency == '5' %}selected{% endif %}>حداکثر 5 اعلان در روز</option>
+                                        <option value="10" {% if notification_settings.buy_sell_frequency == '10' %}selected{% endif %}>حداکثر 10 اعلان در روز</option>
+                                        <option value="unlimited" {% if notification_settings.buy_sell_frequency == 'unlimited' %}selected{% endif %}>بدون محدودیت</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">ساعات دریافت اعلان</label>
+                                    <div class="d-flex">
+                                        <select class="form-select me-2" id="start_hour" name="start_hour">
+                                            {% for hour in range(24) %}
+                                                <option value="{{ hour }}" {% if notification_settings.start_hour == hour %}selected{% endif %}>{{ '%02d'|format(hour) }}:00</option>
+                                            {% endfor %}
+                                        </select>
+                                        <span class="align-self-center">تا</span>
+                                        <select class="form-select ms-2" id="end_hour" name="end_hour">
+                                            {% for hour in range(24) %}
+                                                <option value="{{ hour }}" {% if notification_settings.end_hour == hour %}selected{% endif %}>{{ '%02d'|format(hour) }}:00</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- تنظیمات اعلان‌های نوسانات بازار -->
+                        <div class="section-title mb-3 border-bottom pb-2">
+                            <h5>تشخیص نوسانات بازار</h5>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="volatility_enabled" name="volatility_enabled" 
+                                           {% if notification_settings.volatility_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="volatility_enabled">دریافت اعلان‌های نوسانات قیمت</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="volatility_threshold" class="form-label">آستانه حساسیت</label>
+                                    <select class="form-select" id="volatility_threshold" name="volatility_threshold">
+                                        <option value="low" {% if notification_settings.volatility_threshold == 'low' %}selected{% endif %}>کم (تغییرات بیش از 1%)</option>
+                                        <option value="medium" {% if notification_settings.volatility_threshold == 'medium' %}selected{% endif %}>متوسط (تغییرات بیش از 3%)</option>
+                                        <option value="high" {% if notification_settings.volatility_threshold == 'high' %}selected{% endif %}>زیاد (تغییرات بیش از 5%)</option>
+                                        <option value="extreme" {% if notification_settings.volatility_threshold == 'extreme' %}selected{% endif %}>بسیار زیاد (تغییرات بیش از 10%)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="volatility_timeframe" class="form-label">بازه زمانی بررسی</label>
+                                    <select class="form-select" id="volatility_timeframe" name="volatility_timeframe">
+                                        <option value="5m" {% if notification_settings.volatility_timeframe == '5m' %}selected{% endif %}>5 دقیقه</option>
+                                        <option value="15m" {% if notification_settings.volatility_timeframe == '15m' %}selected{% endif %}>15 دقیقه</option>
+                                        <option value="1h" {% if notification_settings.volatility_timeframe == '1h' %}selected{% endif %}>1 ساعت</option>
+                                        <option value="4h" {% if notification_settings.volatility_timeframe == '4h' %}selected{% endif %}>4 ساعت</option>
+                                        <option value="1d" {% if notification_settings.volatility_timeframe == '1d' %}selected{% endif %}>1 روز</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="volatility_frequency" class="form-label">حداکثر تعداد اعلان در روز</label>
+                                    <select class="form-select" id="volatility_frequency" name="volatility_frequency">
+                                        <option value="3" {% if notification_settings.volatility_frequency == '3' %}selected{% endif %}>حداکثر 3 اعلان در روز</option>
+                                        <option value="5" {% if notification_settings.volatility_frequency == '5' %}selected{% endif %}>حداکثر 5 اعلان در روز</option>
+                                        <option value="10" {% if notification_settings.volatility_frequency == '10' %}selected{% endif %}>حداکثر 10 اعلان در روز</option>
+                                        <option value="unlimited" {% if notification_settings.volatility_frequency == 'unlimited' %}selected{% endif %}>بدون محدودیت</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- تنظیمات اعلان روند کلی بازار -->
+                        <div class="section-title mb-3 border-bottom pb-2">
+                            <h5>اعلان روند کلی بازار</h5>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="market_trend_enabled" name="market_trend_enabled" 
+                                           {% if notification_settings.market_trend_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="market_trend_enabled">دریافت اعلان‌های روند کلی بازار</label>
+                                </div>
+                                <div class="form-text mb-3">
+                                    این اعلان‌ها شامل تحلیل روند کلی بازار و اخبار مهم تأثیرگذار هستند
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="market_trend_frequency" class="form-label">تناوب اعلان‌ها</label>
+                                    <select class="form-select" id="market_trend_frequency" name="market_trend_frequency">
+                                        <option value="daily" {% if notification_settings.market_trend_frequency == 'daily' %}selected{% endif %}>روزانه</option>
+                                        <option value="significant" {% if notification_settings.market_trend_frequency == 'significant' %}selected{% endif %}>فقط تغییرات مهم</option>
+                                        <option value="weekly" {% if notification_settings.market_trend_frequency == 'weekly' %}selected{% endif %}>هفتگی</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- دکمه‌های ذخیره تغییرات -->
+                        <div class="row mt-4">
+                            <div class="col-md-6 offset-md-3">
+                                <button type="submit" class="btn btn-warning w-100">
+                                    <i class="fas fa-save me-2"></i>
+                                    ذخیره تنظیمات
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // دریافت اطلاعات بات تلگرام
+    fetch('/api/telegram-bot-info')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                const botInfo = data.data;
+                document.getElementById('botName').textContent = botInfo.name;
+                document.getElementById('botUsername').textContent = '@' + botInfo.username;
+                document.getElementById('botLink').href = botInfo.link;
+                document.getElementById('botLink').textContent = '@' + botInfo.username;
+            } else {
+                document.getElementById('botName').textContent = 'ناموجود';
+                document.getElementById('telegramBotInfo').classList.remove('alert-info');
+                document.getElementById('telegramBotInfo').classList.add('alert-warning');
+                document.getElementById('telegramBotInfo').innerHTML = '<p>دسترسی به بات تلگرام در حال حاضر مقدور نیست. لطفاً بعداً دوباره امتحان کنید.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching Telegram bot info:', error);
+            document.getElementById('botName').textContent = 'خطا در بارگذاری';
+            document.getElementById('telegramBotInfo').classList.remove('alert-info');
+            document.getElementById('telegramBotInfo').classList.add('alert-danger');
+        });
+
+    // آزمایش ارسال پیام تلگرام
+    document.getElementById('testTelegramButton').addEventListener('click', function() {
+        const chatId = document.getElementById('telegram_chat_id').value;
+        if (!chatId) {
+            alert('لطفاً ابتدا شناسه چت تلگرام خود را وارد کنید');
+            return;
+        }
+
+        const resultDiv = document.getElementById('testTelegramResult');
+        resultDiv.innerHTML = 'در حال ارسال پیام تست...';
+        resultDiv.classList.remove('d-none', 'alert-danger', 'alert-success');
+        resultDiv.classList.add('alert-info');
+
+        fetch('/api/test-telegram', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ chat_id: chatId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                resultDiv.innerHTML = '<i class="fas fa-check-circle me-2"></i> ' + data.message;
+                resultDiv.classList.remove('alert-info', 'alert-danger');
+                resultDiv.classList.add('alert-success');
+            } else {
+                resultDiv.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i> ' + data.message;
+                resultDiv.classList.remove('alert-info', 'alert-success');
+                resultDiv.classList.add('alert-danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error testing Telegram:', error);
+            resultDiv.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i> خطا در ارسال پیام تست. لطفاً بعداً دوباره امتحان کنید.';
+            resultDiv.classList.remove('alert-info', 'alert-success');
+            resultDiv.classList.add('alert-danger');
+        });
+    });
+
+    // ارسال فرم تنظیمات
+    document.getElementById('notificationSettingsForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(this);
+        const formObject = {};
+        
+        formData.forEach((value, key) => {
+            // تبدیل checkboxها به boolean
+            if (key.endsWith('_enabled')) {
+                formObject[key] = value === 'on';
+            } else {
+                formObject[key] = value;
+            }
+        });
+        
+        // checkboxهایی که تیک نخورده‌اند را false قرار بده
+        ['telegram_enabled', 'buy_sell_enabled', 'volatility_enabled', 'market_trend_enabled'].forEach(checkbox => {
+            if (!(checkbox in formObject)) {
+                formObject[checkbox] = false;
+            }
+        });
+        
+        fetch('/api/update-notification-settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formObject),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('تنظیمات با موفقیت ذخیره شد');
+            } else {
+                alert('خطا در ذخیره تنظیمات: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error saving settings:', error);
+            alert('خطا در ذخیره تنظیمات. لطفاً بعداً دوباره امتحان کنید.');
+        });
+    });
+});
+</script>
+{% endblock %}

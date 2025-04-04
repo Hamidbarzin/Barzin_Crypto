@@ -1,87 +1,40 @@
 """
-سرویس اعلان و هشدار برای ارسال پیامک در مورد فرصت‌های خرید و فروش و نوسانات بازار
+سرویس اعلان و هشدار برای فرصت‌های خرید و فروش و نوسانات بازار - مسیردهی به تلگرام
+
+این فایل به عنوان یک لایه میانی عمل می‌کند که تمام اعلان‌ها را به سمت سرویس تلگرام هدایت می‌کند.
+همه متدهای قبلی برای حفظ سازگاری حفظ شده‌اند، اما اکنون به جای ارسال پیامک، از تلگرام استفاده می‌کنند.
 """
 
 import os
 import logging
-from twilio.rest import Client
-from twilio.base.exceptions import TwilioRestException
+from datetime import datetime
+from flask import session
+from crypto_bot.telegram_service import send_telegram_message, send_buy_sell_notification as telegram_send_buy_sell, send_volatility_alert as telegram_send_volatility, send_market_trend_alert as telegram_send_market_trend, send_test_notification as telegram_send_test, get_current_persian_time
 
 # تنظیم لاگر
 logger = logging.getLogger(__name__)
 
-# دریافت اطلاعات Twilio از متغیرهای محیطی
-TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
-TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
-TWILIO_PHONE_NUMBER = os.environ.get("TWILIO_PHONE_NUMBER")
-
 def send_sms_notification(to_phone_number, message):
     """
-    ارسال پیامک با استفاده از Twilio
+    هدایت پیام به تلگرام به جای پیامک
     
     Args:
-        to_phone_number (str): شماره موبایل گیرنده
+        to_phone_number (str): شماره موبایل گیرنده (دیگر استفاده نمی‌شود)
         message (str): متن پیام
         
     Returns:
         bool: آیا ارسال موفقیت‌آمیز بود
     """
-    if not all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER]):
-        logger.error("تنظیمات Twilio کامل نیست")
+    logger.info("هدایت پیام به سمت تلگرام...")
+    
+    # دریافت چت آیدی تلگرام از SESSION
+    chat_id = session.get('telegram_chat_id', None)
+    
+    if not chat_id:
+        logger.error("چت آیدی تلگرام یافت نشد")
         return False
-    
-    # اطمینان از فرمت صحیح شماره تلفن
-    formatted_phone = to_phone_number.strip()
-    
-    # حذف فرمت‌های اضافی مانند پرانتز، خط تیره یا فاصله
-    formatted_phone = ''.join(c for c in formatted_phone if c.isdigit() or c == '+')
-    
-    # حذف کاراکتر + اگر وجود داشته باشد
-    if formatted_phone.startswith('+'):
-        formatted_phone = formatted_phone[1:]
         
-    # حذف صفر ابتدایی اگر وجود داشته باشد
-    if formatted_phone.startswith('0'):
-        formatted_phone = formatted_phone[1:]
-        
-    # اصلاح فرمت شماره آمریکا/کانادا
-    # اگر با 01 شروع شود، آن را به 1 تبدیل می‌کنیم
-    if formatted_phone.startswith('01'):
-        formatted_phone = '1' + formatted_phone[2:]
-        
-    # اصلاح فرمت شماره آمریکا/کانادا
-    # اگر با 001 شروع شود، آن را به 1 تبدیل می‌کنیم
-    if formatted_phone.startswith('001'):
-        formatted_phone = '1' + formatted_phone[3:]
-    
-    # اضافه کردن + در ابتدای شماره
-    formatted_phone = '+' + formatted_phone
-    
-    logger.info(f"شماره تلفن اصلاح شده: {formatted_phone}")
-    
-    try:
-        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-        
-        # اگر شماره با شماره Twilio یکسان باشد، ارسال ممکن نیست
-        if formatted_phone == TWILIO_PHONE_NUMBER:
-            logger.error("امکان ارسال پیامک از یک شماره به همان شماره وجود ندارد")
-            return False
-        else:
-            # ارسال پیامک معمولی
-            message_obj = client.messages.create(
-                body=message,
-                from_=TWILIO_PHONE_NUMBER,
-                to=formatted_phone
-            )
-        
-        logger.info(f"پیام با شناسه {message_obj.sid} ارسال شد")
-        return True
-    except TwilioRestException as e:
-        logger.error(f"خطا در ارسال پیام: {str(e)}")
-        return False
-    except Exception as e:
-        logger.error(f"خطای ناشناخته در ارسال پیام: {str(e)}")
-        return False
+    return send_telegram_message(chat_id, message)
 
 def send_buy_sell_notification(to_phone_number, symbol, action, price, reason):
     """
@@ -157,48 +110,23 @@ def send_test_notification(to_phone_number):
     ارسال پیام تست برای بررسی عملکرد سیستم اعلان
     
     Args:
-        to_phone_number (str): شماره موبایل گیرنده
+        to_phone_number (str): شماره موبایل گیرنده (استفاده نمی‌شود)
         
     Returns:
         dict: وضعیت ارسال و پیام
     """
-    # بررسی اینکه آیا شماره تلفن دریافت‌کننده با شماره تلفن ارسال‌کننده یکسان است
-    # این کار را می‌کنیم چون Twilio امکان ارسال پیامک از یک شماره به همان شماره را نمی‌دهد
-    formatted_phone = to_phone_number.strip()
-    formatted_phone = ''.join(c for c in formatted_phone if c.isdigit() or c == '+')
-    if formatted_phone.startswith('+'):
-        formatted_phone = formatted_phone[1:]
-    if formatted_phone.startswith('0'):
-        formatted_phone = formatted_phone[1:]
-    formatted_phone = '+' + formatted_phone
+    # دریافت چت آیدی تلگرام از SESSION
+    chat_id = session.get('telegram_chat_id', None)
     
-    # اگر شماره‌ها یکسان باشند، به جای پیامک از ایمیل استفاده می‌کنیم (شبیه‌سازی موفقیت)
-    if formatted_phone == TWILIO_PHONE_NUMBER:
-        logger.warning("شماره تلفن ارسال‌کننده و دریافت‌کننده یکسان است. استفاده از شبیه‌سازی پیام.")
-        
-        # در این حالت، یک پیام موفقیت شبیه‌سازی شده برمی‌گردانیم
-        # اما به کاربر اطلاع می‌دهیم که ارسال واقعی نبوده است
-        return {
-            "success": True,
-            "message": "یک پیام تست شبیه‌سازی شده ارسال شد. برای ارسال واقعی، لطفاً شماره تلفن دیگری (غیر از شماره Twilio) وارد کنید."
-        }
-    
-    # در غیر این صورت، ارسال پیامک واقعی را انجام می‌دهیم
-    message = "🤖 پیام تست از ربات معامله ارز دیجیتال\n"
-    message += "سیستم اعلان‌های پیامکی فعال است.\n"
-    message += f"⏰ زمان: {get_current_persian_time()}"
-    
-    result = send_sms_notification(to_phone_number, message)
-    if result:
-        return {
-            "success": True,
-            "message": "پیام تست با موفقیت ارسال شد."
-        }
-    else:
+    if not chat_id:
+        logger.error("چت آیدی تلگرام یافت نشد")
         return {
             "success": False,
-            "message": "خطا در ارسال پیام تست. لطفاً تنظیمات را بررسی کنید."
+            "message": "چت آیدی تلگرام یافت نشد. لطفاً ابتدا تنظیمات تلگرام را انجام دهید."
         }
+    
+    # ارسال پیام تست از طریق تلگرام
+    return telegram_send_test(chat_id)
 
 def get_current_persian_time():
     """
@@ -207,6 +135,5 @@ def get_current_persian_time():
     Returns:
         str: زمان فعلی
     """
-    from datetime import datetime
     now = datetime.now()
     return now.strftime("%Y-%m-%d %H:%M:%S")

@@ -15,37 +15,41 @@
                 </div>
                 <div class="card-body">
                     <form id="notificationSettingsForm" method="post" action="/api/update-notification-settings">
-                        <!-- تنظیمات اعلان‌های پیامکی -->
+                        <!-- تنظیمات اعلان‌های تلگرام -->
                         <div class="section-title mb-3 border-bottom pb-2">
-                            <h5>اعلان‌های پیامکی</h5>
+                            <h5>اعلان‌های تلگرام</h5>
                         </div>
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" id="sms_enabled" name="sms_enabled" 
-                                           {% if notification_settings.sms_enabled %}checked{% endif %}>
-                                    <label class="form-check-label" for="sms_enabled">فعال‌سازی اعلان‌های پیامکی</label>
+                                    <input class="form-check-input" type="checkbox" id="telegram_enabled" name="telegram_enabled" 
+                                           {% if notification_settings.telegram_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="telegram_enabled">فعال‌سازی اعلان‌های تلگرام</label>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="phone_number" class="form-label">شماره موبایل</label>
+                                    <label for="telegram_chat_id" class="form-label">شناسه چت تلگرام</label>
                                     <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                        <input type="text" class="form-control" id="phone_number" name="phone_number" 
-                                               placeholder="+16473390222" value="{{ notification_settings.phone_number }}">
+                                        <span class="input-group-text"><i class="fab fa-telegram"></i></span>
+                                        <input type="text" class="form-control" id="telegram_chat_id" name="telegram_chat_id" 
+                                               placeholder="123456789" value="{{ notification_settings.telegram_chat_id }}">
                                     </div>
-                                    <div class="form-text">شماره را با کد کشور وارد کنید. شماره باید متفاوت از شماره Twilio (+16473390222) باشد، در غیر این صورت امکان ارسال واقعی وجود ندارد.</div>
+                                    <div class="form-text">شناسه چت خود را از بات <span id="botUsername" class="text-info">@GrowthFinderBot</span> دریافت کنید.</div>
+                                </div>
+                                <div id="telegramBotInfo" class="alert alert-info mb-3">
+                                    <p class="mb-2"><i class="fab fa-telegram me-2"></i> بات تلگرام: <strong id="botName">در حال بارگذاری...</strong></p>
+                                    <p class="mb-0">برای دریافت اعلان‌ها، با بات <a href="#" id="botLink" target="_blank">کلیک کنید</a> چت کنید و دستور /start را ارسال کنید.</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">ارسال تست پیامک</label>
-                                    <button type="button" class="btn btn-outline-warning w-100" id="testSmsButton">
-                                        <i class="fas fa-paper-plane me-2"></i>
-                                        ارسال پیامک تست
+                                    <label class="form-label">ارسال پیام تست تلگرام</label>
+                                    <button type="button" class="btn btn-outline-primary w-100" id="testTelegramButton">
+                                        <i class="fab fa-telegram me-2"></i>
+                                        ارسال پیام تست
                                     </button>
                                 </div>
-                                <div id="testSmsResult" class="alert alert-info d-none mt-2">
-                                    نتیجه تست پیامک اینجا نمایش داده می‌شود
+                                <div id="testTelegramResult" class="alert alert-info d-none mt-2">
+                                    نتیجه تست تلگرام اینجا نمایش داده می‌شود
                                 </div>
                             </div>
                         </div>
