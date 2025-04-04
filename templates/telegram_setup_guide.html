@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}راهنمای تنظیم بات تلگرام - ربات تحلیل‌گر ارز دیجیتال{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header text-center bg-primary text-white">
+                    <h3>راهنمای تنظیم بات تلگرام</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        برای دریافت پیام‌های بات، باید ابتدا چت را با بات شروع کنید.
+                    </div>
+                    
+                    <h4 class="mb-4 mt-4">مراحل اتصال به بات تلگرام:</h4>
+                    
+                    <ol class="list-group list-group-numbered mb-4">
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">تلگرام را باز کنید</div>
+                                اگر تلگرام نصب ندارید، آن را نصب کنید.
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">آدرس بات را باز کنید</div>
+                                روی این لینک کلیک کنید: <a href="https://t.me/GrowthFinderBot" target="_blank">@GrowthFinderBot</a>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">شروع گفتگو با بات</div>
+                                روی دکمه "Start" یا "شروع" کلیک کنید تا چت با بات آغاز شود.
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">اطمینان از اتصال</div>
+                                پس از شروع چت، یک پیام آزمایشی ارسال کنید تا مطمئن شوید که ارتباط برقرار شده است.
+                            </div>
+                        </li>
+                    </ol>
+                    
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>نکته مهم:</strong> بعد از شروع چت با بات، اعلان‌های سیستم به شما ارسال خواهد شد.
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <a href="{{ url_for('test_telegram') }}" class="btn btn-primary mb-2">ارسال پیام تست</a>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mb-2 ms-2">بازگشت به داشبورد</a>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>رفع مشکلات احتمالی:</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <strong>پیام دریافت نمی‌کنم:</strong> 
+                                اطمینان حاصل کنید که چت را با بات آغاز کرده‌اید. گاهی ممکن است نیاز باشد بات را بلاک و سپس آنبلاک کنید.
+                            </li>
+                            <li class="list-group-item">
+                                <strong>تلگرام در کشور شما فیلتر است:</strong>
+                                از ابزارهای مناسب برای اتصال به تلگرام استفاده کنید.
+                            </li>
+                            <li class="list-group-item">
+                                <strong>بات پاسخ نمی‌دهد:</strong>
+                                ممکن است سیستم موقتاً دچار اختلال شده باشد. لطفاً بعداً مجدداً تلاش کنید.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <p class="text-muted">برای دریافت راهنمایی بیشتر با پشتیبانی تماس بگیرید.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

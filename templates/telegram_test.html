@@ -19,6 +19,21 @@
             <div class="mb-4">
                 <h5 class="mb-3">ارسال پیام تست</h5>
                 <p>ارسال یک پیام تست برای آزمایش عملکرد اعلان‌های تلگرام.</p>
+                
+                <div class="form-group mb-3">
+                    <label for="chatIdInput" class="form-label">چت آیدی تلگرام</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="chatIdInput" placeholder="چت آیدی خود را وارد کنید (عدد)" value="722627622">
+                        <div class="input-group-text bg-info text-white" data-bs-toggle="tooltip" 
+                             title="چت آیدی یک عدد صحیح است که شناسه منحصر به فرد شما در تلگرام است. برای دریافت چت آیدی خود، با ربات @userinfobot صحبت کنید.">
+                            <i class="fa fa-info-circle"></i>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">
+                        برای دریافت چت آیدی خود، با ربات <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a> در تلگرام صحبت کنید.
+                    </small>
+                </div>
+                
                 <div class="d-flex gap-2">
                     <button id="sendTestButton" class="btn btn-success">
                         <i class="fa fa-paper-plane me-2"></i>
@@ -82,13 +97,34 @@ document.addEventListener('DOMContentLoaded', function() {
         button.disabled = true;
         button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> در حال ارسال...';
         
-        // ارسال درخواست
-        fetch('/telegram')
+        // دریافت چت آیدی از فیلد ورودی
+        const chatId = document.getElementById('chatIdInput').value;
+        
+        if (!chatId) {
+            const resultContainer = document.getElementById('resultContainer');
+            resultContainer.classList.remove('d-none', 'alert-success');
+            resultContainer.classList.add('alert-danger', 'd-block');
+            resultContainer.innerHTML = '<strong>خطا!</strong> لطفاً چت آیدی خود را وارد کنید.';
+            
+            button.disabled = false;
+            button.innerHTML = originalText;
+            return;
+        }
+        
+        // ارسال درخواست با چت آیدی
+        fetch('/api/test-telegram', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ chat_id: chatId })
+        })
             .then(response => response.json())
             .then(data => {
                 // نمایش نتیجه
                 const resultContainer = document.getElementById('resultContainer');
                 resultContainer.classList.remove('d-none', 'alert-success', 'alert-danger');
+                resultContainer.classList.add('d-block');
                 
                 if (data.success) {
                     resultContainer.classList.add('alert-success');
@@ -106,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error sending test message:', error);
                 const resultContainer = document.getElementById('resultContainer');
                 resultContainer.classList.remove('d-none', 'alert-success');
-                resultContainer.classList.add('alert-danger');
+                resultContainer.classList.add('alert-danger', 'd-block');
                 resultContainer.innerHTML = '<strong>خطا!</strong> مشکلی در ارتباط با سرور رخ داده است: ' + error.message;
                 
                 // بازگرداندن دکمه به حالت اولیه

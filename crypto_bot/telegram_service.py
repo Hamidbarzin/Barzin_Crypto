@@ -347,6 +347,88 @@ def get_bot_info():
             "available": False,
             "message": f"خطا در دریافت اطلاعات بات: {str(e)}"
         }
+        
+def get_chat_debug_info(chat_id=None):
+    """
+    دریافت اطلاعات دیباگ برای یک چت
+    
+    Args:
+        chat_id (int or str, optional): شناسه چت مورد نظر
+        
+    Returns:
+        dict: اطلاعات دیباگ
+    """
+    debug_info = {
+        "success": False,
+        "chat_info": None,
+        "error": None,
+        "telegram_available": TELEGRAM_AVAILABLE,
+        "token_available": bool(TELEGRAM_BOT_TOKEN),
+        "default_chat_id": CHAT_IDS.get('default'),
+        "default_chat_id_type": type(CHAT_IDS.get('default')).__name__,
+    }
+    
+    if not TELEGRAM_AVAILABLE or _telegram is None:
+        debug_info["error"] = "کتابخانه تلگرام نصب نشده است"
+        return debug_info
+        
+    if not TELEGRAM_BOT_TOKEN:
+        debug_info["error"] = "توکن بات تلگرام تنظیم نشده است"
+        return debug_info
+    
+    if chat_id is None:
+        chat_id = CHAT_IDS.get('default')
+        if not chat_id:
+            debug_info["error"] = "چت آیدی تعیین نشده است"
+            return debug_info
+    
+    # تبدیل chat_id به عدد صحیح در صورت نیاز
+    try:
+        if isinstance(chat_id, str) and chat_id.isdigit():
+            chat_id = int(chat_id)
+    except Exception as e:
+        debug_info["error"] = f"خطا در تبدیل چت آیدی: {str(e)}"
+        return debug_info
+        
+    try:
+        # تلاش برای ارسال یک پیام تست و دریافت اطلاعات چت
+        async def get_chat_async():
+            bot = _telegram.Bot(token=TELEGRAM_BOT_TOKEN)
+            try:
+                chat = await bot.get_chat(chat_id=chat_id)
+                return {"success": True, "chat": chat}
+            except Exception as e:
+                return {"success": False, "error": str(e)}
+        
+        # استفاده از asyncio برای اجرای کد آسنکرون
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                future = asyncio.run_coroutine_threadsafe(get_chat_async(), loop)
+                result = future.result(timeout=10)
+            else:
+                result = loop.run_until_complete(get_chat_async())
+        except RuntimeError:
+            result = asyncio.run(get_chat_async())
+            
+        if result["success"]:
+            chat = result["chat"]
+            debug_info["success"] = True
+            debug_info["chat_info"] = {
+                "id": chat.id,
+                "type": chat.type,
+                "title": getattr(chat, "title", None),
+                "username": getattr(chat, "username", None),
+                "first_name": getattr(chat, "first_name", None),
+                "last_name": getattr(chat, "last_name", None),
+            }
+        else:
+            debug_info["error"] = f"خطا در دریافت اطلاعات چت: {result['error']}"
+            
+        return debug_info
+    except Exception as e:
+        debug_info["error"] = f"خطا در اجرای دیباگ: {str(e)}"
+        return debug_info
 
 
 def get_current_persian_time():

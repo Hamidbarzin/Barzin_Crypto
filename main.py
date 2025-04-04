@@ -964,6 +964,19 @@ def telegram_bot_info():
     except Exception as e:
         logger.error(f"خطا در دریافت اطلاعات بات تلگرام: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
+        
+@app.route('/api/telegram-chat-debug')
+def telegram_chat_debug():
+    """دیباگ چت تلگرام"""
+    from crypto_bot.telegram_service import get_chat_debug_info
+    
+    chat_id = request.args.get('chat_id')
+    try:
+        debug_info = get_chat_debug_info(chat_id)
+        return jsonify({'success': True, 'data': debug_info})
+    except Exception as e:
+        logger.error(f"خطا در دیباگ چت تلگرام: {str(e)}")
+        return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
 
 @app.route('/api/opportunities')
 def get_buy_sell_opportunities():
