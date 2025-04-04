@@ -18,7 +18,9 @@ _telegram_error = None
 
 try:
     import telegram
+    import asyncio
     from telegram.error import TelegramError
+    from telegram.constants import ParseMode
     TELEGRAM_AVAILABLE = True
     _telegram = telegram
     _telegram_error = TelegramError
@@ -83,8 +85,24 @@ def send_telegram_message(chat_id, message, parse_mode='HTML'):
         return False
 
     try:
+        # تبدیل ParseMode به نوع مناسب
+        if parse_mode == 'HTML':
+            parse_mode_enum = ParseMode.HTML
+        elif parse_mode == 'Markdown':
+            parse_mode_enum = ParseMode.MARKDOWN_V2
+        else:
+            parse_mode_enum = parse_mode
+        
+        # ایجاد بات و اجرای آسنکرون برای ارسال پیام
         bot = _telegram.Bot(token=TELEGRAM_BOT_TOKEN)
-        bot.send_message(chat_id=chat_id, text=message, parse_mode=parse_mode)
+        
+        # ایجاد یک لوپ آسنکرون برای اجرای کد آسنکرون
+        async def send_message_async():
+            await bot.send_message(chat_id=chat_id, text=message, parse_mode=parse_mode_enum)
+            
+        # اجرای تابع آسنکرون
+        asyncio.run(send_message_async())
+        
         logger.info(f"پیام با موفقیت به چت {chat_id} ارسال شد")
         return True
     except Exception as e:
@@ -236,7 +254,14 @@ def get_bot_info():
 
     try:
         bot = _telegram.Bot(token=TELEGRAM_BOT_TOKEN)
-        me = bot.get_me()
+        
+        # ایجاد یک تابع آسنکرون
+        async def get_me_async():
+            return await bot.get_me()
+        
+        # اجرای تابع آسنکرون و دریافت نتیجه
+        me = asyncio.run(get_me_async())
+        
         return {
             "available": True,
             "id": me.id,
