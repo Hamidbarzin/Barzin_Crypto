@@ -497,6 +497,8 @@ def app_settings():
     return redirect(url_for('dashboard'))
 
 @app.route('/notifications')
+@app.route('/notification_settings')
+@app.route('/notification-settings')
 def notification_settings():
     """صفحه تنظیمات اعلان‌ها"""
     # تنظیمات پیش‌فرض اعلان‌ها
@@ -520,7 +522,13 @@ def notification_settings():
         'market_trend_frequency': session.get('market_trend_frequency', 'significant')
     }
     
-    return render_template('notification_settings.html', notification_settings=default_settings)
+    # دریافت اطلاعات بات تلگرام برای نمایش در صفحه
+    from crypto_bot.telegram_service import get_bot_info
+    telegram_bot_info = get_bot_info()
+    
+    return render_template('notification_settings.html', 
+                          notification_settings=default_settings,
+                          telegram_bot_info=telegram_bot_info)
 
 @app.route('/dashboard_new')
 def dashboard_new():
@@ -907,6 +915,41 @@ def test_notification():
             return jsonify({'success': False, 'message': 'خطا در ارسال پیامک. لطفاً تنظیمات Twilio را بررسی کنید'})
     except Exception as e:
         logger.error(f"خطا در ارسال پیامک تست: {str(e)}")
+        return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
+
+@app.route('/api/test-telegram', methods=['POST'])
+def test_telegram():
+    """ارسال پیام تلگرام تست برای بررسی عملکرد اعلان‌ها"""
+    from crypto_bot.telegram_service import send_test_notification
+    
+    data = request.get_json()
+    chat_id = data.get('chat_id')
+    
+    if not chat_id:
+        return jsonify({'success': False, 'message': 'شناسه چت تلگرام الزامی است'})
+    
+    try:
+        result = send_test_notification(chat_id)
+        if isinstance(result, dict):
+            return jsonify(result)
+        elif result:
+            return jsonify({'success': True, 'message': 'پیام تلگرام با موفقیت ارسال شد'})
+        else:
+            return jsonify({'success': False, 'message': 'خطا در ارسال پیام تلگرام. لطفاً تنظیمات تلگرام را بررسی کنید'})
+    except Exception as e:
+        logger.error(f"خطا در ارسال پیام تلگرام تست: {str(e)}")
+        return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
+
+@app.route('/api/telegram-bot-info')
+def telegram_bot_info():
+    """دریافت اطلاعات بات تلگرام"""
+    from crypto_bot.telegram_service import get_bot_info
+    
+    try:
+        bot_info = get_bot_info()
+        return jsonify({'success': True, 'data': bot_info})
+    except Exception as e:
+        logger.error(f"خطا در دریافت اطلاعات بات تلگرام: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
 
 @app.route('/api/opportunities')
@@ -1328,104 +1371,9 @@ def update_notification_settings():
 # این نسخه تکراری از تابع get_market_trend است و حذف شد
 # زیرا قبلاً در مسیر '/api/market-trend' تعریف شده است
 
-@app.route('/api/test-telegram', methods=['POST'])
-def test_telegram():
-    """ارسال پیام تلگرام تست برای بررسی عملکرد اعلان‌ها"""
-    data = request.get_json()
-    
-    if not data or 'chat_id' not in data:
-        return jsonify({
-            'success': False,
-            'message': 'شناسه چت تلگرام الزامی است'
-        })
-    
-    chat_id = data.get('chat_id', '')
-    
-    try:
-        from crypto_bot import telegram_service
-        
-        # بررسی دسترسی به تلگرام
-        if not telegram_service.TELEGRAM_AVAILABLE:
-            return jsonify({
-                'success': False,
-                'message': 'کتابخانه python-telegram-bot نصب نشده است. لطفاً آن را نصب کنید.'
-            })
-            
-        # بررسی توکن بات تلگرام
-        if not telegram_service.TELEGRAM_BOT_TOKEN:
-            return jsonify({
-                'success': False,
-                'message': 'توکن بات تلگرام تنظیم نشده است. لطفاً آن را در متغیرهای محیطی تنظیم کنید.'
-            })
-        
-        result = telegram_service.send_test_notification(chat_id)
-        
-        # ثبت کاربر در صورت موفقیت
-        if result.get('success', False):
-            telegram_service.register_user(chat_id)
-            
-        return jsonify(result)
-    except ImportError:
-        return jsonify({
-            'success': False,
-            'message': 'ماژول اعلان تلگرام در دسترس نیست'
-        })
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'خطا در ارسال پیام تلگرام: {str(e)}'
-        })
+# این روت قبلا با نام دیگری تعریف شده است
 
-@app.route('/api/telegram-bot-info', methods=['GET'])
-def telegram_bot_info():
-    """دریافت اطلاعات بات تلگرام"""
-    try:
-        from crypto_bot import telegram_service
-        
-        # بررسی دسترسی به تلگرام
-        if not telegram_service.TELEGRAM_AVAILABLE:
-            return jsonify({
-                'success': False,
-                'message': 'کتابخانه python-telegram-bot نصب نشده است. لطفاً آن را نصب کنید.',
-                'data': {
-                    'available': False,
-                    'message': 'کتابخانه python-telegram-bot نصب نشده است'
-                }
-            })
-            
-        # بررسی توکن بات تلگرام
-        if not telegram_service.TELEGRAM_BOT_TOKEN:
-            return jsonify({
-                'success': False,
-                'message': 'توکن بات تلگرام تنظیم نشده است. لطفاً آن را در متغیرهای محیطی تنظیم کنید.',
-                'data': {
-                    'available': False,
-                    'message': 'توکن بات تلگرام تنظیم نشده است'
-                }
-            })
-        
-        bot_info = telegram_service.get_bot_info()
-        
-        if bot_info:
-            return jsonify({
-                'success': True,
-                'data': bot_info
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'message': 'اطلاعات بات تلگرام در دسترس نیست'
-            })
-    except ImportError:
-        return jsonify({
-            'success': False,
-            'message': 'ماژول اعلان تلگرام در دسترس نیست'
-        })
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'خطا در دریافت اطلاعات بات: {str(e)}'
-        })
+# این روت قبلا با نام دیگری تعریف شده است
 
 @app.route('/api/email-message')
 def get_email_message():
