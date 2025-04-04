@@ -37,7 +37,10 @@ else:
 
 # دیکشنری برای نگهداری آیدی چت کاربران
 # در نسخه‌های آینده، این دیکشنری باید از دیتابیس خوانده شود
-CHAT_IDS = {}
+# اضافه کردن چت آیدی خودتان اینجا
+CHAT_IDS = {
+    'default': '722627622'  # این چت آیدی شما است که باید جایگزین شود
+}
 
 
 def initialize_bot():
@@ -217,16 +220,24 @@ def send_market_trend_alert(chat_id, trend, affected_coins, reason):
     return send_telegram_message(chat_id, message)
 
 
-def send_test_notification(chat_id):
+def send_test_notification(chat_id=None):
     """
     ارسال پیام تست برای بررسی عملکرد سیستم اعلان تلگرام
 
     Args:
-        chat_id (int or str): شناسه چت کاربر
+        chat_id (int or str, optional): شناسه چت کاربر، اگر None باشد از چت آیدی پیش‌فرض استفاده می‌شود
 
     Returns:
         dict: وضعیت ارسال و پیام
     """
+    if chat_id is None:
+        chat_id = CHAT_IDS.get('default')
+        if not chat_id:
+            return {
+                "success": False,
+                "message": "چت آیدی پیش‌فرض تنظیم نشده است"
+            }
+            
     message = "🤖 <b>پیام تست از ربات معامله ارز دیجیتال</b>\n\n"
     message += "سیستم اعلان‌های تلگرام فعال است.\n\n"
     message += f"⏰ <b>زمان:</b> {get_current_persian_time()}"
@@ -309,6 +320,5 @@ def get_current_persian_time():
     Returns:
         str: زمان فعلی
     """
-    from datetime import datetime
     now = datetime.now()
     return now.strftime("%Y-%m-%d %H:%M:%S")

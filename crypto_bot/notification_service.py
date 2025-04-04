@@ -105,27 +105,21 @@ def send_market_trend_alert(to_phone_number, trend, affected_coins, reason):
     
     return send_sms_notification(to_phone_number, message)
 
-def send_test_notification(to_phone_number):
+def send_test_notification(to_phone_number=None):
     """
     ارسال پیام تست برای بررسی عملکرد سیستم اعلان
     
     Args:
-        to_phone_number (str): شماره موبایل گیرنده (استفاده نمی‌شود)
+        to_phone_number (str, optional): شماره موبایل گیرنده (استفاده نمی‌شود)
         
     Returns:
         dict: وضعیت ارسال و پیام
     """
-    # دریافت چت آیدی تلگرام از SESSION
+    # استفاده از چت آیدی موجود در session یا استفاده از چت آیدی پیش‌فرض
     chat_id = session.get('telegram_chat_id', None)
     
-    if not chat_id:
-        logger.error("چت آیدی تلگرام یافت نشد")
-        return {
-            "success": False,
-            "message": "چت آیدی تلگرام یافت نشد. لطفاً ابتدا تنظیمات تلگرام را انجام دهید."
-        }
-    
-    # ارسال پیام تست از طریق تلگرام
+    # اگر در session چت آیدی نباشد، از تابع telegram_send_test استفاده می‌کنیم
+    # که می‌تواند از چت آیدی پیش‌فرض استفاده کند
     return telegram_send_test(chat_id)
 
 def get_current_persian_time():

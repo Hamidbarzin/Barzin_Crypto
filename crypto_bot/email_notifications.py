@@ -87,12 +87,12 @@ def send_email_notification(to_email, subject, html_content, text_content=None):
     # ارسال مستقیم از طریق تلگرام
     return send_email_via_sendgrid(to_email, subject, html_content, text_content)
 
-def send_buy_sell_email(to_email, symbol, action, price, reason):
+def send_buy_sell_email(to_email=None, symbol="BTC/USDT", action="خرید", price=50000, reason="تحلیل تکنیکال"):
     """
     ارسال اعلان خرید یا فروش از طریق تلگرام (جایگزین ایمیل)
 
     Args:
-        to_email (str): آدرس ایمیل گیرنده (استفاده نمی‌شود، فقط برای سازگاری با کد قبلی)
+        to_email (str, optional): آدرس ایمیل گیرنده (استفاده نمی‌شود، فقط برای سازگاری با کد قبلی)
         symbol (str): نماد ارز
         action (str): 'خرید' یا 'فروش'
         price (float): قیمت فعلی
@@ -104,19 +104,18 @@ def send_buy_sell_email(to_email, symbol, action, price, reason):
     # دریافت چت آیدی تلگرام از SESSION
     chat_id = session.get('telegram_chat_id', None)
     
-    if not chat_id:
-        logger.error("چت آیدی تلگرام یافت نشد")
-        return False
+    # اگر چت آیدی نداریم، از چت آیدی پیش‌فرض استفاده می‌شود
+    chat_id_to_use = chat_id if chat_id else None
     
     # استفاده از تابع ارسال اعلان خرید و فروش تلگرام
-    return telegram_send_buy_sell(chat_id, symbol, action, price, reason)
+    return telegram_send_buy_sell(chat_id_to_use, symbol, action, price, reason)
 
-def send_volatility_email(to_email, symbol, price, change_percent, timeframe="1h"):
+def send_volatility_email(to_email=None, symbol="BTC/USDT", price=50000, change_percent=5.5, timeframe="1h"):
     """
     ارسال هشدار نوسان قیمت از طریق تلگرام
 
     Args:
-        to_email (str): آدرس ایمیل گیرنده (استفاده نمی‌شود، فقط برای سازگاری با کد قبلی)
+        to_email (str, optional): آدرس ایمیل گیرنده (استفاده نمی‌شود، فقط برای سازگاری با کد قبلی)
         symbol (str): نماد ارز
         price (float): قیمت فعلی
         change_percent (float): درصد تغییر
@@ -128,19 +127,18 @@ def send_volatility_email(to_email, symbol, price, change_percent, timeframe="1h
     # دریافت چت آیدی تلگرام از SESSION
     chat_id = session.get('telegram_chat_id', None)
     
-    if not chat_id:
-        logger.error("چت آیدی تلگرام یافت نشد")
-        return False
+    # اگر چت آیدی نداریم، از چت آیدی پیش‌فرض استفاده می‌شود
+    chat_id_to_use = chat_id if chat_id else None
     
     # استفاده از تابع ارسال هشدار نوسان تلگرام
-    return telegram_send_volatility(chat_id, symbol, price, change_percent, timeframe)
+    return telegram_send_volatility(chat_id_to_use, symbol, price, change_percent, timeframe)
 
-def send_market_trend_email(to_email, trend, affected_coins, reason):
+def send_market_trend_email(to_email=None, trend="صعودی", affected_coins=["BTC", "ETH", "XRP"], reason="تحلیل تکنیکال"):
     """
     ارسال هشدار روند کلی بازار از طریق تلگرام
 
     Args:
-        to_email (str): آدرس ایمیل گیرنده (استفاده نمی‌شود، فقط برای سازگاری با کد قبلی)
+        to_email (str, optional): آدرس ایمیل گیرنده (استفاده نمی‌شود، فقط برای سازگاری با کد قبلی)
         trend (str): روند بازار ('صعودی'، 'نزولی' یا 'خنثی')
         affected_coins (list): لیست ارزهای تحت تأثیر
         reason (str): دلیل روند
@@ -151,36 +149,28 @@ def send_market_trend_email(to_email, trend, affected_coins, reason):
     # دریافت چت آیدی تلگرام از SESSION
     chat_id = session.get('telegram_chat_id', None)
     
-    if not chat_id:
-        logger.error("چت آیدی تلگرام یافت نشد")
-        return False
+    # اگر چت آیدی نداریم، از چت آیدی پیش‌فرض استفاده می‌شود
+    chat_id_to_use = chat_id if chat_id else None
     
     # استفاده از تابع ارسال هشدار روند کلی بازار تلگرام
-    return telegram_send_market_trend(chat_id, trend, affected_coins, reason)
+    return telegram_send_market_trend(chat_id_to_use, trend, affected_coins, reason)
 
-def send_test_email(to_email):
+def send_test_email(to_email=None):
     """
     ارسال پیام تست تلگرامی به جای ایمیل تست
     
     Args:
-        to_email (str): آدرس ایمیل گیرنده (استفاده نمی‌شود، فقط برای حفظ سازگاری با کد قبلی)
+        to_email (str, optional): آدرس ایمیل گیرنده (استفاده نمی‌شود، فقط برای حفظ سازگاری با کد قبلی)
         
     Returns:
         dict: وضعیت ارسال و پیام
     """
     logger.info("ارسال پیام تست تلگرامی")
     
-    # دریافت چت آیدی تلگرام از SESSION
+    # دریافت چت آیدی تلگرام از SESSION یا استفاده از چت آیدی پیش‌فرض
     chat_id = session.get('telegram_chat_id', None)
     
-    if not chat_id:
-        logger.error("چت آیدی تلگرام یافت نشد")
-        return {
-            "success": False, 
-            "message": "چت آیدی تلگرام یافت نشد. لطفاً ابتدا تنظیمات تلگرام را انجام دهید."
-        }
-    
-    # استفاده از تابع تست تلگرام
+    # استفاده از تابع تست تلگرام که قابلیت استفاده از چت آیدی پیش‌فرض را دارد
     return telegram_send_test(chat_id)
 
 def get_current_persian_time():
