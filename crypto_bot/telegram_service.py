@@ -270,6 +270,10 @@ def send_test_notification(chat_id=None):
             chat_id = int(chat_id)
     except Exception as e:
         logger.warning(f"خطا در تبدیل چت آیدی به عدد: {str(e)}")
+        return {
+            "success": False,
+            "message": f"فرمت چت آیدی نادرست است. لطفاً یک عدد وارد کنید. خطا: {str(e)}"
+        }
             
     message = "🤖 <b>پیام تست از ربات معامله ارز دیجیتال</b>\n\n"
     message += "سیستم اعلان‌های تلگرام فعال است.\n\n"
@@ -278,17 +282,35 @@ def send_test_notification(chat_id=None):
     # اضافه کردن اطلاعات دیباگ
     logger.info(f"ارسال پیام تست به چت آیدی: {chat_id} (نوع: {type(chat_id).__name__})")
 
-    result = send_telegram_message(chat_id, message)
-    if result:
-        return {
-            "success": True,
-            "message": "پیام تست با موفقیت ارسال شد."
-        }
-    else:
-        return {
-            "success": False,
-            "message": "خطا در ارسال پیام تست. لطفاً تنظیمات را بررسی کنید."
-        }
+    try:
+        result = send_telegram_message(chat_id, message)
+        if result:
+            return {
+                "success": True,
+                "message": "پیام تست با موفقیت ارسال شد."
+            }
+        else:
+            # بررسی علت احتمالی خطا
+            return {
+                "success": False,
+                "message": ("خطا در ارسال پیام تست. احتمالاً شما هنوز با ربات گفتگو را شروع نکرده‌اید. "
+                           "لطفاً ابتدا به @GrowthFinderBot در تلگرام رفته و دکمه Start را بزنید، "
+                           "سپس چت آیدی خود را با ربات @userinfobot بررسی کنید.")
+            }
+    except Exception as e:
+        error_msg = str(e)
+        if "Chat not found" in error_msg:
+            return {
+                "success": False,
+                "message": ("کاربر با چت آیدی وارد شده پیدا نشد. لطفاً مطمئن شوید که: "
+                           "1) چت آیدی صحیح است "
+                           "2) گفتگو با ربات @GrowthFinderBot را در تلگرام شروع کرده‌اید")
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"خطا در ارسال پیام تست: {error_msg}"
+            }
 
 
 def get_bot_info():
