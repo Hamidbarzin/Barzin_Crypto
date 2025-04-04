@@ -929,20 +929,39 @@ def test_telegram():
     """ارسال پیام تلگرام تست برای بررسی عملکرد اعلان‌ها"""
     from crypto_bot.telegram_service import send_test_notification
     
-    chat_id = None
+    # اطلاعات لاگینگ اضافی برای عیب‌یابی
+    logger.info("درخواست تست تلگرام دریافت شد")
+    
+    chat_id = '722627622'  # استفاده از چت آیدی ثابت که می‌دانیم کار می‌کند
     
     # اگر اطلاعات در قالب JSON ارسال شده
     if request.is_json:
         data = request.get_json()
-        chat_id = data.get('chat_id')
+        user_chat_id = data.get('chat_id')
+        if user_chat_id:
+            logger.info(f"چت آیدی از درخواست JSON: {user_chat_id}")
+            chat_id = user_chat_id
     
     # استفاده از چت آیدی تنظیم شده در سشن (اگر وجود داشته باشد)
-    if not chat_id:
-        chat_id = session.get('telegram_chat_id', None)
+    elif session.get('telegram_chat_id'):
+        user_chat_id = session.get('telegram_chat_id')
+        logger.info(f"چت آیدی از سشن: {user_chat_id}")
+        chat_id = user_chat_id
+        
+    # تبدیل به عدد صحیح
+    try:
+        if isinstance(chat_id, str) and chat_id.isdigit():
+            chat_id = int(chat_id)
+            logger.info(f"چت آیدی به عدد صحیح تبدیل شد: {chat_id}")
+    except Exception as e:
+        logger.warning(f"خطا در تبدیل چت آیدی به عدد: {str(e)}")
         
     try:
-        # ارسال پیام تست (چت آیدی می‌تواند None باشد، در این صورت از چت آیدی پیش‌فرض استفاده می‌شود)
+        # ارسال پیام تست
+        logger.info(f"ارسال پیام تست به چت آیدی: {chat_id}")
         result = send_test_notification(chat_id)
+        logger.info(f"نتیجه ارسال پیام: {result}")
+        
         if isinstance(result, dict):
             return jsonify(result)
         elif result:
