@@ -293,8 +293,34 @@ def log_status():
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     logger.info(f"زمان‌بندی وظایف فعال است - {current_time}")
 
+# ارسال اعلان تست برای تایید عملکرد صحیح سیستم
+def send_test_confirmation():
+    """ارسال یک اعلان تست به کاربر برای تایید عملکرد سیستم"""
+    try:
+        logger.info("در حال ارسال اعلان تست تایید...")
+        
+        try:
+            from crypto_bot.telegram_service import send_test_notification
+            result = send_test_notification()
+            if result['success']:
+                logger.info("اعلان تست با موفقیت ارسال شد")
+                return True
+            else:
+                logger.error(f"خطا در ارسال اعلان تست: {result['message']}")
+                return False
+        except Exception as e:
+            logger.error(f"خطا در ارسال اعلان تست: {str(e)}")
+            return False
+            
+    except Exception as e:
+        logger.error(f"خطا در ارسال اعلان تست: {str(e)}")
+        return False
+
 def setup_schedule():
     """تنظیم زمان‌بندی وظایف دوره‌ای"""
+    # ارسال اعلان تست زمان‌بندی در هنگام شروع برنامه
+    send_test_confirmation()
+    
     # هر 5 دقیقه یکبار برنامه را فعال نگه می‌داریم
     schedule.every(5).minutes.do(keep_alive)
     
@@ -309,6 +335,9 @@ def setup_schedule():
     
     # ثبت وضعیت برنامه در لاگ هر 15 دقیقه
     schedule.every(15).minutes.do(log_status)
+    
+    # اعلان تست روزانه برای اطمینان از عملکرد صحیح سیستم
+    schedule.every().day.at("09:00").do(send_test_confirmation)
     
     logger.info("زمان‌بندی وظایف با موفقیت تنظیم شد")
 
