@@ -4,6 +4,7 @@
 
 import os
 import logging
+import asyncio
 from datetime import datetime
 
 # تنظیم لاگر
@@ -39,7 +40,7 @@ else:
 # در نسخه‌های آینده، این دیکشنری باید از دیتابیس خوانده شود
 # اضافه کردن چت آیدی خودتان اینجا
 CHAT_IDS = {
-    'default': '722627622'  # چت آیدی کاربر
+    'default': 722627622  # چت آیدی کاربر - به صورت عدد صحیح
 }
 
 
@@ -86,6 +87,14 @@ def send_telegram_message(chat_id, message, parse_mode='HTML'):
     if not TELEGRAM_BOT_TOKEN:
         logger.error("توکن بات تلگرام تنظیم نشده است")
         return False
+        
+    # اطمینان از اینکه chat_id به فرمت عددی است
+    try:
+        if isinstance(chat_id, str) and chat_id.isdigit():
+            chat_id = int(chat_id)
+    except Exception as e:
+        logger.warning(f"خطا در تبدیل چت آیدی به عدد: {str(e)}")
+        # ادامه کار بدون تبدیل
 
     try:
         # تبدیل ParseMode به نوع مناسب
@@ -95,6 +104,9 @@ def send_telegram_message(chat_id, message, parse_mode='HTML'):
             parse_mode_enum = ParseMode.MARKDOWN_V2
         else:
             parse_mode_enum = parse_mode
+        
+        # اضافه کردن اطلاعات دیباگ
+        logger.info(f"تلاش برای ارسال پیام به چت آیدی: {chat_id} (نوع: {type(chat_id).__name__})")
         
         # ایجاد یک لوپ آسنکرون برای اجرای کد آسنکرون
         async def send_message_async():
@@ -138,8 +150,22 @@ def register_user(chat_id, user_info=None):
         bool: آیا ثبت موفقیت‌آمیز بود
     """
     try:
-        # در نسخه‌های آینده، این اطلاعات باید در دیتابیس ذخیره شوند
-        CHAT_IDS[str(chat_id)] = user_info or {"registered_at": get_current_persian_time()}
+        # تبدیل chat_id به عدد صحیح
+        if isinstance(chat_id, str) and chat_id.isdigit():
+            chat_id = int(chat_id)
+            
+        # استفاده از کلید 'default' برای ذخیره چت آیدی پیش‌فرض
+        if chat_id == CHAT_IDS.get('default'):
+            key = 'default'
+        else:
+            key = f"user_{chat_id}"  # استفاده از پیشوند برای کلیدهای دیگر
+            
+        # ذخیره اطلاعات کاربر
+        if user_info is None:
+            user_info = {"registered_at": get_current_persian_time()}
+            
+        # ثبت کاربر در دیکشنری
+        CHAT_IDS[key] = chat_id
         logger.info(f"کاربر با شناسه چت {chat_id} با موفقیت ثبت شد")
         return True
     except Exception as e:
@@ -237,10 +263,20 @@ def send_test_notification(chat_id=None):
                 "success": False,
                 "message": "چت آیدی پیش‌فرض تنظیم نشده است"
             }
+    
+    # اطمینان از اینکه chat_id به فرمت عددی است
+    try:
+        if isinstance(chat_id, str) and chat_id.isdigit():
+            chat_id = int(chat_id)
+    except Exception as e:
+        logger.warning(f"خطا در تبدیل چت آیدی به عدد: {str(e)}")
             
     message = "🤖 <b>پیام تست از ربات معامله ارز دیجیتال</b>\n\n"
     message += "سیستم اعلان‌های تلگرام فعال است.\n\n"
     message += f"⏰ <b>زمان:</b> {get_current_persian_time()}"
+
+    # اضافه کردن اطلاعات دیباگ
+    logger.info(f"ارسال پیام تست به چت آیدی: {chat_id} (نوع: {type(chat_id).__name__})")
 
     result = send_telegram_message(chat_id, message)
     if result:
