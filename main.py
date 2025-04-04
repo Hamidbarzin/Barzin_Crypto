@@ -917,18 +917,26 @@ def test_notification():
         logger.error(f"خطا در ارسال پیامک تست: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
 
-@app.route('/api/test-telegram', methods=['POST'])
+@app.route('/telegram', methods=['GET'])
+@app.route('/test_telegram', methods=['GET'])
+@app.route('/api/test-telegram', methods=['POST', 'GET'])
 def test_telegram():
     """ارسال پیام تلگرام تست برای بررسی عملکرد اعلان‌ها"""
     from crypto_bot.telegram_service import send_test_notification
     
-    data = request.get_json()
-    chat_id = data.get('chat_id')
+    chat_id = None
     
+    # اگر اطلاعات در قالب JSON ارسال شده
+    if request.is_json:
+        data = request.get_json()
+        chat_id = data.get('chat_id')
+    
+    # استفاده از چت آیدی تنظیم شده در سشن (اگر وجود داشته باشد)
     if not chat_id:
-        return jsonify({'success': False, 'message': 'شناسه چت تلگرام الزامی است'})
-    
+        chat_id = session.get('telegram_chat_id', None)
+        
     try:
+        # ارسال پیام تست (چت آیدی می‌تواند None باشد، در این صورت از چت آیدی پیش‌فرض استفاده می‌شود)
         result = send_test_notification(chat_id)
         if isinstance(result, dict):
             return jsonify(result)
