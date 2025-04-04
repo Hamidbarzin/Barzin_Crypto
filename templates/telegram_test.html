@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}تست ارسال پیام تلگرام{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">تست ارسال پیام تلگرام</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info" id="botInfo">
+                <h5 class="mb-3">اطلاعات بات تلگرام</h5>
+                <p>نام بات: <span id="botName">در حال بارگذاری...</span></p>
+                <p>نام کاربری: <span id="botUsername">در حال بارگذاری...</span></p>
+                <p>لینک بات: <a id="botLink" href="#" target="_blank">در حال بارگذاری...</a></p>
+            </div>
+            
+            <div class="mb-4">
+                <h5 class="mb-3">ارسال پیام تست</h5>
+                <p>ارسال یک پیام تست برای آزمایش عملکرد اعلان‌های تلگرام.</p>
+                <div class="d-flex gap-2">
+                    <button id="sendTestButton" class="btn btn-success">
+                        <i class="fa fa-paper-plane me-2"></i>
+                        ارسال پیام تست
+                    </button>
+                    <a href="/" class="btn btn-secondary">
+                        <i class="fa fa-home me-2"></i>
+                        بازگشت به صفحه اصلی
+                    </a>
+                </div>
+            </div>
+            
+            <div id="resultContainer" class="alert d-none">
+            </div>
+            
+            <div class="mt-4">
+                <h5 class="mb-3">راهنمای اتصال به بات</h5>
+                <ol>
+                    <li>در تلگرام جستجو کنید: <span id="botUsernameGuide">در حال بارگذاری...</span></li>
+                    <li>روی دکمه Start یا شروع کلیک کنید</li>
+                    <li>دکمه «ارسال پیام تست» را بزنید تا یک پیام تست دریافت کنید</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // دریافت اطلاعات بات تلگرام
+    fetch('/api/telegram-bot-info')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data && data.data.available) {
+                const botInfo = data.data;
+                document.getElementById('botName').textContent = botInfo.name;
+                document.getElementById('botUsername').textContent = '@' + botInfo.username;
+                document.getElementById('botLink').href = botInfo.link;
+                document.getElementById('botLink').textContent = '@' + botInfo.username;
+                document.getElementById('botUsernameGuide').textContent = '@' + botInfo.username;
+            } else {
+                const errorMessage = data.data && data.data.message ? data.data.message : 'مشکل در اتصال به تلگرام';
+                document.getElementById('botInfo').classList.remove('alert-info');
+                document.getElementById('botInfo').classList.add('alert-warning');
+                document.getElementById('botInfo').innerHTML = '<p>دسترسی به بات تلگرام در حال حاضر مقدور نیست. خطا: ' + errorMessage + '</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching Telegram bot info:', error);
+            document.getElementById('botInfo').classList.remove('alert-info');
+            document.getElementById('botInfo').classList.add('alert-danger');
+            document.getElementById('botInfo').innerHTML = '<p>خطا در بارگذاری اطلاعات بات تلگرام: ' + error.message + '</p>';
+        });
+
+    // ارسال پیام تست
+    document.getElementById('sendTestButton').addEventListener('click', function() {
+        const button = this;
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> در حال ارسال...';
+        
+        // ارسال درخواست
+        fetch('/telegram')
+            .then(response => response.json())
+            .then(data => {
+                // نمایش نتیجه
+                const resultContainer = document.getElementById('resultContainer');
+                resultContainer.classList.remove('d-none', 'alert-success', 'alert-danger');
+                
+                if (data.success) {
+                    resultContainer.classList.add('alert-success');
+                    resultContainer.innerHTML = '<strong>موفقیت!</strong> ' + data.message;
+                } else {
+                    resultContainer.classList.add('alert-danger');
+                    resultContainer.innerHTML = '<strong>خطا!</strong> ' + data.message;
+                }
+                
+                // بازگرداندن دکمه به حالت اولیه
+                button.disabled = false;
+                button.innerHTML = originalText;
+            })
+            .catch(error => {
+                console.error('Error sending test message:', error);
+                const resultContainer = document.getElementById('resultContainer');
+                resultContainer.classList.remove('d-none', 'alert-success');
+                resultContainer.classList.add('alert-danger');
+                resultContainer.innerHTML = '<strong>خطا!</strong> مشکلی در ارتباط با سرور رخ داده است: ' + error.message;
+                
+                // بازگرداندن دکمه به حالت اولیه
+                button.disabled = false;
+                button.innerHTML = originalText;
+            });
+    });
+});
+</script>
+{% endblock %}

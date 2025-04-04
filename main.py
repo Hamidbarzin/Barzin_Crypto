@@ -917,6 +917,11 @@ def test_notification():
         logger.error(f"خطا در ارسال پیامک تست: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
 
+@app.route('/telegram_test', methods=['GET'])
+def telegram_test_page():
+    """صفحه تست تلگرام"""
+    return render_template('telegram_test.html')
+
 @app.route('/telegram', methods=['GET'])
 @app.route('/test_telegram', methods=['GET'])
 @app.route('/api/test-telegram', methods=['POST', 'GET'])

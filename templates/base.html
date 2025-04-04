@@ -66,6 +66,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/telegram_test' %}active{% endif %}" href="/telegram_test">
+                            <i class="fab fa-telegram me-1"></i> تست تلگرام
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if request.path == '/email-sample' %}active{% endif %}" href="/email-sample">
                             <i class="fas fa-envelope me-1"></i> نمونه ایمیل
                         </a>
