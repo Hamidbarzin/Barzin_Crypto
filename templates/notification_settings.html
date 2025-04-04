@@ -171,6 +171,41 @@
                             </div>
                         </div>
 
+                        <!-- تنظیمات اعلان‌های ایمیلی -->
+                        <div class="section-title mb-3 border-bottom pb-2">
+                            <h5>اعلان‌های ایمیلی</h5>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="email_enabled" name="email_enabled" 
+                                           {% if notification_settings.email_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_enabled">فعال‌سازی اعلان‌های ایمیلی</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email_address" class="form-label">آدرس ایمیل</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="email_address" name="email_address" 
+                                               placeholder="example@email.com" value="{{ notification_settings.email_address }}">
+                                    </div>
+                                    <div class="form-text">ایمیل معتبر خود را وارد کنید تا اعلان‌ها به صورت منظم به شما ارسال شود.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">ارسال تست ایمیل</label>
+                                    <button type="button" class="btn btn-outline-warning w-100" id="testEmailButton">
+                                        <i class="fas fa-paper-plane me-2"></i>
+                                        ارسال ایمیل تست
+                                    </button>
+                                </div>
+                                <div id="testEmailResult" class="alert alert-info d-none mt-2">
+                                    نتیجه تست ایمیل اینجا نمایش داده می‌شود
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- دکمه‌های ذخیره تغییرات -->
                         <div class="row mt-4">
                             <div class="col-md-6 offset-md-3">
@@ -206,9 +241,11 @@ document.addEventListener('DOMContentLoaded', function() {
             settings.buy_sell_enabled = formData.get('buy_sell_enabled') === 'on';
             settings.volatility_enabled = formData.get('volatility_enabled') === 'on';
             settings.market_trend_enabled = formData.get('market_trend_enabled') === 'on';
+            settings.email_enabled = formData.get('email_enabled') === 'on';
             
             // اضافه کردن سایر فیلدها
             settings.phone_number = formData.get('phone_number');
+            settings.email_address = formData.get('email_address');
             settings.buy_sell_sensitivity = formData.get('buy_sell_sensitivity');
             settings.buy_sell_frequency = formData.get('buy_sell_frequency');
             settings.start_hour = parseInt(formData.get('start_hour'));
@@ -310,6 +347,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 testSmsResult.textContent = 'خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.';
                 testSmsResult.classList.remove('alert-info', 'alert-success');
                 testSmsResult.classList.add('alert-danger');
+            });
+        });
+    }
+    
+    // دکمه ارسال ایمیل تست
+    const testEmailButton = document.getElementById('testEmailButton');
+    const testEmailResult = document.getElementById('testEmailResult');
+    if (testEmailButton && testEmailResult) {
+        testEmailButton.addEventListener('click', function() {
+            const emailAddress = document.getElementById('email_address').value;
+            if (!emailAddress) {
+                testEmailResult.textContent = 'لطفاً ابتدا آدرس ایمیل را وارد کنید';
+                testEmailResult.classList.remove('d-none', 'alert-success', 'alert-info');
+                testEmailResult.classList.add('alert-danger');
+                return;
+            }
+            
+            // نمایش وضعیت در حال پردازش
+            testEmailResult.textContent = 'در حال ارسال ایمیل تست...';
+            testEmailResult.classList.remove('d-none', 'alert-success', 'alert-danger');
+            testEmailResult.classList.add('alert-info');
+            
+            // ارسال درخواست
+            fetch('/api/test-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email_address: emailAddress })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // نمایش پیام موفقیت
+                    testEmailResult.textContent = 'ایمیل تست با موفقیت ارسال شد';
+                    testEmailResult.classList.remove('alert-info', 'alert-danger');
+                    testEmailResult.classList.add('alert-success');
+                } else {
+                    // نمایش پیام خطا
+                    testEmailResult.textContent = `خطا در ارسال ایمیل: ${data.message}`;
+                    testEmailResult.classList.remove('alert-info', 'alert-success');
+                    testEmailResult.classList.add('alert-danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending test email:', error);
+                testEmailResult.textContent = 'خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.';
+                testEmailResult.classList.remove('alert-info', 'alert-success');
+                testEmailResult.classList.add('alert-danger');
             });
         });
     }

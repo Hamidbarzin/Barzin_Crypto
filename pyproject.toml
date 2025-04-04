@@ -16,6 +16,7 @@ dependencies = [
     "psycopg2-binary>=2.9.10",
     "requests>=2.32.3",
     "schedule>=1.2.2",
+    "sendgrid>=6.11.0",
     "ta>=0.11.0",
     "trafilatura>=2.0.0",
     "twilio>=9.5.1",

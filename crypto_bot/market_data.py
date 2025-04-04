@@ -99,89 +99,102 @@ def get_current_prices(symbols, timeout=3):
     Returns:
         dict: Dictionary of current prices for each symbol
     """
+    # Always use CoinGecko as the primary source for live data
+    logger.info(f"Fetching real-time prices from CoinGecko for {symbols}")
     result = {}
-    success = False
     
-    # Track the overall start time for timeout handling
-    start_time = time.time()
-    
-    # Try each exchange until we get data
-    for exchange_id in EXCHANGE_LIST:
-        # Check if we've exceeded our overall timeout
-        if time.time() - start_time > timeout:
-            logger.warning(f"Overall timeout of {timeout} seconds exceeded")
-            break
-            
-        try:
-            logger.info(f"Trying to fetch prices from {exchange_id}")
-            exchange = _initialize_exchange(exchange_id)
-            
-            # Set a timeout for the exchange API requests
-            exchange.timeout = timeout * 1000  # ccxt uses milliseconds
-            
-            # Check if exchange supports all symbols
-            unsupported_symbols = []
-            for symbol in symbols:
-                if not exchange.has['fetchTicker']:
-                    logger.warning(f"{exchange_id} does not support fetchTicker")
-                    raise Exception(f"{exchange_id} does not support fetchTicker")
+    try:
+        # First try to get data from CoinGecko
+        coingecko_result = get_prices_from_coingecko(symbols, timeout)
+        
+        # Add results
+        for symbol in symbols:
+            if symbol in coingecko_result:
+                result[symbol] = coingecko_result[symbol]
+                # Mark the data as real (not sample)
+                result[symbol]['is_sample_data'] = False
                 
-                try:
-                    # Check if the symbol is available on this exchange
-                    exchange.markets[symbol]
-                except (KeyError, ValueError):
-                    unsupported_symbols.append(symbol)
+        # Log success or missing symbols
+        if len(result) == len(symbols):
+            logger.info(f"Successfully fetched all prices from CoinGecko")
+        else:
+            missing_symbols = [s for s in symbols if s not in result]
+            logger.warning(f"CoinGecko could not provide data for: {', '.join(missing_symbols)}")
             
-            if unsupported_symbols:
-                logger.warning(f"{exchange_id} does not support symbols: {', '.join(unsupported_symbols)}")
-                continue
-            
-            # Fetch tickers for all symbols
-            for symbol in symbols:
-                # Check if we've exceeded our timeout
-                if time.time() - start_time > timeout:
-                    logger.warning(f"Timeout of {timeout} seconds exceeded during ticker fetching")
-                    break
-                    
-                try:
-                    # Use a shorter timeout for each individual request
-                    ticker = exchange.fetch_ticker(symbol)
-                    result[symbol] = {
-                        'price': ticker['last'],
-                        'change_24h': ticker['percentage'] if 'percentage' in ticker else None,
-                        'high_24h': ticker['high'] if 'high' in ticker else None,
-                        'low_24h': ticker['low'] if 'low' in ticker else None,
-                        'volume_24h': ticker['quoteVolume'] if 'quoteVolume' in ticker else None,
-                        'timestamp': datetime.now().isoformat(),
-                        'source': exchange_id
-                    }
-                except Exception as e:
-                    logger.warning(f"Failed to fetch ticker for {symbol} on {exchange_id}: {str(e)}")
-            
-            # If we got data for all symbols, we're done
-            if len(result) == len(symbols):
-                success = True
+    except Exception as e:
+        logger.error(f"Error fetching prices from CoinGecko: {str(e)}")
+    
+    # If CoinGecko failed, fallback to exchanges
+    if len(result) < len(symbols):
+        logger.info("CoinGecko didn't provide all data, trying exchanges")
+        
+        missing_symbols = [s for s in symbols if s not in result]
+        start_time = time.time()
+        
+        # Try each exchange until we get data for missing symbols
+        for exchange_id in EXCHANGE_LIST:
+            # Check if we've exceeded our overall timeout
+            if time.time() - start_time > timeout:
+                logger.warning(f"Overall timeout of {timeout} seconds exceeded")
                 break
                 
-        except Exception as e:
-            logger.warning(f"Error fetching prices from {exchange_id}: {str(e)}")
-    
-    # If we couldn't get data from any exchange, try CoinGecko as final fallback
-    if not success:
-        logger.warning("All exchanges failed, trying CoinGecko")
-        try:
-            coingecko_result = get_prices_from_coingecko(symbols)
-            
-            # Merge results - only add symbols that we don't have yet
-            for symbol in symbols:
-                if symbol not in result and symbol in coingecko_result:
-                    result[symbol] = coingecko_result[symbol]
-                    result[symbol]['source'] = 'coingecko'
+            try:
+                logger.info(f"Trying to fetch prices from {exchange_id}")
+                exchange = _initialize_exchange(exchange_id)
+                
+                # Set a timeout for the exchange API requests
+                exchange.timeout = timeout * 1000  # ccxt uses milliseconds
+                
+                # Check if exchange supports all symbols
+                unsupported_symbols = []
+                for symbol in missing_symbols:
+                    if not exchange.has['fetchTicker']:
+                        logger.warning(f"{exchange_id} does not support fetchTicker")
+                        raise Exception(f"{exchange_id} does not support fetchTicker")
                     
-        except Exception as e:
-            logger.error(f"Fallback to CoinGecko also failed: {str(e)}")
+                    try:
+                        # Check if the symbol is available on this exchange
+                        exchange.markets[symbol]
+                    except (KeyError, ValueError):
+                        unsupported_symbols.append(symbol)
+                
+                if len(unsupported_symbols) == len(missing_symbols):
+                    logger.warning(f"{exchange_id} does not support any of the missing symbols")
+                    continue
+                
+                # Fetch tickers for missing symbols that are supported
+                for symbol in [s for s in missing_symbols if s not in unsupported_symbols]:
+                    # Check if we've exceeded our timeout
+                    if time.time() - start_time > timeout:
+                        logger.warning(f"Timeout of {timeout} seconds exceeded during ticker fetching")
+                        break
+                        
+                    try:
+                        # Use a shorter timeout for each individual request
+                        ticker = exchange.fetch_ticker(symbol)
+                        result[symbol] = {
+                            'price': ticker['last'],
+                            'change_24h': ticker['percentage'] if 'percentage' in ticker else None,
+                            'high_24h': ticker['high'] if 'high' in ticker else None,
+                            'low_24h': ticker['low'] if 'low' in ticker else None,
+                            'volume_24h': ticker['quoteVolume'] if 'quoteVolume' in ticker else None,
+                            'timestamp': datetime.now().isoformat(),
+                            'source': exchange_id,
+                            'is_sample_data': False
+                        }
+                    except Exception as e:
+                        logger.warning(f"Failed to fetch ticker for {symbol} on {exchange_id}: {str(e)}")
+                
+                # Update missing symbols list
+                missing_symbols = [s for s in symbols if s not in result]
+                if not missing_symbols:
+                    logger.info("All symbols fetched successfully")
+                    break
+                    
+            except Exception as e:
+                logger.warning(f"Error fetching prices from {exchange_id}: {str(e)}")
     
-    # Log missing symbols
+    # Final check - if we still have missing symbols, log it
     missing_symbols = [s for s in symbols if s not in result]
     if missing_symbols:
         logger.warning(f"Could not fetch data for symbols: {', '.join(missing_symbols)}")

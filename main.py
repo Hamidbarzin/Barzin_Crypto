@@ -503,6 +503,8 @@ def notification_settings():
     default_settings = {
         'sms_enabled': session.get('sms_enabled', False),
         'phone_number': session.get('phone_number', ''),
+        'email_enabled': session.get('email_enabled', False),
+        'email_address': session.get('email_address', ''),
         'buy_sell_enabled': session.get('buy_sell_enabled', True),
         'buy_sell_sensitivity': session.get('buy_sell_sensitivity', 'medium'),
         'buy_sell_frequency': session.get('buy_sell_frequency', '3'),
@@ -859,19 +861,27 @@ def user_settings():
 
 @app.route('/api/test-email', methods=['POST'])
 def test_email():
-    email_address = request.form.get('email_address')
+    """ارسال ایمیل تست برای بررسی عملکرد سیستم اعلان ایمیلی"""
+    from crypto_bot.email_notifications import send_test_email
+    
+    data = request.get_json()
+    email_address = data.get('email_address')
+    
     if not email_address:
-        return jsonify({'success': False, 'message': 'Email address is required'})
+        return jsonify({'success': False, 'message': 'آدرس ایمیل الزامی است'})
     
     try:
         result = send_test_email(email_address)
-        if result:
-            return jsonify({'success': True, 'message': 'Test email sent successfully!'})
+        # چون تابع send_test_email دیکشنری برمی‌گرداند
+        if isinstance(result, dict):
+            return jsonify(result)
+        elif result:
+            return jsonify({'success': True, 'message': 'ایمیل تست با موفقیت ارسال شد'})
         else:
-            return jsonify({'success': False, 'message': 'Failed to send test email. Check your settings.'})
+            return jsonify({'success': False, 'message': 'خطا در ارسال ایمیل تست. لطفاً تنظیمات را بررسی کنید.'})
     except Exception as e:
-        logger.error(f"Error sending test email: {str(e)}")
-        return jsonify({'success': False, 'message': f'Error: {str(e)}'})
+        logger.error(f"خطا در ارسال ایمیل تست: {str(e)}")
+        return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
 
 @app.route('/api/test-notification', methods=['POST'])
 def test_notification():
@@ -1286,6 +1296,8 @@ def update_notification_settings():
         # ذخیره تنظیمات در سشن
         session['sms_enabled'] = settings.get('sms_enabled', False)
         session['phone_number'] = settings.get('phone_number', '')
+        session['email_enabled'] = settings.get('email_enabled', False)
+        session['email_address'] = settings.get('email_address', '')
         session['buy_sell_enabled'] = settings.get('buy_sell_enabled', True)
         session['buy_sell_sensitivity'] = settings.get('buy_sell_sensitivity', 'medium')
         session['buy_sell_frequency'] = settings.get('buy_sell_frequency', '3')

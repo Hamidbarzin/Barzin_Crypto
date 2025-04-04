@@ -17,8 +17,9 @@ import os
 import sys
 import time
 from datetime import datetime
-import schedule
+import json
 import requests
+import schedule
 
 # تنظیم لاگینگ
 logging.basicConfig(
@@ -31,6 +32,53 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger('crypto_scheduler')
+
+# ماژول‌های اطلاع‌رسانی
+try:
+    from crypto_bot.notification_service import send_buy_sell_notification, send_volatility_alert, send_market_trend_alert
+except ImportError:
+    logger.warning("ماژول notification_service در دسترس نیست")
+
+try:
+    from crypto_bot.email_notifications import send_buy_sell_email, send_volatility_email, send_market_trend_email
+except ImportError:
+    logger.warning("ماژول email_notifications در دسترس نیست")
+
+# پیکربندی معادل‌های اعلان ایمیلی و پیامکی به صورت دیکشنری
+# این تابع بعداً مقداردهی می‌شود (پس از import کردن ماژول‌های مورد نیاز)
+notification_methods = {
+    'sms': {},
+    'email': {}
+}
+
+# پس از اینکه همه ماژول‌ها import شدند، پر کردن این دیکشنری
+try:
+    notification_methods['sms'] = {
+        'buy_sell': send_buy_sell_notification,
+        'volatility': send_volatility_alert,
+        'market_trend': send_market_trend_alert
+    }
+except NameError:
+    logger.warning("توابع اعلان پیامکی در دسترس نیستند")
+    notification_methods['sms'] = {
+        'buy_sell': None,
+        'volatility': None,
+        'market_trend': None
+    }
+
+try:
+    notification_methods['email'] = {
+        'buy_sell': send_buy_sell_email,
+        'volatility': send_volatility_email,
+        'market_trend': send_market_trend_email
+    }
+except NameError:
+    logger.warning("توابع اعلان ایمیلی در دسترس نیستند")
+    notification_methods['email'] = {
+        'buy_sell': None,
+        'volatility': None,
+        'market_trend': None
+    }
 
 # آدرس پایه برنامه
 BASE_URL = "http://localhost:5000"
@@ -100,8 +148,42 @@ def check_buy_sell_opportunities():
         if response.status_code == 200:
             data = response.json()
             if data.get('success') and len(data.get('data', [])) > 0:
-                # در اینجا می‌توان منطق اضافی برای ارسال اعلان‌ها قرار داد
-                logger.info(f"تعداد {len(data.get('data'))} فرصت خرید و فروش یافت شد")
+                opportunities = data.get('data', [])
+                logger.info(f"تعداد {len(opportunities)} فرصت خرید و فروش یافت شد")
+                
+                # پیکربندی اعلان‌ها با احتمال عدم دسترسی به سرویس
+                try:
+                    # ارسال اعلان از طریق ایمیل
+                    if notification_methods['email']['buy_sell']:
+                        for opportunity in opportunities:
+                            symbol = opportunity.get('symbol', 'نامشخص')
+                            action = opportunity.get('action', 'نامشخص')
+                            price = opportunity.get('price', 0)
+                            reason = opportunity.get('reason', 'دلایل فنی')
+                            
+                            # دریافت اطلاعات ایمیل از تنظیمات برنامه
+                            response_settings = requests.get(f"{REPLIT_PROXY}/api/notification-settings", timeout=5)
+                            if response_settings.status_code == 200:
+                                settings = response_settings.json().get('data', {})
+                                email = settings.get('email', os.environ.get('DEFAULT_EMAIL'))
+                                
+                                if email:
+                                    # ارسال ایمیل اعلان خرید/فروش
+                                    notification_methods['email']['buy_sell'](email, symbol, action, price, reason)
+                                    logger.info(f"اعلان فرصت {action} برای {symbol} به {email} ارسال شد")
+                                else:
+                                    logger.warning("آدرس ایمیل برای ارسال اعلان در دسترس نیست")
+                            else:
+                                logger.warning(f"خطا در دریافت تنظیمات اعلان: {response_settings.status_code}")
+                    else:
+                        logger.warning("سرویس ارسال ایمیل در دسترس نیست")
+                    
+                    # در صورتی که ارسال پیامک نیز فعال باشد
+                    if notification_methods['sms']['buy_sell']:
+                        # کد مربوط به ارسال پیامک
+                        pass
+                except Exception as notify_error:
+                    logger.error(f"خطا در ارسال اعلان خرید و فروش: {str(notify_error)}")
             else:
                 logger.info("فرصت خرید و فروش جدیدی یافت نشد")
         else:
@@ -116,7 +198,42 @@ def check_market_volatility():
         if response.status_code == 200:
             data = response.json()
             if data.get('success') and len(data.get('data', [])) > 0:
-                logger.info(f"تعداد {len(data.get('data'))} نوسان بازار یافت شد")
+                volatilities = data.get('data', [])
+                logger.info(f"تعداد {len(volatilities)} نوسان بازار یافت شد")
+                
+                # پیکربندی اعلان‌ها
+                try:
+                    # ارسال اعلان از طریق ایمیل
+                    if notification_methods['email']['volatility']:
+                        for volatility in volatilities:
+                            symbol = volatility.get('symbol', 'نامشخص')
+                            price = volatility.get('price', 0)
+                            change_percent = volatility.get('change_percent', 0)
+                            timeframe = volatility.get('timeframe', '1h')
+                            
+                            # دریافت اطلاعات ایمیل از تنظیمات برنامه
+                            response_settings = requests.get(f"{REPLIT_PROXY}/api/notification-settings", timeout=5)
+                            if response_settings.status_code == 200:
+                                settings = response_settings.json().get('data', {})
+                                email = settings.get('email', os.environ.get('DEFAULT_EMAIL'))
+                                
+                                if email:
+                                    # ارسال ایمیل اعلان نوسان بازار
+                                    notification_methods['email']['volatility'](email, symbol, price, change_percent, timeframe)
+                                    logger.info(f"اعلان نوسان {change_percent}% برای {symbol} به {email} ارسال شد")
+                                else:
+                                    logger.warning("آدرس ایمیل برای ارسال اعلان در دسترس نیست")
+                            else:
+                                logger.warning(f"خطا در دریافت تنظیمات اعلان: {response_settings.status_code}")
+                    else:
+                        logger.warning("سرویس ارسال ایمیل برای اعلان نوسانات در دسترس نیست")
+                    
+                    # در صورتی که ارسال پیامک نیز فعال باشد
+                    if notification_methods['sms']['volatility']:
+                        # کد مربوط به ارسال پیامک
+                        pass
+                except Exception as notify_error:
+                    logger.error(f"خطا در ارسال اعلان نوسان بازار: {str(notify_error)}")
             else:
                 logger.info("نوسان مهمی در بازار مشاهده نشد")
         else:
@@ -131,8 +248,39 @@ def check_market_trend():
         if response.status_code == 200:
             data = response.json()
             if data.get('success'):
-                trend = data.get('data', {}).get('trend', 'نامشخص')
+                trend_data = data.get('data', {})
+                trend = trend_data.get('trend', 'نامشخص')
+                affected_coins = trend_data.get('affected_coins', [])
+                reason = trend_data.get('reason', 'دلایل تکنیکال و بنیادی')
                 logger.info(f"روند فعلی بازار: {trend}")
+                
+                # ارسال اعلان روند بازار
+                try:
+                    # ارسال اعلان از طریق ایمیل
+                    if notification_methods['email']['market_trend']:
+                        # دریافت اطلاعات ایمیل از تنظیمات برنامه
+                        response_settings = requests.get(f"{REPLIT_PROXY}/api/notification-settings", timeout=5)
+                        if response_settings.status_code == 200:
+                            settings = response_settings.json().get('data', {})
+                            email = settings.get('email', os.environ.get('DEFAULT_EMAIL'))
+                            
+                            if email:
+                                # ارسال ایمیل اعلان روند بازار
+                                notification_methods['email']['market_trend'](email, trend, affected_coins, reason)
+                                logger.info(f"اعلان روند {trend} بازار به {email} ارسال شد")
+                            else:
+                                logger.warning("آدرس ایمیل برای ارسال اعلان در دسترس نیست")
+                        else:
+                            logger.warning(f"خطا در دریافت تنظیمات اعلان: {response_settings.status_code}")
+                    else:
+                        logger.warning("سرویس ارسال ایمیل برای اعلان روند بازار در دسترس نیست")
+                    
+                    # در صورتی که ارسال پیامک نیز فعال باشد
+                    if notification_methods['sms']['market_trend']:
+                        # کد مربوط به ارسال پیامک
+                        pass
+                except Exception as notify_error:
+                    logger.error(f"خطا در ارسال اعلان روند بازار: {str(notify_error)}")
             else:
                 logger.info("اطلاعات روند بازار در دسترس نیست")
         else:
