@@ -93,15 +93,28 @@ def send_telegram_message(chat_id, message, parse_mode='HTML'):
         else:
             parse_mode_enum = parse_mode
         
-        # ایجاد بات و اجرای آسنکرون برای ارسال پیام
-        bot = _telegram.Bot(token=TELEGRAM_BOT_TOKEN)
-        
         # ایجاد یک لوپ آسنکرون برای اجرای کد آسنکرون
         async def send_message_async():
+            # ایجاد بات داخل تابع آسنکرون
+            bot = _telegram.Bot(token=TELEGRAM_BOT_TOKEN)
+            # ارسال پیام
             await bot.send_message(chat_id=chat_id, text=message, parse_mode=parse_mode_enum)
             
-        # اجرای تابع آسنکرون
-        asyncio.run(send_message_async())
+        # بررسی وجود لوپ رویداد و اجرای تابع آسنکرون
+        try:
+            # اگر لوپ رویداد در حال اجرا باشد
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # ایجاد تسک جدید در لوپ موجود
+                future = asyncio.run_coroutine_threadsafe(send_message_async(), loop)
+                # منتظر اتمام تسک می‌مانیم
+                future.result(timeout=10)  # تایم‌اوت 10 ثانیه
+            else:
+                # اجرا در لوپ فعلی
+                loop.run_until_complete(send_message_async())
+        except RuntimeError:
+            # اگر لوپ رویداد وجود نداشته باشد، یک لوپ جدید ایجاد می‌کنیم
+            asyncio.run(send_message_async())
         
         logger.info(f"پیام با موفقیت به چت {chat_id} ارسال شد")
         return True
@@ -253,14 +266,26 @@ def get_bot_info():
         }
 
     try:
-        bot = _telegram.Bot(token=TELEGRAM_BOT_TOKEN)
-        
         # ایجاد یک تابع آسنکرون
         async def get_me_async():
+            bot = _telegram.Bot(token=TELEGRAM_BOT_TOKEN)
             return await bot.get_me()
         
-        # اجرای تابع آسنکرون و دریافت نتیجه
-        me = asyncio.run(get_me_async())
+        # بررسی وجود لوپ رویداد و اجرای تابع آسنکرون
+        try:
+            # اگر لوپ رویداد در حال اجرا باشد
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # ایجاد تسک جدید در لوپ موجود
+                future = asyncio.run_coroutine_threadsafe(get_me_async(), loop)
+                # منتظر اتمام تسک می‌مانیم
+                me = future.result(timeout=10)  # تایم‌اوت 10 ثانیه
+            else:
+                # اجرا در لوپ فعلی
+                me = loop.run_until_complete(get_me_async())
+        except RuntimeError:
+            # اگر لوپ رویداد وجود نداشته باشد، یک لوپ جدید ایجاد می‌کنیم
+            me = asyncio.run(get_me_async())
         
         return {
             "available": True,
