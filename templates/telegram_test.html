@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // ارسال درخواست با چت آیدی
+        // ارسال درخواست به سرور مستقیماً
         fetch('/api/test-telegram', {
             method: 'POST',
             headers: {
@@ -125,6 +125,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const resultContainer = document.getElementById('resultContainer');
                 resultContainer.classList.remove('d-none', 'alert-success', 'alert-danger');
                 resultContainer.classList.add('d-block');
+                
+                // همیشه نتیجه را در کنسول نمایش می‌دهیم برای عیب‌یابی
+                console.log('Server response:', data);
                 
                 if (data.success) {
                     resultContainer.classList.add('alert-success');
