@@ -92,6 +92,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ارسال پیام تست
     document.getElementById('sendTestButton').addEventListener('click', function() {
+        // حذف هر نتیجه قبلی
+        const resultContainer = document.getElementById('resultContainer');
+        resultContainer.classList.remove('d-none', 'alert-success', 'alert-danger');
+        resultContainer.innerHTML = '';
+        
         const button = this;
         const originalText = button.innerHTML;
         button.disabled = true;
@@ -101,8 +106,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const chatId = document.getElementById('chatIdInput').value;
         
         if (!chatId) {
-            const resultContainer = document.getElementById('resultContainer');
-            resultContainer.classList.remove('d-none', 'alert-success');
             resultContainer.classList.add('alert-danger', 'd-block');
             resultContainer.innerHTML = '<strong>خطا!</strong> لطفاً چت آیدی خود را وارد کنید.';
             
@@ -110,6 +113,10 @@ document.addEventListener('DOMContentLoaded', function() {
             button.innerHTML = originalText;
             return;
         }
+        
+        // نمایش پیغام در حال پردازش
+        resultContainer.classList.add('alert-info', 'd-block');
+        resultContainer.innerHTML = '<strong>درحال پردازش...</strong> در حال ارسال پیام به تلگرام، لطفاً منتظر بمانید.';
         
         // ارسال درخواست به سرور مستقیماً
         fetch('/api/test-telegram', {
@@ -119,19 +126,23 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({ chat_id: chatId })
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('خطا در دریافت پاسخ از سرور: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 // نمایش نتیجه
-                const resultContainer = document.getElementById('resultContainer');
-                resultContainer.classList.remove('d-none', 'alert-success', 'alert-danger');
-                resultContainer.classList.add('d-block');
+                resultContainer.classList.remove('alert-info');
                 
                 // همیشه نتیجه را در کنسول نمایش می‌دهیم برای عیب‌یابی
                 console.log('Server response:', data);
                 
                 if (data.success) {
                     resultContainer.classList.add('alert-success');
-                    resultContainer.innerHTML = '<strong>موفقیت!</strong> ' + data.message;
+                    resultContainer.innerHTML = '<strong>موفقیت!</strong> ' + data.message + 
+                                              '<br><small>اگر چت آیدی شما صحیح باشد و شما با بات گفتگو را آغاز کرده باشید، باید پیام را در تلگرام خود دریافت کنید.</small>';
                 } else {
                     resultContainer.classList.add('alert-danger');
                     resultContainer.innerHTML = '<strong>خطا!</strong> ' + data.message;
@@ -143,8 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error sending test message:', error);
-                const resultContainer = document.getElementById('resultContainer');
-                resultContainer.classList.remove('d-none', 'alert-success');
+                resultContainer.classList.remove('alert-info');
                 resultContainer.classList.add('alert-danger', 'd-block');
                 resultContainer.innerHTML = '<strong>خطا!</strong> مشکلی در ارتباط با سرور رخ داده است: ' + error.message;
                 

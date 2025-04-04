@@ -979,10 +979,21 @@ def telegram_bot_info():
     
     try:
         bot_info = get_bot_info()
+        logger.info(f"اطلاعات بات تلگرام: {bot_info}")
         return jsonify({'success': True, 'data': bot_info})
     except Exception as e:
         logger.error(f"خطا در دریافت اطلاعات بات تلگرام: {str(e)}")
-        return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
+        return jsonify({
+            'success': False, 
+            'message': f'خطا: {str(e)}',
+            'data': {
+                'available': False,
+                'username': 'GrowthFinderBot',  # اطلاعات ثابت در صورت خطا
+                'link': 'https://t.me/GrowthFinderBot',
+                'name': 'CryptoSage Bot',
+                'message': 'لطفاً تنظیمات تلگرام را بررسی کنید. متغیر محیطی TELEGRAM_BOT_TOKEN را در بخش Secrets در Replit تنظیم کنید.'
+            }
+        })
         
 @app.route('/api/telegram-chat-debug')
 def telegram_chat_debug():
