@@ -140,14 +140,17 @@ document.addEventListener('DOMContentLoaded', function() {
      * دریافت پیش‌بینی قیمت
      */
     function fetchPricePrediction(symbol, timeframe) {
+        console.log(`Fetching price prediction for ${symbol} with timeframe ${timeframe}`);
         return fetch(`/api/ai/price-prediction/${encodeURIComponent(symbol)}?timeframe=${timeframe}`)
             .then(response => {
+                console.log('Price prediction response status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
+                console.log('Price prediction data received:', data);
                 if (data.success) {
                     updatePricePredictionUI(data.data, timeframe);
                 } else {
@@ -163,14 +166,17 @@ document.addEventListener('DOMContentLoaded', function() {
      * دریافت الگوهای قیمت
      */
     function fetchPricePatterns(symbol) {
+        console.log(`Fetching price patterns for ${symbol}`);
         return fetch(`/api/ai/price-patterns/${encodeURIComponent(symbol)}`)
             .then(response => {
+                console.log('Price patterns response status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
+                console.log('Price patterns data received:', data);
                 if (data.success) {
                     updatePatternsUI(data.data);
                 } else {
