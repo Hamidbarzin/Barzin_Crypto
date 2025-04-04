@@ -505,6 +505,8 @@ def notification_settings():
         'phone_number': session.get('phone_number', ''),
         'email_enabled': session.get('email_enabled', False),
         'email_address': session.get('email_address', ''),
+        'telegram_enabled': session.get('telegram_enabled', False),
+        'telegram_chat_id': session.get('telegram_chat_id', ''),
         'buy_sell_enabled': session.get('buy_sell_enabled', True),
         'buy_sell_sensitivity': session.get('buy_sell_sensitivity', 'medium'),
         'buy_sell_frequency': session.get('buy_sell_frequency', '3'),
@@ -1298,6 +1300,8 @@ def update_notification_settings():
         session['phone_number'] = settings.get('phone_number', '')
         session['email_enabled'] = settings.get('email_enabled', False)
         session['email_address'] = settings.get('email_address', '')
+        session['telegram_enabled'] = settings.get('telegram_enabled', False)
+        session['telegram_chat_id'] = settings.get('telegram_chat_id', '')
         session['buy_sell_enabled'] = settings.get('buy_sell_enabled', True)
         session['buy_sell_sensitivity'] = settings.get('buy_sell_sensitivity', 'medium')
         session['buy_sell_frequency'] = settings.get('buy_sell_frequency', '3')
@@ -1323,6 +1327,105 @@ def update_notification_settings():
 
 # این نسخه تکراری از تابع get_market_trend است و حذف شد
 # زیرا قبلاً در مسیر '/api/market-trend' تعریف شده است
+
+@app.route('/api/test-telegram', methods=['POST'])
+def test_telegram():
+    """ارسال پیام تلگرام تست برای بررسی عملکرد اعلان‌ها"""
+    data = request.get_json()
+    
+    if not data or 'chat_id' not in data:
+        return jsonify({
+            'success': False,
+            'message': 'شناسه چت تلگرام الزامی است'
+        })
+    
+    chat_id = data.get('chat_id', '')
+    
+    try:
+        from crypto_bot import telegram_service
+        
+        # بررسی دسترسی به تلگرام
+        if not telegram_service.TELEGRAM_AVAILABLE:
+            return jsonify({
+                'success': False,
+                'message': 'کتابخانه python-telegram-bot نصب نشده است. لطفاً آن را نصب کنید.'
+            })
+            
+        # بررسی توکن بات تلگرام
+        if not telegram_service.TELEGRAM_BOT_TOKEN:
+            return jsonify({
+                'success': False,
+                'message': 'توکن بات تلگرام تنظیم نشده است. لطفاً آن را در متغیرهای محیطی تنظیم کنید.'
+            })
+        
+        result = telegram_service.send_test_notification(chat_id)
+        
+        # ثبت کاربر در صورت موفقیت
+        if result.get('success', False):
+            telegram_service.register_user(chat_id)
+            
+        return jsonify(result)
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'message': 'ماژول اعلان تلگرام در دسترس نیست'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'خطا در ارسال پیام تلگرام: {str(e)}'
+        })
+
+@app.route('/api/telegram-bot-info', methods=['GET'])
+def telegram_bot_info():
+    """دریافت اطلاعات بات تلگرام"""
+    try:
+        from crypto_bot import telegram_service
+        
+        # بررسی دسترسی به تلگرام
+        if not telegram_service.TELEGRAM_AVAILABLE:
+            return jsonify({
+                'success': False,
+                'message': 'کتابخانه python-telegram-bot نصب نشده است. لطفاً آن را نصب کنید.',
+                'data': {
+                    'available': False,
+                    'message': 'کتابخانه python-telegram-bot نصب نشده است'
+                }
+            })
+            
+        # بررسی توکن بات تلگرام
+        if not telegram_service.TELEGRAM_BOT_TOKEN:
+            return jsonify({
+                'success': False,
+                'message': 'توکن بات تلگرام تنظیم نشده است. لطفاً آن را در متغیرهای محیطی تنظیم کنید.',
+                'data': {
+                    'available': False,
+                    'message': 'توکن بات تلگرام تنظیم نشده است'
+                }
+            })
+        
+        bot_info = telegram_service.get_bot_info()
+        
+        if bot_info:
+            return jsonify({
+                'success': True,
+                'data': bot_info
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'اطلاعات بات تلگرام در دسترس نیست'
+            })
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'message': 'ماژول اعلان تلگرام در دسترس نیست'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'خطا در دریافت اطلاعات بات: {str(e)}'
+        })
 
 @app.route('/api/email-message')
 def get_email_message():

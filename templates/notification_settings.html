@@ -171,6 +171,45 @@
                             </div>
                         </div>
 
+                        <!-- تنظیمات اعلان‌های تلگرام -->
+                        <div class="section-title mb-3 border-bottom pb-2">
+                            <h5>اعلان‌های تلگرام</h5>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="telegram_enabled" name="telegram_enabled" 
+                                           {% if notification_settings.telegram_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="telegram_enabled">فعال‌سازی اعلان‌های تلگرام</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="telegram_chat_id" class="form-label">شناسه چت تلگرام</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fab fa-telegram"></i></span>
+                                        <input type="text" class="form-control" id="telegram_chat_id" name="telegram_chat_id" 
+                                               placeholder="123456789" value="{{ notification_settings.telegram_chat_id }}">
+                                    </div>
+                                    <div class="form-text">شناسه چت خود را از بات <span id="botUsername" class="text-info">@CryptoAnalysisBot</span> دریافت کنید.</div>
+                                </div>
+                                <div id="telegramBotInfo" class="alert alert-info mb-3">
+                                    <p class="mb-2"><i class="fab fa-telegram me-2"></i> بات تلگرام: <strong id="botName">در حال بارگذاری...</strong></p>
+                                    <p class="mb-0">برای دریافت اعلان‌ها، با بات <a href="#" id="botLink" target="_blank">کلیک کنید</a> چت کنید و دستور /start را ارسال کنید.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">ارسال پیام تست تلگرام</label>
+                                    <button type="button" class="btn btn-outline-primary w-100" id="testTelegramButton">
+                                        <i class="fab fa-telegram me-2"></i>
+                                        ارسال پیام تست
+                                    </button>
+                                </div>
+                                <div id="testTelegramResult" class="alert alert-info d-none mt-2">
+                                    نتیجه تست تلگرام اینجا نمایش داده می‌شود
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- تنظیمات اعلان‌های ایمیلی -->
                         <div class="section-title mb-3 border-bottom pb-2">
                             <h5>اعلان‌های ایمیلی</h5>
@@ -226,6 +265,9 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // دریافت اطلاعات بات تلگرام
+    fetchTelegramBotInfo();
+    
     // فرم تنظیمات اعلان‌ها
     const notificationForm = document.getElementById('notificationSettingsForm');
     if (notificationForm) {
@@ -242,10 +284,12 @@ document.addEventListener('DOMContentLoaded', function() {
             settings.volatility_enabled = formData.get('volatility_enabled') === 'on';
             settings.market_trend_enabled = formData.get('market_trend_enabled') === 'on';
             settings.email_enabled = formData.get('email_enabled') === 'on';
+            settings.telegram_enabled = formData.get('telegram_enabled') === 'on';
             
             // اضافه کردن سایر فیلدها
             settings.phone_number = formData.get('phone_number');
             settings.email_address = formData.get('email_address');
+            settings.telegram_chat_id = formData.get('telegram_chat_id');
             settings.buy_sell_sensitivity = formData.get('buy_sell_sensitivity');
             settings.buy_sell_frequency = formData.get('buy_sell_frequency');
             settings.start_hour = parseInt(formData.get('start_hour'));
@@ -399,6 +443,83 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+    
+    // دکمه ارسال پیام تست تلگرام
+    const testTelegramButton = document.getElementById('testTelegramButton');
+    const testTelegramResult = document.getElementById('testTelegramResult');
+    if (testTelegramButton && testTelegramResult) {
+        testTelegramButton.addEventListener('click', function() {
+            const chatId = document.getElementById('telegram_chat_id').value;
+            if (!chatId) {
+                testTelegramResult.textContent = 'لطفاً ابتدا شناسه چت تلگرام را وارد کنید';
+                testTelegramResult.classList.remove('d-none', 'alert-success', 'alert-info');
+                testTelegramResult.classList.add('alert-danger');
+                return;
+            }
+            
+            // نمایش وضعیت در حال پردازش
+            testTelegramResult.textContent = 'در حال ارسال پیام تست...';
+            testTelegramResult.classList.remove('d-none', 'alert-success', 'alert-danger');
+            testTelegramResult.classList.add('alert-info');
+            
+            // ارسال درخواست
+            fetch('/api/test-telegram', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ chat_id: chatId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // نمایش پیام موفقیت
+                    testTelegramResult.textContent = 'پیام تست تلگرام با موفقیت ارسال شد';
+                    testTelegramResult.classList.remove('alert-info', 'alert-danger');
+                    testTelegramResult.classList.add('alert-success');
+                } else {
+                    // نمایش پیام خطا
+                    testTelegramResult.textContent = `خطا در ارسال پیام تلگرام: ${data.message}`;
+                    testTelegramResult.classList.remove('alert-info', 'alert-success');
+                    testTelegramResult.classList.add('alert-danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending test telegram message:', error);
+                testTelegramResult.textContent = 'خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.';
+                testTelegramResult.classList.remove('alert-info', 'alert-success');
+                testTelegramResult.classList.add('alert-danger');
+            });
+        });
+    }
 });
+
+// دریافت اطلاعات بات تلگرام
+function fetchTelegramBotInfo() {
+    fetch('/api/telegram-bot-info')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                const botInfo = data.data;
+                document.getElementById('botName').textContent = botInfo.name;
+                document.getElementById('botUsername').textContent = '@' + botInfo.username;
+                document.getElementById('botLink').href = botInfo.link;
+                
+                // نمایش اطلاعات بات
+                document.getElementById('telegramBotInfo').classList.remove('alert-info');
+                document.getElementById('telegramBotInfo').classList.add('alert-success');
+            } else {
+                document.getElementById('botName').textContent = 'خطا در دریافت اطلاعات بات';
+                document.getElementById('telegramBotInfo').classList.remove('alert-info');
+                document.getElementById('telegramBotInfo').classList.add('alert-warning');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching bot info:', error);
+            document.getElementById('botName').textContent = 'خطا در ارتباط با سرور';
+            document.getElementById('telegramBotInfo').classList.remove('alert-info');
+            document.getElementById('telegramBotInfo').classList.add('alert-danger');
+        });
+}
 </script>
 {% endblock %}
