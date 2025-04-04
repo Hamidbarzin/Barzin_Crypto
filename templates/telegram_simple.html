@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}تست ساده ارسال پیام تلگرام{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">تست ساده ارسال پیام تلگرام</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info" id="botInfo">
+                <h5 class="mb-3">اطلاعات بات</h5>
+                <p>نام: CryptoSage</p>
+                <p>نام کاربری: @GrowthFinderBot</p>
+                <p>لینک: <a href="https://t.me/GrowthFinderBot" target="_blank">@GrowthFinderBot</a></p>
+            </div>
+            
+            <div class="mb-4">
+                <h5 class="mb-3">ارسال پیام تست</h5>
+                <p>برای آزمایش عملکرد اعلان‌های تلگرام، روی دکمه زیر کلیک کنید.</p>
+                
+                <form action="/api/test-telegram" method="post" id="telegramTestForm">
+                    <div class="mb-3">
+                        <label for="chatIdInput" class="form-label">چت آیدی تلگرام</label>
+                        <input type="number" class="form-control" id="chatIdInput" name="chat_id" value="722627622" required>
+                        <small class="form-text text-muted">
+                            برای دریافت چت آیدی خود، با ربات <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a> در تلگرام صحبت کنید.
+                        </small>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-paper-plane me-2"></i>
+                            ارسال پیام تست
+                        </button>
+                        <a href="/" class="btn btn-secondary">
+                            <i class="fa fa-home me-2"></i>
+                            بازگشت به صفحه اصلی
+                        </a>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="resultContainer" class="alert d-none mt-3">
+            </div>
+            
+            <div class="mt-4">
+                <h5 class="mb-3">راهنمای اتصال به بات</h5>
+                <ol>
+                    <li>در تلگرام جستجو کنید: @GrowthFinderBot</li>
+                    <li>روی دکمه Start یا شروع کلیک کنید</li>
+                    <li>دکمه «ارسال پیام تست» را بزنید تا یک پیام تست دریافت کنید</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handling form submission
+    const form = document.getElementById('telegramTestForm');
+    const resultContainer = document.getElementById('resultContainer');
+    
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        // Clear previous results
+        resultContainer.classList.remove('d-none', 'alert-success', 'alert-danger', 'alert-info');
+        resultContainer.innerHTML = '';
+        
+        // Show loading message
+        resultContainer.classList.add('alert-info', 'd-block');
+        resultContainer.innerHTML = '<strong>در حال ارسال...</strong> لطفاً منتظر بمانید.';
+        
+        // Get chat ID
+        const chatId = document.getElementById('chatIdInput').value;
+        
+        // Send POST request to the API
+        fetch('/api/test-telegram', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ chat_id: chatId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response:', data);
+            
+            resultContainer.classList.remove('alert-info');
+            
+            if (data.success) {
+                resultContainer.classList.add('alert-success');
+                resultContainer.innerHTML = '<strong>موفقیت!</strong> ' + data.message + 
+                                           '<br><small>پیام به تلگرام شما ارسال شد. اگر آن را دریافت نکردید، چت آیدی را بررسی کنید و مطمئن شوید که با بات گفتگو را آغاز کرده‌اید.</small>';
+            } else {
+                resultContainer.classList.add('alert-danger');
+                resultContainer.innerHTML = '<strong>خطا!</strong> ' + data.message;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            resultContainer.classList.remove('alert-info');
+            resultContainer.classList.add('alert-danger');
+            resultContainer.innerHTML = '<strong>خطای سیستمی!</strong> خطا در ارتباط با سرور: ' + error.message;
+        });
+    });
+});
+</script>
+{% endblock %}

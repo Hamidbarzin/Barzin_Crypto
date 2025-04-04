@@ -921,6 +921,11 @@ def test_notification():
 def telegram_test_page():
     """صفحه تست تلگرام"""
     return render_template('telegram_test.html')
+    
+@app.route('/telegram_simple', methods=['GET'])
+def telegram_simple_page():
+    """صفحه ساده تست تلگرام"""
+    return render_template('telegram_simple.html')
 
 @app.route('/telegram', methods=['GET'])
 @app.route('/test_telegram', methods=['GET'])
