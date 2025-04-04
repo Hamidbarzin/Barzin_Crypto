@@ -68,7 +68,7 @@ def initialize_bot():
         return None
 
 
-def send_telegram_message(chat_id, message, parse_mode='HTML'):
+def send_telegram_message(chat_id, message, parse_mode='HTML', max_retries=3, retry_delay=1):
     """
     ارسال پیام متنی به کاربر از طریق تلگرام
 
@@ -76,6 +76,8 @@ def send_telegram_message(chat_id, message, parse_mode='HTML'):
         chat_id (int or str): شناسه چت کاربر
         message (str): متن پیام
         parse_mode (str): نوع پارس پیام ('HTML' یا 'Markdown')
+        max_retries (int): حداکثر تعداد تلاش‌های مجدد در صورت خطا
+        retry_delay (int): تاخیر به ثانیه بین تلاش‌های مجدد
 
     Returns:
         bool: آیا ارسال موفقیت‌آمیز بود
@@ -84,7 +86,9 @@ def send_telegram_message(chat_id, message, parse_mode='HTML'):
         logger.error("کتابخانه تلگرام نصب نشده است")
         return False
         
-    if not TELEGRAM_BOT_TOKEN:
+    # بررسی مجدد توکن تلگرام از متغیرهای محیطی
+    token = os.environ.get("TELEGRAM_BOT_TOKEN") or TELEGRAM_BOT_TOKEN
+    if not token:
         logger.error("توکن بات تلگرام تنظیم نشده است")
         return False
         
@@ -96,46 +100,65 @@ def send_telegram_message(chat_id, message, parse_mode='HTML'):
         logger.warning(f"خطا در تبدیل چت آیدی به عدد: {str(e)}")
         # ادامه کار بدون تبدیل
 
-    try:
-        # تبدیل ParseMode به نوع مناسب
-        if parse_mode == 'HTML':
-            parse_mode_enum = ParseMode.HTML
-        elif parse_mode == 'Markdown':
-            parse_mode_enum = ParseMode.MARKDOWN_V2
-        else:
-            parse_mode_enum = parse_mode
-        
-        # اضافه کردن اطلاعات دیباگ
-        logger.info(f"تلاش برای ارسال پیام به چت آیدی: {chat_id} (نوع: {type(chat_id).__name__})")
-        
-        # ایجاد یک لوپ آسنکرون برای اجرای کد آسنکرون
-        async def send_message_async():
-            # ایجاد بات داخل تابع آسنکرون
-            bot = _telegram.Bot(token=TELEGRAM_BOT_TOKEN)
-            # ارسال پیام
-            await bot.send_message(chat_id=chat_id, text=message, parse_mode=parse_mode_enum)
-            
-        # بررسی وجود لوپ رویداد و اجرای تابع آسنکرون
+    # تبدیل ParseMode به نوع مناسب
+    if parse_mode == 'HTML':
+        parse_mode_enum = ParseMode.HTML
+    elif parse_mode == 'Markdown':
+        parse_mode_enum = ParseMode.MARKDOWN_V2
+    else:
+        parse_mode_enum = parse_mode
+    
+    # اضافه کردن اطلاعات دیباگ
+    logger.info(f"تلاش برای ارسال پیام به چت آیدی: {chat_id} (نوع: {type(chat_id).__name__})")
+    
+    # ایجاد یک لوپ آسنکرون برای اجرای کد آسنکرون
+    async def send_message_async():
+        # ایجاد بات داخل تابع آسنکرون
+        bot = _telegram.Bot(token=token)
+        # ارسال پیام
+        await bot.send_message(chat_id=chat_id, text=message, parse_mode=parse_mode_enum)
+    
+    # تلاش مجدد با تاخیر
+    retries = 0
+    last_error = None
+    
+    while retries <= max_retries:
         try:
-            # اگر لوپ رویداد در حال اجرا باشد
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                # ایجاد تسک جدید در لوپ موجود
-                future = asyncio.run_coroutine_threadsafe(send_message_async(), loop)
-                # منتظر اتمام تسک می‌مانیم
-                future.result(timeout=10)  # تایم‌اوت 10 ثانیه
+            # بررسی وجود لوپ رویداد و اجرای تابع آسنکرون
+            try:
+                # اگر لوپ رویداد در حال اجرا باشد
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # ایجاد تسک جدید در لوپ موجود
+                    future = asyncio.run_coroutine_threadsafe(send_message_async(), loop)
+                    # منتظر اتمام تسک می‌مانیم
+                    future.result(timeout=10)  # تایم‌اوت 10 ثانیه
+                else:
+                    # اجرا در لوپ فعلی
+                    loop.run_until_complete(send_message_async())
+            except RuntimeError:
+                # اگر لوپ رویداد وجود نداشته باشد، یک لوپ جدید ایجاد می‌کنیم
+                asyncio.run(send_message_async())
+            
+            logger.info(f"پیام با موفقیت به چت {chat_id} ارسال شد")
+            return True
+            
+        except Exception as e:
+            last_error = e
+            retries += 1
+            logger.warning(f"خطا در ارسال پیام تلگرام (تلاش {retries}/{max_retries}): {str(e)}")
+            
+            if retries <= max_retries:
+                logger.info(f"تلاش مجدد پس از {retry_delay} ثانیه...")
+                import time
+                time.sleep(retry_delay)  # تاخیر قبل از تلاش مجدد
             else:
-                # اجرا در لوپ فعلی
-                loop.run_until_complete(send_message_async())
-        except RuntimeError:
-            # اگر لوپ رویداد وجود نداشته باشد، یک لوپ جدید ایجاد می‌کنیم
-            asyncio.run(send_message_async())
-        
-        logger.info(f"پیام با موفقیت به چت {chat_id} ارسال شد")
-        return True
-    except Exception as e:
-        logger.error(f"خطا در ارسال پیام تلگرام: {str(e)}")
-        return False
+                logger.error(f"همه تلاش‌ها برای ارسال پیام به {chat_id} با شکست مواجه شد")
+                return False
+    
+    # اگر به اینجا برسیم، یعنی همه تلاش‌ها ناموفق بوده‌اند
+    logger.error(f"خطا در ارسال پیام تلگرام پس از {max_retries} تلاش: {str(last_error)}")
+    return False
 
 
 def register_user(chat_id, user_info=None):
@@ -313,12 +336,16 @@ def send_test_notification(chat_id=None):
             }
 
 
-def get_bot_info():
+def get_bot_info(max_retries=2, retry_delay=1):
     """
     دریافت اطلاعات بات تلگرام
 
+    Args:
+        max_retries (int): حداکثر تعداد تلاش‌های مجدد در صورت خطا
+        retry_delay (int): تاخیر به ثانیه بین تلاش‌های مجدد
+
     Returns:
-        dict: اطلاعات بات یا None در صورت خطا
+        dict: اطلاعات بات یا اطلاعات خطا
     """
     if not TELEGRAM_AVAILABLE or _telegram is None:
         logger.error("کتابخانه تلگرام نصب نشده است")
@@ -326,56 +353,84 @@ def get_bot_info():
             "available": False,
             "message": "کتابخانه python-telegram-bot نصب نشده است"
         }
-        
-    if not TELEGRAM_BOT_TOKEN:
+    
+    # بررسی مجدد توکن تلگرام از متغیرهای محیطی
+    token = os.environ.get("TELEGRAM_BOT_TOKEN") or TELEGRAM_BOT_TOKEN
+    if not token:
         logger.error("توکن بات تلگرام تنظیم نشده است")
         return {
             "available": False, 
-            "message": "توکن بات تلگرام تنظیم نشده است"
+            "message": "توکن بات تلگرام تنظیم نشده است. لطفاً متغیر محیطی TELEGRAM_BOT_TOKEN را تنظیم کنید."
         }
 
-    try:
-        # ایجاد یک تابع آسنکرون
-        async def get_me_async():
-            bot = _telegram.Bot(token=TELEGRAM_BOT_TOKEN)
-            return await bot.get_me()
-        
-        # بررسی وجود لوپ رویداد و اجرای تابع آسنکرون
+    # ایجاد یک تابع آسنکرون
+    async def get_me_async():
+        bot = _telegram.Bot(token=token)
+        return await bot.get_me()
+    
+    # تلاش چندباره با تاخیر
+    retries = 0
+    last_error = None
+    
+    while retries <= max_retries:
         try:
-            # اگر لوپ رویداد در حال اجرا باشد
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                # ایجاد تسک جدید در لوپ موجود
-                future = asyncio.run_coroutine_threadsafe(get_me_async(), loop)
-                # منتظر اتمام تسک می‌مانیم
-                me = future.result(timeout=10)  # تایم‌اوت 10 ثانیه
-            else:
-                # اجرا در لوپ فعلی
-                me = loop.run_until_complete(get_me_async())
-        except RuntimeError:
-            # اگر لوپ رویداد وجود نداشته باشد، یک لوپ جدید ایجاد می‌کنیم
-            me = asyncio.run(get_me_async())
+            # بررسی وجود لوپ رویداد و اجرای تابع آسنکرون
+            try:
+                # اگر لوپ رویداد در حال اجرا باشد
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # ایجاد تسک جدید در لوپ موجود
+                    future = asyncio.run_coroutine_threadsafe(get_me_async(), loop)
+                    # منتظر اتمام تسک می‌مانیم
+                    me = future.result(timeout=10)  # تایم‌اوت 10 ثانیه
+                else:
+                    # اجرا در لوپ فعلی
+                    me = loop.run_until_complete(get_me_async())
+            except RuntimeError:
+                # اگر لوپ رویداد وجود نداشته باشد، یک لوپ جدید ایجاد می‌کنیم
+                me = asyncio.run(get_me_async())
+            
+            return {
+                "available": True,
+                "id": me.id,
+                "name": me.first_name,
+                "username": me.username,
+                "link": f"https://t.me/{me.username}"
+            }
+        except Exception as e:
+            last_error = e
+            retries += 1
+            logger.warning(f"خطا در دریافت اطلاعات بات (تلاش {retries}/{max_retries}): {str(e)}")
+            
+            if retries <= max_retries:
+                logger.info(f"تلاش مجدد پس از {retry_delay} ثانیه...")
+                import time
+                time.sleep(retry_delay)  # تاخیر قبل از تلاش مجدد
+    
+    # اگر به اینجا برسیم، یعنی همه تلاش‌ها ناموفق بوده‌اند
+    error_msg = str(last_error) if last_error else "دلیل نامشخص"
+    logger.error(f"خطا در دریافت اطلاعات بات پس از {max_retries} تلاش: {error_msg}")
+    
+    # ارائه اطلاعات پیش‌فرض در صورت عدم دسترسی به API تلگرام
+    token_valid = bool(token and len(token) > 20)  # بررسی سریع معتبر بودن توکن
+    return {
+        "available": False,
+        "token_seems_valid": token_valid,
+        "message": f"خطای ارتباط با API تلگرام: {error_msg}",
+        "username": "GrowthFinderBot",  # اطلاعات ثابت در صورت عدم دسترسی به API
+        "link": "https://t.me/GrowthFinderBot",
+        "name": "CryptoSage Bot",
+        "id": 0
+    }
         
-        return {
-            "available": True,
-            "id": me.id,
-            "name": me.first_name,
-            "username": me.username,
-            "link": f"https://t.me/{me.username}"
-        }
-    except Exception as e:
-        logger.error(f"خطا در دریافت اطلاعات بات: {str(e)}")
-        return {
-            "available": False,
-            "message": f"خطا در دریافت اطلاعات بات: {str(e)}"
-        }
-        
-def get_chat_debug_info(chat_id=None):
+def get_chat_debug_info(chat_id=None, max_retries=2, retry_delay=1):
     """
     دریافت اطلاعات دیباگ برای یک چت
     
     Args:
         chat_id (int or str, optional): شناسه چت مورد نظر
+        max_retries (int): حداکثر تعداد تلاش‌های مجدد در صورت خطا
+        retry_delay (int): تاخیر به ثانیه بین تلاش‌های مجدد
         
     Returns:
         dict: اطلاعات دیباگ
@@ -385,17 +440,27 @@ def get_chat_debug_info(chat_id=None):
         "chat_info": None,
         "error": None,
         "telegram_available": TELEGRAM_AVAILABLE,
-        "token_available": bool(TELEGRAM_BOT_TOKEN),
+        "token_available": False,
+        "token_value_preview": "",
         "default_chat_id": CHAT_IDS.get('default'),
         "default_chat_id_type": type(CHAT_IDS.get('default')).__name__,
     }
     
+    # بررسی مجدد توکن تلگرام از متغیرهای محیطی
+    token = os.environ.get("TELEGRAM_BOT_TOKEN") or TELEGRAM_BOT_TOKEN
+    
+    # افزودن اطلاعات بیشتر درباره توکن تلگرام
+    if token:
+        debug_info["token_available"] = True
+        # نمایش بخشی از توکن برای دیباگ (با حفظ امنیت)
+        token_preview = f"{token[:5]}...{token[-4:]}" if len(token) > 10 else "توکن کوتاه (غیر معتبر)"
+        debug_info["token_value_preview"] = token_preview
+    else:
+        debug_info["error"] = "توکن بات تلگرام تنظیم نشده است"
+        return debug_info
+    
     if not TELEGRAM_AVAILABLE or _telegram is None:
         debug_info["error"] = "کتابخانه تلگرام نصب نشده است"
-        return debug_info
-        
-    if not TELEGRAM_BOT_TOKEN:
-        debug_info["error"] = "توکن بات تلگرام تنظیم نشده است"
         return debug_info
     
     if chat_id is None:
@@ -411,46 +476,73 @@ def get_chat_debug_info(chat_id=None):
     except Exception as e:
         debug_info["error"] = f"خطا در تبدیل چت آیدی: {str(e)}"
         return debug_info
-        
-    try:
-        # تلاش برای ارسال یک پیام تست و دریافت اطلاعات چت
-        async def get_chat_async():
-            bot = _telegram.Bot(token=TELEGRAM_BOT_TOKEN)
-            try:
-                chat = await bot.get_chat(chat_id=chat_id)
-                return {"success": True, "chat": chat}
-            except Exception as e:
-                return {"success": False, "error": str(e)}
-        
-        # استفاده از asyncio برای اجرای کد آسنکرون
+    
+    # تابع آسنکرون برای دریافت اطلاعات چت
+    async def get_chat_async():
+        bot = _telegram.Bot(token=token)
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                future = asyncio.run_coroutine_threadsafe(get_chat_async(), loop)
-                result = future.result(timeout=10)
+            chat = await bot.get_chat(chat_id=chat_id)
+            return {"success": True, "chat": chat}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    # تلاش چندباره با تاخیر
+    retries = 0
+    last_error = None
+    
+    while retries <= max_retries:
+        try:
+            # استفاده از asyncio برای اجرای کد آسنکرون
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    future = asyncio.run_coroutine_threadsafe(get_chat_async(), loop)
+                    result = future.result(timeout=10)
+                else:
+                    result = loop.run_until_complete(get_chat_async())
+            except RuntimeError:
+                result = asyncio.run(get_chat_async())
+                
+            if result["success"]:
+                chat = result["chat"]
+                debug_info["success"] = True
+                debug_info["chat_info"] = {
+                    "id": chat.id,
+                    "type": chat.type,
+                    "title": getattr(chat, "title", None),
+                    "username": getattr(chat, "username", None),
+                    "first_name": getattr(chat, "first_name", None),
+                    "last_name": getattr(chat, "last_name", None),
+                }
+                return debug_info
             else:
-                result = loop.run_until_complete(get_chat_async())
-        except RuntimeError:
-            result = asyncio.run(get_chat_async())
+                last_error = result["error"]
+                retries += 1
+                logger.warning(f"خطا در دریافت اطلاعات چت (تلاش {retries}/{max_retries}): {last_error}")
+                
+                if retries <= max_retries:
+                    logger.info(f"تلاش مجدد پس از {retry_delay} ثانیه...")
+                    import time
+                    time.sleep(retry_delay)  # تاخیر قبل از تلاش مجدد
+                else:
+                    debug_info["error"] = f"خطا در دریافت اطلاعات چت پس از چند تلاش: {last_error}"
+        except Exception as e:
+            last_error = str(e)
+            retries += 1
+            logger.warning(f"خطا در اجرای دیباگ چت (تلاش {retries}/{max_retries}): {last_error}")
             
-        if result["success"]:
-            chat = result["chat"]
-            debug_info["success"] = True
-            debug_info["chat_info"] = {
-                "id": chat.id,
-                "type": chat.type,
-                "title": getattr(chat, "title", None),
-                "username": getattr(chat, "username", None),
-                "first_name": getattr(chat, "first_name", None),
-                "last_name": getattr(chat, "last_name", None),
-            }
-        else:
-            debug_info["error"] = f"خطا در دریافت اطلاعات چت: {result['error']}"
-            
-        return debug_info
-    except Exception as e:
-        debug_info["error"] = f"خطا در اجرای دیباگ: {str(e)}"
-        return debug_info
+            if retries <= max_retries:
+                logger.info(f"تلاش مجدد پس از {retry_delay} ثانیه...")
+                import time
+                time.sleep(retry_delay)  # تاخیر قبل از تلاش مجدد
+            else:
+                debug_info["error"] = f"خطا در اجرای دیباگ چت: {last_error}"
+                
+    # اگر به اینجا برسیم، یعنی همه تلاش‌ها ناموفق بوده‌اند
+    error_msg = str(last_error) if last_error else "دلیل نامشخص"
+    logger.error(f"خطا در دریافت اطلاعات چت پس از {max_retries} تلاش: {error_msg}")
+    debug_info["error"] = error_msg
+    return debug_info
 
 
 def get_current_persian_time():
