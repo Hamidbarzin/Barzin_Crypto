@@ -41,30 +41,80 @@ except ImportError:
     logger.error("خطا در بارگذاری ماژول تحلیل تکنیکال")
     logger.error(traceback.format_exc())
 
+# وارد کردن ماژول API بازار
+try:
+    from crypto_bot.market_api import get_current_price, get_market_prices, test_api_connection
+    logger.info("ماژول API بازار با موفقیت بارگذاری شد")
+except ImportError:
+    logger.error("خطا در بارگذاری ماژول API بازار")
+    logger.error(traceback.format_exc())
+
 def get_price_report():
     """
-    تهیه گزارش قیمت ارزهای دیجیتال
-    در این نسخه ساده، از داده‌های ثابت استفاده می‌کنیم
+    تهیه گزارش قیمت ارزهای دیجیتال با استفاده از API بازار
     """
     try:
+        # تست اتصال به API
+        api_test = test_api_connection()
+        logger.info(f"نتیجه تست اتصال به API: {api_test}")
+        
         price_report = "🤖 *گزارش قیمت ارزهای دیجیتال*\n\n"
         
-        # افزودن قیمت‌های نمونه (در نسخه‌های آینده می‌توان از API واقعی استفاده کرد)
-        prices = [
-            "BTC/USDT: $67,345.20 (🟢 +2.3%)",
-            "ETH/USDT: $3,245.80 (🟢 +1.8%)",
-            "XRP/USDT: $0.5423 (🔴 -0.7%)",
-            "BNB/USDT: $532.40 (🟢 +0.5%)",
-            "SOL/USDT: $143.21 (🟢 +3.2%)"
-        ]
+        # لیست ارزهای مورد نظر
+        symbols = ["BTC/USDT", "ETH/USDT", "XRP/USDT", "BNB/USDT", "SOL/USDT"]
+        
+        # دریافت قیمت‌ها از API
+        market_data = get_market_prices(symbols)
+        
+        # تبدیل داده‌ها به متن گزارش
+        price_lines = []
+        for symbol, data in market_data.items():
+            if 'error' in data and data['error']:
+                # اگر خطایی در دریافت داده‌ها باشد، آن را گزارش می‌دهیم
+                logger.error(f"خطا در دریافت داده‌های {symbol}: {data['error_message']}")
+                continue
+                
+            price = data['price']
+            if price <= 0:
+                # اگر قیمت نامعتبر باشد، این ارز را رد می‌کنیم
+                continue
+                
+            change = data.get('change_percent', 0)
+            change_emoji = "🟢" if change >= 0 else "🔴"
+            change_sign = "+" if change >= 0 else ""
             
-        price_report += "\n".join(prices)
+            # قالب‌بندی قیمت بر اساس مقدار آن
+            if price >= 1000:
+                formatted_price = f"${price:,.2f}"
+            elif price >= 1:
+                formatted_price = f"${price:.2f}"
+            else:
+                formatted_price = f"${price:.6f}"
+                
+            price_line = f"{symbol}: {formatted_price} ({change_emoji} {change_sign}{change:.2f}%)"
+            price_lines.append(price_line)
+            
+        if price_lines:
+            price_report += "\n".join(price_lines)
+        else:
+            # اگر هیچ داده‌ای دریافت نشد، این پیام را نمایش می‌دهیم
+            price_report += "متأسفانه در حال حاضر اطلاعات قیمت‌ها در دسترس نیست.\n"
+            price_report += "سیستم در حال تلاش برای اتصال به منابع داده است."
+            
         price_report += "\n\n⏰ زمان گزارش: " + get_current_persian_time()
         
         return price_report
     except Exception as e:
-        logger.error(f"خطا در تهیه گزارش قیمت: {str(e)}")
-        return None
+        error_text = traceback.format_exc()
+        logger.error(f"خطا در تهیه گزارش قیمت: {str(e)}\n{error_text}")
+        
+        # در صورت بروز خطا، یک گزارش ساده برمی‌گردانیم
+        error_report = "🤖 *گزارش قیمت ارزهای دیجیتال*\n\n"
+        error_report += "متأسفانه در حال حاضر اطلاعات قیمت‌ها در دسترس نیست.\n"
+        error_report += "سیستم در حال تلاش برای اتصال به منابع داده است.\n\n"
+        error_report += "⏰ زمان گزارش: " + get_current_persian_time()
+        
+        return error_report
 
 def get_technical_report(symbol="BTC/USDT"):
     """
