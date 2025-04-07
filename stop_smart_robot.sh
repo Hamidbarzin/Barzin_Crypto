@@ -1,70 +1,45 @@
 #!/bin/bash
-# اسکریپت توقف ربات تحلیل هوشمند ارزهای دیجیتال
 
-# تنظیم تاریخ و زمان
-DATE=$(date +"%Y-%m-%d %H:%M:%S")
+# اسکریپت توقف ربات هوشمند
 
-# ایجاد فایل لاگ
-LOG_FILE="smart_robot_stop.log"
-echo "[$DATE] شروع توقف ربات تحلیل هوشمند ارزهای دیجیتال" > $LOG_FILE
+# تنظیم رنگ‌ها برای خروجی
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
 
-# خواندن شناسه فرآیند
-if [ -f "smart_scheduler.pid" ]; then
-    PID=$(cat smart_scheduler.pid)
-    echo "[$DATE] شناسه فرآیند یافت شد: $PID" >> $LOG_FILE
-    
-    # بررسی وجود فرآیند
-    if ps -p $PID > /dev/null; then
-        echo "[$DATE] در حال توقف فرآیند با شناسه $PID..." >> $LOG_FILE
-        kill $PID
-        sleep 2
-        
-        # بررسی موفقیت‌آمیز بودن توقف
-        if ! ps -p $PID > /dev/null; then
-            echo "[$DATE] ربات با موفقیت متوقف شد" >> $LOG_FILE
-            echo "✅ ربات تحلیل هوشمند ارزهای دیجیتال با موفقیت متوقف شد"
-            rm smart_scheduler.pid
-        else
-            echo "[$DATE] هشدار: ربات هنوز در حال اجراست، در حال استفاده از kill -9..." >> $LOG_FILE
-            kill -9 $PID
-            echo "✅ ربات تحلیل هوشمند ارزهای دیجیتال با اجبار متوقف شد"
-            rm smart_scheduler.pid
-        fi
-    else
-        echo "[$DATE] هشدار: فرآیندی با شناسه $PID یافت نشد" >> $LOG_FILE
-        echo "⚠️ فرآیندی با شناسه $PID یافت نشد"
-        echo "در حال جستجو برای فرآیندهای مشابه..."
-        
-        # جستجو برای فرآیندهای مشابه
-        PIDS=$(pgrep -f "python3 smart_scheduler.py")
-        if [ -n "$PIDS" ]; then
-            echo "[$DATE] فرآیندهای مشابه یافت شد: $PIDS" >> $LOG_FILE
-            echo "در حال توقف فرآیندهای مشابه..."
-            pkill -f "python3 smart_scheduler.py"
-            echo "✅ تمام فرآیندهای مرتبط با ربات متوقف شد"
-        else
-            echo "[$DATE] هیچ فرآیندی یافت نشد" >> $LOG_FILE
-            echo "❌ هیچ فرآیند در حال اجرای رباتی یافت نشد"
-        fi
-        
-        rm -f smart_scheduler.pid
-    fi
-else
-    echo "[$DATE] هشدار: فایل PID یافت نشد" >> $LOG_FILE
-    echo "⚠️ فایل شناسه فرآیند یافت نشد"
-    echo "در حال جستجو برای فرآیندهای مشابه..."
-    
-    # جستجو برای فرآیندهای مشابه
-    PIDS=$(pgrep -f "python3 smart_scheduler.py")
-    if [ -n "$PIDS" ]; then
-        echo "[$DATE] فرآیندهای مشابه یافت شد: $PIDS" >> $LOG_FILE
-        echo "در حال توقف فرآیندهای مشابه..."
-        pkill -f "python3 smart_scheduler.py"
-        echo "✅ تمام فرآیندهای مرتبط با ربات متوقف شد"
-    else
-        echo "[$DATE] هیچ فرآیندی یافت نشد" >> $LOG_FILE
-        echo "❌ هیچ فرآیند در حال اجرای رباتی یافت نشد"
-    fi
+echo -e "${YELLOW}در حال توقف ربات هوشمند تحلیل ارز دیجیتال...${NC}"
+
+# بررسی وجود فایل PID
+if [ ! -f "smart_ai_scheduler.pid" ]; then
+    echo -e "${RED}فایل PID ربات هوشمند یافت نشد. به نظر می‌رسد ربات در حال اجرا نیست.${NC}"
+    exit 1
 fi
 
-echo "[$DATE] پایان توقف ربات تحلیل هوشمند ارزهای دیجیتال" >> $LOG_FILE
+# خواندن PID
+PID=$(cat smart_ai_scheduler.pid)
+
+# بررسی وجود فرآیند
+if ! ps -p $PID > /dev/null; then
+    echo -e "${YELLOW}فرآیند با شناسه $PID یافت نشد. در حال پاکسازی فایل PID...${NC}"
+    rm smart_ai_scheduler.pid
+    exit 1
+fi
+
+# توقف فرآیند
+echo -e "${YELLOW}در حال توقف فرآیند با شناسه $PID...${NC}"
+kill $PID
+
+# بررسی موفقیت‌آمیز بودن توقف
+sleep 2
+if ps -p $PID > /dev/null; then
+    echo -e "${RED}توقف ربات با خطا مواجه شد. در حال اجبار به توقف...${NC}"
+    kill -9 $PID
+    sleep 1
+fi
+
+# حذف فایل PID
+rm smart_ai_scheduler.pid
+
+echo -e "${GREEN}ربات هوشمند با موفقیت متوقف شد.${NC}"
+exit 0

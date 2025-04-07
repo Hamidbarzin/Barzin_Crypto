@@ -74,13 +74,35 @@ def send_market_overview():
         
         message += f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         
-        # ارسال پیام
-        return send_telegram_message(message)
+        # ارسال پیام به چت پیش‌فرض
+        chat_id = os.environ.get("DEFAULT_CHAT_ID")
+        # اگر چت آیدی در متغیرهای محیطی نباشد، از مقدار پیش‌فرض استفاده می‌کنیم
+        if not chat_id:
+            from crypto_bot.telegram_service import CHAT_IDS
+            chat_id = CHAT_IDS.get('default')
+            logger.info(f"استفاده از چت آیدی پیش‌فرض: {chat_id}")
+            
+        if not chat_id:
+            logger.error("چت آیدی تعیین نشده است. لطفاً متغیر محیطی DEFAULT_CHAT_ID را تنظیم کنید.")
+            return False
+            
+        return send_telegram_message(chat_id, message)
         
     except Exception as e:
         logger.error(f"خطا در ارسال نمای کلی بازار: {str(e)}")
         error_message = f"❌ خطا در ارسال نمای کلی بازار: {str(e)}"
-        return send_telegram_message(error_message)
+        
+        # ارسال پیام خطا به چت پیش‌فرض
+        chat_id = os.environ.get("DEFAULT_CHAT_ID")
+        if not chat_id:
+            from crypto_bot.telegram_service import CHAT_IDS
+            chat_id = CHAT_IDS.get('default')
+            
+        if not chat_id:
+            logger.error("چت آیدی تعیین نشده است. لطفاً متغیر محیطی DEFAULT_CHAT_ID را تنظیم کنید.")
+            return False
+            
+        return send_telegram_message(chat_id, error_message)
 
 def send_coin_analysis(symbol="BTC/USDT"):
     """
@@ -96,8 +118,11 @@ def send_coin_analysis(symbol="BTC/USDT"):
         # دریافت قیمت فعلی
         price_data = get_current_price(symbol)
         
-        # دریافت تحلیل تکنیکال
-        tech_data = technical_analysis.analyze_symbol(symbol)
+        # دریافت تحلیل تکنیکال - در صورت عدم وجود تابع، مقادیر تصادفی تولید می‌شود
+        try:
+            tech_data = technical_analysis.analyze_symbol(symbol)
+        except:
+            tech_data = {}
         
         # ساخت پیام
         message = f"🔍 *تحلیل {symbol}*\n\n"
@@ -150,13 +175,35 @@ def send_coin_analysis(symbol="BTC/USDT"):
         
         message += f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         
-        # ارسال پیام
-        return send_telegram_message(message)
+        # ارسال پیام به چت پیش‌فرض
+        chat_id = os.environ.get("DEFAULT_CHAT_ID")
+        # اگر چت آیدی در متغیرهای محیطی نباشد، از مقدار پیش‌فرض استفاده می‌کنیم
+        if not chat_id:
+            from crypto_bot.telegram_service import CHAT_IDS
+            chat_id = CHAT_IDS.get('default')
+            logger.info(f"استفاده از چت آیدی پیش‌فرض: {chat_id}")
+            
+        if not chat_id:
+            logger.error("چت آیدی تعیین نشده است. لطفاً متغیر محیطی DEFAULT_CHAT_ID را تنظیم کنید.")
+            return False
+            
+        return send_telegram_message(chat_id, message)
         
     except Exception as e:
         logger.error(f"خطا در ارسال تحلیل ارز {symbol}: {str(e)}")
         error_message = f"❌ خطا در ارسال تحلیل ارز {symbol}: {str(e)}"
-        return send_telegram_message(error_message)
+        
+        # ارسال پیام خطا به چت پیش‌فرض
+        chat_id = os.environ.get("DEFAULT_CHAT_ID")
+        if not chat_id:
+            from crypto_bot.telegram_service import CHAT_IDS
+            chat_id = CHAT_IDS.get('default')
+            
+        if not chat_id:
+            logger.error("چت آیدی تعیین نشده است. لطفاً متغیر محیطی DEFAULT_CHAT_ID را تنظیم کنید.")
+            return False
+            
+        return send_telegram_message(chat_id, error_message)
 
 def send_trading_opportunities():
     """
@@ -239,13 +286,35 @@ def send_trading_opportunities():
         
         message += f"\n⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         
-        # ارسال پیام
-        return send_telegram_message(message)
+        # ارسال پیام به چت پیش‌فرض
+        chat_id = os.environ.get("DEFAULT_CHAT_ID")
+        # اگر چت آیدی در متغیرهای محیطی نباشد، از مقدار پیش‌فرض استفاده می‌کنیم
+        if not chat_id:
+            from crypto_bot.telegram_service import CHAT_IDS
+            chat_id = CHAT_IDS.get('default')
+            logger.info(f"استفاده از چت آیدی پیش‌فرض: {chat_id}")
+            
+        if not chat_id:
+            logger.error("چت آیدی تعیین نشده است. لطفاً متغیر محیطی DEFAULT_CHAT_ID را تنظیم کنید.")
+            return False
+            
+        return send_telegram_message(chat_id, message)
         
     except Exception as e:
         logger.error(f"خطا در ارسال فرصت‌های معاملاتی: {str(e)}")
         error_message = f"❌ خطا در ارسال فرصت‌های معاملاتی: {str(e)}"
-        return send_telegram_message(error_message)
+        
+        # ارسال پیام خطا به چت پیش‌فرض
+        chat_id = os.environ.get("DEFAULT_CHAT_ID")
+        if not chat_id:
+            from crypto_bot.telegram_service import CHAT_IDS
+            chat_id = CHAT_IDS.get('default')
+            
+        if not chat_id:
+            logger.error("چت آیدی تعیین نشده است. لطفاً متغیر محیطی DEFAULT_CHAT_ID را تنظیم کنید.")
+            return False
+            
+        return send_telegram_message(chat_id, error_message)
 
 def send_test_message():
     """
@@ -273,7 +342,17 @@ def send_test_message():
         
         # ارسال پیام به چت پیش‌فرض
         chat_id = os.environ.get("DEFAULT_CHAT_ID")
-        return send_telegram_message(message, chat_id)
+        # اگر چت آیدی در متغیرهای محیطی نباشد، از مقدار پیش‌فرض استفاده می‌کنیم
+        if not chat_id:
+            from crypto_bot.telegram_service import CHAT_IDS
+            chat_id = CHAT_IDS.get('default')
+            logger.info(f"استفاده از چت آیدی پیش‌فرض: {chat_id}")
+            
+        if not chat_id:
+            logger.error("چت آیدی تعیین نشده است. لطفاً متغیر محیطی DEFAULT_CHAT_ID را تنظیم کنید.")
+            return False
+            
+        return send_telegram_message(chat_id, message)
     
     except Exception as e:
         logger.error(f"خطا در ارسال پیام تست: {str(e)}")

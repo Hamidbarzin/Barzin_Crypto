@@ -1,118 +1,112 @@
-# ربات تحلیل تکنیکال ارز دیجیتال
+# Cryptocurrency Trading Bot
 
-این ربات به صورت خودکار تحلیل تکنیکال ارزهای دیجیتال را انجام می‌دهد و از طریق تلگرام به شما گزارش می‌دهد.
+A sophisticated cryptocurrency trading assistant that performs technical analysis and provides real-time market insights, trading signals, and price alerts through Telegram.
 
-## قابلیت‌های ربات
+## Key Features
 
-- تحلیل تکنیکال ارزهای مختلف (BTC، ETH و ...)
-- محاسبه شاخص‌های مهم تکنیکال (RSI، MACD، میانگین متحرک و ...)
-- تشخیص روند بازار و سیگنال‌های خرید و فروش
-- ارسال گزارش‌های دوره‌ای به تلگرام
-- تنظیم زمان‌بندی برای ارسال خودکار گزارش‌ها
+- **Real-time Market Analysis**: Monitors cryptocurrency prices and provides timely market overviews
+- **Technical Analysis**: Calculates key technical indicators (RSI, MACD, Moving Averages) to identify trading opportunities
+- **Trading Signals**: Generates buy/sell signals based on technical analysis
+- **Price Alerts**: Notifies about significant price movements and market volatility
+- **Automated Reporting**: Sends scheduled reports about market conditions
+- **AI-powered Analysis**: Provides intelligent market insights using OpenAI API (optional feature)
+- **Telegram Integration**: Delivers all alerts and reports through Telegram for maximum convenience
 
-## پیش‌نیازها
+## Getting Started
 
-- پایتون 3.7 یا بالاتر
-- توکن بات تلگرام
-- چت آیدی تلگرام برای دریافت پیام‌ها
+### Prerequisites
 
-## راه‌اندازی
+- Python 3.8 or higher
+- Telegram Bot Token
+- Telegram Chat ID
+- OpenAI API Key (optional, for AI-powered features)
 
-### 1. تنظیم متغیرهای محیطی
+### Installation
 
-متغیرهای محیطی زیر باید تنظیم شوند:
-
-```
-TELEGRAM_BOT_TOKEN=your_telegram_bot_token
-DEFAULT_CHAT_ID=your_telegram_chat_id
-```
-
-### 2. نصب وابستگی‌ها
-
-نصب کتابخانه‌های زیر:
-
-```
-pip install numpy pandas ta python-telegram-bot schedule matplotlib
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/crypto-trading-bot.git
+cd crypto-trading-bot
 ```
 
-### 3. ارسال پیام تست
-
-برای اطمینان از عملکرد صحیح ربات، یک پیام تست ارسال کنید:
-
-```
-python telegram_reporter.py test
+2. Install dependencies
+```bash
+pip install -r requirements.txt
 ```
 
-### 4. راه‌اندازی زمان‌بندی خودکار
-
-برای راه‌اندازی زمان‌بندی خودکار ارسال گزارش‌ها:
-
-```
-./run_scheduler.sh
-```
-
-## دستورات
-
-### راه‌اندازی اولیه
-
-```
-./startup.sh
+3. Set up environment variables
+```bash
+export TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+export DEFAULT_CHAT_ID=your_telegram_chat_id
+export OPENAI_API_KEY=your_openai_api_key  # Optional
 ```
 
-این دستور یک پیام تست و چند گزارش اولیه ارسال می‌کند.
+### Usage
 
-### ارسال تحلیل تکنیکال یک ارز
+#### Quick Start
 
-```
-python telegram_reporter.py technical BTC/USDT
-```
-
-### ارسال گزارش کلی بازار
-
-```
-python telegram_reporter.py market
+To start the bot with default settings, run:
+```bash
+./start_smart_robot.sh
 ```
 
-### ارسال گزارش دوره‌ای
-
-```
-python telegram_reporter.py
-```
-
-### راه‌اندازی زمان‌بندی خودکار
-
-```
-./run_scheduler.sh
+To stop the bot:
+```bash
+./stop_smart_robot.sh
 ```
 
-### توقف زمان‌بندی خودکار
+#### Manual Commands
 
+- Send test message:
+```bash
+python simple_ai_mode.py --test
 ```
-./stop_scheduler.sh
+
+- Get market overview:
+```bash
+python simple_ai_mode.py --overview
 ```
 
-## ساختار پروژه
+- Analyze specific coin:
+```bash
+python simple_ai_mode.py --coin BTC
+```
 
-- `crypto_bot/`: ماژول‌های اصلی ربات
-  - `technical_analysis.py`: تحلیل تکنیکال ارزها
-  - `telegram_service.py`: سرویس ارسال پیام به تلگرام
-- `telegram_reporter.py`: اسکریپت گزارش‌دهی به تلگرام
-- `simple_scheduler.py`: زمان‌بندی خودکار ارسال گزارش‌ها
-- `startup.sh`: اسکریپت راه‌اندازی اولیه
-- `run_scheduler.sh`: اسکریپت راه‌اندازی زمان‌بندی
-- `stop_scheduler.sh`: اسکریپت توقف زمان‌بندی
+- Get trading opportunities:
+```bash
+python simple_ai_mode.py --opportunities
+```
 
-## تنظیمات پیش‌فرض
+#### AI-Powered Analysis (requires OpenAI API key)
 
-- گزارش دوره‌ای قیمت: هر 30 دقیقه
-- گزارش کلی بازار: هر 2 ساعت
-- تحلیل تکنیکال ارزهای منتخب: هر 4 ساعت
-- گزارش وضعیت سیستم: هر 12 ساعت
+- Smart market analysis:
+```bash
+python telegram_smart_reporter.py market
+```
 
-## ارزهای تحت نظارت
+- Smart coin analysis:
+```bash
+python telegram_smart_reporter.py coin BTC
+```
 
-- BTC/USDT
-- ETH/USDT
-- BNB/USDT
-- XRP/USDT
-- SOL/USDT
+## Documentation
+
+For detailed documentation, please refer to:
+- [User Guide (English)](./GUIDE.md)
+- [User Guide (Persian)](./راهنمای_استفاده.md)
+- [Smart Bot Guide (Persian)](./راهنمای_ربات_هوشمند.md)
+
+## Running 24/7
+
+For continuous operation, it's recommended to:
+1. Deploy on a dedicated Linux server or VPS
+2. Use cloud services like Heroku or Railway
+3. Set up cron jobs for periodic execution
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Disclaimer
+
+This bot is for informational purposes only. Do not make financial decisions based solely on its signals. Always consult with financial professionals before trading.

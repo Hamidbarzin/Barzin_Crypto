@@ -1,67 +1,47 @@
 #!/bin/bash
-# اسکریپت راه‌اندازی ربات تحلیل هوشمند ارزهای دیجیتال
 
-# تنظیم تاریخ و زمان
-DATE=$(date +"%Y-%m-%d %H:%M:%S")
+# اسکریپت راه‌اندازی ربات هوشمند
 
-# ایجاد فایل لاگ
-LOG_FILE="smart_robot.log"
-echo "[$DATE] شروع راه‌اندازی ربات تحلیل هوشمند ارزهای دیجیتال" > $LOG_FILE
+# تنظیم رنگ‌ها برای خروجی
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
 
-# بررسی وجود پایتون
-if ! command -v python3 &> /dev/null; then
-    echo "[$DATE] خطا: پایتون نصب نشده است" >> $LOG_FILE
-    echo "لطفاً پایتون 3 را نصب کنید" >> $LOG_FILE
-    exit 1
+echo -e "${YELLOW}در حال راه‌اندازی ربات هوشمند تحلیل ارز دیجیتال...${NC}"
+
+# بررسی وجود فایل PID
+if [ -f "smart_ai_scheduler.pid" ]; then
+    PID=$(cat smart_ai_scheduler.pid)
+    if ps -p $PID > /dev/null; then
+        echo -e "${RED}ربات هوشمند قبلاً راه‌اندازی شده و در حال اجرا است (PID: $PID)${NC}"
+        echo -e "${YELLOW}برای راه‌اندازی مجدد، ابتدا ربات را با اجرای اسکریپت stop_smart_robot.sh متوقف کنید.${NC}"
+        exit 1
+    else
+        echo -e "${YELLOW}فایل PID قدیمی یافت شد اما فرآیند مربوطه در حال اجرا نیست. در حال پاکسازی...${NC}"
+        rm smart_ai_scheduler.pid
+    fi
 fi
 
-# بررسی وجود کلید API هوش مصنوعی OpenAI
-if [ -z "$OPENAI_API_KEY" ]; then
-    echo "[$DATE] هشدار: کلید API هوش مصنوعی تنظیم نشده است" >> $LOG_FILE
-    echo "برای استفاده از امکانات هوش مصنوعی، لطفاً متغیر محیطی OPENAI_API_KEY را تنظیم کنید" >> $LOG_FILE
-    echo "export OPENAI_API_KEY=\"کلید-API-خود-را-اینجا-قرار-دهید\"" >> $LOG_FILE
-fi
+# شروع اجرای اسکریپت زمان‌بندی در پس‌زمینه
+echo -e "${YELLOW}در حال شروع زمان‌بندی ربات هوشمند در پس‌زمینه...${NC}"
+nohup python smart_ai_scheduler.py > smart_ai_scheduler.log 2>&1 &
 
-# اجرای تست اولیه
-echo "[$DATE] در حال اجرای تست اولیه..." >> $LOG_FILE
-python3 telegram_smart_reporter.py --test
-
-# بررسی نتیجه اجرای تست
-if [ $? -ne 0 ]; then
-    echo "[$DATE] خطا: اجرای تست اولیه با شکست مواجه شد" >> $LOG_FILE
-    exit 1
-fi
-
-# اجرای اسکریپت زمان‌بندی در پس‌زمینه
-echo "[$DATE] در حال راه‌اندازی زمان‌بندی هوشمند در پس‌زمینه..." >> $LOG_FILE
-
-# کشتن فرآیندهای قبلی (اگر وجود داشته باشد)
-pkill -f "python3 smart_scheduler.py" &> /dev/null
-
-# اجرای اسکریپت جدید
-nohup python3 smart_scheduler.py > smart_scheduler.log 2>&1 &
-
-# ذخیره شناسه فرآیند
-PID=$!
-echo $PID > smart_scheduler.pid
-echo "[$DATE] زمان‌بندی هوشمند با شناسه فرآیند $PID راه‌اندازی شد" >> $LOG_FILE
-
-# بررسی اجرای موفقیت‌آمیز
+# بررسی موفقیت‌آمیز بودن راه‌اندازی
 sleep 2
-if ps -p $PID > /dev/null; then
-    echo "[$DATE] ربات تحلیل هوشمند ارزهای دیجیتال با موفقیت راه‌اندازی شد" >> $LOG_FILE
-    echo "اطلاعات بیشتر در فایل smart_scheduler.log ذخیره می‌شود" >> $LOG_FILE
-    
-    echo "✅ ربات تحلیل هوشمند ارزهای دیجیتال با موفقیت راه‌اندازی شد"
-    echo "شناسه فرآیند: $PID"
-    echo "برای مشاهده وضعیت ربات از دستور زیر استفاده کنید:"
-    echo "cat smart_scheduler.log"
-    echo "برای توقف ربات از دستور زیر استفاده کنید:"
-    echo "./stop_smart_robot.sh"
-else
-    echo "[$DATE] خطا: راه‌اندازی ربات با شکست مواجه شد" >> $LOG_FILE
-    echo "❌ خطا: راه‌اندازی ربات با شکست مواجه شد"
-    echo "لطفاً لاگ‌ها را بررسی کنید:"
-    echo "cat $LOG_FILE"
-    exit 1
+if [ -f "smart_ai_scheduler.pid" ]; then
+    PID=$(cat smart_ai_scheduler.pid)
+    if ps -p $PID > /dev/null; then
+        echo -e "${GREEN}ربات هوشمند با موفقیت راه‌اندازی شد!${NC}"
+        echo -e "${GREEN}شناسه فرآیند (PID): $PID${NC}"
+        echo -e "${YELLOW}لاگ‌های ربات در فایل smart_ai_scheduler.log ذخیره می‌شوند.${NC}"
+        echo -e "${YELLOW}برای مشاهده لاگ‌ها، می‌توانید از دستور زیر استفاده کنید:${NC}"
+        echo -e "${YELLOW}  tail -f smart_ai_scheduler.log${NC}"
+        echo -e "${YELLOW}برای توقف ربات، از دستور زیر استفاده کنید:${NC}"
+        echo -e "${YELLOW}  ./stop_smart_robot.sh${NC}"
+        exit 0
+    fi
 fi
+
+echo -e "${RED}راه‌اندازی ربات هوشمند با خطا مواجه شد. لطفاً لاگ‌ها را بررسی کنید.${NC}"
+exit 1
