@@ -44,6 +44,7 @@ def initialize_session():
 @app.route('/')
 def index():
     """Main page redirects to minimal dashboard"""
+    inject_now()
     return redirect(url_for('minimal_dashboard'))
     
     # بررسی کدام ارز دیجیتال انتخاب شده است
@@ -558,6 +559,11 @@ def ai_dashboard():
 
 @app.route('/dashboard')
 def dashboard():
+    """هاب اصلی قیمت‌ها، چارت‌ها و اخبار - هدایت به نسخه مینیمال"""
+    return redirect(url_for('minimal_dashboard'))
+
+@app.route('/dashboard_classic')
+def dashboard_classic():
     # Initialize session if not already set
     if not session.get('initialized', False):
         session['initialized'] = True
@@ -853,10 +859,10 @@ def simple_email():
     """Ultra simple route for email display when other routes fail"""
     return redirect(url_for('dashboard'))
     
-@app.route('/minimal')
+@app.route('/minimal_old')
 def minimal_email():
     """Extremely minimal email display with almost no styling"""
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('minimal_dashboard'))
     
 @app.route('/ultra')
 def ultra_simple():
@@ -1481,11 +1487,17 @@ def minimal_settings():
         'update_frequency': '60'
     }
     
-    bot_username = 'Unknown'
+    bot_username = 'GrowthFinderBot'
     # Extract username from bot token if available 
     telegram_bot_token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
     if telegram_bot_token and ':' in telegram_bot_token:
-        bot_username = telegram_bot_token.split(':')[0]
+        try:
+            from crypto_bot.telegram_service import get_bot_info
+            bot_info = get_bot_info()
+            if bot_info and 'username' in bot_info:
+                bot_username = bot_info['username']
+        except Exception as e:
+            logger.error(f"Error getting bot username: {e}")
     
     return render_template('minimal_settings.html', settings=settings, bot_username=bot_username)
 

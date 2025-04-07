@@ -1,329 +1,388 @@
 <!DOCTYPE html>
-<html lang="fa" data-bs-theme="dark" dir="rtl">
+<html lang="fa" dir="rtl" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ربات هوشمند ارز دیجیتال{% endblock %}</title>
     
     <!-- Meta tags for PWA -->
-    <meta name="description" content="ربات هوشمند تحلیل ارز دیجیتال با امکان گزارش‌های لحظه‌ای در تلگرام">
-    <meta name="theme-color" content="#212529">
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
+    <meta name="description" content="ربات هوشمند تحلیل ارزهای دیجیتال با قابلیت ارسال سیگنال‌های معاملاتی">
+    <meta name="theme-color" content="#1C1C28">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
     
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
     
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Vazirmatn Font (Persian) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
-    
-    <!-- Custom CSS -->
+    <!-- Custom Styles -->
     <style>
+        /* Base Styles */
         body {
-            font-family: 'Vazirmatn', 'Tahoma', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            font-family: 'Vazirmatn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease;
+            padding-bottom: 60px; /* Space for mobile nav */
         }
-
-        .navbar {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .main-content {
-            flex: 1;
-        }
-
-        .footer {
-            margin-top: auto;
-            padding: 1rem 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-pills .nav-link.active {
-            background-color: rgba(var(--bs-primary-rgb), 0.8);
-        }
-
+        
+        /* Crypto Cards */
         .crypto-card {
-            transition: transform 0.2s;
-            border-radius: 10px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            background: linear-gradient(145deg, rgba(40, 40, 40, 0.4), rgba(20, 20, 20, 0.4));
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: rgba(0, 0, 0, 0.2);
         }
         
         .crypto-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
-
-        .positive-change {
-            color: #00cc66;
+        
+        .crypto-card .card-body {
+            padding: 1.5rem;
         }
-
-        .negative-change {
-            color: #ff5050;
-        }
-
+        
         .icon-circle {
-            height: 48px;
-            width: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(var(--bs-primary-rgb), 0.1);
+            background-color: rgba(0, 0, 0, 0.2);
         }
-
-        .bottom-nav {
+        
+        /* Settings Cards */
+        .setting-card {
+            background-color: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .setting-card:hover {
+            background-color: rgba(0, 0, 0, 0.25);
+        }
+        
+        /* Navigation */
+        .top-navbar {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .mobile-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: var(--bs-body-bg);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             z-index: 1000;
+            padding: 0.5rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--bs-body-color);
+            font-size: 0.8rem;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-nav-item.active {
+            color: var(--bs-primary);
+        }
+        
+        .mobile-nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        /* Utilities */
+        .bg-gradient-dark {
+            background: linear-gradient(120deg, #1C1C28, #2D2D3A);
+        }
+        
+        .positive-change {
+            color: #00b894;
+        }
+        
+        .negative-change {
+            color: #ff7675;
+        }
+        
+        /* Loading Spinner */
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
         }
 
-        @media (max-width: 768px) {
-            .main-content {
-                padding-bottom: 70px; /* Make room for the bottom nav on mobile */
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
             }
         }
-
-        #toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 2000;
-        }
     </style>
-    
-    {% block extra_css %}{% endblock %}
 </head>
-<body>
-    <!-- Top Navigation Bar -->
-    <nav class="navbar navbar-expand-lg">
+<body class="bg-gradient-dark">
+    <!-- Top Navbar (Desktop) -->
+    <nav class="navbar navbar-expand-lg top-navbar mb-4 sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-robot me-2"></i>
-                ربات هوشمند ارز دیجیتال
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i class="fab fa-bitcoin text-warning me-2"></i>
+                <span>ربات هوشمند ارز دیجیتال</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/dashboard' or request.path == '/' %}active{% endif %}" href="/dashboard">
+                        <a class="nav-link {% if request.path == '/minimal_dashboard' or request.path == '/' %}active{% endif %}" href="/minimal_dashboard">
                             <i class="fas fa-chart-line me-1"></i> داشبورد
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/settings' or request.path == '/notification_settings' %}active{% endif %}" href="/notification_settings">
+                        <a class="nav-link {% if request.path == '/minimal_settings' %}active{% endif %}" href="/minimal_settings">
                             <i class="fas fa-cog me-1"></i> تنظیمات
                         </a>
                     </li>
                 </ul>
-                <div class="d-flex align-items-center">
-                    <div class="me-3 d-flex align-items-center">
-                        <i class="fas fa-clock text-secondary me-2"></i>
-                        <span id="current-time" class="text-secondary"></span>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <span class="me-2 text-secondary">وضعیت ربات:</span>
-                        <span id="bot-status" class="badge rounded-pill bg-success">
-                            فعال
-                        </span>
-                    </div>
-                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Mobile Bottom Navigation for small screens -->
-    <div class="d-block d-lg-none bottom-nav">
-        <div class="container">
-            <div class="row py-2">
-                <div class="col-6 text-center">
-                    <a href="/dashboard" class="btn btn-link text-decoration-none {% if request.path == '/dashboard' or request.path == '/' %}text-primary{% else %}text-muted{% endif %}">
-                        <div><i class="fas fa-chart-line fs-5"></i></div>
-                        <div class="small">داشبورد</div>
-                    </a>
-                </div>
-                <div class="col-6 text-center">
-                    <a href="/notification_settings" class="btn btn-link text-decoration-none {% if request.path == '/settings' or request.path == '/notification_settings' %}text-primary{% else %}text-muted{% endif %}">
-                        <div><i class="fas fa-cog fs-5"></i></div>
-                        <div class="small">تنظیمات</div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Container -->
-    <div id="toast-container"></div>
-
-    <!-- Main Content Area -->
-    <div class="container py-4 main-content">
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
-        <!-- Page Content -->
+    <!-- Main Content Container -->
+    <div class="container">
         {% block content %}{% endblock %}
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
+    <!-- Mobile Navigation Bar -->
+    <div class="mobile-nav d-lg-none">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start">
-                    <span class="text-secondary">ربات هوشمند ارز دیجیتال &copy; {{ now.year }}</span>
+            <div class="row text-center">
+                <div class="col-6">
+                    <a href="/minimal_dashboard" class="mobile-nav-item {% if request.path == '/minimal_dashboard' or request.path == '/' %}active{% endif %}">
+                        <i class="fas fa-chart-line"></i>
+                        <span>داشبورد</span>
+                    </a>
                 </div>
-                <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
-                    <a href="#" id="telegram-link" class="text-secondary mx-2">
-                        <i class="fab fa-telegram"></i>
-                    </a>
-                    <a href="javascript:void(0)" id="refresh-data" class="text-secondary mx-2" title="بروزرسانی داده‌ها">
-                        <i class="fas fa-sync-alt"></i>
-                    </a>
-                    <a href="javascript:void(0)" id="install-app" class="text-secondary mx-2" style="display: none;" title="نصب برنامه">
-                        <i class="fas fa-download"></i>
+                <div class="col-6">
+                    <a href="/minimal_settings" class="mobile-nav-item {% if request.path == '/minimal_settings' %}active{% endif %}">
+                        <i class="fas fa-cog"></i>
+                        <span>تنظیمات</span>
                     </a>
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- PWA Service Worker Registration -->
+    <!-- Custom Scripts -->
     <script>
-        // Register Service Worker for PWA functionality
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/static/js/sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registered with scope:', registration.scope);
+        // Function to format price with commas and appropriate decimal places
+        function formatPrice(price) {
+            if (price === null || price === undefined || isNaN(price)) {
+                return '--';
+            }
+            
+            // Check if price is very large (no decimal needed)
+            if (price > 1000) {
+                return price.toLocaleString('en-US', {maximumFractionDigits: 0});
+            }
+            
+            // Check if price is very small (more decimals needed)
+            if (price < 0.01) {
+                return price.toLocaleString('en-US', {minimumFractionDigits: 6, maximumFractionDigits: 6});
+            }
+            
+            // Default: 2 decimal places
+            return price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        // Function to format price change with sign and color
+        function formatChange(change) {
+            if (change === null || change === undefined || isNaN(change)) {
+                return '--';
+            }
+            
+            let sign = change >= 0 ? '+' : '';
+            let className = change >= 0 ? 'positive-change' : 'negative-change';
+            let formattedChange = `${sign}${change.toFixed(2)}%`;
+            
+            return `<span class="${className}">${formattedChange}</span>`;
+        }
+
+        // Update cryptocurrency prices
+        function updatePrices() {
+            const currencies = ['BTC/USDT', 'ETH/USDT', 'XRP/USDT'];
+            
+            console.log('Updating prices for:', currencies);
+            
+            currencies.forEach(symbol => {
+                // Convert symbol format for DOM ID (replace / with -)
+                const domSymbol = symbol.replace('/', '-');
+                
+                fetch(`/api/price/${symbol}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.data) {
+                            // Update price
+                            const priceElement = document.getElementById(`${domSymbol}-price`);
+                            if (priceElement) {
+                                priceElement.textContent = formatPrice(data.data.price);
+                            }
+                            
+                            // Update change percentage
+                            const changeElement = document.getElementById(`${domSymbol}-change`);
+                            if (changeElement) {
+                                changeElement.innerHTML = formatChange(data.data.change_24h);
+                            }
+                        }
                     })
                     .catch(error => {
-                        console.log('ServiceWorker registration failed:', error);
+                        console.error('Error updating prices:', error);
                     });
             });
         }
 
-        // Update current time
-        function updateTime() {
-            const now = new Date();
-            // Use Persian-friendly time format
-            const options = { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit',
-                hour12: false
-            };
-            document.getElementById('current-time').textContent = now.toLocaleTimeString('fa-IR', options);
-        }
-        updateTime();
-        setInterval(updateTime, 1000);
-
-        // Install PWA functionality
-        let deferredPrompt;
-        const installAppButton = document.getElementById('install-app');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent Chrome 67 and earlier from automatically showing the prompt
-            e.preventDefault();
-            // Stash the event so it can be triggered later
-            deferredPrompt = e;
-            // Show the install button
-            installAppButton.style.display = 'inline-block';
-        });
-
-        installAppButton.addEventListener('click', () => {
-            if (!deferredPrompt) return;
+        // Page-specific initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all tooltips
+            const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            tooltips.forEach(tooltip => {
+                new bootstrap.Tooltip(tooltip);
+            });
             
-            // Show the install prompt
-            deferredPrompt.prompt();
+            // Update cryptocurrency prices on dashboard
+            if (document.getElementById('dashboard-content')) {
+                updatePrices();
+                // Refresh prices every 30 seconds
+                setInterval(updatePrices, 30000);
+                
+                // Show technical analysis content after loading
+                setTimeout(() => {
+                    const loadingEl = document.getElementById('technical-loading');
+                    const contentEl = document.getElementById('technical-content');
+                    
+                    if (loadingEl && contentEl) {
+                        loadingEl.style.display = 'none';
+                        contentEl.style.display = 'block';
+                    }
+                }, 1500);
+            }
             
-            // Wait for the user to respond to the prompt
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
-                    showToast('برنامه با موفقیت نصب شد', 'success');
-                } else {
-                    console.log('User dismissed the install prompt');
+            // Setup notification settings form
+            const notificationForm = document.getElementById('notification-settings-form');
+            if (notificationForm) {
+                notificationForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    
+                    // Show saving indicator
+                    const submitBtn = notificationForm.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> در حال ذخیره...';
+                    submitBtn.disabled = true;
+                    
+                    // Simulate saving (replace with actual API call)
+                    setTimeout(() => {
+                        submitBtn.innerHTML = '<i class="fas fa-check me-2"></i> ذخیره شد';
+                        
+                        // Reset button after 1.5 seconds
+                        setTimeout(() => {
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                        }, 1500);
+                    }, 1000);
+                });
+                
+                // Setup test notification buttons
+                const testTelegramBtn = document.getElementById('test-telegram-button');
+                if (testTelegramBtn) {
+                    testTelegramBtn.addEventListener('click', function() {
+                        const chatId = document.getElementById('telegram_chat_id').value;
+                        
+                        // Show loading state
+                        const originalText = testTelegramBtn.innerHTML;
+                        testTelegramBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> در حال ارسال...';
+                        testTelegramBtn.disabled = true;
+                        
+                        // Send test message
+                        fetch('/api/test-telegram', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                chat_id: chatId
+                            }),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                testTelegramBtn.innerHTML = '<i class="fas fa-check me-2"></i> ارسال شد';
+                                setTimeout(() => {
+                                    testTelegramBtn.innerHTML = originalText;
+                                    testTelegramBtn.disabled = false;
+                                }, 2000);
+                            } else {
+                                testTelegramBtn.innerHTML = '<i class="fas fa-times me-2"></i> خطا';
+                                alert('خطا در ارسال پیام: ' + data.message);
+                                setTimeout(() => {
+                                    testTelegramBtn.innerHTML = originalText;
+                                    testTelegramBtn.disabled = false;
+                                }, 2000);
+                            }
+                        })
+                        .catch(error => {
+                            testTelegramBtn.innerHTML = '<i class="fas fa-times me-2"></i> خطا';
+                            alert('خطا در ارسال پیام: ' + error);
+                            setTimeout(() => {
+                                testTelegramBtn.innerHTML = originalText;
+                                testTelegramBtn.disabled = false;
+                            }, 2000);
+                        });
+                    });
                 }
-                // Clear the saved prompt since it can't be used again
-                deferredPrompt = null;
-                // Hide the install button
-                installAppButton.style.display = 'none';
-            });
-        });
-
-        // Toast notification system
-        function showToast(message, type = 'info') {
-            const toastContainer = document.getElementById('toast-container');
-            const toastId = `toast-${Date.now()}`;
-            const toast = document.createElement('div');
-            toast.className = `toast align-items-center text-white bg-${type} border-0`;
-            toast.setAttribute('role', 'alert');
-            toast.setAttribute('aria-live', 'assertive');
-            toast.setAttribute('aria-atomic', 'true');
-            toast.setAttribute('id', toastId);
-            
-            toast.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            `;
-            
-            toastContainer.appendChild(toast);
-            
-            const bsToast = new bootstrap.Toast(toast, {
-                autohide: true,
-                delay: 5000
-            });
-            
-            bsToast.show();
-            
-            // Remove the toast from DOM after it's hidden
-            toast.addEventListener('hidden.bs.toast', function () {
-                toastContainer.removeChild(toast);
-            });
-        }
-
-        // Refresh data functionality
-        document.getElementById('refresh-data').addEventListener('click', function() {
-            this.querySelector('i').classList.add('fa-spin');
-            showToast('در حال بروزرسانی داده‌ها...', 'info');
-            
-            setTimeout(() => {
-                this.querySelector('i').classList.remove('fa-spin');
-                showToast('داده‌ها با موفقیت بروزرسانی شدند', 'success');
-                window.location.reload();
-            }, 1000);
+            }
         });
     </script>
     
-    {% block extra_js %}{% endblock %}
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/static/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
 </body>
 </html>

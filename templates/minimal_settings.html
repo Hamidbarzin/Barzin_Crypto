@@ -1,0 +1,285 @@
+{% extends "minimal_base.html" %}
+
+{% block title %}تنظیمات | ربات هوشمند ارز دیجیتال{% endblock %}
+
+{% block content %}
+<div id="notification-settings-content">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">تنظیمات</h1>
+            <p class="text-muted">تنظیمات اعلان‌ها، تلگرام و گزارش‌های دوره‌ای</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Settings Form -->
+        <div class="col-lg-8">
+            <form id="notification-settings-form">
+                <!-- Notification Channels -->
+                <div class="card mb-4 crypto-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">کانال‌های اعلان</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card setting-card h-100">
+                                    <div class="card-body">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="telegram_enabled" name="telegram_enabled" checked>
+                                            <label class="form-check-label" for="telegram_enabled">تلگرام</label>
+                                        </div>
+                                        <p class="text-muted small mt-2">دریافت اعلان‌ها و گزارش‌ها در تلگرام</p>
+                                        <div class="input-group mt-3">
+                                            <span class="input-group-text"><i class="fab fa-telegram"></i></span>
+                                            <input type="text" class="form-control" id="telegram_chat_id" name="telegram_chat_id" placeholder="چت آیدی" value="{{ settings.get('telegram_chat_id', '') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card setting-card h-100">
+                                    <div class="card-body">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="email_enabled" name="email_enabled">
+                                            <label class="form-check-label" for="email_enabled">ایمیل</label>
+                                        </div>
+                                        <p class="text-muted small mt-2">دریافت گزارش‌های روزانه از طریق ایمیل</p>
+                                        <div class="input-group mt-3">
+                                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                            <input type="email" class="form-control" id="email_address" name="email_address" placeholder="آدرس ایمیل" value="{{ settings.get('email_address', '') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card setting-card h-100">
+                                    <div class="card-body">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="sms_enabled" name="sms_enabled">
+                                            <label class="form-check-label" for="sms_enabled">پیامک</label>
+                                        </div>
+                                        <p class="text-muted small mt-2">دریافت هشدارهای مهم از طریق پیامک</p>
+                                        <div class="input-group mt-3">
+                                            <span class="input-group-text"><i class="fas fa-sms"></i></span>
+                                            <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="شماره موبایل" value="{{ settings.get('phone_number', '') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notification Types -->
+                <div class="card mb-4 crypto-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">انواع اعلان‌ها</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card setting-card h-100">
+                                    <div class="card-body">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="price_alerts_enabled" name="price_alerts_enabled" checked>
+                                            <label class="form-check-label" for="price_alerts_enabled">هشدارهای قیمت</label>
+                                        </div>
+                                        <p class="text-muted small mt-2">اعلان تغییرات قیمت بیش از حد مشخص</p>
+                                        <div class="input-group mt-3">
+                                            <span class="input-group-text">%</span>
+                                            <input type="number" class="form-control" id="price_change_threshold" name="price_change_threshold" min="1" max="50" value="{{ settings.get('price_change_threshold', 5) }}">
+                                            <span class="input-group-text">تغییر</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card setting-card h-100">
+                                    <div class="card-body">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="signals_enabled" name="signals_enabled" checked>
+                                            <label class="form-check-label" for="signals_enabled">سیگنال‌های معاملاتی</label>
+                                        </div>
+                                        <p class="text-muted small mt-2">دریافت سیگنال‌های خرید و فروش</p>
+                                        <div class="mt-3">
+                                            <select class="form-select" id="signals_frequency" name="signals_frequency">
+                                                <option value="all" {% if settings.get('signals_frequency') == 'all' %}selected{% endif %}>تمام سیگنال‌ها</option>
+                                                <option value="strong" {% if settings.get('signals_frequency') == 'strong' %}selected{% endif %}>فقط سیگنال‌های قوی</option>
+                                                <option value="confirmed" {% if settings.get('signals_frequency') == 'confirmed' %}selected{% endif %}>فقط سیگنال‌های تایید شده</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card setting-card h-100">
+                                    <div class="card-body">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="news_alerts_enabled" name="news_alerts_enabled" checked>
+                                            <label class="form-check-label" for="news_alerts_enabled">اخبار مهم</label>
+                                        </div>
+                                        <p class="text-muted small mt-2">دریافت اخبار مهم و تاثیرگذار بر بازار</p>
+                                        <div class="mt-3">
+                                            <select class="form-select" id="news_sources" name="news_sources">
+                                                <option value="all" {% if settings.get('news_sources') == 'all' %}selected{% endif %}>همه منابع خبری</option>
+                                                <option value="major" {% if settings.get('news_sources') == 'major' %}selected{% endif %}>فقط منابع معتبر</option>
+                                                <option value="verified" {% if settings.get('news_sources') == 'verified' %}selected{% endif %}>فقط اخبار تایید شده</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Report Schedule -->
+                <div class="card mb-4 crypto-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">زمان‌بندی گزارش‌های دوره‌ای</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card setting-card h-100">
+                                    <div class="card-body">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="daily_report_enabled" name="daily_report_enabled" checked>
+                                            <label class="form-check-label" for="daily_report_enabled">گزارش روزانه</label>
+                                        </div>
+                                        <p class="text-muted small mt-2">خلاصه وضعیت بازار و تحلیل روزانه</p>
+                                        <div class="mt-3">
+                                            <select class="form-select" id="daily_report_time" name="daily_report_time">
+                                                <option value="8:00">۸:۰۰ صبح</option>
+                                                <option value="12:00">۱۲:۰۰ ظهر</option>
+                                                <option value="16:00" selected>۱۶:۰۰ عصر</option>
+                                                <option value="20:00">۲۰:۰۰ شب</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card setting-card h-100">
+                                    <div class="card-body">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="weekly_report_enabled" name="weekly_report_enabled" checked>
+                                            <label class="form-check-label" for="weekly_report_enabled">گزارش هفتگی</label>
+                                        </div>
+                                        <p class="text-muted small mt-2">تحلیل جامع هفتگی و پیش‌بینی</p>
+                                        <div class="mt-3">
+                                            <select class="form-select" id="weekly_report_day" name="weekly_report_day">
+                                                <option value="0">یکشنبه</option>
+                                                <option value="1">دوشنبه</option>
+                                                <option value="4" selected>پنج‌شنبه</option>
+                                                <option value="5">جمعه</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card setting-card h-100">
+                                    <div class="card-body">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="realtime_updates_enabled" name="realtime_updates_enabled" checked>
+                                            <label class="form-check-label" for="realtime_updates_enabled">بروزرسانی لحظه‌ای</label>
+                                        </div>
+                                        <p class="text-muted small mt-2">ارسال بروزرسانی‌های مهم در لحظه</p>
+                                        <div class="mt-3">
+                                            <select class="form-select" id="update_frequency" name="update_frequency">
+                                                <option value="30">هر ۳۰ دقیقه</option>
+                                                <option value="60" selected>هر ۱ ساعت</option>
+                                                <option value="120">هر ۲ ساعت</option>
+                                                <option value="240">هر ۴ ساعت</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form Buttons -->
+                <div class="d-flex justify-content-between">
+                    <button type="reset" class="btn btn-outline-secondary">بازنشانی</button>
+                    <button type="submit" class="btn btn-primary">ذخیره تنظیمات</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <!-- Test Notifications -->
+            <div class="card mb-4 crypto-card">
+                <div class="card-header">
+                    <h5 class="mb-0">تست اعلان‌ها</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">روش‌های اعلان را با ارسال یک پیام تست بررسی کنید.</p>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="button" id="test-telegram-button" class="btn btn-outline-primary mb-2">
+                            <i class="fab fa-telegram me-2"></i> تست تلگرام
+                        </button>
+                        <button type="button" id="test-email-button" class="btn btn-outline-secondary mb-2">
+                            <i class="fas fa-envelope me-2"></i> تست ایمیل
+                        </button>
+                        <button type="button" id="test-sms-button" class="btn btn-outline-secondary">
+                            <i class="fas fa-sms me-2"></i> تست پیامک
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Telegram Bot Setup -->
+            <div class="card mb-4 crypto-card">
+                <div class="card-header">
+                    <h5 class="mb-0">راهنمای تنظیم ربات تلگرام</h5>
+                </div>
+                <div class="card-body">
+                    <ol class="ps-3">
+                        <li class="mb-2">به ربات <a href="https://t.me/{{ bot_username }}" target="_blank">@{{ bot_username }}</a> پیام دهید</li>
+                        <li class="mb-2">دستور <code>/start</code> را ارسال کنید</li>
+                        <li class="mb-2">دستور <code>/id</code> را برای دریافت چت آیدی ارسال کنید</li>
+                        <li>چت آیدی دریافتی را در فیلد مربوطه در قسمت تنظیمات تلگرام وارد کنید</li>
+                    </ol>
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        چت آیدی یک عدد منحصربفرد برای هر کاربر در تلگرام است. ربات با استفاده از این شناسه، پیام‌های اختصاصی را برای شما ارسال می‌کند.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status Info -->
+            <div class="card crypto-card">
+                <div class="card-header">
+                    <h5 class="mb-0">وضعیت سیستم</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                            وضعیت ربات
+                            <span class="badge bg-success rounded-pill">فعال</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                            آخرین بروزرسانی
+                            <span>{{ now.strftime('%H:%M:%S') }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                            وضعیت API بازار
+                            <span class="badge bg-success rounded-pill">متصل</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                            حالت ربات
+                            <span class="badge bg-primary rounded-pill">هوشمند</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
