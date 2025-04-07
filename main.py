@@ -43,8 +43,8 @@ def initialize_session():
 
 @app.route('/')
 def index():
-    """Main page redirects to dashboard"""
-    return redirect(url_for('dashboard'))
+    """Main page redirects to minimal dashboard"""
+    return redirect(url_for('minimal_dashboard'))
     
     # بررسی کدام ارز دیجیتال انتخاب شده است
     selected_crypto = request.args.get('crypto', 'BTC')
@@ -1455,6 +1455,39 @@ def get_email_message():
         'last_message': last_email_content if has_message else None
     }
     return jsonify({'success': True, 'data': status})
+
+# Minimal UI routes
+@app.route('/minimal')
+def minimal_dashboard():
+    """صفحه داشبورد با طراحی مینیمال"""
+    inject_now()
+    return render_template('minimal_dashboard.html')
+
+@app.route('/minimal_settings')
+def minimal_settings():
+    """صفحه تنظیمات با طراحی مینیمال"""
+    inject_now()
+    
+    # Load notification settings
+    settings = {
+        'telegram_chat_id': os.environ.get('DEFAULT_CHAT_ID', ''),
+        'email_address': '',
+        'phone_number': '',
+        'price_change_threshold': 5,
+        'signals_frequency': 'strong',
+        'news_sources': 'major',
+        'daily_report_time': '16:00',
+        'weekly_report_day': '4',
+        'update_frequency': '60'
+    }
+    
+    bot_username = 'Unknown'
+    # Extract username from bot token if available 
+    telegram_bot_token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+    if telegram_bot_token and ':' in telegram_bot_token:
+        bot_username = telegram_bot_token.split(':')[0]
+    
+    return render_template('minimal_settings.html', settings=settings, bot_username=bot_username)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
