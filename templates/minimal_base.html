@@ -247,7 +247,9 @@
                 // Convert symbol format for DOM ID (replace / with -)
                 const domSymbol = symbol.replace('/', '-');
                 
-                fetch(`/api/price/${symbol}`)
+                // Replace slash with dash for API call
+                const apiSymbol = symbol.replace('/', '-');
+                fetch(`/api/price/${apiSymbol}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.success && data.data) {
