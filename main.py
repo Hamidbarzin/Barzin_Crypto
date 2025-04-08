@@ -497,6 +497,17 @@ def cryptocurrencies():
         },
         {
             'id': 3, 
+            'name': 'تتر', 
+            'symbol': 'USDT/USD', 
+            'icon': 'fas fa-dollar-sign text-success',
+            'price': '1.000',
+            'change': '+0.01%',
+            'volume': '85.6B',
+            'signal': 'نگهداری',
+            'signal_class': 'warning'
+        },
+        {
+            'id': 4, 
             'name': 'سولانا', 
             'symbol': 'SOL/USDT', 
             'icon': 'fas fa-sun text-info',
@@ -507,7 +518,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 4, 
+            'id': 5, 
             'name': 'بایننس کوین', 
             'symbol': 'BNB/USDT', 
             'icon': 'fas fa-coins text-warning',
@@ -518,7 +529,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 5, 
+            'id': 6, 
             'name': 'ریپل', 
             'symbol': 'XRP/USDT', 
             'icon': 'fas fa-stream text-info',
@@ -529,7 +540,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 6, 
+            'id': 7, 
             'name': 'چین‌لینک', 
             'symbol': 'LINK/USDT', 
             'icon': 'fas fa-link text-info',
@@ -540,7 +551,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 7, 
+            'id': 8, 
             'name': 'آواکس', 
             'symbol': 'AVAX/USDT', 
             'icon': 'fas fa-mountain text-danger',
@@ -550,17 +561,6 @@ def cryptocurrencies():
             'signal': 'خرید قوی',
             'signal_class': 'success'
         },
-        {
-            'id': 8, 
-            'name': 'تتر', 
-            'symbol': 'USDT/USD', 
-            'icon': 'fas fa-dollar-sign text-success',
-            'price': '1.000',
-            'change': '+0.01%',
-            'volume': '85.6B',
-            'signal': 'نگهداری',
-            'signal_class': 'warning'
-        }
     ]
     
     # لیست ارزهای تأثیرگذار در هوش مصنوعی
