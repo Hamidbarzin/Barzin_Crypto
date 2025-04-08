@@ -12,6 +12,24 @@
     </div>
 
     <div class="row mb-4">
+        <!-- کارت راه‌اندازی همه سرویس‌ها -->
+        <div class="col-12 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">راه‌اندازی تمام سرویس‌های گزارش‌دهی</h5>
+                </div>
+                <div class="card-body">
+                    <p class="lead">با یک کلیک، تمام گزارش‌های تلگرام را فعال کنید و گزارش‌های متنوع خود را دریافت نمایید.</p>
+                    <div class="mt-4">
+                        <button class="btn btn-warning btn-lg" onclick="startService('all')">راه‌اندازی همه سرویس‌ها</button>
+                        <button class="btn btn-danger btn-lg ms-2" onclick="stopService('all')">توقف همه سرویس‌ها</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
         <div class="col-lg-6 mb-4">
             <div class="card h-100">
                 <div class="card-header bg-primary text-white">
@@ -163,11 +181,17 @@ function startService(type) {
         case 'simple':
             script = './simple_scheduler.sh';
             break;
+        case 'all':
+            script = './start_all_telegram_services.sh';
+            break;
     }
     
     if (confirm(`آیا می‌خواهید سرویس ${type} را راه‌اندازی کنید؟`)) {
+        // در حالت ساده فقط یک پیام نمایش می‌دهیم
         alert(`دستور راه‌اندازی سرویس ${type} صادر شد:\n${script}`);
-        // در اینجا باید یک درخواست Ajax به سرور ارسال شود
+        
+        // در اینجا در نسخه‌های بعدی می‌توان یک درخواست Ajax به سرور ارسال کرد
+        // تا اسکریپت‌ها مستقیماً از طریق وب اجرا شوند
     }
 }
 
@@ -182,6 +206,9 @@ function stopService(type) {
             break;
         case 'simple':
             script = './stop_scheduler.sh';
+            break;
+        case 'all':
+            script = './stop_all_telegram_services.sh';
             break;
     }
     
