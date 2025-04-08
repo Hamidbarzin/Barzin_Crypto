@@ -81,7 +81,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">تحلیل تکنیکال <span id="selected-crypto-name">بیت‌کوین</span></h5>
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-outline-primary active" id="tab-technical">تحلیل فنی</button>
+                        <button class="btn btn-sm btn-primary active" id="tab-technical">تحلیل فنی</button>
                         <button class="btn btn-sm btn-outline-primary" id="tab-news">اخبار و تحلیل‌ها</button>
                     </div>
                 </div>
@@ -274,11 +274,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // فراخوانی تابع تنظیم دکمه‌های فیلتر
     setupFilterButtons();
     
-    // دکمه‌های تحلیل
-    const analysisButtons = document.querySelectorAll('.btn-outline-primary');
+    // دکمه‌های تحلیل در جدول ارزها
+    const tableAnalysisButtons = document.querySelectorAll('td .btn-outline-primary');
     
     // اضافه کردن رویداد کلیک برای نمایش تحلیل فنی
-    analysisButtons.forEach(button => {
+    tableAnalysisButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
             
@@ -294,10 +294,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 // به روزرسانی بخش تحلیل
                 const nameElement = document.getElementById('selected-crypto-name');
                 const symbolElement = document.getElementById('selected-crypto-symbol');
+                const nameElement2 = document.getElementById('selected-crypto-name2');
                 
                 if (nameElement && symbolElement) {
                     nameElement.textContent = cryptoName;
                     symbolElement.textContent = cryptoSymbol;
+                    
+                    if (nameElement2) {
+                        nameElement2.textContent = cryptoName;
+                    }
+                }
+                
+                // نمایش بخش تحلیل فنی (به جای اخبار)
+                const tabTechnical = document.getElementById('tab-technical');
+                const tabNews = document.getElementById('tab-news');
+                const technicalContent = document.getElementById('technical-analysis-content');
+                const newsContent = document.getElementById('news-analysis-content');
+                
+                if (tabTechnical && tabNews && technicalContent && newsContent) {
+                    tabTechnical.classList.add('active');
+                    tabTechnical.classList.add('btn-primary');
+                    tabTechnical.classList.remove('btn-outline-primary');
+                    
+                    tabNews.classList.remove('active');
+                    tabNews.classList.remove('btn-primary');
+                    tabNews.classList.add('btn-outline-primary');
+                    
+                    technicalContent.style.display = 'block';
+                    newsContent.style.display = 'none';
                 }
                 
                 // اسکرول به بخش تحلیل
@@ -328,17 +352,29 @@ document.addEventListener('DOMContentLoaded', function() {
             tabTechnical.addEventListener('click', function() {
                 // فعال‌سازی دکمه تحلیل فنی
                 tabTechnical.classList.add('active');
+                tabTechnical.classList.add('btn-primary');
+                tabTechnical.classList.remove('btn-outline-primary');
+                
                 tabNews.classList.remove('active');
+                tabNews.classList.remove('btn-primary');
+                tabNews.classList.add('btn-outline-primary');
                 
                 // نمایش محتوای تحلیل فنی و مخفی کردن اخبار
                 technicalContent.style.display = 'block';
                 newsContent.style.display = 'none';
+                
+                console.log('تب تحلیل فنی کلیک شد');
             });
             
             tabNews.addEventListener('click', function() {
                 // فعال‌سازی دکمه اخبار
                 tabNews.classList.add('active');
+                tabNews.classList.add('btn-primary');
+                tabNews.classList.remove('btn-outline-primary');
+                
                 tabTechnical.classList.remove('active');
+                tabTechnical.classList.remove('btn-primary');
+                tabTechnical.classList.add('btn-outline-primary');
                 
                 // نمایش محتوای اخبار و مخفی کردن تحلیل فنی
                 newsContent.style.display = 'block';
@@ -350,6 +386,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (cryptoName2) {
                     cryptoName2.textContent = cryptoName;
                 }
+                
+                console.log('تب اخبار و تحلیل‌ها کلیک شد');
             });
             
             // دکمه بارگذاری اخبار بیشتر
