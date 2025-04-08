@@ -61,7 +61,13 @@ except Exception as e:
     
 try:
     # بررسی و لود کردن ماژول تحلیل تکنیکال
-    from crypto_bot.technical_analysis import analyze_symbol
+    from crypto_bot.technical_analysis import get_technical_analysis
+    
+    # تعریف تابع analyze_symbol با استفاده از get_technical_analysis
+    def analyze_symbol(symbol, timeframe="1d"):
+        """تابع تحلیل نماد با استفاده از ماژول تحلیل تکنیکال"""
+        return get_technical_analysis(symbol, timeframe)
+        
     logger.info("ماژول تحلیل تکنیکال با موفقیت بارگذاری شد")
 except Exception as e:
     logger.error(f"خطا در بارگذاری ماژول تحلیل تکنیکال: {str(e)}")

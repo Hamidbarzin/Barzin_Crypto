@@ -1534,15 +1534,26 @@ def scheduler_status():
 def start_scheduler_api():
     """راه‌اندازی زمان‌بندی خودکار از طریق API"""
     try:
-        # Start scheduler
-        from crypto_bot.scheduler import start_scheduler
-        result = start_scheduler()
+        # راه‌اندازی زمان‌بندی های مختلف
+        result = {}
+        
+        # راه‌اندازی زمان‌بندی خودکار اصلی
+        try:
+            import subprocess
+            result['main_scheduler'] = subprocess.check_output(['bash', 'start_ten_minute_reporter.sh']).decode('utf-8')
+        except Exception as e:
+            logger.error(f"Error starting ten_minute_reporter: {str(e)}")
+            result['main_scheduler'] = str(e)
         
         # Update session
         session['scheduler_running'] = True
         
         # Return result
-        return jsonify({"status": "success", "message": "زمان‌بندی خودکار با موفقیت راه‌اندازی شد", "result": result})
+        return jsonify({
+            "status": "success", 
+            "message": "زمان‌بندی خودکار با موفقیت راه‌اندازی شد", 
+            "result": result
+        })
     except Exception as e:
         logger.error(f"Error starting scheduler: {str(e)}")
         return jsonify({"status": "error", "message": f"خطا در راه‌اندازی زمان‌بندی خودکار: {str(e)}"}), 500
@@ -1551,15 +1562,40 @@ def start_scheduler_api():
 def stop_scheduler_api():
     """توقف زمان‌بندی خودکار از طریق API"""
     try:
-        # Stop scheduler
-        from crypto_bot.scheduler import stop_scheduler
-        result = stop_scheduler()
+        # توقف زمان‌بندی های مختلف
+        result = {}
+        
+        # توقف زمان‌بندی خودکار اصلی
+        try:
+            import subprocess
+            import os
+            
+            # کشتن فرآیند زمان‌بندی 10 دقیقه‌ای
+            if os.path.exists("ten_minute_scheduler.pid"):
+                with open("ten_minute_scheduler.pid", "r") as f:
+                    pid = f.read().strip()
+                    if pid:
+                        kill_output = subprocess.check_output(['kill', pid]).decode('utf-8')
+                        result['kill_output'] = kill_output
+                        result['pid'] = pid
+            
+            # اجرای اسکریپت توقف
+            if os.path.exists("stop_all_telegram_services.sh"):
+                stop_output = subprocess.check_output(['bash', 'stop_all_telegram_services.sh']).decode('utf-8')
+                result['stop_output'] = stop_output
+        except Exception as e:
+            logger.error(f"Error stopping ten_minute_reporter: {str(e)}")
+            result['error'] = str(e)
         
         # Update session
         session['scheduler_running'] = False
         
         # Return result
-        return jsonify({"status": "success", "message": "زمان‌بندی خودکار با موفقیت متوقف شد", "result": result})
+        return jsonify({
+            "status": "success", 
+            "message": "زمان‌بندی خودکار با موفقیت متوقف شد", 
+            "result": result
+        })
     except Exception as e:
         logger.error(f"Error stopping scheduler: {str(e)}")
         return jsonify({"status": "error", "message": f"خطا در توقف زمان‌بندی خودکار: {str(e)}"}), 500
