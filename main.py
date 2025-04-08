@@ -20,10 +20,14 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "crypto_bot_secret_key")
 
-# Add datetime to all templates
+# Add datetime and developer info to all templates
 @app.context_processor
 def inject_now():
-    return {'now': datetime.now()}
+    return {
+        'now': datetime.now(),
+        'developer_name': 'حمید برزین',
+        'developer_year': '۱۴۰۴'
+    }
 
 # Initialize session defaults
 @app.before_request
