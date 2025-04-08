@@ -1,0 +1,231 @@
+{% extends "minimal_base.html" %}
+
+{% block title %}داشبورد اعلان‌ها | ربات هوشمند ارز دیجیتال{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">مدیریت اعلان‌های تلگرام</h1>
+            <p class="text-muted">راه‌اندازی و مدیریت ارسال گزارش‌های دوره‌ای به تلگرام</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">گزارش‌های سه لایه‌ای (هر ۱۰ دقیقه)</h5>
+                </div>
+                <div class="card-body">
+                    <p>گزارش‌های کامل با سه لایه:</p>
+                    <ul>
+                        <li><strong>لایه ۱: داده‌های بازار</strong> - قیمت‌ها، حجم معاملات و روند قیمت</li>
+                        <li><strong>لایه ۲: تحلیل تکنیکال</strong> - اندیکاتورها و سیگنال‌های معاملاتی</li>
+                        <li><strong>لایه ۳: اخبار و رویدادها</strong> - اخبار اقتصادی و تاریخ‌های مهم اقتصادی</li>
+                    </ul>
+                    <div class="mt-4">
+                        <button class="btn btn-success" onclick="startService('ten_minute')">راه‌اندازی</button>
+                        <button class="btn btn-danger ms-2" onclick="stopService('ten_minute')">توقف</button>
+                        <button class="btn btn-secondary ms-2" onclick="testService('ten_minute')">تست</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">گزارش‌های هوشمند</h5>
+                </div>
+                <div class="card-body">
+                    <p>گزارش‌های هوشمند متنوع:</p>
+                    <ul>
+                        <li><strong>نمای کلی بازار</strong> - هر ۳۰ دقیقه</li>
+                        <li><strong>تحلیل ارز</strong> - هر ۲ ساعت</li>
+                        <li><strong>فرصت‌های معاملاتی</strong> - هر ۴ ساعت</li>
+                        <li><strong>پیام زنده بودن سیستم</strong> - هر ۱۲ ساعت</li>
+                    </ul>
+                    <div class="mt-4">
+                        <button class="btn btn-success" onclick="startService('smart_ai')">راه‌اندازی</button>
+                        <button class="btn btn-danger ms-2" onclick="stopService('smart_ai')">توقف</button>
+                        <button class="btn btn-secondary ms-2" onclick="testService('smart_ai')">تست</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">گزارش‌های ساده</h5>
+                </div>
+                <div class="card-body">
+                    <p>گزارش‌های ساده بدون نیاز به هوش مصنوعی:</p>
+                    <ul>
+                        <li><strong>گزارش قیمت‌ها</strong> - هر ساعت</li>
+                        <li><strong>تحلیل تکنیکال</strong> - هر ۴ ساعت</li>
+                        <li><strong>نمای کلی بازار</strong> - هر ۲ ساعت</li>
+                        <li><strong>پیام زنده بودن سیستم</strong> - هر ۱۲ ساعت</li>
+                    </ul>
+                    <div class="mt-4">
+                        <button class="btn btn-success" onclick="startService('simple')">راه‌اندازی</button>
+                        <button class="btn btn-danger ms-2" onclick="stopService('simple')">توقف</button>
+                        <button class="btn btn-secondary ms-2" onclick="testService('simple')">تست</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">تنظیمات اعلان‌ها</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="chatId" class="form-label">چت آیدی تلگرام</label>
+                        <input type="text" class="form-control" id="chatId" placeholder="۷۲۲۶۲۷۶۲۲" value="722627622">
+                    </div>
+                    <div class="mb-3">
+                        <label for="botToken" class="form-label">توکن بات تلگرام</label>
+                        <input type="text" class="form-control" id="botToken" placeholder="توکن بات" value="7429658178:AAFc8hfXeog2Cu8EWOcXQbMc5Nn-q-f1ePk">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSettings()">ذخیره تنظیمات</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">وضعیت سرویس‌ها</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>نوع سرویس</th>
+                                    <th>وضعیت</th>
+                                    <th>آخرین اجرا</th>
+                                    <th>عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>گزارش سه لایه‌ای (۱۰ دقیقه)</td>
+                                    <td><span class="badge bg-secondary">نامشخص</span></td>
+                                    <td>-</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-secondary" onclick="checkStatus('ten_minute')">بررسی وضعیت</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>گزارش هوشمند</td>
+                                    <td><span class="badge bg-secondary">نامشخص</span></td>
+                                    <td>-</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-secondary" onclick="checkStatus('smart_ai')">بررسی وضعیت</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>گزارش ساده</td>
+                                    <td><span class="badge bg-secondary">نامشخص</span></td>
+                                    <td>-</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-secondary" onclick="checkStatus('simple')">بررسی وضعیت</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function startService(type) {
+    let script = '';
+    switch(type) {
+        case 'ten_minute':
+            script = './start_ten_minute_reporter.sh';
+            break;
+        case 'smart_ai':
+            script = './start_smart_robot.sh';
+            break;
+        case 'simple':
+            script = './simple_scheduler.sh';
+            break;
+    }
+    
+    if (confirm(`آیا می‌خواهید سرویس ${type} را راه‌اندازی کنید؟`)) {
+        alert(`دستور راه‌اندازی سرویس ${type} صادر شد:\n${script}`);
+        // در اینجا باید یک درخواست Ajax به سرور ارسال شود
+    }
+}
+
+function stopService(type) {
+    let script = '';
+    switch(type) {
+        case 'ten_minute':
+            script = './stop_ten_minute_reporter.sh';
+            break;
+        case 'smart_ai':
+            script = './stop_smart_robot.sh';
+            break;
+        case 'simple':
+            script = './stop_scheduler.sh';
+            break;
+    }
+    
+    if (confirm(`آیا می‌خواهید سرویس ${type} را متوقف کنید؟`)) {
+        alert(`دستور توقف سرویس ${type} صادر شد:\n${script}`);
+        // در اینجا باید یک درخواست Ajax به سرور ارسال شود
+    }
+}
+
+function testService(type) {
+    let command = '';
+    switch(type) {
+        case 'ten_minute':
+            command = 'python enhanced_telegram_reporter.py --test';
+            break;
+        case 'smart_ai':
+            command = 'python telegram_smart_reporter.py --test';
+            break;
+        case 'simple':
+            command = 'python telegram_reporter.py test';
+            break;
+    }
+    
+    alert(`دستور تست سرویس ${type} ارسال شد:\n${command}`);
+    // در اینجا باید یک درخواست Ajax به سرور ارسال شود
+}
+
+function checkStatus(type) {
+    // این تابع باید وضعیت سرویس را بررسی کند
+    alert(`در حال بررسی وضعیت سرویس ${type}...`);
+    // در اینجا باید یک درخواست Ajax به سرور ارسال شود
+}
+
+function saveSettings() {
+    const chatId = document.getElementById('chatId').value;
+    const botToken = document.getElementById('botToken').value;
+    
+    if (!chatId || !botToken) {
+        alert('لطفاً تمام فیلدها را پر کنید.');
+        return;
+    }
+    
+    alert(`تنظیمات ذخیره شد:\nچت آیدی: ${chatId}\nتوکن بات: ${botToken}`);
+    // در اینجا باید یک درخواست Ajax به سرور ارسال شود
+}
+</script>
+{% endblock %}

@@ -527,7 +527,7 @@ def notification_settings():
     from crypto_bot.telegram_service import get_bot_info
     telegram_bot_info = get_bot_info()
     
-    return render_template('notification_settings.html', 
+    return render_template('notification_dashboard.html', 
                           notification_settings=default_settings,
                           telegram_bot_info=telegram_bot_info)
 
