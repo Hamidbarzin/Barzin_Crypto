@@ -1517,12 +1517,87 @@ def ai_trading_strategy(symbol):
         logger.error(f"خطا در پیشنهاد استراتژی معاملاتی {symbol}: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
 
+@app.route('/scheduler_status', methods=['GET'])
+def scheduler_status():
+    """دریافت وضعیت زمان‌بندی خودکار"""
+    try:
+        # Get scheduler status from session
+        running = session.get('scheduler_running', False)
+        
+        # Return status
+        return jsonify({"running": running})
+    except Exception as e:
+        logger.error(f"Error getting scheduler status: {str(e)}")
+        return jsonify({"running": False, "error": str(e)}), 500
+
+@app.route('/start_scheduler', methods=['GET'])
+def start_scheduler_api():
+    """راه‌اندازی زمان‌بندی خودکار از طریق API"""
+    try:
+        # Start scheduler
+        from crypto_bot.scheduler import start_scheduler
+        result = start_scheduler()
+        
+        # Update session
+        session['scheduler_running'] = True
+        
+        # Return result
+        return jsonify({"status": "success", "message": "زمان‌بندی خودکار با موفقیت راه‌اندازی شد", "result": result})
+    except Exception as e:
+        logger.error(f"Error starting scheduler: {str(e)}")
+        return jsonify({"status": "error", "message": f"خطا در راه‌اندازی زمان‌بندی خودکار: {str(e)}"}), 500
+        
+@app.route('/stop_scheduler', methods=['GET'])
+def stop_scheduler_api():
+    """توقف زمان‌بندی خودکار از طریق API"""
+    try:
+        # Stop scheduler
+        from crypto_bot.scheduler import stop_scheduler
+        result = stop_scheduler()
+        
+        # Update session
+        session['scheduler_running'] = False
+        
+        # Return result
+        return jsonify({"status": "success", "message": "زمان‌بندی خودکار با موفقیت متوقف شد", "result": result})
+    except Exception as e:
+        logger.error(f"Error stopping scheduler: {str(e)}")
+        return jsonify({"status": "error", "message": f"خطا در توقف زمان‌بندی خودکار: {str(e)}"}), 500
+
 @app.route('/api/update-notification-settings', methods=['POST'])
+@app.route('/update_notification_settings', methods=['GET', 'POST'])
 def update_notification_settings():
     """بروزرسانی تنظیمات اعلان‌ها"""
+    # برای درخواست‌های GET، نمایش وضعیت فعلی را برمی‌گرداند
+    if request.method == 'GET':
+        # Get system and notification settings from session
+        settings = {
+            'sms_enabled': session.get('sms_enabled', False),
+            'phone_number': session.get('phone_number', ''),
+            'email_enabled': session.get('email_enabled', False),
+            'email_address': session.get('email_address', ''),
+            'telegram_enabled': session.get('telegram_enabled', True),
+            'telegram_chat_id': session.get('telegram_chat_id', os.environ.get('DEFAULT_CHAT_ID', '')),
+            'buy_sell_enabled': session.get('buy_sell_enabled', True),
+            'buy_sell_sensitivity': session.get('buy_sell_sensitivity', 'medium'),
+            'system_monitor_enabled': session.get('system_monitor_enabled', True),
+            'scheduler_running': session.get('scheduler_running', False),
+            'start_hour': session.get('start_hour', 8),
+            'end_hour': session.get('end_hour', 22),
+            'volatility_enabled': session.get('volatility_enabled', True),
+            'volatility_threshold': session.get('volatility_threshold', 'medium'),
+            'market_trend_enabled': session.get('market_trend_enabled', True)
+        }
+        return jsonify({'success': True, 'settings': settings})
+    
+    # برای درخواست‌های POST، تنظیمات را بروزرسانی می‌کند
     try:
         # دریافت داده‌های ارسال شده
         settings = request.get_json()
+        
+        # اگر تنظیمات خالی باشد، یک خطا برمی‌گرداند
+        if not settings:
+            return jsonify({'success': False, 'message': 'تنظیماتی دریافت نشد'}), 400
         
         # ذخیره تنظیمات در سشن
         session['sms_enabled'] = settings.get('sms_enabled', False)
@@ -1533,6 +1608,9 @@ def update_notification_settings():
         session['telegram_chat_id'] = settings.get('telegram_chat_id', '')
         session['buy_sell_enabled'] = settings.get('buy_sell_enabled', True)
         session['buy_sell_sensitivity'] = settings.get('buy_sell_sensitivity', 'medium')
+        
+        # Check if system monitor is enabled
+        session['system_monitor_enabled'] = settings.get('system_monitor_enabled', False)
         session['buy_sell_frequency'] = settings.get('buy_sell_frequency', '3')
         session['start_hour'] = settings.get('start_hour', 8)
         session['end_hour'] = settings.get('end_hour', 22)
@@ -1546,7 +1624,7 @@ def update_notification_settings():
         return jsonify({'success': True, 'message': 'تنظیمات با موفقیت ذخیره شد'})
     except Exception as e:
         logger.error(f"خطا در ذخیره تنظیمات اعلان‌ها: {str(e)}")
-        return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
+        return jsonify({'success': False, 'message': f'خطا: {str(e)}'}), 500
 
 # این نسخه تکراری از تابع get_buy_sell_opportunities است و حذف شد
 # زیرا قبلاً در مسیر '/api/opportunities' تعریف شده است

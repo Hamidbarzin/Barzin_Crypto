@@ -212,15 +212,31 @@
         
         <!-- Sidebar -->
         <div class="col-lg-4 mt-4 mt-lg-0">
-            <!-- Test Notifications -->
+            <!-- System Controls -->
             <div class="card mb-4 crypto-card">
                 <div class="card-header">
-                    <h5 class="mb-0">تست اعلان‌ها</h5>
+                    <h5 class="mb-0">کنترل سیستم</h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">روش‌های اعلان را با ارسال یک پیام تست بررسی کنید.</p>
+                    <p class="text-muted">مدیریت سرویس‌های ربات و راه‌اندازی گزارش‌دهی خودکار</p>
+                    
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="system_monitor_enabled" name="system_monitor_enabled" checked>
+                        <label class="form-check-label" for="system_monitor_enabled">سیستم مانیتورینگ روشن/خاموش</label>
+                        <p class="text-muted small mt-1">ارسال گزارش به تلگرام هنگام روشن یا خاموش شدن سیستم</p>
+                    </div>
                     
                     <div class="d-grid gap-2">
+                        <button type="button" id="start-scheduler-button" class="btn btn-success mb-2">
+                            <i class="fas fa-play me-2"></i> راه‌اندازی زمان‌بندی خودکار
+                        </button>
+                        <button type="button" id="stop-scheduler-button" class="btn btn-danger mb-2">
+                            <i class="fas fa-stop me-2"></i> توقف زمان‌بندی خودکار
+                        </button>
+                        <a href="/update_notification_settings" class="btn btn-outline-info mb-2" target="_blank">
+                            <i class="fas fa-external-link-alt me-2"></i> تست API در مرورگر
+                        </a>
+                        <hr>
                         <button type="button" id="test-telegram-button" class="btn btn-outline-primary mb-2">
                             <i class="fab fa-telegram me-2"></i> تست تلگرام
                         </button>
