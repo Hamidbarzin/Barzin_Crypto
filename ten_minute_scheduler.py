@@ -64,14 +64,29 @@ MACD: صعودی
         direct_result = send_telegram_message(chat_id, message)
         logger.info(f"نتیجه ارسال پیام مستقیم: {direct_result}")
         
-        # استفاده از ماژول enhanced_telegram_reporter
+        # استفاده از ماژول formatted_telegram_reporter برای گزارش‌های ساده و بدون جدول
         try:
-            import enhanced_telegram_reporter
-            result = enhanced_telegram_reporter.send_three_layer_report()
-            logger.info(f"نتیجه ارسال گزارش سه لایه‌ای: {result}")
+            try:
+                # ابتدا سعی می‌کنیم از ماژول ساده استفاده کنیم
+                from crypto_bot.simple_formatted_reporter import send_formatted_report
+                logger.info("استفاده از گزارش‌دهنده ساده بدون جدول")
+                result = send_formatted_report()
+            except ImportError:
+                try:
+                    # سپس سعی می‌کنیم از ماژول جدید استفاده کنیم
+                    from crypto_bot.formatted_telegram_reporter import send_formatted_report
+                    logger.info("استفاده از گزارش‌دهنده جدید")
+                    result = send_formatted_report()
+                except ImportError:
+                    # در صورت عدم وجود ماژول جدید، از ماژول قدیمی استفاده می‌کنیم
+                    import enhanced_telegram_reporter
+                    logger.info("استفاده از گزارش‌دهنده قدیمی")
+                    result = enhanced_telegram_reporter.send_three_layer_report()
+                
+            logger.info(f"نتیجه ارسال گزارش: {result}")
             return result
         except Exception as e:
-            logger.error(f"خطا در استفاده از ماژول enhanced_telegram_reporter: {str(e)}")
+            logger.error(f"خطا در ارسال گزارش: {str(e)}")
             logger.error(traceback.format_exc())
             return direct_result  # حداقل پیام مستقیم ارسال شده
     except Exception as e:
@@ -151,9 +166,24 @@ def main():
     save_pid()
     
     # ارسال یک پیام تست برای اطمینان از عملکرد صحیح
-    import enhanced_telegram_reporter
     logger.info("در حال ارسال پیام تست...")
-    test_result = enhanced_telegram_reporter.send_test_message()
+    try:
+        # ابتدا سعی می‌کنیم از ماژول ساده استفاده کنیم
+        from crypto_bot.simple_formatted_reporter import send_test_message
+        logger.info("استفاده از گزارش‌دهنده ساده بدون جدول برای پیام تست")
+        test_result = send_test_message()
+    except ImportError:
+        try:
+            # سپس سعی می‌کنیم از ماژول جدید استفاده کنیم
+            from crypto_bot.formatted_telegram_reporter import send_test_message
+            logger.info("استفاده از گزارش‌دهنده جدید برای پیام تست")
+            test_result = send_test_message()
+        except ImportError:
+            # در صورت عدم وجود ماژول جدید، از ماژول قدیمی استفاده می‌کنیم
+            import enhanced_telegram_reporter
+            logger.info("استفاده از گزارش‌دهنده قدیمی برای پیام تست")
+            test_result = enhanced_telegram_reporter.send_test_message()
+        
     logger.info(f"نتیجه ارسال پیام تست: {test_result}")
     
     # تنظیم زمان‌بندی وظایف
