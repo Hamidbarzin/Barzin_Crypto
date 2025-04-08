@@ -124,6 +124,50 @@
             color: #ff7675;
         }
         
+        /* Cryptocurrency Page Styles */
+        .icon-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.2);
+            margin-right: 10px;
+        }
+        
+        .indicator-box {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.15);
+            margin-bottom: 15px;
+        }
+        
+        .indicator-label {
+            font-size: 14px;
+            color: #adb5bd;
+            margin-bottom: 10px;
+        }
+        
+        .indicator-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .indicator-description {
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            background-color: #1c1c28;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
         /* Loading Spinner */
         .loader {
             width: 48px;
@@ -165,6 +209,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/cryptocurrencies' or request.path == '/crypto' %}active{% endif %}" href="/cryptocurrencies">
+                            <i class="fas fa-coins me-1"></i> ارزهای دیجیتال
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if request.path == '/minimal_settings' %}active{% endif %}" href="/minimal_settings">
                             <i class="fas fa-cog me-1"></i> تنظیمات
                         </a>
@@ -183,13 +232,19 @@
     <div class="mobile-nav d-lg-none">
         <div class="container">
             <div class="row text-center">
-                <div class="col-6">
+                <div class="col-4">
                     <a href="/minimal_dashboard" class="mobile-nav-item {% if request.path == '/minimal_dashboard' or request.path == '/' %}active{% endif %}">
                         <i class="fas fa-chart-line"></i>
                         <span>داشبورد</span>
                     </a>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
+                    <a href="/cryptocurrencies" class="mobile-nav-item {% if request.path == '/cryptocurrencies' or request.path == '/crypto' %}active{% endif %}">
+                        <i class="fas fa-coins"></i>
+                        <span>ارزها</span>
+                    </a>
+                </div>
+                <div class="col-4">
                     <a href="/minimal_settings" class="mobile-nav-item {% if request.path == '/minimal_settings' %}active{% endif %}">
                         <i class="fas fa-cog"></i>
                         <span>تنظیمات</span>

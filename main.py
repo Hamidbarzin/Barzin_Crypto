@@ -467,6 +467,12 @@ def index():
         tv_symbol=tv_symbol
     )
     
+@app.route('/cryptocurrencies')
+@app.route('/crypto')
+def cryptocurrencies():
+    """صفحه مخصوص ارزهای دیجیتال با تمرکز روی ارزهای جدید و با پتانسیل"""
+    return render_template('cryptocurrencies.html')
+
 @app.route('/simple')
 def simple_home():
     """A simplified home page with direct links to all pages"""
