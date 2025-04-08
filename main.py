@@ -1413,11 +1413,72 @@ def get_price(symbol):
 @app.route('/api/technical/<symbol>/<timeframe>')
 def get_technical(symbol, timeframe):
     try:
-        data = get_technical_analysis(symbol, timeframe)
+        # پاکسازی نماد قبل از ارسال به تابع تحلیل فنی
+        clean_symbol = symbol.replace('-', '/') if '-' in symbol else symbol
+        logger.info(f"Getting technical data for symbol: {clean_symbol}, timeframe: {timeframe}")
+        
+        # دریافت تحلیل فنی
+        data = get_technical_analysis(clean_symbol, timeframe)
+        
+        # بررسی صحت داده‌های برگشتی
+        if 'error' in data:
+            logger.warning(f"Technical analysis returned error: {data['error']}")
+            # ارسال داده‌های پیش‌فرض همراه با خطا
+            return jsonify({
+                'success': False, 
+                'message': f"خطا در تحلیل فنی: {data['error']}", 
+                'data': get_default_technical_data(clean_symbol, timeframe)
+            })
+            
         return jsonify({'success': True, 'data': data})
     except Exception as e:
         logger.error(f"Error getting technical data for {symbol}: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)})
+        # ارسال داده‌های پیش‌فرض در صورت بروز خطا
+        return jsonify({
+            'success': False, 
+            'message': str(e),
+            'data': get_default_technical_data(symbol, timeframe)
+        })
+        
+def get_default_technical_data(symbol, timeframe):
+    """
+    ایجاد داده‌های پیش‌فرض برای تحلیل فنی در صورت بروز خطا
+    """
+    current_price = 0
+    try:
+        # سعی می‌کنیم حداقل قیمت فعلی را دریافت کنیم
+        price_data = get_current_prices([symbol, symbol.replace('/', '-') if '/' in symbol else symbol.replace('-', '/')])
+        if price_data and len(price_data) > 0:
+            for key in price_data:
+                if price_data[key] and 'price' in price_data[key]:
+                    current_price = price_data[key]['price']
+                    break
+    except:
+        # در صورت بروز خطا، از مقادیر پیش‌فرض استفاده می‌کنیم
+        if 'BTC' in symbol:
+            current_price = 69500
+        elif 'ETH' in symbol:
+            current_price = 3400
+        elif 'XRP' in symbol:
+            current_price = 0.52
+        else:
+            current_price = 100
+            
+    # ایجاد اندیکاتورهای پیش‌فرض
+    return {
+        'symbol': symbol,
+        'timeframe': timeframe,
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'current_price': current_price,
+        'rsi': 50,  # مقدار خنثی
+        'macd': 0,
+        'macd_signal': 0,
+        'ma20': current_price * 0.98,
+        'ma50': current_price * 0.95,
+        'ma200': current_price * 0.9,
+        'signal': 'خنثی',
+        'signal_strength': 0
+    }
 
 @app.route('/api/news')
 def get_news():

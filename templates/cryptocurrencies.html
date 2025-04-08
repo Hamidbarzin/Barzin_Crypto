@@ -5,7 +5,7 @@
 {% block content %}
 <!-- Header with creator information -->
 <div style="background-color: #FFD700; color: #000; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-size: 24px; font-weight: bold;">
-    توسعه‌دهنده: حمید برزین
+    توسعه‌دهنده: ربات مشاور ارزهای دیجیتال
 </div>
 
 <div class="row mb-3">
@@ -70,7 +70,7 @@
                                     <td id="{{ coin.symbol.replace('/', '-') }}-change" class="{% if coin.change.startswith('+') %}text-success{% else %}text-danger{% endif %}">{{ coin.change }}</td>
                                     <td>{{ coin.volume }}</td>
                                     <td><span class="badge bg-{{ coin.signal_class }}">{{ coin.signal }}</span></td>
-                                    <td><a href="#" class="btn btn-sm btn-outline-primary">تحلیل کامل</a></td>
+                                    <td><a href="#" class="btn btn-sm btn-outline-primary analysis-button">تحلیل فنی</a></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -307,9 +307,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (analysis.rsi < 30) {
                                 rsiProgressEl.classList.add('bg-danger');
                             } else if (analysis.rsi > 70) {
-                                rsiProgressEl.classList.add('bg-danger');
-                            } else {
                                 rsiProgressEl.classList.add('bg-success');
+                            } else {
+                                rsiProgressEl.classList.add('bg-warning');
                             }
                         }
                     }
@@ -473,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupFilterButtons();
     
     // دکمه‌های تحلیل در جدول ارزها
-    const tableAnalysisButtons = document.querySelectorAll('td .btn-outline-primary');
+    const tableAnalysisButtons = document.querySelectorAll('td .analysis-button');
     
     // اضافه کردن رویداد کلیک برای نمایش تحلیل فنی
     tableAnalysisButtons.forEach(button => {
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="row mt-5">
     <div class="col-12 text-center">
         <p class="text-muted small">
-            طراحی و توسعه توسط <span class="text-warning fw-bold">حمید برزین</span> | ۱۴۰۴ &copy;
+            ربات مشاور ارزهای دیجیتال | ۱۴۰۴ &copy;
         </p>
     </div>
 </div>
