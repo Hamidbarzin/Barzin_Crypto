@@ -1569,6 +1569,7 @@ def get_email_message():
 
 # Minimal UI routes
 @app.route('/minimal')
+@app.route('/minimal_dashboard')
 def minimal_dashboard():
     """صفحه داشبورد با طراحی مینیمال"""
     inject_now()
