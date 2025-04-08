@@ -81,8 +81,8 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">تحلیل تکنیکال <span id="selected-crypto-name">بیت‌کوین</span></h5>
                     <div class="border rounded p-1 bg-dark">
-                        <a href="javascript:void(0)" id="show-technical" class="btn btn-sm btn-primary mx-1">تحلیل فنی</a>
-                        <a href="javascript:void(0)" id="show-news" class="btn btn-sm btn-outline-primary mx-1">اخبار و تحلیل‌ها</a>
+                        <button onclick="document.getElementById('technical-analysis-content').style.display='block'; document.getElementById('news-analysis-content').style.display='none';" class="btn btn-sm btn-primary mx-1">تحلیل فنی</button>
+                        <button onclick="document.getElementById('technical-analysis-content').style.display='none'; document.getElementById('news-analysis-content').style.display='block';" class="btn btn-sm btn-outline-primary mx-1">اخبار و تحلیل‌ها</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -342,8 +342,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // نمایش بخش تحلیل فنی (به جای اخبار)
-                // از تابع جدید استفاده می‌کنیم
-                showTechnical();
+                document.getElementById('technical-analysis-content').style.display = 'block';
+                document.getElementById('news-analysis-content').style.display = 'none';
                 
                 // اسکرول به بخش تحلیل
                 const analysisSection = document.querySelector('.card-header');
