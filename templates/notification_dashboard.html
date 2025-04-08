@@ -27,7 +27,7 @@
                     <div class="mt-4">
                         <button class="btn btn-success" onclick="startService('ten_minute')">راه‌اندازی</button>
                         <button class="btn btn-danger ms-2" onclick="stopService('ten_minute')">توقف</button>
-                        <button class="btn btn-secondary ms-2" onclick="testTelegramDirectly()">تست</button>
+                        <button class="btn btn-secondary ms-2" onclick="testTelegram()">تست</button>
                     </div>
                 </div>
             </div>
@@ -49,7 +49,7 @@
                     <div class="mt-4">
                         <button class="btn btn-success" onclick="startService('smart_ai')">راه‌اندازی</button>
                         <button class="btn btn-danger ms-2" onclick="stopService('smart_ai')">توقف</button>
-                        <button class="btn btn-secondary ms-2" onclick="testService('smart_ai')">تست</button>
+                        <button class="btn btn-secondary ms-2" onclick="testTelegram()">تست</button>
                     </div>
                 </div>
             </div>
@@ -73,7 +73,7 @@
                     <div class="mt-4">
                         <button class="btn btn-success" onclick="startService('simple')">راه‌اندازی</button>
                         <button class="btn btn-danger ms-2" onclick="stopService('simple')">توقف</button>
-                        <button class="btn btn-secondary ms-2" onclick="testService('simple')">تست</button>
+                        <button class="btn btn-secondary ms-2" onclick="testTelegram()">تست</button>
                     </div>
                 </div>
             </div>
@@ -191,22 +191,19 @@ function stopService(type) {
     }
 }
 
-function testService(type) {
-    let command = '';
-    switch(type) {
-        case 'ten_minute':
-            command = 'python enhanced_telegram_reporter.py --test';
-            break;
-        case 'smart_ai':
-            command = 'python telegram_smart_reporter.py --test';
-            break;
-        case 'simple':
-            command = 'python telegram_reporter.py test';
-            break;
-    }
-    
-    alert(`دستور تست سرویس ${type} ارسال شد:\n${command}`);
-    // در اینجا باید یک درخواست Ajax به سرور ارسال شود
+function testTelegram() {
+    fetch('/api/test-telegram')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('پیام تست با موفقیت ارسال شد!');
+            } else {
+                alert('خطا در ارسال پیام: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('خطا در ارتباط با سرور: ' + error);
+        });
 }
 
 function checkStatus(type) {
@@ -229,20 +226,3 @@ function saveSettings() {
 }
 </script>
 {% endblock %}
-
-<script>
-function testTelegramDirectly() {
-    fetch('/api/test-telegram')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('پیام تست با موفقیت ارسال شد!');
-            } else {
-                alert('خطا در ارسال پیام: ' + data.message);
-            }
-        })
-        .catch(error => {
-            alert('خطا در ارتباط با سرور: ' + error);
-        });
-}
-</script>
