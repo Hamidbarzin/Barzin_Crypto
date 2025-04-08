@@ -5,7 +5,7 @@
 {% block content %}
 <!-- Header with creator information -->
 <div style="background-color: #FFD700; color: #000; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-size: 24px; font-weight: bold;">
-    توسعه‌دهنده: ربات مشاور ارزهای دیجیتال
+    ربات مشاور ارزهای دیجیتال | طراحی و توسعه: حمید برزین
 </div>
 
 <div class="row mb-3">
@@ -88,8 +88,8 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">تحلیل تکنیکال <span id="selected-crypto-name">بیت‌کوین</span></h5>
                     <div class="border rounded p-1 bg-dark">
-                        <button onclick="document.getElementById('technical-analysis-content').style.display='block'; document.getElementById('news-analysis-content').style.display='none';" class="btn btn-sm btn-primary mx-1">تحلیل فنی</button>
-                        <button onclick="document.getElementById('technical-analysis-content').style.display='none'; document.getElementById('news-analysis-content').style.display='block';" class="btn btn-sm btn-outline-primary mx-1">اخبار و تحلیل‌ها</button>
+                        <button onclick="document.getElementById('technical-analysis-content').style.display='block'; document.getElementById('news-analysis-content').style.display='none';" class="btn btn-sm btn-outline-primary mx-1">تحلیل فنی</button>
+                        <button onclick="document.getElementById('technical-analysis-content').style.display='none'; document.getElementById('news-analysis-content').style.display='block';" class="btn btn-sm btn-primary mx-1">اخبار و تحلیل‌ها</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -162,7 +162,7 @@
                     </div>
                     
                     <!-- بخش اخبار و تحلیل‌ها -->
-                    <div id="news-analysis-content" style="display: none;">
+                    <div id="news-analysis-content" style="display: block;">
                         <h6 class="border-bottom pb-2 mb-3">آخرین اخبار مرتبط با <span id="selected-crypto-name2">بیت‌کوین</span></h6>
                         <div class="news-container">
                             <div class="news-item mb-3 p-3 border-start border-4 border-primary">
@@ -507,8 +507,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // نمایش بخش تحلیل فنی (به جای اخبار)
-                document.getElementById('technical-analysis-content').style.display = 'block';
-                document.getElementById('news-analysis-content').style.display = 'none';
+                document.getElementById('technical-analysis-content').style.display = 'none';
+                document.getElementById('news-analysis-content').style.display = 'block';
                 
                 // اسکرول به بخش تحلیل
                 const analysisSection = document.querySelector('.card-header');
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="row mt-5">
     <div class="col-12 text-center">
         <p class="text-muted small">
-            ربات مشاور ارزهای دیجیتال | ۱۴۰۴ &copy;
+            طراحی و توسعه توسط <span class="text-warning fw-bold">حمید برزین</span> | ۱۴۰۴ &copy;
         </p>
     </div>
 </div>
