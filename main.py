@@ -980,7 +980,9 @@ def test_telegram():
     # اطلاعات لاگینگ اضافی برای عیب‌یابی
     logger.info("درخواست تست تلگرام دریافت شد")
     
-    chat_id = '722627622'  # استفاده از چت آیدی ثابت که می‌دانیم کار می‌کند
+    # استفاده از چت آیدی پیش‌فرض از متغیر محیطی
+    chat_id = os.environ.get('DEFAULT_CHAT_ID', '722627622')
+    logger.info(f"چت آیدی پیش‌فرض: {chat_id}")
     
     # اگر اطلاعات در قالب JSON ارسال شده
     if request.is_json:
@@ -990,17 +992,29 @@ def test_telegram():
             logger.info(f"چت آیدی از درخواست JSON: {user_chat_id}")
             chat_id = user_chat_id
     
+    # اگر از طریق پارامترهای URL درخواست شده
+    elif request.method == 'GET' and request.args.get('chat_id'):
+        user_chat_id = request.args.get('chat_id')
+        logger.info(f"چت آیدی از پارامترهای URL: {user_chat_id}")
+        chat_id = user_chat_id
+    
     # استفاده از چت آیدی تنظیم شده در سشن (اگر وجود داشته باشد)
     elif session.get('telegram_chat_id'):
         user_chat_id = session.get('telegram_chat_id')
         logger.info(f"چت آیدی از سشن: {user_chat_id}")
         chat_id = user_chat_id
         
-    # تبدیل به عدد صحیح
+    # ذخیره چت آیدی در سشن برای استفاده‌های بعدی
+    session['telegram_chat_id'] = chat_id
+        
+    # تبدیل به عدد صحیح (اگر عدد باشد)
     try:
-        if isinstance(chat_id, str) and chat_id.isdigit():
-            chat_id = int(chat_id)
-            logger.info(f"چت آیدی به عدد صحیح تبدیل شد: {chat_id}")
+        if isinstance(chat_id, str):
+            # حذف هرگونه کاراکتر غیر عددی (مثل فاصله یا کاراکترهای خاص)
+            cleaned_chat_id = ''.join(c for c in chat_id if c.isdigit() or c == '-')
+            if cleaned_chat_id and cleaned_chat_id.lstrip('-').isdigit():
+                chat_id = int(cleaned_chat_id)
+                logger.info(f"چت آیدی به عدد صحیح تبدیل شد: {chat_id}")
     except Exception as e:
         logger.warning(f"خطا در تبدیل چت آیدی به عدد: {str(e)}")
         
