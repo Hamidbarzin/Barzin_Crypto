@@ -247,26 +247,57 @@
                 // Convert symbol format for DOM ID (replace / with -)
                 const domSymbol = symbol.replace('/', '-');
                 
-                // Replace slash with dash for API call
-                const apiSymbol = symbol.replace('/', '-');
-                fetch(`/api/price/${apiSymbol}`)
+                fetch(`/api/price/${domSymbol}`)
                     .then(response => response.json())
                     .then(data => {
+                        // Clear previous error formatting
+                        const priceElement = document.getElementById(`${domSymbol}-price`);
+                        if (priceElement) {
+                            priceElement.classList.remove('text-danger');
+                        }
+                        
+                        const changeElement = document.getElementById(`${domSymbol}-change`);
+                        if (changeElement) {
+                            changeElement.classList.remove('text-danger');
+                        }
+                        
                         if (data.success && data.data) {
                             // Update price
-                            const priceElement = document.getElementById(`${domSymbol}-price`);
                             if (priceElement) {
                                 priceElement.textContent = formatPrice(data.data.price);
                             }
                             
                             // Update change percentage
-                            const changeElement = document.getElementById(`${domSymbol}-change`);
                             if (changeElement) {
                                 changeElement.innerHTML = formatChange(data.data.change_24h);
                             }
+                        } else {
+                            // Display error message in price elements
+                            if (priceElement) {
+                                priceElement.textContent = 'خطای API';
+                                priceElement.classList.add('text-danger');
+                            }
+                            
+                            if (changeElement) {
+                                changeElement.innerHTML = '<span class="text-danger">عدم اتصال</span>';
+                            }
+                            
+                            console.error('API Error:', data.message || 'خطای نامشخص');
                         }
                     })
                     .catch(error => {
+                        // Display error message in price elements
+                        const priceElement = document.getElementById(`${domSymbol}-price`);
+                        if (priceElement) {
+                            priceElement.textContent = 'خطای شبکه';
+                            priceElement.classList.add('text-danger');
+                        }
+                        
+                        const changeElement = document.getElementById(`${domSymbol}-change`);
+                        if (changeElement) {
+                            changeElement.innerHTML = '<span class="text-danger">عدم اتصال</span>';
+                        }
+                        
                         console.error('Error updating prices:', error);
                     });
             });
