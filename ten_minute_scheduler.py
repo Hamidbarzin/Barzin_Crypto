@@ -72,7 +72,7 @@ def send_alive_message():
             logger.error("چت آیدی تعیین نشده است. لطفاً متغیر محیطی DEFAULT_CHAT_ID را تنظیم کنید.")
             return False
             
-        result = send_telegram_message(message)
+        result = send_telegram_message(chat_id, message)
         logger.info(f"نتیجه ارسال پیام زنده بودن سیستم: {result}")
         return result
     except Exception as e:

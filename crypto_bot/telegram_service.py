@@ -1,11 +1,12 @@
 """
-سرویس اعلان و هشدار Telegram برای ارسال پیام در مورد فرصت‌های خرید و فروش و نوسانات بازار
+سرویس اعلان و هشدار Telegram برای ارسال پیام و تصویر در مورد فرصت‌های خرید و فروش و نوسانات بازار
 """
 
 import os
 import logging
 import asyncio
 from datetime import datetime
+import pathlib
 
 # تنظیم لاگر
 logger = logging.getLogger(__name__)
@@ -543,6 +544,113 @@ def get_chat_debug_info(chat_id=None, max_retries=2, retry_delay=1):
     logger.error(f"خطا در دریافت اطلاعات چت پس از {max_retries} تلاش: {error_msg}")
     debug_info["error"] = error_msg
     return debug_info
+
+
+def send_telegram_photo(chat_id, photo_path, caption=None, parse_mode='HTML', max_retries=3, retry_delay=1):
+    """
+    ارسال عکس به کاربر از طریق تلگرام
+
+    Args:
+        chat_id (int or str): شناسه چت کاربر
+        photo_path (str): مسیر فایل عکس
+        caption (str, optional): توضیحات عکس
+        parse_mode (str): نوع پارس پیام ('HTML' یا 'Markdown')
+        max_retries (int): حداکثر تعداد تلاش‌های مجدد در صورت خطا
+        retry_delay (int): تاخیر به ثانیه بین تلاش‌های مجدد
+
+    Returns:
+        bool: آیا ارسال موفقیت‌آمیز بود
+    """
+    if not TELEGRAM_AVAILABLE or _telegram is None:
+        logger.error("کتابخانه تلگرام نصب نشده است")
+        return False
+        
+    # بررسی مجدد توکن تلگرام از متغیرهای محیطی
+    token = os.environ.get("TELEGRAM_BOT_TOKEN") or TELEGRAM_BOT_TOKEN
+    if not token:
+        logger.error("توکن بات تلگرام تنظیم نشده است")
+        return False
+        
+    # اطمینان از اینکه chat_id به فرمت عددی است
+    try:
+        if isinstance(chat_id, str) and chat_id.isdigit():
+            chat_id = int(chat_id)
+    except Exception as e:
+        logger.warning(f"خطا در تبدیل چت آیدی به عدد: {str(e)}")
+        # ادامه کار بدون تبدیل
+        
+    # بررسی وجود فایل
+    photo_file = pathlib.Path(photo_path)
+    if not photo_file.exists():
+        logger.error(f"فایل تصویر در مسیر {photo_path} یافت نشد.")
+        return False
+        
+    # تبدیل ParseMode به نوع مناسب
+    if parse_mode == 'HTML':
+        parse_mode_enum = ParseMode.HTML
+    elif parse_mode == 'Markdown':
+        parse_mode_enum = ParseMode.MARKDOWN_V2
+    else:
+        parse_mode_enum = parse_mode
+    
+    # اضافه کردن اطلاعات دیباگ
+    logger.info(f"تلاش برای ارسال تصویر به چت آیدی: {chat_id} از مسیر {photo_path}")
+    
+    # ایجاد یک لوپ آسنکرون برای اجرای کد آسنکرون
+    async def send_photo_async():
+        # ایجاد بات داخل تابع آسنکرون
+        bot = _telegram.Bot(token=token)
+        # باز کردن فایل عکس
+        with open(photo_path, 'rb') as photo:
+            # ارسال عکس
+            await bot.send_photo(
+                chat_id=chat_id,
+                photo=photo,
+                caption=caption,
+                parse_mode=parse_mode_enum if caption else None
+            )
+    
+    # تلاش مجدد با تاخیر
+    retries = 0
+    last_error = None
+    
+    while retries <= max_retries:
+        try:
+            # بررسی وجود لوپ رویداد و اجرای تابع آسنکرون
+            try:
+                # اگر لوپ رویداد در حال اجرا باشد
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # ایجاد تسک جدید در لوپ موجود
+                    future = asyncio.run_coroutine_threadsafe(send_photo_async(), loop)
+                    # منتظر اتمام تسک می‌مانیم
+                    future.result(timeout=10)  # تایم‌اوت 10 ثانیه
+                else:
+                    # اجرا در لوپ فعلی
+                    loop.run_until_complete(send_photo_async())
+            except RuntimeError:
+                # اگر لوپ رویداد وجود نداشته باشد، یک لوپ جدید ایجاد می‌کنیم
+                asyncio.run(send_photo_async())
+            
+            logger.info(f"تصویر با موفقیت به چت {chat_id} ارسال شد")
+            return True
+            
+        except Exception as e:
+            last_error = e
+            retries += 1
+            logger.warning(f"خطا در ارسال تصویر تلگرام (تلاش {retries}/{max_retries}): {str(e)}")
+            
+            if retries <= max_retries:
+                logger.info(f"تلاش مجدد پس از {retry_delay} ثانیه...")
+                import time
+                time.sleep(retry_delay)  # تاخیر قبل از تلاش مجدد
+            else:
+                logger.error(f"همه تلاش‌ها برای ارسال تصویر به {chat_id} با شکست مواجه شد")
+                return False
+    
+    # اگر به اینجا برسیم، یعنی همه تلاش‌ها ناموفق بوده‌اند
+    logger.error(f"خطا در ارسال تصویر تلگرام پس از {max_retries} تلاش: {str(last_error)}")
+    return False
 
 
 def get_current_persian_time():
