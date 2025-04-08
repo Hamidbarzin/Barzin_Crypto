@@ -246,9 +246,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const categoryButtons = document.querySelectorAll('[data-crypto-category]');
     const cryptoRows = document.querySelectorAll('.crypto-row');
     
+    console.log("تعداد دکمه‌های فیلتر: ", categoryButtons.length);
+    console.log("تعداد سطرهای جدول: ", cryptoRows.length);
+    
     // اضافه کردن رویداد کلیک به هر دکمه فیلتر
     categoryButtons.forEach(button => {
         button.addEventListener('click', function() {
+            console.log("کلیک شد روی: ", this.textContent);
+            console.log("دسته‌بندی انتخاب شده: ", this.getAttribute('data-crypto-category'));
+            
             // به روزرسانی وضعیت active دکمه‌ها
             categoryButtons.forEach(btn => {
                 btn.classList.remove('active');
@@ -264,6 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // فیلتر کردن سطرهای جدول
             cryptoRows.forEach(row => {
+                console.log("بررسی سطر: ", row.classList);
                 if (category === 'all') {
                     row.style.display = '';
                 } else {
