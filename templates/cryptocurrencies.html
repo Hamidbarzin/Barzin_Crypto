@@ -40,130 +40,32 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- ارزهای اصلی و شناخته شده -->
+                                <!-- لیست ارزهای دیجیتال با استفاده از داده‌های دینامیک -->
+                                {% for coin in cryptocurrencies %}
+                                {% if coin.id <= 7 %}
                                 <tr class="crypto-row major">
-                                    <td>1</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="icon-circle me-2">
-                                                <i class="fab fa-bitcoin text-warning"></i>
-                                            </div>
-                                            <div>بیت‌کوین</div>
-                                        </div>
-                                    </td>
-                                    <td>BTC/USDT</td>
-                                    <td id="BTC-USDT-price">64,200.50</td>
-                                    <td id="BTC-USDT-change" class="text-success">+1.2%</td>
-                                    <td>48.5B</td>
-                                    <td><span class="badge bg-success">خرید</span></td>
-                                    <td><a href="#" class="btn btn-sm btn-outline-primary">تحلیل کامل</a></td>
-                                </tr>
-                                <tr class="crypto-row major">
-                                    <td>2</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="icon-circle me-2">
-                                                <i class="fab fa-ethereum text-primary"></i>
-                                            </div>
-                                            <div>اتریوم</div>
-                                        </div>
-                                    </td>
-                                    <td>ETH/USDT</td>
-                                    <td id="ETH-USDT-price">3,455.75</td>
-                                    <td id="ETH-USDT-change" class="text-success">+2.4%</td>
-                                    <td>15.2B</td>
-                                    <td><span class="badge bg-success">خرید</span></td>
-                                    <td><a href="#" class="btn btn-sm btn-outline-primary">تحلیل کامل</a></td>
-                                </tr>
-                                <tr class="crypto-row major">
-                                    <td>3</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="icon-circle me-2">
-                                                <i class="fas fa-sun text-warning"></i>
-                                            </div>
-                                            <div>سولانا</div>
-                                        </div>
-                                    </td>
-                                    <td>SOL/USDT</td>
-                                    <td id="SOL-USDT-price">142.30</td>
-                                    <td id="SOL-USDT-change" class="text-success">+3.5%</td>
-                                    <td>5.8B</td>
-                                    <td><span class="badge bg-success">خرید</span></td>
-                                    <td><a href="#" class="btn btn-sm btn-outline-primary">تحلیل کامل</a></td>
-                                </tr>
-                                
-                                <!-- ارزهای با پتانسیل رشد بالا -->
+                                {% elif coin.id <= 13 %}
                                 <tr class="crypto-row promising">
-                                    <td>4</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="icon-circle me-2">
-                                                <i class="fas fa-link text-info"></i>
-                                            </div>
-                                            <div>چین‌لینک</div>
-                                        </div>
-                                    </td>
-                                    <td>LINK/USDT</td>
-                                    <td id="LINK-USDT-price">14.85</td>
-                                    <td id="LINK-USDT-change" class="text-danger">-0.8%</td>
-                                    <td>984M</td>
-                                    <td><span class="badge bg-warning">خنثی</span></td>
-                                    <td><a href="#" class="btn btn-sm btn-outline-primary">تحلیل کامل</a></td>
-                                </tr>
-                                <tr class="crypto-row promising">
-                                    <td>5</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="icon-circle me-2">
-                                                <i class="fas fa-globe text-success"></i>
-                                            </div>
-                                            <div>کاسموس</div>
-                                        </div>
-                                    </td>
-                                    <td>ATOM/USDT</td>
-                                    <td id="ATOM-USDT-price">8.65</td>
-                                    <td id="ATOM-USDT-change" class="text-success">+1.9%</td>
-                                    <td>345M</td>
-                                    <td><span class="badge bg-success">خرید</span></td>
-                                    <td><a href="#" class="btn btn-sm btn-outline-primary">تحلیل کامل</a></td>
-                                </tr>
-                                
-                                <!-- ارزهای جدیدتر با پتانسیل رشد -->
+                                {% else %}
                                 <tr class="crypto-row new">
-                                    <td>6</td>
+                                {% endif %}
+                                    <td>{{ coin.id }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="icon-circle me-2">
-                                                <i class="fas fa-cube text-primary"></i>
+                                                <i class="{{ coin.icon }}"></i>
                                             </div>
-                                            <div>سوی</div>
+                                            <div>{{ coin.name }}</div>
                                         </div>
                                     </td>
-                                    <td>SUI/USDT</td>
-                                    <td id="SUI-USDT-price">1.45</td>
-                                    <td id="SUI-USDT-change" class="text-success">+5.2%</td>
-                                    <td>235M</td>
-                                    <td><span class="badge bg-success">خرید قوی</span></td>
+                                    <td>{{ coin.symbol }}</td>
+                                    <td id="{{ coin.symbol.replace('/', '-') }}-price">{{ coin.price }}</td>
+                                    <td id="{{ coin.symbol.replace('/', '-') }}-change" class="{% if coin.change.startswith('+') %}text-success{% else %}text-danger{% endif %}">{{ coin.change }}</td>
+                                    <td>{{ coin.volume }}</td>
+                                    <td><span class="badge bg-{{ coin.signal_class }}">{{ coin.signal }}</span></td>
                                     <td><a href="#" class="btn btn-sm btn-outline-primary">تحلیل کامل</a></td>
                                 </tr>
-                                <tr class="crypto-row new">
-                                    <td>7</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="icon-circle me-2">
-                                                <i class="fas fa-paper-plane text-info"></i>
-                                            </div>
-                                            <div>تونیک</div>
-                                        </div>
-                                    </td>
-                                    <td>TON/USDT</td>
-                                    <td id="TON-USDT-price">5.87</td>
-                                    <td id="TON-USDT-change" class="text-success">+2.4%</td>
-                                    <td>185M</td>
-                                    <td><span class="badge bg-success">خرید</span></td>
-                                    <td><a href="#" class="btn btn-sm btn-outline-primary">تحلیل کامل</a></td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
