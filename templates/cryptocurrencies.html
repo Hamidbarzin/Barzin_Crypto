@@ -78,61 +78,114 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card crypto-card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">تحلیل تکنیکال <span id="selected-crypto-name">بیت‌کوین</span></h5>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-outline-primary active" id="tab-technical">تحلیل فنی</button>
+                        <button class="btn btn-sm btn-outline-primary" id="tab-news">اخبار و تحلیل‌ها</button>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <!-- Chart Placeholder -->
-                            <div class="chart-container" style="height: 300px; background: #1c1c28; border-radius: 8px;">
-                                <div class="d-flex justify-content-center align-items-center h-100">
-                                    <p class="text-muted">نمودار قیمت <span id="selected-crypto-symbol">BTC/USDT</span> به زودی بارگذاری خواهد شد</p>
+                    <!-- بخش تحلیل تکنیکال -->
+                    <div id="technical-analysis-content">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <!-- Chart Placeholder -->
+                                <div class="chart-container" style="height: 300px; background: #1c1c28; border-radius: 8px;">
+                                    <div class="d-flex justify-content-center align-items-center h-100">
+                                        <p class="text-muted">نمودار قیمت <span id="selected-crypto-symbol">BTC/USDT</span> به زودی بارگذاری خواهد شد</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="indicator-box mb-3">
+                                    <div class="indicator-label">RSI (شاخص قدرت نسبی)</div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted">اشباع فروش</small>
+                                        <small class="text-muted">خنثی</small>
+                                        <small class="text-muted">اشباع خرید</small>
+                                    </div>
+                                    <div class="indicator-value">65</div>
+                                </div>
+                                
+                                <div class="indicator-box mb-3">
+                                    <div class="indicator-label">MACD</div>
+                                    <div class="d-flex justify-content-between">
+                                        <div>سیگنال: <span class="text-info">12.2</span></div>
+                                        <div>خط MACD: <span class="text-warning">15.8</span></div>
+                                    </div>
+                                    <div class="indicator-description">
+                                        <span class="text-success">
+                                            <i class="fas fa-arrow-up me-1"></i>
+                                            روند صعودی (سیگنال خرید)
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="indicator-box">
+                                    <div class="indicator-label">میانگین‌های متحرک</div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <div>MA20: <span class="text-info">63,200</span></div>
+                                        <div>MA50: <span class="text-warning">61,500</span></div>
+                                    </div>
+                                    <div class="indicator-description">
+                                        <span class="text-success">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            قیمت بالای میانگین‌های متحرک (روند صعودی)
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="indicator-box mb-3">
-                                <div class="indicator-label">RSI (شاخص قدرت نسبی)</div>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-success" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    
+                    <!-- بخش اخبار و تحلیل‌ها -->
+                    <div id="news-analysis-content" style="display: none;">
+                        <h6 class="border-bottom pb-2 mb-3">آخرین اخبار مرتبط با <span id="selected-crypto-name2">بیت‌کوین</span></h6>
+                        <div class="news-container">
+                            <div class="news-item mb-3 p-3 border-start border-4 border-primary">
+                                <h6 class="news-title mb-2">بیت‌کوین به بالاترین قیمت تاریخ خود رسید</h6>
+                                <p class="news-excerpt text-muted mb-1">ارز دیجیتال بیت‌کوین با عبور از مرز ۷۰ هزار دلار به بالاترین قیمت تاریخ خود دست یافت. این اتفاق در پی افزایش تقاضا از سوی صندوق‌های ETF رخ داده است.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="news-source">منبع: خبرگزاری ارز دیجیتال</small>
+                                    <small class="news-date">۸ آوریل ۲۰۲۵</small>
                                 </div>
-                                <div class="d-flex justify-content-between">
-                                    <small class="text-muted">اشباع فروش</small>
-                                    <small class="text-muted">خنثی</small>
-                                    <small class="text-muted">اشباع خرید</small>
-                                </div>
-                                <div class="indicator-value">65</div>
-                            </div>
-                            
-                            <div class="indicator-box mb-3">
-                                <div class="indicator-label">MACD</div>
-                                <div class="d-flex justify-content-between">
-                                    <div>سیگنال: <span class="text-info">12.2</span></div>
-                                    <div>خط MACD: <span class="text-warning">15.8</span></div>
-                                </div>
-                                <div class="indicator-description">
-                                    <span class="text-success">
-                                        <i class="fas fa-arrow-up me-1"></i>
-                                        روند صعودی (سیگنال خرید)
-                                    </span>
+                                <div class="news-sentiment mt-2">
+                                    <span class="badge bg-success">احساس بازار: مثبت</span>
                                 </div>
                             </div>
                             
-                            <div class="indicator-box">
-                                <div class="indicator-label">میانگین‌های متحرک</div>
-                                <div class="d-flex justify-content-between mt-2">
-                                    <div>MA20: <span class="text-info">63,200</span></div>
-                                    <div>MA50: <span class="text-warning">61,500</span></div>
+                            <div class="news-item mb-3 p-3 border-start border-4 border-warning">
+                                <h6 class="news-title mb-2">تحلیل‌گران: احتمال اصلاح کوتاه‌مدت در قیمت بیت‌کوین</h6>
+                                <p class="news-excerpt text-muted mb-1">برخی تحلیل‌گران معتقدند پس از رشد اخیر، بیت‌کوین ممکن است یک اصلاح قیمت موقت را تجربه کند. شاخص‌های تکنیکال نشان می‌دهند بازار در وضعیت اشباع خرید قرار دارد.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="news-source">منبع: تحلیل‌گران بازار</small>
+                                    <small class="news-date">۷ آوریل ۲۰۲۵</small>
                                 </div>
-                                <div class="indicator-description">
-                                    <span class="text-success">
-                                        <i class="fas fa-check-circle me-1"></i>
-                                        قیمت بالای میانگین‌های متحرک (روند صعودی)
-                                    </span>
+                                <div class="news-sentiment mt-2">
+                                    <span class="badge bg-warning">احساس بازار: خنثی</span>
+                                </div>
+                            </div>
+                            
+                            <div class="news-item mb-3 p-3 border-start border-4 border-info">
+                                <h6 class="news-title mb-2">استراتژی معامله هدفمند: زمان مناسب برای ورود به بازار</h6>
+                                <p class="news-excerpt text-muted mb-1">با توجه به تثبیت قیمت بیت‌کوین در بالای سطح ۶۵ هزار دلار، بسیاری از معامله‌گران این محدوده را برای ورود به بازار مناسب می‌دانند. استراتژی خرید تدریجی می‌تواند ریسک را کاهش دهد.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="news-source">منبع: دنیای رمزارز</small>
+                                    <small class="news-date">۶ آوریل ۲۰۲۵</small>
+                                </div>
+                                <div class="news-sentiment mt-2">
+                                    <span class="badge bg-info">احساس بازار: محتاطانه مثبت</span>
                                 </div>
                             </div>
                         </div>
+                        
+                        <a href="#" class="btn btn-outline-secondary btn-sm mt-2 w-100" id="load-more-news">
+                            <i class="fas fa-sync me-1"></i> بارگذاری اخبار بیشتر
+                        </a>
                     </div>
                 </div>
             </div>
@@ -264,6 +317,80 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // تنظیم دکمه‌های زبانه برای تحلیل فنی / اخبار
+    function setupTabs() {
+        const tabTechnical = document.getElementById('tab-technical');
+        const tabNews = document.getElementById('tab-news');
+        const technicalContent = document.getElementById('technical-analysis-content');
+        const newsContent = document.getElementById('news-analysis-content');
+        
+        if (tabTechnical && tabNews && technicalContent && newsContent) {
+            tabTechnical.addEventListener('click', function() {
+                // فعال‌سازی دکمه تحلیل فنی
+                tabTechnical.classList.add('active');
+                tabNews.classList.remove('active');
+                
+                // نمایش محتوای تحلیل فنی و مخفی کردن اخبار
+                technicalContent.style.display = 'block';
+                newsContent.style.display = 'none';
+            });
+            
+            tabNews.addEventListener('click', function() {
+                // فعال‌سازی دکمه اخبار
+                tabNews.classList.add('active');
+                tabTechnical.classList.remove('active');
+                
+                // نمایش محتوای اخبار و مخفی کردن تحلیل فنی
+                newsContent.style.display = 'block';
+                technicalContent.style.display = 'none';
+                
+                // به‌روزرسانی نام رمزارز در بخش اخبار
+                const cryptoName = document.getElementById('selected-crypto-name').textContent;
+                const cryptoName2 = document.getElementById('selected-crypto-name2');
+                if (cryptoName2) {
+                    cryptoName2.textContent = cryptoName;
+                }
+            });
+            
+            // دکمه بارگذاری اخبار بیشتر
+            const loadMoreButton = document.getElementById('load-more-news');
+            if (loadMoreButton) {
+                loadMoreButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // شبیه‌سازی بارگذاری اخبار بیشتر
+                    loadMoreButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> در حال بارگذاری...';
+                    
+                    // شبیه‌سازی تأخیر در بارگذاری
+                    setTimeout(() => {
+                        // افزودن یک خبر جدید
+                        const newsContainer = document.querySelector('.news-container');
+                        const newNewsItem = document.createElement('div');
+                        newNewsItem.className = 'news-item mb-3 p-3 border-start border-4 border-success';
+                        newNewsItem.innerHTML = `
+                            <h6 class="news-title mb-2">گزارش: سرمایه‌گذاری نهادی در رمزارزها افزایش یافته است</h6>
+                            <p class="news-excerpt text-muted mb-1">گزارش‌ها حاکی از آن است که سرمایه‌گذاری نهادی در بازار رمزارزها، خصوصاً بیت‌کوین و اتریوم به شدت افزایش یافته است. این روند می‌تواند نشانه‌ای از پذیرش گسترده‌تر ارزهای دیجیتال باشد.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="news-source">منبع: تحلیل مالی کریپتو</small>
+                                <small class="news-date">۵ آوریل ۲۰۲۵</small>
+                            </div>
+                            <div class="news-sentiment mt-2">
+                                <span class="badge bg-success">احساس بازار: بسیار مثبت</span>
+                            </div>
+                        `;
+                        
+                        if (newsContainer) {
+                            newsContainer.appendChild(newNewsItem);
+                        }
+                        
+                        // بازگرداندن دکمه به حالت اصلی
+                        loadMoreButton.innerHTML = '<i class="fas fa-sync me-1"></i> بارگذاری اخبار بیشتر';
+                    }, 1500);
+                });
+            }
+        }
+    }
+    
     // شبیه‌سازی به‌روزرسانی قیمت‌ها (در حالت واقعی با API جایگزین می‌شود)
     function updatePrices() {
         const cryptoPriceElements = document.querySelectorAll('[id$="-price"]');
@@ -303,7 +430,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // به‌روزرسانی قیمت‌ها هر 5 ثانیه
     setInterval(updatePrices, 5000);
     
-    // برای اطمینان، یک بار اجرا کن
+    // اجرای توابع اصلی
+    setupTabs();
     setTimeout(updatePrices, 1000);
 });
 </script>

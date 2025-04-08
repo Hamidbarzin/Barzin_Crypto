@@ -168,6 +168,39 @@
             overflow: hidden;
         }
         
+        /* نمایش اخبار و تحلیل */
+        .news-item {
+            background-color: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .news-item:hover {
+            background-color: rgba(0, 0, 0, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .news-title {
+            font-weight: bold;
+            color: #f0f0f0;
+        }
+        
+        .news-excerpt {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .news-source, .news-date {
+            color: #adb5bd;
+            font-size: 0.8rem;
+        }
+        
+        /* زبانه‌های تحلیل */
+        .btn-group .btn-outline-primary.active {
+            background-color: var(--bs-primary);
+            color: white;
+        }
+        
         /* Loading Spinner */
         .loader {
             width: 48px;
