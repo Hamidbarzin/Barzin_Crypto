@@ -1088,21 +1088,42 @@ def get_price(symbol):
                 logger.info(f"Found price data for {sym}")
                 return jsonify({'success': True, 'data': result[sym]})
         
-        # If we didn't get data for any format, return a sample with clear marking
-        logger.warning(f"No result for {symbol} or alternatives, providing sample data")
+        # If we didn't get data for any format, use API specific call for this coin
+        # This is useful when the primary API has rate limits
+        try:
+            # Extract coin name from symbol
+            coin = symbol.split('/')[0] if '/' in symbol else symbol.split('-')[0]
+            
+            # Use cryptocompare API directly
+            from crypto_bot.market_api import get_price_from_cryptocompare, get_price_from_coingecko
+            
+            # Try Cryptocompare first
+            if '/' in symbol:
+                result = get_price_from_cryptocompare(symbol)
+            else:
+                result = get_price_from_cryptocompare(symbol.replace('-', '/'))
+                
+            if not result.get('error', False):
+                return jsonify({'success': True, 'data': result})
+                
+            # Then try Coingecko
+            if '/' in symbol:
+                result = get_price_from_coingecko(symbol)
+            else:
+                result = get_price_from_coingecko(symbol.replace('-', '/'))
+                
+            if not result.get('error', False):
+                return jsonify({'success': True, 'data': result})
+                
+        except Exception as e:
+            logger.error(f"Error using direct API for {symbol}: {str(e)}")
         
-        # Create sample data that is clearly marked as such
-        sample_data = {
-            'price': 69420.50,
-            'change_24h': 1.2,
-            'high_24h': 70000.50,
-            'low_24h': 68500.75,
-            'volume_24h': 1245678.90,
-            'is_sample_data': True,
-            'source': 'sample_data',
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        return jsonify({'success': True, 'data': sample_data, 'sample_data': True})
+        # If all attempts failed, return failure
+        logger.warning(f"No result for {symbol} or alternatives, API request failed")
+        return jsonify({
+            'success': False, 
+            'message': 'خطا در دریافت اطلاعات قیمت. لطفاً بعداً دوباره امتحان کنید.'
+        })
     except Exception as e:
         logger.error(f"Error getting price for {symbol}: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
