@@ -3,21 +3,19 @@
 {% block title %}ارزهای دیجیتال | ربات هوشمند ارز دیجیتال{% endblock %}
 
 {% block content %}
-<!-- Creator information -->
-<div class="row mb-2">
-    <div class="col-12 text-center">
-        <p class="text-warning small">
-            طراحی و توسعه توسط <span class="fw-bold">حمید برزین</span> | ۱۴۰۴ &copy;
-        </p>
+<!-- Header with creator information -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="mb-0">ارزهای دیجیتال</h1>
+            <div class="text-warning">
+                طراحی و توسعه: <span class="fw-bold" style="font-size: 1.2rem;">{{ developer_name }}</span>
+            </div>
+        </div>
+        <p class="text-muted mt-2">لیست کامل ارزهای دیجیتال تحت نظارت و تحلیل ربات</p>
     </div>
 </div>
 <div id="dashboard-content">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="mb-3">ارزهای دیجیتال</h1>
-            <p class="text-muted">لیست کامل ارزهای دیجیتال تحت نظارت و تحلیل ربات</p>
-        </div>
-    </div>
 
     <!-- Cryptocurrency Categories -->
     <div class="row mb-4">

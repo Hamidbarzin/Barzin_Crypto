@@ -644,7 +644,8 @@ def cryptocurrencies():
                           cryptocurrencies=all_cryptocurrencies,
                           major_coins=important_coins,
                           promising_coins=ai_coins,
-                          new_coins=layer_coins)
+                          new_coins=layer_coins,
+                          developer_name="حمید برزین")
 
 @app.route('/simple')
 def simple_home():
