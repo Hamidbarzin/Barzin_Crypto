@@ -18,10 +18,10 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">دسته‌بندی ارزها</h5>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-sm btn-warning active" data-category="all">همه ارزها</button>
-                        <button type="button" class="btn btn-sm btn-outline-warning" data-category="major">ارزهای اصلی</button>
-                        <button type="button" class="btn btn-sm btn-outline-warning" data-category="promising">ارزهای با پتانسیل</button>
-                        <button type="button" class="btn btn-sm btn-outline-warning" data-category="new">ارزهای جدید</button>
+                        <button type="button" class="btn btn-sm btn-warning active" data-crypto-category="all">همه ارزها</button>
+                        <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="major">ارزهای اصلی</button>
+                        <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="promising">ارزهای با پتانسیل</button>
+                        <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="new">ارزهای جدید</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -242,19 +242,27 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Category filter functionality
-    const categoryButtons = document.querySelectorAll('[data-category]');
+    // دکمه‌های فیلتر دسته‌بندی
+    const categoryButtons = document.querySelectorAll('[data-crypto-category]');
     const cryptoRows = document.querySelectorAll('.crypto-row');
     
+    // اضافه کردن رویداد کلیک به هر دکمه فیلتر
     categoryButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // Update active button
-            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            // به روزرسانی وضعیت active دکمه‌ها
+            categoryButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.remove('btn-warning');
+                btn.classList.add('btn-outline-warning');
+            });
+            
             this.classList.add('active');
+            this.classList.remove('btn-outline-warning');
+            this.classList.add('btn-warning');
             
-            const category = this.getAttribute('data-category');
+            const category = this.getAttribute('data-crypto-category');
             
-            // Filter rows
+            // فیلتر کردن سطرهای جدول
             cryptoRows.forEach(row => {
                 if (category === 'all') {
                     row.style.display = '';
@@ -269,60 +277,90 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Analysis buttons functionality
+    // دکمه‌های تحلیل
     const analysisButtons = document.querySelectorAll('.btn-outline-primary');
     
+    // اضافه کردن رویداد کلیک برای نمایش تحلیل فنی
     analysisButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Get crypto data from the row
+            // دریافت اطلاعات ارز از سطر کلیک شده
             const row = this.closest('tr');
-            const cryptoName = row.querySelector('.d-flex > div:nth-child(2)').textContent;
-            const cryptoSymbol = row.querySelector('td:nth-child(3)').textContent;
+            const cryptoNameElement = row.querySelector('.d-flex > div:nth-child(2)');
+            const cryptoSymbolElement = row.querySelector('td:nth-child(3)');
             
-            // Update the analysis section
-            document.getElementById('selected-crypto-name').textContent = cryptoName;
-            document.getElementById('selected-crypto-symbol').textContent = cryptoSymbol;
-            
-            // Scroll to analysis section
-            document.querySelector('.card-header:contains("تحلیل تکنیکال")').scrollIntoView({
-                behavior: 'smooth'
-            });
+            if (cryptoNameElement && cryptoSymbolElement) {
+                const cryptoName = cryptoNameElement.textContent;
+                const cryptoSymbol = cryptoSymbolElement.textContent;
+                
+                // به روزرسانی بخش تحلیل
+                const nameElement = document.getElementById('selected-crypto-name');
+                const symbolElement = document.getElementById('selected-crypto-symbol');
+                
+                if (nameElement && symbolElement) {
+                    nameElement.textContent = cryptoName;
+                    symbolElement.textContent = cryptoSymbol;
+                }
+                
+                // اسکرول به بخش تحلیل
+                const analysisSection = document.querySelector('.card-header');
+                if (analysisSection && analysisSection.textContent.includes('تحلیل تکنیکال')) {
+                    analysisSection.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                } else {
+                    // اگر بخش تحلیل پیدا نشد، به انتهای صفحه اسکرول کن
+                    window.scrollTo({
+                        top: document.body.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            }
         });
     });
     
-    // Real-time price update simulation
+    // شبیه‌سازی به‌روزرسانی قیمت‌ها (در حالت واقعی با API جایگزین می‌شود)
     function updatePrices() {
-        // This would be replaced with actual API calls in production
         const cryptoPriceElements = document.querySelectorAll('[id$="-price"]');
         const cryptoChangeElements = document.querySelectorAll('[id$="-change"]');
         
         cryptoPriceElements.forEach(el => {
-            const currentPrice = parseFloat(el.textContent.replace(',', ''));
-            const change = (Math.random() - 0.5) * 0.001; // Small random change
-            const newPrice = currentPrice * (1 + change);
-            el.textContent = newPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            // اطمینان از اینکه محتوا یک عدد معتبر است
+            const currentText = el.textContent.trim().replace(/,/g, '');
+            if (!isNaN(parseFloat(currentText))) {
+                const currentPrice = parseFloat(currentText);
+                const change = (Math.random() - 0.5) * 0.001; // تغییر کوچک تصادفی
+                const newPrice = currentPrice * (1 + change);
+                el.textContent = newPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
         });
         
         cryptoChangeElements.forEach(el => {
-            const currentChange = parseFloat(el.textContent);
-            const fluctuation = (Math.random() - 0.5) * 0.1; 
-            const newChange = currentChange + fluctuation;
-            
-            el.textContent = (newChange >= 0 ? '+' : '') + newChange.toFixed(2) + '%';
-            
-            // Update colors
-            if (newChange >= 0) {
-                el.className = 'text-success';
-            } else {
-                el.className = 'text-danger';
+            // اطمینان از اینکه محتوا یک عدد معتبر است
+            const currentText = el.textContent.trim().replace(/%/g, '').replace(/\+/g, '');
+            if (!isNaN(parseFloat(currentText))) {
+                const currentChange = parseFloat(currentText);
+                const fluctuation = (Math.random() - 0.5) * 0.1; 
+                const newChange = currentChange + fluctuation;
+                
+                el.textContent = (newChange >= 0 ? '+' : '') + newChange.toFixed(2) + '%';
+                
+                // به‌روزرسانی رنگ‌ها
+                if (newChange >= 0) {
+                    el.className = 'text-success';
+                } else {
+                    el.className = 'text-danger';
+                }
             }
         });
     }
     
-    // Update prices every 5 seconds
+    // به‌روزرسانی قیمت‌ها هر 5 ثانیه
     setInterval(updatePrices, 5000);
+    
+    // برای اطمینان، یک بار اجرا کن
+    setTimeout(updatePrices, 1000);
 });
 </script>
 {% endblock %}
