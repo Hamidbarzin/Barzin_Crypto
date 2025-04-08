@@ -470,17 +470,17 @@ def index():
 @app.route('/cryptocurrencies')
 @app.route('/crypto')
 def cryptocurrencies():
-    """صفحه مخصوص ارزهای دیجیتال با تمرکز روی ارزهای جدید و با پتانسیل"""
-    # لیست ارزهای اصلی و شناخته شده
-    major_coins = [
+    """صفحه مخصوص ارزهای دیجیتال با تمرکز روی ارزهای مهم و تأثیرگذار"""
+    # لیست ارزهای مهم و تأثیرگذار در بازار
+    important_coins = [
         {
             'id': 1, 
             'name': 'بیت‌کوین', 
             'symbol': 'BTC/USDT', 
             'icon': 'fab fa-bitcoin text-warning',
-            'price': '64,200.50',
-            'change': '+1.2%',
-            'volume': '48.5B',
+            'price': '67,500.25',
+            'change': '+2.4%',
+            'volume': '52.3B',
             'signal': 'خرید',
             'signal_class': 'success'
         },
@@ -489,9 +489,9 @@ def cryptocurrencies():
             'name': 'اتریوم', 
             'symbol': 'ETH/USDT', 
             'icon': 'fab fa-ethereum text-primary',
-            'price': '3,100.75',
-            'change': '+0.8%',
-            'volume': '22.3B',
+            'price': '3,450.75',
+            'change': '+1.8%',
+            'volume': '24.7B',
             'signal': 'خرید',
             'signal_class': 'success'
         },
@@ -499,11 +499,11 @@ def cryptocurrencies():
             'id': 3, 
             'name': 'سولانا', 
             'symbol': 'SOL/USDT', 
-            'icon': 'fas fa-globe text-info',
-            'price': '146.60',
-            'change': '+2.5%',
-            'volume': '5.7B',
-            'signal': 'خرید',
+            'icon': 'fas fa-sun text-info',
+            'price': '142.60',
+            'change': '+4.2%',
+            'volume': '6.1B',
+            'signal': 'خرید قوی',
             'signal_class': 'success'
         },
         {
@@ -511,195 +511,140 @@ def cryptocurrencies():
             'name': 'بایننس کوین', 
             'symbol': 'BNB/USDT', 
             'icon': 'fas fa-coins text-warning',
-            'price': '560.25',
-            'change': '-0.3%',
-            'volume': '3.2B',
-            'signal': 'نگهداری',
-            'signal_class': 'warning'
+            'price': '571.25',
+            'change': '+1.5%',
+            'volume': '3.5B',
+            'signal': 'خرید',
+            'signal_class': 'success'
         },
         {
             'id': 5, 
-            'name': 'کاردانو', 
-            'symbol': 'ADA/USDT', 
-            'icon': 'fas fa-project-diagram text-danger',
-            'price': '0.462',
-            'change': '+0.5%',
-            'volume': '1.8B',
-            'signal': 'نگهداری',
-            'signal_class': 'warning'
-        },
-        {
-            'id': 6, 
             'name': 'ریپل', 
             'symbol': 'XRP/USDT', 
             'icon': 'fas fa-stream text-info',
-            'price': '0.589',
-            'change': '+1.1%',
-            'volume': '2.4B',
+            'price': '0.622',
+            'change': '+2.9%',
+            'volume': '2.8B',
+            'signal': 'خرید',
+            'signal_class': 'success'
+        },
+        {
+            'id': 6, 
+            'name': 'چین‌لینک', 
+            'symbol': 'LINK/USDT', 
+            'icon': 'fas fa-link text-info',
+            'price': '14.25',
+            'change': '+3.8%',
+            'volume': '945M',
             'signal': 'خرید',
             'signal_class': 'success'
         },
         {
             'id': 7, 
-            'name': 'پولکادات', 
-            'symbol': 'DOT/USDT', 
-            'icon': 'fas fa-dot-circle text-danger',
-            'price': '7.23',
-            'change': '-0.8%',
-            'volume': '0.9B',
+            'name': 'آواکس', 
+            'symbol': 'AVAX/USDT', 
+            'icon': 'fas fa-mountain text-danger',
+            'price': '35.42',
+            'change': '+5.2%',
+            'volume': '1.2B',
+            'signal': 'خرید قوی',
+            'signal_class': 'success'
+        },
+        {
+            'id': 8, 
+            'name': 'تتر', 
+            'symbol': 'USDT/USD', 
+            'icon': 'fas fa-dollar-sign text-success',
+            'price': '1.000',
+            'change': '+0.01%',
+            'volume': '85.6B',
             'signal': 'نگهداری',
             'signal_class': 'warning'
         }
     ]
     
-    # لیست ارزهای با پتانسیل
-    promising_coins = [
-        {
-            'id': 8, 
-            'name': 'آربیتروم', 
-            'symbol': 'ARB/USDT', 
-            'icon': 'fas fa-chart-line text-primary',
-            'price': '1.24',
-            'change': '+5.2%',
-            'volume': '580M',
-            'signal': 'خرید',
-            'signal_class': 'success'
-        },
+    # لیست ارزهای تأثیرگذار در هوش مصنوعی
+    ai_coins = [
         {
             'id': 9, 
-            'name': 'ایموتبل ایکس', 
-            'symbol': 'IMX/USDT', 
-            'icon': 'fas fa-gamepad text-success',
-            'price': '2.67',
-            'change': '+3.7%',
+            'name': 'رندر', 
+            'symbol': 'RNDR/USDT', 
+            'icon': 'fas fa-cubes text-danger',
+            'price': '7.25',
+            'change': '+8.4%',
             'volume': '420M',
-            'signal': 'خرید',
+            'signal': 'خرید قوی',
             'signal_class': 'success'
         },
         {
             'id': 10, 
-            'name': 'چین‌لینک', 
-            'symbol': 'LINK/USDT', 
-            'icon': 'fas fa-link text-info',
-            'price': '13.48',
-            'change': '+1.9%',
-            'volume': '850M',
+            'name': 'فچر', 
+            'symbol': 'FET/USDT', 
+            'icon': 'fas fa-robot text-primary',
+            'price': '1.52',
+            'change': '+6.7%',
+            'volume': '310M',
             'signal': 'خرید',
             'signal_class': 'success'
         },
         {
             'id': 11, 
-            'name': 'رندر', 
-            'symbol': 'RNDR/USDT', 
-            'icon': 'fas fa-cubes text-danger',
-            'price': '6.82',
-            'change': '+7.3%',
-            'volume': '310M',
+            'name': 'ورلدکوین', 
+            'symbol': 'WLD/USDT', 
+            'icon': 'fas fa-globe-europe text-info',
+            'price': '5.82',
+            'change': '+9.3%',
+            'volume': '265M',
             'signal': 'خرید قوی',
             'signal_class': 'success'
-        },
-        {
-            'id': 12, 
-            'name': 'کازموس', 
-            'symbol': 'ATOM/USDT', 
-            'icon': 'fas fa-atom text-primary',
-            'price': '8.56',
-            'change': '-1.2%',
-            'volume': '240M',
-            'signal': 'نگهداری',
-            'signal_class': 'warning'
-        },
-        {
-            'id': 13, 
-            'name': 'پلیگان', 
-            'symbol': 'MATIC/USDT', 
-            'icon': 'fas fa-project-diagram text-purple',
-            'price': '0.572',
-            'change': '+0.4%',
-            'volume': '490M',
-            'signal': 'نگهداری',
-            'signal_class': 'warning'
         }
     ]
     
-    # لیست ارزهای جدید با پتانسیل رشد
-    new_coins = [
+    # لیست ارزهای مهم لایر 1 و 2
+    layer_coins = [
+        {
+            'id': 12, 
+            'name': 'پلیگان', 
+            'symbol': 'MATIC/USDT', 
+            'icon': 'fas fa-project-diagram text-purple',
+            'price': '0.625',
+            'change': '+3.8%',
+            'volume': '520M',
+            'signal': 'خرید',
+            'signal_class': 'success'
+        },
+        {
+            'id': 13, 
+            'name': 'آربیتروم', 
+            'symbol': 'ARB/USDT', 
+            'icon': 'fas fa-chart-line text-primary',
+            'price': '1.35',
+            'change': '+6.2%',
+            'volume': '610M',
+            'signal': 'خرید',
+            'signal_class': 'success'
+        },
         {
             'id': 14, 
-            'name': 'سویی', 
-            'symbol': 'SUI/USDT', 
-            'icon': 'fas fa-fire text-danger',
-            'price': '1.34',
-            'change': '+8.7%',
-            'volume': '220M',
+            'name': 'اپتیمیسم', 
+            'symbol': 'OP/USDT', 
+            'icon': 'fas fa-rocket text-danger',
+            'price': '2.95',
+            'change': '+4.7%',
+            'volume': '480M',
             'signal': 'خرید',
             'signal_class': 'success'
-        },
-        {
-            'id': 15, 
-            'name': 'اپتوس', 
-            'symbol': 'APT/USDT', 
-            'icon': 'fas fa-bolt text-warning',
-            'price': '8.12',
-            'change': '+3.4%',
-            'volume': '180M',
-            'signal': 'خرید',
-            'signal_class': 'success'
-        },
-        {
-            'id': 16, 
-            'name': 'اینترنت کامپیوتر', 
-            'symbol': 'ICP/USDT', 
-            'icon': 'fas fa-server text-info',
-            'price': '10.89',
-            'change': '+5.9%',
-            'volume': '320M',
-            'signal': 'خرید',
-            'signal_class': 'success'
-        },
-        {
-            'id': 17, 
-            'name': 'سی', 
-            'symbol': 'SEI/USDT', 
-            'icon': 'fas fa-bolt text-primary',
-            'price': '0.682',
-            'change': '+12.4%',
-            'volume': '190M',
-            'signal': 'خرید قوی',
-            'signal_class': 'success'
-        },
-        {
-            'id': 18, 
-            'name': 'تن', 
-            'symbol': 'TON/USDT', 
-            'icon': 'far fa-paper-plane text-primary',
-            'price': '5.48',
-            'change': '+2.1%',
-            'volume': '260M',
-            'signal': 'خرید',
-            'signal_class': 'success'
-        },
-        {
-            'id': 19, 
-            'name': 'نیر', 
-            'symbol': 'NEAR/USDT', 
-            'icon': 'fas fa-network-wired text-success',
-            'price': '4.25',
-            'change': '-0.8%',
-            'volume': '140M',
-            'signal': 'نگهداری',
-            'signal_class': 'warning'
         }
     ]
     
     # ترکیب همه ارزها
-    all_cryptocurrencies = major_coins + promising_coins + new_coins
+    all_cryptocurrencies = important_coins + ai_coins + layer_coins
     
     return render_template('cryptocurrencies.html', 
                           cryptocurrencies=all_cryptocurrencies,
-                          major_coins=major_coins,
-                          promising_coins=promising_coins,
-                          new_coins=new_coins)
+                          major_coins=important_coins,
+                          promising_coins=ai_coins,
+                          new_coins=layer_coins)
 
 @app.route('/simple')
 def simple_home():
