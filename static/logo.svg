@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="90" fill="#1a1a2e" stroke="#ffd700" stroke-width="6" />
+  
+  <!-- Bitcoin Symbol -->
+  <path d="M135 85c2.5 12.5-7.5 19.2-20 21l4 16h-10l-3.9-15.7c-2.6 0-5.3-.2-8-.5l3.9 16.2h-10l-4-16c-2.2-.6-4.3-1.2-6.3-1.7l-13.5.1 2-12s7.5 2 7.4 1.8c4.1 0 5.9-3 6.6-5.6l-6.6-26.5 9 .1 5 20.1 5 20.1c2.9-.6 5.7-1.2 8.5-1.9l-5-20.2-5-20c5.5 0 9.3 0 9.3 0a5 5 0 0 1 4.5 6.7l-5.5 22c10-1.9 17.5-5.6 16-14.9-1.2-7.5-9.2-9.8-19.2-9.9 10-5.7 15-13.5 8.5-26-4.5-8.9-15.3-10.9-25.7-10l-4.6-.1-6.8 27.1-6.7 27.1-6.8 27.1h-12.5l6.7-27.1 6.8-27.1 6.7-27.1s9.5.1 19.3-.1c16 0 29.5 4.1 33.5 19.5 3 11.6-2.5 16.5-8.5 19.5 10 2 18.7 7.6 15 25z" fill="#ffd700" stroke="#ffd700" stroke-width="1"/>
+  
+  <!-- Letter B -->
+  <text x="100" y="140" font-family="Arial, sans-serif" font-size="120" font-weight="bold" fill="#ffffff" text-anchor="middle">B</text>
+</svg>
