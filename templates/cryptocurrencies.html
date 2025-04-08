@@ -242,47 +242,82 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // دکمه‌های فیلتر دسته‌بندی
-    const categoryButtons = document.querySelectorAll('[data-crypto-category]');
-    const cryptoRows = document.querySelectorAll('.crypto-row');
-    
-    console.log("تعداد دکمه‌های فیلتر: ", categoryButtons.length);
-    console.log("تعداد سطرهای جدول: ", cryptoRows.length);
-    
-    // اضافه کردن رویداد کلیک به هر دکمه فیلتر
-    categoryButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            console.log("کلیک شد روی: ", this.textContent);
-            console.log("دسته‌بندی انتخاب شده: ", this.getAttribute('data-crypto-category'));
-            
-            // به روزرسانی وضعیت active دکمه‌ها
-            categoryButtons.forEach(btn => {
-                btn.classList.remove('active');
-                btn.classList.remove('btn-warning');
-                btn.classList.add('btn-outline-warning');
+    // روش ساده برای فیلتر کردن ارزها
+    function setupFilterButtons() {
+        // انتخاب دکمه‌ها و سطرهای جدول
+        const allButton = document.querySelector('[data-crypto-category="all"]');
+        const majorButton = document.querySelector('[data-crypto-category="major"]');
+        const promisingButton = document.querySelector('[data-crypto-category="promising"]');
+        const newButton = document.querySelector('[data-crypto-category="new"]');
+        
+        const allRows = document.querySelectorAll('.crypto-row');
+        const majorRows = document.querySelectorAll('.crypto-row.major');
+        const promisingRows = document.querySelectorAll('.crypto-row.promising');
+        const newRows = document.querySelectorAll('.crypto-row.new');
+        
+        console.log('تعداد کل سطرها:', allRows.length);
+        console.log('سطرهای ارزهای اصلی:', majorRows.length);
+        console.log('سطرهای ارزهای با پتانسیل:', promisingRows.length);
+        console.log('سطرهای ارزهای جدید:', newRows.length);
+        
+        // تابع نمایش دادن یا مخفی کردن سطرها
+        function showRows(rowsToShow) {
+            // همه سطرها را مخفی کن
+            allRows.forEach(row => {
+                row.style.display = 'none';
             });
             
-            this.classList.add('active');
-            this.classList.remove('btn-outline-warning');
-            this.classList.add('btn-warning');
-            
-            const category = this.getAttribute('data-crypto-category');
-            
-            // فیلتر کردن سطرهای جدول
-            cryptoRows.forEach(row => {
-                console.log("بررسی سطر: ", row.classList);
-                if (category === 'all') {
-                    row.style.display = '';
-                } else {
-                    if (row.classList.contains(category)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                }
+            // فقط سطرهای انتخاب شده را نمایش بده
+            rowsToShow.forEach(row => {
+                row.style.display = '';
             });
-        });
-    });
+        }
+        
+        // تابع به روزرسانی وضعیت دکمه‌ها
+        function updateButtonStates(activeButton) {
+            [allButton, majorButton, promisingButton, newButton].forEach(button => {
+                button.classList.remove('active');
+                button.classList.remove('btn-warning');
+                button.classList.add('btn-outline-warning');
+            });
+            
+            activeButton.classList.add('active');
+            activeButton.classList.remove('btn-outline-warning');
+            activeButton.classList.add('btn-warning');
+        }
+        
+        // اضافه کردن رویداد کلیک برای هر دکمه
+        if (allButton) {
+            allButton.addEventListener('click', function() {
+                updateButtonStates(this);
+                showRows(allRows);
+            });
+        }
+        
+        if (majorButton) {
+            majorButton.addEventListener('click', function() {
+                updateButtonStates(this);
+                showRows(majorRows);
+            });
+        }
+        
+        if (promisingButton) {
+            promisingButton.addEventListener('click', function() {
+                updateButtonStates(this);
+                showRows(promisingRows);
+            });
+        }
+        
+        if (newButton) {
+            newButton.addEventListener('click', function() {
+                updateButtonStates(this);
+                showRows(newRows);
+            });
+        }
+    }
+    
+    // فراخوانی تابع تنظیم دکمه‌های فیلتر
+    setupFilterButtons();
     
     // دکمه‌های تحلیل
     const analysisButtons = document.querySelectorAll('.btn-outline-primary');
