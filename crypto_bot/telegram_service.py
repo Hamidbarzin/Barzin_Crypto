@@ -83,6 +83,15 @@ def send_telegram_message(chat_id, message, parse_mode='HTML', max_retries=3, re
     Returns:
         bool: آیا ارسال موفقیت‌آمیز بود
     """
+    # استفاده از چت آیدی پیش‌فرض اگر مقدار ورودی مشخص نشده باشد
+    if not chat_id:
+        default_chat_id = os.environ.get('DEFAULT_CHAT_ID', CHAT_IDS.get('default'))
+        if default_chat_id:
+            chat_id = default_chat_id
+            logger.info(f"استفاده از چت آیدی پیش‌فرض: {chat_id}")
+        else:
+            logger.error("چت آیدی مشخص نشده و چت آیدی پیش‌فرض نیز یافت نشد.")
+            return False
     if not TELEGRAM_AVAILABLE or _telegram is None:
         logger.error("کتابخانه تلگرام نصب نشده است")
         return False
@@ -281,7 +290,7 @@ def send_test_notification(chat_id=None):
         dict: وضعیت ارسال و پیام
     """
     if chat_id is None:
-        chat_id = CHAT_IDS.get('default')
+        chat_id = os.environ.get('DEFAULT_CHAT_ID', CHAT_IDS.get('default'))
         if not chat_id:
             return {
                 "success": False,
@@ -443,6 +452,7 @@ def get_chat_debug_info(chat_id=None, max_retries=2, retry_delay=1):
         "telegram_available": TELEGRAM_AVAILABLE,
         "token_available": False,
         "token_value_preview": "",
+        "default_chat_id_env": os.environ.get('DEFAULT_CHAT_ID'),
         "default_chat_id": CHAT_IDS.get('default'),
         "default_chat_id_type": type(CHAT_IDS.get('default')).__name__,
     }
@@ -465,7 +475,7 @@ def get_chat_debug_info(chat_id=None, max_retries=2, retry_delay=1):
         return debug_info
     
     if chat_id is None:
-        chat_id = CHAT_IDS.get('default')
+        chat_id = os.environ.get('DEFAULT_CHAT_ID', CHAT_IDS.get('default'))
         if not chat_id:
             debug_info["error"] = "چت آیدی تعیین نشده است"
             return debug_info
