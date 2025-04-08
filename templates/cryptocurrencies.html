@@ -95,28 +95,40 @@
                 <div class="card-body">
                     <!-- بخش تحلیل تکنیکال -->
                     <div id="technical-analysis-content">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <!-- Chart Placeholder -->
-                                <div class="chart-container" style="height: 300px; background: #1c1c28; border-radius: 8px;">
-                                    <div class="d-flex justify-content-center align-items-center h-100">
-                                        <p class="text-muted">نمودار قیمت <span id="selected-crypto-symbol">BTC/USDT</span> به زودی بارگذاری خواهد شد</p>
-                                    </div>
+                        <!-- نمایش وضعیت بارگذاری -->
+                        <div id="technical-loading" style="display: none;">
+                            <div class="text-center my-5">
+                                <div class="spinner-border text-warning" role="status">
+                                    <span class="visually-hidden">در حال بارگذاری...</span>
                                 </div>
+                                <p class="mt-2 text-muted">در حال دریافت تحلیل فنی <span id="selected-crypto-symbol2">BTC/USDT</span>...</p>
                             </div>
-                            <div class="col-md-4">
-                                <div class="indicator-box mb-3">
-                                    <div class="indicator-label">RSI (شاخص قدرت نسبی)</div>
-                                    <div class="progress" style="height: 8px;">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        
+                        <!-- محتوای تحلیل فنی -->
+                        <div id="technical-content">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <!-- Chart Placeholder -->
+                                    <div class="chart-container" style="height: 300px; background: #1c1c28; border-radius: 8px;">
+                                        <div class="d-flex justify-content-center align-items-center h-100">
+                                            <p class="text-muted">نمودار قیمت <span id="selected-crypto-symbol">BTC/USDT</span> به زودی بارگذاری خواهد شد</p>
+                                        </div>
                                     </div>
-                                    <div class="d-flex justify-content-between">
-                                        <small class="text-muted">اشباع فروش</small>
-                                        <small class="text-muted">خنثی</small>
-                                        <small class="text-muted">اشباع خرید</small>
-                                    </div>
-                                    <div class="indicator-value">65</div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="indicator-box mb-3">
+                                        <div class="indicator-label">RSI (شاخص قدرت نسبی)</div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <small class="text-muted">اشباع فروش</small>
+                                            <small class="text-muted">خنثی</small>
+                                            <small class="text-muted">اشباع خرید</small>
+                                        </div>
+                                        <div class="indicator-value">65</div>
+                                    </div>
                                 
                                 <div class="indicator-box mb-3">
                                     <div class="indicator-label">MACD</div>
@@ -240,6 +252,149 @@ function loadMoreNews() {
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // تابع قالب‌بندی قیمت
+    function formatPrice(price) {
+        if (price === null || price === undefined || isNaN(price)) {
+            return '--';
+        }
+        
+        // اگر قیمت بزرگ است (بدون اعشار)
+        if (price >= 1000) {
+            return price.toLocaleString('en-US', {maximumFractionDigits: 0});
+        }
+        
+        // اگر قیمت کوچک است (اعشار بیشتر لازم است)
+        if (price < 0.01) {
+            return price.toLocaleString('en-US', {minimumFractionDigits: 6, maximumFractionDigits: 6});
+        }
+        
+        // حالت پیش‌فرض: 2 رقم اعشار
+        return price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+    
+    // تابع برای دریافت تحلیل فنی از API
+    function loadTechnicalData(symbol) {
+        // نمایش وضعیت بارگذاری
+        const loadingEl = document.getElementById('technical-loading');
+        const contentEl = document.getElementById('technical-content');
+        
+        if (loadingEl && contentEl) {
+            loadingEl.style.display = 'block';
+            contentEl.style.display = 'none';
+        }
+        
+        // درخواست به API
+        fetch(`/api/technical/${symbol}/1d`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    const analysis = data.data;
+                    
+                    // به‌روزرسانی RSI
+                    if (analysis.rsi !== undefined) {
+                        const rsiEl = document.querySelector('.indicator-box:nth-child(1) .indicator-value');
+                        const rsiProgressEl = document.querySelector('.indicator-box:nth-child(1) .progress-bar');
+                        
+                        if (rsiEl) {
+                            rsiEl.textContent = analysis.rsi.toFixed(1);
+                        }
+                        
+                        if (rsiProgressEl) {
+                            rsiProgressEl.style.width = `${analysis.rsi}%`;
+                            
+                            // تغییر رنگ بر اساس مقدار
+                            rsiProgressEl.classList.remove('bg-success', 'bg-danger', 'bg-warning');
+                            if (analysis.rsi < 30) {
+                                rsiProgressEl.classList.add('bg-danger');
+                            } else if (analysis.rsi > 70) {
+                                rsiProgressEl.classList.add('bg-danger');
+                            } else {
+                                rsiProgressEl.classList.add('bg-success');
+                            }
+                        }
+                    }
+                    
+                    // به‌روزرسانی MACD
+                    if (analysis.macd !== undefined && analysis.macd_signal !== undefined) {
+                        const macdEl = document.querySelector('.indicator-box:nth-child(2) .text-warning');
+                        const signalEl = document.querySelector('.indicator-box:nth-child(2) .text-info');
+                        const macdDescEl = document.querySelector('.indicator-box:nth-child(2) .indicator-description span');
+                        
+                        if (macdEl) {
+                            macdEl.textContent = analysis.macd.toFixed(2);
+                        }
+                        
+                        if (signalEl) {
+                            signalEl.textContent = analysis.macd_signal.toFixed(2);
+                        }
+                        
+                        if (macdDescEl) {
+                            if (analysis.macd > analysis.macd_signal) {
+                                macdDescEl.innerHTML = '<i class="fas fa-arrow-up me-1"></i> روند صعودی (سیگنال خرید)';
+                                macdDescEl.className = 'text-success';
+                            } else {
+                                macdDescEl.innerHTML = '<i class="fas fa-arrow-down me-1"></i> روند نزولی (سیگنال فروش)';
+                                macdDescEl.className = 'text-danger';
+                            }
+                        }
+                    }
+                    
+                    // به‌روزرسانی میانگین‌های متحرک
+                    if (analysis.ma20 !== undefined && analysis.ma50 !== undefined) {
+                        const ma20El = document.querySelector('.indicator-box:nth-child(3) .text-info');
+                        const ma50El = document.querySelector('.indicator-box:nth-child(3) .text-warning');
+                        const maDescEl = document.querySelector('.indicator-box:nth-child(3) .indicator-description span');
+                        
+                        if (ma20El) {
+                            ma20El.textContent = formatPrice(analysis.ma20);
+                        }
+                        
+                        if (ma50El) {
+                            ma50El.textContent = formatPrice(analysis.ma50);
+                        }
+                        
+                        if (maDescEl && analysis.current_price !== undefined) {
+                            if (analysis.current_price > analysis.ma20 && analysis.ma20 > analysis.ma50) {
+                                maDescEl.innerHTML = '<i class="fas fa-check-circle me-1"></i> قیمت بالای میانگین‌های متحرک (روند صعودی)';
+                                maDescEl.className = 'text-success';
+                            } else if (analysis.current_price < analysis.ma20 && analysis.ma20 < analysis.ma50) {
+                                maDescEl.innerHTML = '<i class="fas fa-times-circle me-1"></i> قیمت زیر میانگین‌های متحرک (روند نزولی)';
+                                maDescEl.className = 'text-danger';
+                            } else {
+                                maDescEl.innerHTML = '<i class="fas fa-minus-circle me-1"></i> قیمت در محدوده میانگین‌های متحرک (روند خنثی)';
+                                maDescEl.className = 'text-warning';
+                            }
+                        }
+                    }
+                    
+                    // نمایش نتیجه و مخفی کردن بارگذاری
+                    if (loadingEl && contentEl) {
+                        loadingEl.style.display = 'none';
+                        contentEl.style.display = 'block';
+                    }
+                } else {
+                    console.error('Error loading technical data:', data.message || 'خطای نامشخص');
+                    
+                    // مخفی کردن بارگذاری و نمایش پیغام خطا
+                    if (loadingEl && contentEl) {
+                        loadingEl.style.display = 'none';
+                        contentEl.style.display = 'block';
+                        contentEl.innerHTML = '<div class="alert alert-danger">خطا در دریافت اطلاعات تحلیل فنی</div>';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading technical data:', error);
+                
+                // مخفی کردن بارگذاری و نمایش پیغام خطا
+                if (loadingEl && contentEl) {
+                    loadingEl.style.display = 'none';
+                    contentEl.style.display = 'block';
+                    contentEl.innerHTML = '<div class="alert alert-danger">خطا در ارتباط با سرور</div>';
+                }
+            });
+    }
+    
     // روش ساده برای فیلتر کردن ارزها
     function setupFilterButtons() {
         // انتخاب دکمه‌ها و سطرهای جدول
@@ -346,6 +501,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (nameElement2) {
                         nameElement2.textContent = cryptoName;
                     }
+                    
+                    // درخواست دریافت تحلیل فنی برای ارز انتخاب شده
+                    loadTechnicalData(cryptoSymbol);
                 }
                 
                 // نمایش بخش تحلیل فنی (به جای اخبار)
@@ -442,33 +600,36 @@ document.addEventListener('DOMContentLoaded', function() {
         const cryptoPriceElements = document.querySelectorAll('[id$="-price"]');
         const cryptoChangeElements = document.querySelectorAll('[id$="-change"]');
         
+        // به‌روزرسانی قیمت‌ها با استفاده از API
         cryptoPriceElements.forEach(el => {
-            // اطمینان از اینکه محتوا یک عدد معتبر است
-            const currentText = el.textContent.trim().replace(/,/g, '');
-            if (!isNaN(parseFloat(currentText))) {
-                const currentPrice = parseFloat(currentText);
-                const change = (Math.random() - 0.5) * 0.001; // تغییر کوچک تصادفی
-                const newPrice = currentPrice * (1 + change);
-                el.textContent = newPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            }
-        });
-        
-        cryptoChangeElements.forEach(el => {
-            // اطمینان از اینکه محتوا یک عدد معتبر است
-            const currentText = el.textContent.trim().replace(/%/g, '').replace(/\+/g, '');
-            if (!isNaN(parseFloat(currentText))) {
-                const currentChange = parseFloat(currentText);
-                const fluctuation = (Math.random() - 0.5) * 0.1; 
-                const newChange = currentChange + fluctuation;
-                
-                el.textContent = (newChange >= 0 ? '+' : '') + newChange.toFixed(2) + '%';
-                
-                // به‌روزرسانی رنگ‌ها
-                if (newChange >= 0) {
-                    el.className = 'text-success';
-                } else {
-                    el.className = 'text-danger';
-                }
+            const domId = el.id;
+            const symbol = domId.replace('-price', '');
+            if (symbol) {
+                fetch(`/api/price/${symbol}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.data) {
+                            // به‌روزرسانی قیمت
+                            el.textContent = formatPrice(data.data.price);
+                            
+                            // به‌روزرسانی درصد تغییر (اگر element وجود داشته باشد)
+                            const changeEl = document.getElementById(`${symbol}-change`);
+                            if (changeEl && data.data.change_24h !== undefined) {
+                                const newChange = data.data.change_24h;
+                                changeEl.textContent = (newChange >= 0 ? '+' : '') + newChange.toFixed(2) + '%';
+                                
+                                // به‌روزرسانی رنگ‌ها
+                                if (newChange >= 0) {
+                                    changeEl.className = 'text-success';
+                                } else {
+                                    changeEl.className = 'text-danger';
+                                }
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error fetching price for ${symbol}:`, error);
+                    });
             }
         });
     }
