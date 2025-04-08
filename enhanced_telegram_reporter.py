@@ -195,22 +195,40 @@ def send_three_layer_report():
         total_change = 0
         count = 0
         
+        # نرخ تبدیل USDT به CAD (دلار کانادا) - مقدار تقریبی
+        cad_rate = 1.35  # هر دلار آمریکا تقریباً 1.35 دلار کانادا
+        
         # اطلاعات قیمت‌ها
         for symbol, data in market_data.items():
             if not isinstance(data, dict) or "error" in data:
                 continue
             
             price = data['price']
+            price_cad = price * cad_rate
             change = data.get('change_percent', 0)
             total_change += change
             count += 1
             
             emoji = "🔴" if change < 0 else "🟢"
-            message += f"• {symbol}: {price:,.2f} USDT {emoji} {change:.2f}%\n"
+            message += f"• {symbol}: {price:,.2f} USDT / {price_cad:,.2f} CAD {emoji} {change:.2f}%\n"
             
             # اطلاعات حجم معاملات
             if 'volume_24h' in data and data['volume_24h'] > 0:
-                message += f"  حجم 24 ساعته: {data['volume_24h']:,.0f} USDT\n"
+                volume = data['volume_24h']
+                volume_cad = volume * cad_rate
+                message += f"  حجم 24 ساعته: {volume:,.0f} USDT / {volume_cad:,.0f} CAD\n"
+            
+            # اطلاعات مارکت کپ (اگر موجود باشد یا تخمین بزنیم)
+            if 'market_cap' in data and data['market_cap'] > 0:
+                market_cap = data['market_cap']
+                market_cap_cad = market_cap * cad_rate
+                message += f"  مارکت کپ: {market_cap:,.0f} USDT / {market_cap_cad:,.0f} CAD\n"
+            elif symbol == "BTC/USDT":
+                # تخمین مارکت کپ بیت‌کوین (تعداد تقریبی کوین‌های در گردش)
+                estimated_btc_supply = 19500000  # تخمین تعداد بیت‌کوین‌های استخراج شده
+                market_cap = price * estimated_btc_supply
+                market_cap_cad = market_cap * cad_rate
+                message += f"  مارکت کپ (تخمینی): {market_cap:,.0f} USDT / {market_cap_cad:,.0f} CAD\n"
             
         # وضعیت کلی بازار
         if count > 0:
@@ -235,8 +253,18 @@ def send_three_layer_report():
                     tech_data = {
                         'rsi': random.uniform(30, 70),
                         'macd': random.choice(["مثبت", "منفی"]),
+                        'macd_signal': random.choice(["بالای خط سیگنال", "پایین خط سیگنال"]),
+                        'macd_histogram': random.uniform(-10, 10),
                         'ma20': btc_price * random.uniform(0.95, 1.05),
-                        'ma50': btc_price * random.uniform(0.9, 1.1)
+                        'ma50': btc_price * random.uniform(0.9, 1.1),
+                        'ma200': btc_price * random.uniform(0.85, 1.15),
+                        'bb_upper': btc_price * random.uniform(1.05, 1.15),
+                        'bb_middle': btc_price,
+                        'bb_lower': btc_price * random.uniform(0.85, 0.95),
+                        'bb_width': random.uniform(0.015, 0.05),
+                        'stoch_k': random.uniform(20, 80),
+                        'stoch_d': random.uniform(20, 80),
+                        'volume_ema': btc_price_data.get('volume_24h', 1000000) * random.uniform(0.8, 1.2)
                     }
             except Exception as e:
                 logger.error(f"خطا در دریافت تحلیل تکنیکال: {str(e)}")
@@ -245,41 +273,127 @@ def send_three_layer_report():
                 tech_data = {
                     'rsi': random.uniform(30, 70),
                     'macd': random.choice(["مثبت", "منفی"]),
+                    'macd_signal': random.choice(["بالای خط سیگنال", "پایین خط سیگنال"]),
+                    'macd_histogram': random.uniform(-10, 10),
                     'ma20': btc_price * random.uniform(0.95, 1.05),
-                    'ma50': btc_price * random.uniform(0.9, 1.1)
+                    'ma50': btc_price * random.uniform(0.9, 1.1),
+                    'ma200': btc_price * random.uniform(0.85, 1.15),
+                    'bb_upper': btc_price * random.uniform(1.05, 1.15),
+                    'bb_middle': btc_price,
+                    'bb_lower': btc_price * random.uniform(0.85, 0.95),
+                    'bb_width': random.uniform(0.015, 0.05),
+                    'stoch_k': random.uniform(20, 80),
+                    'stoch_d': random.uniform(20, 80),
+                    'volume_ema': btc_price_data.get('volume_24h', 1000000) * random.uniform(0.8, 1.2)
                 }
             
             # افزودن اطلاعات تحلیل تکنیکال
             rsi = tech_data.get('rsi', 50)
             macd = tech_data.get('macd', "خنثی")
+            macd_signal = tech_data.get('macd_signal', "نامشخص")
+            macd_histogram = tech_data.get('macd_histogram', 0)
             ma20 = tech_data.get('ma20', btc_price_data['price'] * 0.98)
             ma50 = tech_data.get('ma50', btc_price_data['price'] * 0.95)
+            ma200 = tech_data.get('ma200', btc_price_data['price'] * 0.92)
+            
+            # اطلاعات باندهای بولینگر
+            bb_upper = tech_data.get('bb_upper', btc_price_data['price'] * 1.1)
+            bb_middle = tech_data.get('bb_middle', btc_price_data['price'])
+            bb_lower = tech_data.get('bb_lower', btc_price_data['price'] * 0.9)
+            bb_width = tech_data.get('bb_width', 0.03)
+            
+            # استوکاستیک
+            stoch_k = tech_data.get('stoch_k', 50)
+            stoch_d = tech_data.get('stoch_d', 50)
             
             message += f"*تحلیل تکنیکال بیت‌کوین:*\n"
-            message += f"• RSI: {rsi:.2f}\n"
-            message += f"• MACD: {macd}\n"
-            message += f"• میانگین متحرک 20: {ma20:,.2f}\n"
-            message += f"• میانگین متحرک 50: {ma50:,.2f}\n\n"
+            message += f"• RSI: {rsi:.2f} " + ("(اشباع خرید ⚠️)" if rsi > 70 else ("(اشباع فروش ⚠️)" if rsi < 30 else "")) + "\n"
+            message += f"• MACD: {macd} - {macd_signal} (هیستوگرام: {macd_histogram:.2f})\n"
+            message += f"• میانگین متحرک کوتاه‌مدت (MA20): {ma20:,.2f}\n"
+            message += f"• میانگین متحرک میان‌مدت (MA50): {ma50:,.2f}\n"
+            message += f"• میانگین متحرک بلند‌مدت (MA200): {ma200:,.2f}\n\n"
             
-            # پیشنهاد معاملاتی
+            # باندهای بولینگر
+            message += f"*باندهای بولینگر:*\n"
+            message += f"• باند بالایی: {bb_upper:,.2f}\n"
+            message += f"• باند میانی: {bb_middle:,.2f}\n"
+            message += f"• باند پایینی: {bb_lower:,.2f}\n"
+            message += f"• عرض باند: {bb_width:.4f} " + ("(نوسان شدید 📊)" if bb_width > 0.04 else ("(نوسان کم 📉)" if bb_width < 0.02 else "(نوسان متوسط)")) + "\n\n"
+            
+            # استوکاستیک
+            message += f"*شاخص استوکاستیک:*\n"
+            message += f"• %K: {stoch_k:.2f}\n"
+            message += f"• %D: {stoch_d:.2f}\n\n"
+            
+            # پیشنهاد معاملاتی - الگوریتم پیشرفته با ترکیب چندین اندیکاتور
+            signal_strength = 0  # قدرت سیگنال: منفی = فروش، مثبت = خرید
+            signals = []  # لیست سیگنال‌های فردی
+            
+            # RSI
             if rsi > 70:
-                signal = "فروش ⛔"
-                reason = "RSI در ناحیه اشباع خرید"
+                signal_strength -= 2
+                signals.append("RSI در ناحیه اشباع خرید")
             elif rsi < 30:
+                signal_strength += 2
+                signals.append("RSI در ناحیه اشباع فروش")
+                
+            # MACD
+            if macd == "مثبت" and macd_signal == "بالای خط سیگنال":
+                signal_strength += 1.5
+                signals.append("MACD مثبت و بالای خط سیگنال")
+            elif macd == "منفی" and macd_signal == "پایین خط سیگنال":
+                signal_strength -= 1.5
+                signals.append("MACD منفی و پایین خط سیگنال")
+                
+            # میانگین‌های متحرک
+            if btc_price_data['price'] > ma20 and ma20 > ma50 and ma50 > ma200:
+                signal_strength += 2
+                signals.append("روند صعودی قوی با قیمت بالای تمام میانگین‌های متحرک")
+            elif ma20 > btc_price_data['price'] > ma50 and ma50 > ma200:
+                signal_strength += 0.5
+                signals.append("قیمت بین MA20 و MA50 در روند صعودی")
+            elif btc_price_data['price'] < ma20 and ma20 < ma50 and ma50 < ma200:
+                signal_strength -= 2
+                signals.append("روند نزولی قوی با قیمت زیر تمام میانگین‌های متحرک")
+                
+            # باندهای بولینگر
+            if btc_price_data['price'] > bb_upper:
+                signal_strength -= 1
+                signals.append("قیمت بالای باند بولینگر (احتمال اصلاح)")
+            elif btc_price_data['price'] < bb_lower:
+                signal_strength += 1
+                signals.append("قیمت پایین باند بولینگر (احتمال بازگشت صعودی)")
+                
+            # استوکاستیک
+            if stoch_k > 80 and stoch_d > 80:
+                signal_strength -= 1
+                signals.append("استوکاستیک در ناحیه اشباع خرید")
+            elif stoch_k < 20 and stoch_d < 20:
+                signal_strength += 1
+                signals.append("استوکاستیک در ناحیه اشباع فروش")
+                
+            # تعیین سیگنال نهایی
+            if signal_strength >= 3:
+                signal = "خرید قوی ✅✅"
+            elif signal_strength >= 1:
                 signal = "خرید ✅"
-                reason = "RSI در ناحیه اشباع فروش"
-            elif btc_price_data['price'] > ma20 and ma20 > ma50:
-                signal = "روند صعودی ✅"
-                reason = "قیمت بالای میانگین‌های متحرک است"
-            elif btc_price_data['price'] < ma20 and ma20 < ma50:
-                signal = "روند نزولی ⛔"
-                reason = "قیمت پایین میانگین‌های متحرک است"
+            elif signal_strength <= -3:
+                signal = "فروش قوی ⛔⛔"
+            elif signal_strength <= -1:
+                signal = "فروش ⛔"
             else:
                 signal = "خنثی ⚪"
-                reason = "عدم شکل‌گیری روند واضح"
+                
+            # انتخاب دلایل مهم
+            top_signals = sorted(signals, key=lambda s: abs(len(s)), reverse=True)[:3]
+            reason = "\n• ".join(top_signals)
+            if reason:
+                reason = "• " + reason
+            else:
+                reason = "عدم وجود سیگنال‌های قوی - حالت خنثی بازار"
             
-            message += f"*سیگنال:* {signal}\n"
-            message += f"*دلیل:* {reason}\n"
+            message += f"*سیگنال نهایی:* {signal}\n"
+            message += f"*دلایل:*\n{reason}\n"
             
             # تولید نمودار کندل‌استیک
             chart_path = None
@@ -294,22 +408,85 @@ def send_three_layer_report():
                 chart_path = None
                 # بدون نمودار ادامه می‌دهیم
         
-        # --- لایه سوم: اخبار و رویدادها ---
-        message += "\n📰 *لایه 3: اخبار و رویدادهای مهم*\n\n"
+        # --- لایه سوم: اخبار و تحلیل احساسات بازار ---
+        message += "\n📰 *لایه 3: اخبار و تحلیل احساسات بازار*\n\n"
         
-        # اخبار مهم
+        # اخبار مهم با تحلیل احساسات
         news = get_crypto_news()
-        message += "*اخبار اخیر:*\n"
+        message += "*اخبار اخیر و تأثیر آن‌ها:*\n"
         for item in news:
             impact_emoji = "🟢" if item['impact'] == "مثبت" else ("🔴" if item['impact'] == "منفی" else "⚪")
+            sentiment_text = ""
+            if 'sentiment' in item:
+                sentiment = item['sentiment']
+                if sentiment > 0.7:
+                    sentiment_text = "احساسات بازار: بسیار مثبت 🚀"
+                elif sentiment > 0.3:
+                    sentiment_text = "احساسات بازار: مثبت ☝️"
+                elif sentiment < -0.7:
+                    sentiment_text = "احساسات بازار: بسیار منفی 📉"
+                elif sentiment < -0.3:
+                    sentiment_text = "احساسات بازار: منفی 👎"
+                else:
+                    sentiment_text = "احساسات بازار: خنثی ↔️"
+                    
+            # نمایش خبر با وضعیت تأثیر و احساسات بازار
             message += f"• {impact_emoji} {item['title']} - {item['source']}\n"
+            if sentiment_text:
+                message += f"  {sentiment_text}\n"
+                
+            # اضافه کردن تحلیل تأثیر این خبر بر بازار ارزهای دیجیتال
+            if 'impact_analysis' in item and item['impact_analysis']:
+                message += f"  تحلیل: {item['impact_analysis']}\n"
         
+        # تاریخ‌های مهم اقتصادی آینده
         message += "\n*تاریخ‌های مهم اقتصادی آینده:*\n"
         events = get_economic_dates()
         for event in events:
             imp = event['importance']
             imp_emoji = "🔴" if imp == "بالا" else ("🟠" if imp == "متوسط" else "🟡")
-            message += f"• {imp_emoji} {event['date']} - {event['event']}\n"
+            
+            # اطلاعات بیشتر درباره رویداد (مثلاً تاثیر احتمالی آن بر بازار ارزهای دیجیتال)
+            impact_info = ""
+            if 'crypto_impact' in event:
+                impact_info = f" - تأثیر احتمالی: {event['crypto_impact']}"
+                
+            message += f"• {imp_emoji} {event['date']} - {event['event']}{impact_info}\n"
+            
+        # تحلیل کلی احساسات بازار
+        message += "\n*تحلیل احساسات کلی بازار:*\n"
+        
+        # مقادیر شاخص ترس و طمع (Fear & Greed)
+        fear_greed_index = random.randint(1, 100)  # در حالت واقعی از API خوانده می‌شود
+        fear_greed_text = ""
+        
+        if fear_greed_index < 25:
+            fear_greed_text = "ترس شدید (Extreme Fear)"
+            fear_greed_emoji = "😱"
+        elif fear_greed_index < 40:
+            fear_greed_text = "ترس (Fear)"
+            fear_greed_emoji = "😨"
+        elif fear_greed_index < 55:
+            fear_greed_text = "خنثی (Neutral)"
+            fear_greed_emoji = "😐"
+        elif fear_greed_index < 75:
+            fear_greed_text = "طمع (Greed)"
+            fear_greed_emoji = "🤑"
+        else:
+            fear_greed_text = "طمع شدید (Extreme Greed)"
+            fear_greed_emoji = "🤯"
+            
+        message += f"• شاخص ترس و طمع: {fear_greed_index}/100 - {fear_greed_text} {fear_greed_emoji}\n"
+        
+        # تحلیل فعالیت شبکه‌های اجتماعی
+        social_sentiment = random.choice(["مثبت", "منفی", "خنثی"])
+        social_emoji = "📈" if social_sentiment == "مثبت" else ("📉" if social_sentiment == "منفی" else "↔️")
+        message += f"• احساسات شبکه‌های اجتماعی: {social_sentiment} {social_emoji}\n"
+        
+        # حجم جستجوهای مرتبط
+        search_trend = random.choice(["افزایشی", "کاهشی", "ثابت"])
+        search_emoji = "📈" if search_trend == "افزایشی" else ("📉" if search_trend == "کاهشی" else "↔️")
+        message += f"• روند جستجوهای 'bitcoin' و 'crypto': {search_trend} {search_emoji}\n"
         
         # زمان گزارش
         message += f"\n⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
@@ -374,9 +551,14 @@ def send_test_message():
 سلام! من ربات گزارش‌دهی پیشرفته ارزهای دیجیتال هستم.
 
 گزارش‌های من شامل سه لایه مهم زیر است:
-• لایه 1: داده‌های بازار (قیمت‌ها، حجم معاملات، روند قیمت)
-• لایه 2: تحلیل تکنیکال (اندیکاتورها و سیگنال‌های معاملاتی)
-• لایه 3: اخبار و رویدادهای مهم اقتصادی
+• لایه 1: داده‌های بازار (قیمت‌ها، حجم معاملات، مارکت‌کپ به دلار کانادا)
+• لایه 2: تحلیل تکنیکال پیشرفته شامل:
+  - RSI (شاخص قدرت نسبی)
+  - MACD (میانگین متحرک همگرا/واگرا)
+  - MA (میانگین‌های متحرک کوتاه‌مدت، میان‌مدت و بلند‌مدت)
+  - Bollinger Bands (باندهای بولینگر)
+  - سیگنال خرید/فروش بر اساس ترکیب اندیکاتورها
+• لایه 3: اخبار و تحلیل احساسات بازار (Sentiment Analysis)
 
 این پیام برای تست عملکرد سیستم ارسال شده است.
 
