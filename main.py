@@ -6,7 +6,7 @@ from flask import Flask, render_template, render_template_string, request, redir
 from crypto_bot.config import DEFAULT_CURRENCIES, TIMEFRAMES
 from crypto_bot.market_data import get_current_prices
 from crypto_bot.scheduler import start_scheduler, stop_scheduler
-from crypto_bot.technical_analysis import get_technical_indicators
+from crypto_bot.technical_analysis import get_technical_analysis
 from crypto_bot.news_analyzer import get_latest_news
 from crypto_bot.signal_generator import generate_signals
 from crypto_bot.email_service import send_test_email, update_email_settings, last_email_content, DISABLE_REAL_EMAIL
@@ -1229,7 +1229,7 @@ def get_price(symbol):
 @app.route('/api/technical/<symbol>/<timeframe>')
 def get_technical(symbol, timeframe):
     try:
-        data = get_technical_indicators(symbol, timeframe)
+        data = get_technical_analysis(symbol, timeframe)
         return jsonify({'success': True, 'data': data})
     except Exception as e:
         logger.error(f"Error getting technical data for {symbol}: {str(e)}")

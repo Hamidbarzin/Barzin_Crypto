@@ -69,14 +69,14 @@ def initialize_bot():
         return None
 
 
-def send_telegram_message(chat_id, message, parse_mode='HTML', max_retries=3, retry_delay=1):
+def send_telegram_message(chat_id, message, parse_mode=None, max_retries=3, retry_delay=1):
     """
     ارسال پیام متنی به کاربر از طریق تلگرام
 
     Args:
         chat_id (int or str): شناسه چت کاربر
         message (str): متن پیام
-        parse_mode (str): نوع پارس پیام ('HTML' یا 'Markdown')
+        parse_mode (str): نوع پارس پیام ('HTML' یا 'Markdown') یا None برای بدون پارس
         max_retries (int): حداکثر تعداد تلاش‌های مجدد در صورت خطا
         retry_delay (int): تاخیر به ثانیه بین تلاش‌های مجدد
 
