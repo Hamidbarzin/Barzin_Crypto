@@ -208,13 +208,201 @@
                 <!-- Trading Signals Tab -->
                 <div class="tab-pane fade" id="signals-pane" role="tabpanel" aria-labelledby="signals-tab">
                     <!-- Loading Spinner -->
-                    <div id="signals-loading" class="text-center py-5">
+                    <div id="signals-loading" style="display: none;" class="text-center py-5">
                         <span class="loader"></span>
                         <p class="mt-3 text-muted">در حال بارگذاری سیگنال‌های معاملاتی...</p>
                     </div>
                     
                     <!-- Signals Container -->
-                    <div id="signals-container" class="row"></div>
+                    <div id="signals-container" class="row">
+                        <!-- BTC Signal Card -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card crypto-card h-100">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-circle me-2">
+                                                <i class="fab fa-bitcoin text-warning"></i>
+                                            </div>
+                                            <h5 class="mb-0">بیت‌کوین (BTC/USDT)</h5>
+                                        </div>
+                                        <span class="badge bg-success">خرید</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">قیمت فعلی:</span>
+                                            <span id="btc-signal-price" class="fw-bold">۶۵,۱۲۰ USDT</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">حجم پیشنهادی:</span>
+                                            <span class="fw-bold">۰.۵ BTC</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">حد سود:</span>
+                                            <span class="text-success">۶۸,۵۰۰ USDT (+۵.۲٪)</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">حد ضرر:</span>
+                                            <span class="text-danger">۶۲,۸۰۰ USDT (-۳.۶٪)</span>
+                                        </div>
+                                    </div>
+                                    <p class="signal-description">
+                                        بیت‌کوین اخیراً یک الگوی مثلث صعودی را تکمیل کرده و به نظر می‌رسد آماده ادامه روند صعودی است. شاخص RSI در ناحیه خنثی قرار دارد و MACD سیگنال خرید را نشان می‌دهد.
+                                    </p>
+                                    <div class="text-center mt-3">
+                                        <button class="btn btn-sm btn-outline-warning me-2">اشتراک‌گذاری <i class="fas fa-share-alt ms-1"></i></button>
+                                        <button class="btn btn-sm btn-primary">خرید <i class="fas fa-arrow-right ms-1"></i></button>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-muted">
+                                    <small>ایجاد شده: امروز ۱۵:۴۵ | اعتبار: ۲۴ ساعت</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ETH Signal Card -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card crypto-card h-100">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-circle me-2">
+                                                <i class="fab fa-ethereum text-primary"></i>
+                                            </div>
+                                            <h5 class="mb-0">اتریوم (ETH/USDT)</h5>
+                                        </div>
+                                        <span class="badge bg-danger">فروش</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">قیمت فعلی:</span>
+                                            <span id="eth-signal-price" class="fw-bold">۳,۴۵۰ USDT</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">حجم پیشنهادی:</span>
+                                            <span class="fw-bold">۲ ETH</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">حد سود:</span>
+                                            <span class="text-success">۳,۲۳۰ USDT (+۶.۴٪)</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">حد ضرر:</span>
+                                            <span class="text-danger">۳,۵۸۰ USDT (-۳.۸٪)</span>
+                                        </div>
+                                    </div>
+                                    <p class="signal-description">
+                                        اتریوم در نزدیکی مقاومت کلیدی قرار گرفته و شاخص‌های تکنیکال نشان‌دهنده اشباع خرید هستند. RSI بالای ۷۰ قرار دارد و الگوی واگرایی منفی با MACD مشاهده می‌شود. احتمال اصلاح قیمت وجود دارد.
+                                    </p>
+                                    <div class="text-center mt-3">
+                                        <button class="btn btn-sm btn-outline-warning me-2">اشتراک‌گذاری <i class="fas fa-share-alt ms-1"></i></button>
+                                        <button class="btn btn-sm btn-danger">فروش <i class="fas fa-arrow-left ms-1"></i></button>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-muted">
+                                    <small>ایجاد شده: امروز ۱۶:۳۰ | اعتبار: ۱۲ ساعت</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- SOL Signal Card -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card crypto-card h-100">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-circle me-2">
+                                                <i class="fas fa-sun text-info"></i>
+                                            </div>
+                                            <h5 class="mb-0">سولانا (SOL/USDT)</h5>
+                                        </div>
+                                        <span class="badge bg-success">خرید</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">قیمت فعلی:</span>
+                                            <span class="fw-bold">۱۵۲ USDT</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">حجم پیشنهادی:</span>
+                                            <span class="fw-bold">۱۰ SOL</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">حد سود:</span>
+                                            <span class="text-success">۱۷۵ USDT (+۱۵.۱٪)</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">حد ضرر:</span>
+                                            <span class="text-danger">۱۳۹ USDT (-۸.۶٪)</span>
+                                        </div>
+                                    </div>
+                                    <p class="signal-description">
+                                        سولانا در حال شکستن یک الگوی مقاومتی کلیدی است و با حجم معاملات بالا در حال حرکت است. میانگین‌های متحرک حمایت قوی را نشان می‌دهند و پتانسیل رشد قابل توجهی وجود دارد.
+                                    </p>
+                                    <div class="text-center mt-3">
+                                        <button class="btn btn-sm btn-outline-warning me-2">اشتراک‌گذاری <i class="fas fa-share-alt ms-1"></i></button>
+                                        <button class="btn btn-sm btn-primary">خرید <i class="fas fa-arrow-right ms-1"></i></button>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-muted">
+                                    <small>ایجاد شده: امروز ۱۴:۲۰ | اعتبار: ۴۸ ساعت</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- BNB Signal Card -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card crypto-card h-100">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-circle me-2">
+                                                <i class="fas fa-coins text-warning"></i>
+                                            </div>
+                                            <h5 class="mb-0">بایننس کوین (BNB/USDT)</h5>
+                                        </div>
+                                        <span class="badge bg-warning">انتظار</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">قیمت فعلی:</span>
+                                            <span class="fw-bold">۵۶۰ USDT</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">سطح نظارت:</span>
+                                            <span class="fw-bold">۵۸۰ USDT</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">هدف قیمتی (صعودی):</span>
+                                            <span class="text-success">۶۱۵ USDT</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">هدف قیمتی (نزولی):</span>
+                                            <span class="text-danger">۵۲۰ USDT</span>
+                                        </div>
+                                    </div>
+                                    <p class="signal-description">
+                                        بایننس کوین در یک محدوده قیمتی باریک در حال معامله است. در صورت شکست سطح مقاومت ۵۸۰ دلار، سیگنال خرید فعال می‌شود. پیشنهاد می‌شود تا زمان شکست این سطح، معامله‌ای انجام نشود.
+                                    </p>
+                                    <div class="text-center mt-3">
+                                        <button class="btn btn-sm btn-outline-warning me-2">اشتراک‌گذاری <i class="fas fa-share-alt ms-1"></i></button>
+                                        <button class="btn btn-sm btn-secondary">تنظیم هشدار <i class="fas fa-bell ms-1"></i></button>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-muted">
+                                    <small>ایجاد شده: امروز ۱۷:۱۰ | اعتبار: ۲۴ ساعت</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- News Tab -->
