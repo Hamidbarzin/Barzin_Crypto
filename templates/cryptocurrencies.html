@@ -80,11 +80,39 @@
             <div class="card crypto-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">تحلیل تکنیکال <span id="selected-crypto-name">بیت‌کوین</span></h5>
-                    <div class="btn-group">
-                        <button class="btn btn-sm btn-primary active" id="tab-technical">تحلیل فنی</button>
-                        <button class="btn btn-sm btn-outline-primary" id="tab-news">اخبار و تحلیل‌ها</button>
+                    <div class="border rounded p-1 bg-dark">
+                        <a href="#technical" class="btn btn-sm btn-primary mx-1" onclick="showTechnical(); return false;">تحلیل فنی</a>
+                        <a href="#news" class="btn btn-sm btn-outline-primary mx-1" onclick="showNews(); return false;">اخبار و تحلیل‌ها</a>
                     </div>
                 </div>
+                
+                <script>
+                    // تابع‌های مستقیم برای نمایش محتوا
+                    function showTechnical() {
+                        document.getElementById('technical-analysis-content').style.display = 'block';
+                        document.getElementById('news-analysis-content').style.display = 'none';
+                        
+                        const buttons = document.querySelectorAll('.card-header .btn');
+                        buttons[0].className = 'btn btn-sm btn-primary mx-1';
+                        buttons[1].className = 'btn btn-sm btn-outline-primary mx-1';
+                    }
+                    
+                    function showNews() {
+                        document.getElementById('technical-analysis-content').style.display = 'none';
+                        document.getElementById('news-analysis-content').style.display = 'block';
+                        
+                        const buttons = document.querySelectorAll('.card-header .btn');
+                        buttons[0].className = 'btn btn-sm btn-outline-primary mx-1';
+                        buttons[1].className = 'btn btn-sm btn-primary mx-1';
+                        
+                        // به‌روزرسانی نام رمزارز در بخش اخبار
+                        const cryptoName = document.getElementById('selected-crypto-name').textContent;
+                        const cryptoName2 = document.getElementById('selected-crypto-name2');
+                        if (cryptoName2) {
+                            cryptoName2.textContent = cryptoName;
+                        }
+                    }
+                </script>
                 <div class="card-body">
                     <!-- بخش تحلیل تکنیکال -->
                     <div id="technical-analysis-content">
@@ -183,9 +211,45 @@
                             </div>
                         </div>
                         
-                        <a href="#" class="btn btn-outline-secondary btn-sm mt-2 w-100" id="load-more-news">
+                        <a href="#" class="btn btn-outline-secondary btn-sm mt-2 w-100" id="load-more-news" onclick="loadMoreNews(); return false;">
                             <i class="fas fa-sync me-1"></i> بارگذاری اخبار بیشتر
                         </a>
+                        
+<script>
+// تابع بارگذاری اخبار بیشتر
+function loadMoreNews() {
+    const loadMoreButton = document.getElementById('load-more-news');
+    const newsContainer = document.querySelector('.news-container');
+    
+    if (loadMoreButton && newsContainer) {
+        // نمایش حالت بارگذاری
+        loadMoreButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> در حال بارگذاری...';
+        
+        // شبیه‌سازی تأخیر در بارگذاری (در نسخه واقعی با درخواست API جایگزین می‌شود)
+        setTimeout(() => {
+            // افزودن خبر جدید
+            const newNewsItem = document.createElement('div');
+            newNewsItem.className = 'news-item mb-3 p-3 border-start border-4 border-success';
+            newNewsItem.innerHTML = `
+                <h6 class="news-title mb-2">گزارش: سرمایه‌گذاری نهادی در رمزارزها افزایش یافته است</h6>
+                <p class="news-excerpt text-muted mb-1">گزارش‌ها حاکی از آن است که سرمایه‌گذاری نهادی در بازار رمزارزها، خصوصاً بیت‌کوین و اتریوم به شدت افزایش یافته است. این روند می‌تواند نشانه‌ای از پذیرش گسترده‌تر ارزهای دیجیتال باشد.</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="news-source">منبع: تحلیل مالی کریپتو</small>
+                    <small class="news-date">۵ آوریل ۲۰۲۵</small>
+                </div>
+                <div class="news-sentiment mt-2">
+                    <span class="badge bg-success">احساس بازار: بسیار مثبت</span>
+                </div>
+            `;
+            
+            newsContainer.appendChild(newNewsItem);
+            
+            // بازگرداندن دکمه به حالت اصلی
+            loadMoreButton.innerHTML = '<i class="fas fa-sync me-1"></i> بارگذاری اخبار بیشتر';
+        }, 1000);
+    }
+}
+</script>
                     </div>
                 </div>
             </div>
@@ -306,23 +370,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // نمایش بخش تحلیل فنی (به جای اخبار)
-                const tabTechnical = document.getElementById('tab-technical');
-                const tabNews = document.getElementById('tab-news');
-                const technicalContent = document.getElementById('technical-analysis-content');
-                const newsContent = document.getElementById('news-analysis-content');
-                
-                if (tabTechnical && tabNews && technicalContent && newsContent) {
-                    tabTechnical.classList.add('active');
-                    tabTechnical.classList.add('btn-primary');
-                    tabTechnical.classList.remove('btn-outline-primary');
-                    
-                    tabNews.classList.remove('active');
-                    tabNews.classList.remove('btn-primary');
-                    tabNews.classList.add('btn-outline-primary');
-                    
-                    technicalContent.style.display = 'block';
-                    newsContent.style.display = 'none';
-                }
+                // از تابع جدید استفاده می‌کنیم
+                showTechnical();
                 
                 // اسکرول به بخش تحلیل
                 const analysisSection = document.querySelector('.card-header');
@@ -390,42 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('تب اخبار و تحلیل‌ها کلیک شد');
             });
             
-            // دکمه بارگذاری اخبار بیشتر
-            const loadMoreButton = document.getElementById('load-more-news');
-            if (loadMoreButton) {
-                loadMoreButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // شبیه‌سازی بارگذاری اخبار بیشتر
-                    loadMoreButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> در حال بارگذاری...';
-                    
-                    // شبیه‌سازی تأخیر در بارگذاری
-                    setTimeout(() => {
-                        // افزودن یک خبر جدید
-                        const newsContainer = document.querySelector('.news-container');
-                        const newNewsItem = document.createElement('div');
-                        newNewsItem.className = 'news-item mb-3 p-3 border-start border-4 border-success';
-                        newNewsItem.innerHTML = `
-                            <h6 class="news-title mb-2">گزارش: سرمایه‌گذاری نهادی در رمزارزها افزایش یافته است</h6>
-                            <p class="news-excerpt text-muted mb-1">گزارش‌ها حاکی از آن است که سرمایه‌گذاری نهادی در بازار رمزارزها، خصوصاً بیت‌کوین و اتریوم به شدت افزایش یافته است. این روند می‌تواند نشانه‌ای از پذیرش گسترده‌تر ارزهای دیجیتال باشد.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="news-source">منبع: تحلیل مالی کریپتو</small>
-                                <small class="news-date">۵ آوریل ۲۰۲۵</small>
-                            </div>
-                            <div class="news-sentiment mt-2">
-                                <span class="badge bg-success">احساس بازار: بسیار مثبت</span>
-                            </div>
-                        `;
-                        
-                        if (newsContainer) {
-                            newsContainer.appendChild(newNewsItem);
-                        }
-                        
-                        // بازگرداندن دکمه به حالت اصلی
-                        loadMoreButton.innerHTML = '<i class="fas fa-sync me-1"></i> بارگذاری اخبار بیشتر';
-                    }, 1500);
-                });
-            }
+            // اکنون از تابع مستقل loadMoreNews استفاده می‌شود
         }
     }
     
