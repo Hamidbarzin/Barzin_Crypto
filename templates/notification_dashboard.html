@@ -27,7 +27,7 @@
                     <div class="mt-4">
                         <button class="btn btn-success" onclick="startService('ten_minute')">راه‌اندازی</button>
                         <button class="btn btn-danger ms-2" onclick="stopService('ten_minute')">توقف</button>
-                        <button class="btn btn-secondary ms-2" onclick="testService('ten_minute')">تست</button>
+                        <button class="btn btn-secondary ms-2" onclick="testTelegramDirectly()">تست</button>
                     </div>
                 </div>
             </div>
@@ -229,3 +229,20 @@ function saveSettings() {
 }
 </script>
 {% endblock %}
+
+<script>
+function testTelegramDirectly() {
+    fetch('/api/test-telegram')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('پیام تست با موفقیت ارسال شد!');
+            } else {
+                alert('خطا در ارسال پیام: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('خطا در ارتباط با سرور: ' + error);
+        });
+}
+</script>
