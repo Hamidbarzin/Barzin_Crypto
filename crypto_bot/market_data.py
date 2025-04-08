@@ -19,7 +19,8 @@ from crypto_bot.config import (
 logger = logging.getLogger(__name__)
 
 # List of exchanges to try in order of preference
-EXCHANGE_LIST = ['kucoin', 'coinex', 'binance', 'kraken', 'okx']
+# Binance removed due to Canada IP restrictions
+EXCHANGE_LIST = ['kucoin', 'coinex', 'kraken', 'okx']
 
 def get_exchange(exchange_id=None):
     """
