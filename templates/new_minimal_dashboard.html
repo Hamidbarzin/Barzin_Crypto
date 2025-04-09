@@ -1,0 +1,534 @@
+{% extends "minimal_base.html" %}
+
+{% block title %}داشبورد | برزین کریپتو{% endblock %}
+
+{% block styles %}
+<style>
+    .price-card {
+        transition: all 0.3s ease;
+    }
+    
+    .price-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .crypto-card {
+        background-color: var(--bs-gray-800);
+        border: 1px solid var(--bs-gray-700);
+    }
+    
+    .stat-card {
+        background-color: var(--bs-gray-900);
+        border: 1px solid var(--bs-gray-800);
+    }
+    
+    .chart-container {
+        height: 200px;
+        background-color: var(--bs-gray-900);
+        border-radius: 0.375rem;
+        padding: 1rem;
+    }
+    
+    .loader {
+        width: 48px;
+        height: 48px;
+        border: 5px solid var(--bs-secondary);
+        border-bottom-color: var(--bs-primary);
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+    }
+    
+    @keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    
+    .icon-circle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: rgba(255,255,255,0.1);
+    }
+    
+    .signal-description {
+        font-size: 0.9rem;
+        color: var(--bs-gray-400);
+    }
+    
+    /* Simple Tab System */
+    .tab-button {
+        background-color: var(--bs-gray-800);
+        border: 1px solid var(--bs-gray-700);
+        color: var(--bs-gray-400);
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-right: 5px;
+        border-radius: 5px;
+    }
+    
+    .tab-button.active {
+        background-color: var(--bs-primary);
+        color: white;
+        border-color: var(--bs-primary);
+    }
+    
+    .content-tab {
+        display: none;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">داشبورد</h1>
+                <a href="{{ url_for('minimal_settings') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-cog me-1"></i> تنظیمات
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Price Overview Cards -->
+    <div class="row mb-4">
+        <!-- Bitcoin Card -->
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card price-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle me-2">
+                                <i class="fab fa-bitcoin text-warning"></i>
+                            </div>
+                            <h5 class="card-title mb-0">بیت‌کوین</h5>
+                        </div>
+                        <div class="text-end">
+                            <h4 class="mb-0" id="BTC-USDT-price">--</h4>
+                            <p class="text-muted small mb-0">تتر (USDT)</p>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <span class="text-muted small">تغییرات ۲۴ ساعته</span>
+                        <span id="BTC-USDT-change" class="badge rounded-pill px-2"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ethereum Card -->
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card price-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle me-2">
+                                <i class="fab fa-ethereum text-primary"></i>
+                            </div>
+                            <h5 class="card-title mb-0">اتریوم</h5>
+                        </div>
+                        <div class="text-end">
+                            <h4 class="mb-0" id="ETH-USDT-price">--</h4>
+                            <p class="text-muted small mb-0">تتر (USDT)</p>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <span class="text-muted small">تغییرات ۲۴ ساعته</span>
+                        <span id="ETH-USDT-change" class="badge rounded-pill px-2"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- XRP Card -->
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card price-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle me-2">
+                                <i class="fas fa-chart-line text-info"></i>
+                            </div>
+                            <h5 class="card-title mb-0">ریپل</h5>
+                        </div>
+                        <div class="text-end">
+                            <h4 class="mb-0" id="XRP-USDT-price">--</h4>
+                            <p class="text-muted small mb-0">تتر (USDT)</p>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <span class="text-muted small">تغییرات ۲۴ ساعته</span>
+                        <span id="XRP-USDT-change" class="badge rounded-pill px-2"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Simple Tabs System -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="tab-buttons d-flex justify-content-center">
+                <button class="tab-button active" data-tab="technical-tab" onclick="showTab('technical-tab')">
+                    <i class="fas fa-chart-bar me-1"></i> تحلیل تکنیکال
+                </button>
+                <button class="tab-button" data-tab="signals-tab" onclick="showTab('signals-tab')">
+                    <i class="fas fa-signal me-1"></i> سیگنال‌های معاملاتی
+                </button>
+                <button class="tab-button" data-tab="news-tab" onclick="showTab('news-tab')">
+                    <i class="fas fa-newspaper me-1"></i> اخبار
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tab Content -->
+    <div class="row">
+        <div class="col-12">
+            <!-- Technical Analysis Tab -->
+            <div class="content-tab" id="technical-tab">
+                <div class="card crypto-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">تحلیل تکنیکال بیت‌کوین (تایم‌فریم ساعتی)</h5>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-secondary active">BTC</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary">ETH</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary">XRP</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Loading Spinner -->
+                        <div id="technical-loading" class="text-center py-5">
+                            <span class="loader"></span>
+                            <p class="mt-3 text-muted">در حال بارگذاری تحلیل تکنیکال...</p>
+                        </div>
+                        
+                        <!-- Technical Analysis Content -->
+                        <div id="technical-content" style="display: none;">
+                            <!-- Chart Placeholder -->
+                            <div class="chart-container mb-4">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    <p class="text-muted">نمودار قیمت BTC/USDT</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="card mb-3 stat-card">
+                                        <div class="card-body">
+                                            <h5 class="card-title mb-3">شاخص‌های تکنیکال</h5>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><strong>RSI</strong> <small class="text-muted">(14)</small></td>
+                                                            <td><span id="rsi-value">--</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>MACD</strong></td>
+                                                            <td><span id="macd-value">--</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>میانگین متحرک</strong></td>
+                                                            <td><span id="ma-value">--</span></td>
+                                                        </tr>
+                                                        <tr class="table-active">
+                                                            <td><strong>سیگنال کلی</strong></td>
+                                                            <td><strong id="overall-signal">--</strong></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="card mb-3 stat-card">
+                                        <div class="card-body">
+                                            <h5 class="card-title mb-3">سطوح حمایت و مقاومت</h5>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><strong>مقاومت 2</strong></td>
+                                                            <td>۶۸,۵۰۰</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>مقاومت 1</strong></td>
+                                                            <td>۶۶,۸۰۰</td>
+                                                        </tr>
+                                                        <tr class="table-active">
+                                                            <td><strong>قیمت فعلی</strong></td>
+                                                            <td>۶۵,۱۲۰</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>حمایت 1</strong></td>
+                                                            <td>۶۴,۵۰۰</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>حمایت 2</strong></td>
+                                                            <td>۶۳,۲۰۰</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-3 stat-card">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-3">توضیحات تحلیل</h5>
+                                    <p>بیت‌کوین در حال حاضر در روند صعودی قرار دارد. شاخص RSI نشان‌دهنده شرایط خریداری بیش از حد (اشباع خرید) است، اما MACD همچنان سیگنال صعودی را نشان می‌دهد. میانگین‌های متحرک حمایت خوبی را در سطح ۶۴,۵۰۰ دلار فراهم می‌کنند.</p>
+                                    <p>توصیه می‌شود معامله‌گران صبر کنند تا سیگنال تأییدی بیشتری دریافت کنند یا منتظر اصلاح به سمت سطوح حمایتی باشند.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trading Signals Tab -->
+            <div class="content-tab" id="signals-tab">
+                <!-- Loading Spinner -->
+                <div id="signals-loading" style="display: none;" class="text-center py-5">
+                    <span class="loader"></span>
+                    <p class="mt-3 text-muted">در حال بارگذاری سیگنال‌های معاملاتی...</p>
+                </div>
+                
+                <!-- Signals Container -->
+                <div id="signals-container" class="row">
+                    <!-- BTC Signal Card -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card crypto-card h-100">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-circle me-2">
+                                            <i class="fab fa-bitcoin text-warning"></i>
+                                        </div>
+                                        <h5 class="mb-0">بیت‌کوین (BTC/USDT)</h5>
+                                    </div>
+                                    <span class="badge bg-success">خرید</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-muted">قیمت فعلی:</span>
+                                        <span id="btc-signal-price" class="fw-bold">۶۵,۱۲۰ USDT</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-muted">حجم پیشنهادی:</span>
+                                        <span class="fw-bold">۰.۵ BTC</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-muted">حد سود:</span>
+                                        <span class="text-success">۶۸,۵۰۰ USDT (+۵.۲٪)</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">حد ضرر:</span>
+                                        <span class="text-danger">۶۲,۸۰۰ USDT (-۳.۶٪)</span>
+                                    </div>
+                                </div>
+                                <p class="signal-description">
+                                    بیت‌کوین اخیراً یک الگوی مثلث صعودی را تکمیل کرده و به نظر می‌رسد آماده ادامه روند صعودی است. شاخص RSI در ناحیه خنثی قرار دارد و MACD سیگنال خرید را نشان می‌دهد.
+                                </p>
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-sm btn-outline-warning me-2">اشتراک‌گذاری <i class="fas fa-share-alt ms-1"></i></button>
+                                    <button class="btn btn-sm btn-primary">خرید <i class="fas fa-arrow-right ms-1"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-footer text-muted">
+                                <small>ایجاد شده: امروز ۱۵:۴۵ | اعتبار: ۲۴ ساعت</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ETH Signal Card -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card crypto-card h-100">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-circle me-2">
+                                            <i class="fab fa-ethereum text-primary"></i>
+                                        </div>
+                                        <h5 class="mb-0">اتریوم (ETH/USDT)</h5>
+                                    </div>
+                                    <span class="badge bg-danger">فروش</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-muted">قیمت فعلی:</span>
+                                        <span id="eth-signal-price" class="fw-bold">۳,۴۵۰ USDT</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-muted">حجم پیشنهادی:</span>
+                                        <span class="fw-bold">۲ ETH</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-muted">حد سود:</span>
+                                        <span class="text-success">۳,۲۳۰ USDT (+۶.۴٪)</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">حد ضرر:</span>
+                                        <span class="text-danger">۳,۵۸۰ USDT (-۳.۸٪)</span>
+                                    </div>
+                                </div>
+                                <p class="signal-description">
+                                    اتریوم در نزدیکی مقاومت کلیدی قرار گرفته و شاخص‌های تکنیکال نشان‌دهنده اشباع خرید هستند. RSI بالای ۷۰ قرار دارد و الگوی واگرایی منفی با MACD مشاهده می‌شود. احتمال اصلاح قیمت وجود دارد.
+                                </p>
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-sm btn-outline-warning me-2">اشتراک‌گذاری <i class="fas fa-share-alt ms-1"></i></button>
+                                    <button class="btn btn-sm btn-danger">فروش <i class="fas fa-arrow-left ms-1"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-footer text-muted">
+                                <small>ایجاد شده: امروز ۱۶:۳۰ | اعتبار: ۱۲ ساعت</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- News Tab -->
+            <div class="content-tab" id="news-tab">
+                <!-- Loading Spinner -->
+                <div id="news-loading" class="text-center py-5">
+                    <span class="loader"></span>
+                    <p class="mt-3 text-muted">در حال بارگذاری اخبار...</p>
+                </div>
+                
+                <!-- News Container -->
+                <div id="news-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/simple-tabs.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // تابع به‌روزرسانی قیمت ارزها
+        function updatePrices() {
+            console.log('Updating prices for:', ['BTC/USDT', 'ETH/USDT', 'XRP/USDT']);
+            
+            // به‌روزرسانی خودکار هر ۳۰ ثانیه
+            fetch('/get_price/BTC/USDT')
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById('BTC-USDT-price').textContent = data.price;
+                        const changeElement = document.getElementById('BTC-USDT-change');
+                        changeElement.textContent = data.change;
+                        if (parseFloat(data.change) >= 0) {
+                            changeElement.className = 'badge rounded-pill bg-success px-2';
+                        } else {
+                            changeElement.className = 'badge rounded-pill bg-danger px-2';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching BTC price:', error));
+            
+            fetch('/get_price/ETH/USDT')
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById('ETH-USDT-price').textContent = data.price;
+                        const changeElement = document.getElementById('ETH-USDT-change');
+                        changeElement.textContent = data.change;
+                        if (parseFloat(data.change) >= 0) {
+                            changeElement.className = 'badge rounded-pill bg-success px-2';
+                        } else {
+                            changeElement.className = 'badge rounded-pill bg-danger px-2';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching ETH price:', error));
+                
+            fetch('/get_price/XRP/USDT')
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById('XRP-USDT-price').textContent = data.price;
+                        const changeElement = document.getElementById('XRP-USDT-change');
+                        changeElement.textContent = data.change;
+                        if (parseFloat(data.change) >= 0) {
+                            changeElement.className = 'badge rounded-pill bg-success px-2';
+                        } else {
+                            changeElement.className = 'badge rounded-pill bg-danger px-2';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching XRP price:', error));
+        }
+        
+        // به‌روزرسانی تحلیل تکنیکال
+        function updateTechnical() {
+            document.getElementById('technical-loading').style.display = 'block';
+            document.getElementById('technical-content').style.display = 'none';
+            
+            // نمایش محتوای تحلیل تکنیکال پس از ۲ ثانیه (شبیه‌سازی بارگذاری)
+            setTimeout(function() {
+                document.getElementById('technical-loading').style.display = 'none';
+                document.getElementById('technical-content').style.display = 'block';
+                
+                // به‌روزرسانی شاخص‌ها
+                fetch('/get_technical/BTC/1h')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data) {
+                            document.getElementById('rsi-value').textContent = data.rsi || '--';
+                            document.getElementById('macd-value').textContent = data.macd || '--';
+                            document.getElementById('ma-value').textContent = data.ma || '--';
+                            
+                            const signal = document.getElementById('overall-signal');
+                            signal.textContent = data.signal || '--';
+                            if (data.signal === 'خرید') {
+                                signal.className = 'text-success';
+                            } else if (data.signal === 'فروش') {
+                                signal.className = 'text-danger';
+                            } else {
+                                signal.className = 'text-warning';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching technical data:', error);
+                        // نمایش داده‌های پیش‌فرض در صورت خطا
+                        document.getElementById('rsi-value').textContent = '۵۸';
+                        document.getElementById('macd-value').textContent = 'صعودی';
+                        document.getElementById('ma-value').textContent = 'بالای MA200';
+                        document.getElementById('overall-signal').textContent = 'خرید';
+                        document.getElementById('overall-signal').className = 'text-success';
+                    });
+            }, 2000);
+        }
+        
+        // به‌روزرسانی اولیه
+        updatePrices();
+        updateTechnical();
+        
+        // به‌روزرسانی خودکار هر ۳۰ ثانیه
+        setInterval(updatePrices, 30000);
+    });
+</script>
+{% endblock %}

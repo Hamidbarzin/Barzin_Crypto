@@ -1946,6 +1946,9 @@ def get_email_message():
 def minimal_dashboard():
     """صفحه داشبورد با طراحی مینیمال"""
     inject_now()
+    # استفاده از نسخه جدید داشبورد اگر پارامتر new در URL وجود داشته باشد
+    if 'new' in request.args:
+        return render_template('new_minimal_dashboard.html')
     return render_template('minimal_dashboard.html')
 
 @app.route('/minimal_settings')
