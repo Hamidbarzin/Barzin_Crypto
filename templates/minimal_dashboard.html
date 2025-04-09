@@ -82,27 +82,27 @@
     <!-- Tabs for Technical Analysis, Trading Signals, and News -->
     <div class="row">
         <div class="col-12">
-            <ul class="nav nav-pills mb-3" id="dashboardTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="technical-tab" data-bs-toggle="tab" data-bs-target="#technical-pane" type="button" role="tab" aria-controls="technical-pane" aria-selected="true">
+            <ul class="nav nav-tabs mb-3" id="dashboard-tabs">
+                <li class="nav-item">
+                    <button class="nav-link active" id="technical-tab" onclick="showTab('technical')">
                         <i class="fas fa-chart-bar me-1"></i> تحلیل تکنیکال
                     </button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="signals-tab" data-bs-toggle="tab" data-bs-target="#signals-pane" type="button" role="tab" aria-controls="signals-pane" aria-selected="false">
+                <li class="nav-item">
+                    <button class="nav-link" id="signals-tab" onclick="showTab('signals')">
                         <i class="fas fa-signal me-1"></i> سیگنال‌های معاملاتی
                     </button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="news-tab" data-bs-toggle="tab" data-bs-target="#news-pane" type="button" role="tab" aria-controls="news-pane" aria-selected="false">
+                <li class="nav-item">
+                    <button class="nav-link" id="news-tab" onclick="showTab('news')">
                         <i class="fas fa-newspaper me-1"></i> اخبار
                     </button>
                 </li>
             </ul>
             
-            <div class="tab-content" id="dashboardTabContent">
+            <div class="tab-content" id="dashboard-content">
                 <!-- Technical Analysis Tab -->
-                <div class="tab-pane fade show active" id="technical-pane" role="tabpanel" aria-labelledby="technical-tab">
+                <div class="tab-pane active" id="technical-pane" role="tabpanel" aria-labelledby="technical-tab">
                     <div class="card crypto-card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">تحلیل تکنیکال بیت‌کوین (تایم‌فریم ساعتی)</h5>
@@ -206,7 +206,7 @@
                 </div>
                 
                 <!-- Trading Signals Tab -->
-                <div class="tab-pane fade" id="signals-pane" role="tabpanel" aria-labelledby="signals-tab" style="display: block !important;">
+                <div class="tab-pane" id="signals-pane" role="tabpanel" aria-labelledby="signals-tab" style="display: none;">
                     <!-- Loading Spinner -->
                     <div id="signals-loading" style="display: none;" class="text-center py-5">
                         <span class="loader"></span>
@@ -406,7 +406,7 @@
                 </div>
                 
                 <!-- News Tab -->
-                <div class="tab-pane fade" id="news-pane" role="tabpanel" aria-labelledby="news-tab">
+                <div class="tab-pane" id="news-pane" role="tabpanel" aria-labelledby="news-tab" style="display: none;">
                     <!-- Loading Spinner -->
                     <div id="news-loading" class="text-center py-5">
                         <span class="loader"></span>
@@ -425,74 +425,45 @@
 {% block extra_scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // فعال کردن تب‌ها با بوت‌استرپ
-        if (typeof bootstrap !== 'undefined') {
-            const triggerTabList = document.querySelectorAll('#dashboardTabs button');
-            triggerTabList.forEach(triggerEl => {
-                const tabTrigger = new bootstrap.Tab(triggerEl);
-                
-                triggerEl.addEventListener('click', event => {
-                    event.preventDefault();
-                    tabTrigger.show();
-                    
-                    // به‌روزرسانی قیمت‌ها در تب سیگنال‌ها
-                    if (triggerEl.id === 'signals-tab') {
-                        updateSignalPrices();
-                    }
-                });
-            });
-        } else {
-            // روش جایگزین برای زمانی که bootstrap به درستی بارگذاری نشده است
-            const tabElements = document.querySelectorAll('#dashboardTabs button');
-            tabElements.forEach(tab => {
-                tab.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    // فعال کردن تب انتخاب شده
-                    tabElements.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // نمایش محتوای تب مرتبط
-                    const target = this.getAttribute('data-bs-target');
-                    const tabPanes = document.querySelectorAll('.tab-pane');
-                    tabPanes.forEach(pane => {
-                        pane.classList.remove('show', 'active');
-                    });
-                    document.querySelector(target).classList.add('show', 'active');
-                    
-                    // به‌روزرسانی قیمت‌ها در تب سیگنال‌ها
-                    if (this.id === 'signals-tab') {
-                        updateSignalPrices();
-                    }
-                });
-            });
-        }
-        
-        // فعال‌سازی تب سیگنال‌ها برای نمایش
-        document.getElementById('signals-tab').addEventListener('click', function() {
-            // فعال شدن حالت دستی
-            const tabPanes = document.querySelectorAll('.tab-pane');
-            tabPanes.forEach(pane => {
-                pane.classList.remove('show', 'active');
-                pane.style.display = 'none';
-            });
-            document.getElementById('signals-pane').classList.add('show', 'active');
-            document.getElementById('signals-pane').style.display = 'block';
+        // تابع نمایش تب مورد نظر
+        window.showTab = function(tabName) {
+            console.log('Showing tab:', tabName);
             
-            // فعال‌سازی تب در UI
-            document.querySelectorAll('#dashboardTabs button').forEach(button => {
+            // مخفی کردن همه تب‌ها
+            document.querySelectorAll('.tab-pane').forEach(function(tab) {
+                tab.style.display = 'none';
+            });
+            
+            // غیرفعال کردن همه دکمه‌های تب
+            document.querySelectorAll('#dashboard-tabs .nav-link').forEach(function(button) {
                 button.classList.remove('active');
             });
-            document.getElementById('signals-tab').classList.add('active');
-        });
+            
+            // نمایش تب مورد نظر
+            const tabPane = document.getElementById(tabName + '-pane');
+            if (tabPane) {
+                tabPane.style.display = 'block';
+                // فعال کردن دکمه تب مربوطه
+                document.getElementById(tabName + '-tab').classList.add('active');
+                
+                // اگر تب سیگنال‌ها است، قیمت‌ها را به‌روز کن
+                if (tabName === 'signals') {
+                    updateSignalPrices();
+                }
+            }
+        };
         
         // به‌روزرسانی قیمت‌های واقعی در کارت‌های سیگنال
         function updateSignalPrices() {
             try {
+                console.log('Updating signal prices');
+                
                 // دریافت قیمت بیت‌کوین
                 const btcPrice = document.getElementById('BTC-USDT-price').textContent;
                 if (btcPrice && btcPrice !== '--') {
                     const btcSignalPrice = document.getElementById('btc-signal-price');
                     if (btcSignalPrice) {
+                        console.log('Updating BTC price to:', btcPrice);
                         btcSignalPrice.textContent = btcPrice;
                     }
                 }
@@ -502,18 +473,30 @@
                 if (ethPrice && ethPrice !== '--') {
                     const ethSignalPrice = document.getElementById('eth-signal-price');
                     if (ethSignalPrice) {
+                        console.log('Updating ETH price to:', ethPrice);
                         ethSignalPrice.textContent = ethPrice;
                     }
                 }
             } catch (error) {
-                console.log('Error updating signal prices: ', error);
+                console.error('Error updating signal prices:', error);
             }
         }
         
-        // به‌روزرسانی قیمت‌ها در بارگذاری صفحه
+        // تنظیم وضعیت اولیه تب‌ها
+        const allTabPanes = document.querySelectorAll('.tab-pane');
+        allTabPanes.forEach(function(tab) {
+            // همه تب‌ها را مخفی کن به جز تب فعال
+            if (!tab.classList.contains('active')) {
+                tab.style.display = 'none';
+            } else {
+                tab.style.display = 'block';
+            }
+        });
+        
+        // به‌روزرسانی قیمت‌ها در بارگذاری اولیه صفحه
         updateSignalPrices();
         
-        // به‌روزرسانی قیمت‌ها هر ۳۰ ثانیه
+        // به‌روزرسانی خودکار قیمت‌ها هر ۳۰ ثانیه
         setInterval(updateSignalPrices, 30000);
     });
 </script>
