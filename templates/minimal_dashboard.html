@@ -421,3 +421,92 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // فعال کردن تب‌ها با بوت‌استرپ
+        if (typeof bootstrap !== 'undefined') {
+            const triggerTabList = document.querySelectorAll('#dashboardTabs button');
+            triggerTabList.forEach(triggerEl => {
+                const tabTrigger = new bootstrap.Tab(triggerEl);
+                
+                triggerEl.addEventListener('click', event => {
+                    event.preventDefault();
+                    tabTrigger.show();
+                    
+                    // به‌روزرسانی قیمت‌ها در تب سیگنال‌ها
+                    if (triggerEl.id === 'signals-tab') {
+                        updateSignalPrices();
+                    }
+                });
+            });
+        } else {
+            // روش جایگزین برای زمانی که bootstrap به درستی بارگذاری نشده است
+            const tabElements = document.querySelectorAll('#dashboardTabs button');
+            tabElements.forEach(tab => {
+                tab.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    // فعال کردن تب انتخاب شده
+                    tabElements.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // نمایش محتوای تب مرتبط
+                    const target = this.getAttribute('data-bs-target');
+                    const tabPanes = document.querySelectorAll('.tab-pane');
+                    tabPanes.forEach(pane => {
+                        pane.classList.remove('show', 'active');
+                    });
+                    document.querySelector(target).classList.add('show', 'active');
+                    
+                    // به‌روزرسانی قیمت‌ها در تب سیگنال‌ها
+                    if (this.id === 'signals-tab') {
+                        updateSignalPrices();
+                    }
+                });
+            });
+        }
+        
+        // فعال‌سازی تب سیگنال‌ها برای نمایش
+        document.getElementById('signals-tab').addEventListener('click', function() {
+            // فعال شدن حالت دستی
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            tabPanes.forEach(pane => {
+                pane.classList.remove('show', 'active');
+            });
+            document.getElementById('signals-pane').classList.add('show', 'active');
+        });
+        
+        // به‌روزرسانی قیمت‌های واقعی در کارت‌های سیگنال
+        function updateSignalPrices() {
+            try {
+                // دریافت قیمت بیت‌کوین
+                const btcPrice = document.getElementById('BTC-USDT-price').textContent;
+                if (btcPrice && btcPrice !== '--') {
+                    const btcSignalPrice = document.getElementById('btc-signal-price');
+                    if (btcSignalPrice) {
+                        btcSignalPrice.textContent = btcPrice;
+                    }
+                }
+                
+                // دریافت قیمت اتریوم
+                const ethPrice = document.getElementById('ETH-USDT-price').textContent;
+                if (ethPrice && ethPrice !== '--') {
+                    const ethSignalPrice = document.getElementById('eth-signal-price');
+                    if (ethSignalPrice) {
+                        ethSignalPrice.textContent = ethPrice;
+                    }
+                }
+            } catch (error) {
+                console.log('Error updating signal prices: ', error);
+            }
+        }
+        
+        // به‌روزرسانی قیمت‌ها در بارگذاری صفحه
+        updateSignalPrices();
+        
+        // به‌روزرسانی قیمت‌ها هر ۳۰ ثانیه
+        setInterval(updateSignalPrices, 30000);
+    });
+</script>
+{% endblock %}
