@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>کنترل پنل تلگرام Crypto Barzin</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #181A20;
+            color: #eaecef;
+        }
+        .header {
+            border-bottom: 2px solid #FCD535;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+        h1, h2, h3 {
+            color: #FCD535;
+        }
+        .card {
+            margin-bottom: 20px;
+            background-color: #2b3139;
+            border: none;
+        }
+        .card-header {
+            background-color: #2b3139;
+            color: #FCD535;
+            font-weight: bold;
+            border-bottom: 1px solid #3c434f;
+        }
+        .btn-primary {
+            background-color: #F0B90B;
+            border-color: #F0B90B;
+            color: #000;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background-color: #FCD535;
+            border-color: #FCD535;
+            color: #000;
+        }
+        .btn-secondary {
+            background-color: #4a545f;
+            border-color: #4a545f;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6775;
+            border-color: #5a6775;
+        }
+        .alert-success {
+            background-color: rgba(14, 203, 129, 0.2);
+            color: #0ECB81;
+            border-color: #0ECB81;
+        }
+        .alert-danger {
+            background-color: rgba(246, 70, 93, 0.2);
+            color: #F6465D;
+            border-color: #F6465D;
+        }
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #3c434f;
+            text-align: center;
+            color: #848E9C;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="text-center">کنترل پنل تلگرام Crypto Barzin</h1>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        ارسال پیام‌های تلگرام
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            از این بخش می‌توانید پیام‌های مختلف را به صورت دستی به تلگرام ارسال کنید.
+                        </div>
+                        
+                        <div id="status-message" class="alert d-none mb-3"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">گزارش قیمت‌ها</h5>
+                                        <p class="card-text">ارسال گزارش قیمت‌های لحظه‌ای ارزهای دیجیتال</p>
+                                        <button id="send-price-report" class="btn btn-primary w-100">ارسال گزارش قیمت‌ها</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">گزارش سیستم</h5>
+                                        <p class="card-text">ارسال گزارش وضعیت سیستم و سرویس‌ها</p>
+                                        <button id="send-system-report" class="btn btn-primary w-100">ارسال گزارش سیستم</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">پیام تست</h5>
+                                        <p class="card-text">ارسال یک پیام تست ساده برای بررسی اتصال</p>
+                                        <button id="send-test-message" class="btn btn-primary w-100">ارسال پیام تست</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        راهنمای استفاده
+                    </div>
+                    <div class="card-body">
+                        <h5>نحوه استفاده از سیستم تلگرام</h5>
+                        <ul>
+                            <li>برای ارسال گزارش قیمت‌ها، روی دکمه «ارسال گزارش قیمت‌ها» کلیک کنید.</li>
+                            <li>برای ارسال گزارش وضعیت سیستم، روی دکمه «ارسال گزارش سیستم» کلیک کنید.</li>
+                            <li>برای ارسال پیام تست، روی دکمه «ارسال پیام تست» کلیک کنید.</li>
+                            <li>برای راه‌اندازی سرویس خودکار ارسال پیام هر 10 دقیقه، از اسکریپت‌های مربوطه استفاده کنید.</li>
+                        </ul>
+                        
+                        <h5 class="mt-4">اسکریپت‌های مدیریت سرویس</h5>
+                        <ul>
+                            <li><code>اجرای_گزارش_دهنده_هر_۱۰_دقیقه.sh</code> - راه‌اندازی سرویس ارسال پیام هر 10 دقیقه</li>
+                            <li><code>توقف_گزارش_دهنده_هر_۱۰_دقیقه.sh</code> - توقف سرویس ارسال پیام هر 10 دقیقه</li>
+                            <li><code>اجرای_نظارت_تلگرام.sh</code> - راه‌اندازی سیستم نظارت بر سرویس تلگرام</li>
+                            <li><code>توقف_نظارت_تلگرام.sh</code> - توقف سیستم نظارت بر سرویس تلگرام</li>
+                            <li><code>اجرای_خودکار_همه_سرویس_های_تلگرام.sh</code> - راه‌اندازی تمام سرویس‌های تلگرام</li>
+                            <li><code>توقف_همه_سرویس_های_تلگرام.sh</code> - توقف تمام سرویس‌های تلگرام</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>طراح و توسعه دهنده: حمید برزین</p>
+            <p>© ۱۴۰۴</p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusMessage = document.getElementById('status-message');
+            
+            function showStatus(message, isSuccess) {
+                statusMessage.textContent = message;
+                statusMessage.classList.remove('d-none', 'alert-success', 'alert-danger');
+                statusMessage.classList.add(isSuccess ? 'alert-success' : 'alert-danger');
+                
+                // Hide message after 5 seconds
+                setTimeout(() => {
+                    statusMessage.classList.add('d-none');
+                }, 5000);
+            }
+            
+            function sendRequest(endpoint) {
+                fetch(endpoint)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showStatus(data.message, true);
+                        } else {
+                            showStatus(data.message || 'خطا در ارسال درخواست', false);
+                        }
+                    })
+                    .catch(error => {
+                        showStatus('خطا در ارسال درخواست: ' + error.message, false);
+                    });
+            }
+            
+            // Event listeners for buttons
+            document.getElementById('send-price-report').addEventListener('click', function() {
+                sendRequest('/send_price_report');
+            });
+            
+            document.getElementById('send-system-report').addEventListener('click', function() {
+                sendRequest('/send_system_report');
+            });
+            
+            document.getElementById('send-test-message').addEventListener('click', function() {
+                sendRequest('/send_test_message_replit');
+            });
+        });
+    </script>
+</body>
+</html>

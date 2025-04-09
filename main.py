@@ -12,6 +12,7 @@ from crypto_bot.signal_generator import generate_signals
 from crypto_bot.email_service import send_test_email, update_email_settings, last_email_content, DISABLE_REAL_EMAIL
 from crypto_bot.commodity_data import get_commodity_prices, get_forex_rates, get_economic_indicators
 from crypto_bot.ai_module import get_price_prediction, get_market_sentiment, get_price_patterns, get_trading_strategy
+import replit_telegram_sender
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -2012,6 +2013,82 @@ def minimal_settings():
             logger.error(f"Error getting bot username: {e}")
     
     return render_template('minimal_settings.html', settings=settings, bot_username=bot_username)
+
+@app.route('/send_price_report')
+def send_telegram_price_report():
+    """ارسال گزارش قیمت‌های ارزهای دیجیتال به تلگرام"""
+    try:
+        result = replit_telegram_sender.send_price_report()
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'گزارش قیمت با موفقیت به تلگرام ارسال شد'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'خطا در ارسال گزارش قیمت به تلگرام'
+            })
+    except Exception as e:
+        logger.error(f"خطا در ارسال گزارش قیمت به تلگرام: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'خطا در ارسال گزارش قیمت به تلگرام'
+        })
+
+@app.route('/send_system_report')
+def send_telegram_system_report():
+    """ارسال گزارش وضعیت سیستم به تلگرام"""
+    try:
+        result = replit_telegram_sender.send_system_report()
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'گزارش وضعیت سیستم با موفقیت به تلگرام ارسال شد'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'خطا در ارسال گزارش وضعیت سیستم به تلگرام'
+            })
+    except Exception as e:
+        logger.error(f"خطا در ارسال گزارش وضعیت سیستم به تلگرام: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'خطا در ارسال گزارش وضعیت سیستم به تلگرام'
+        })
+
+@app.route('/send_test_message_replit')
+def send_test_message_replit():
+    """ارسال پیام تست با استفاده از ماژول جدید replit_telegram_sender"""
+    try:
+        result = replit_telegram_sender.send_test_message()
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'پیام تست با موفقیت به تلگرام ارسال شد'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'خطا در ارسال پیام تست به تلگرام'
+            })
+    except Exception as e:
+        logger.error(f"خطا در ارسال پیام تست به تلگرام: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'خطا در ارسال پیام تست به تلگرام'
+        })
+
+@app.route('/telegram_control')
+@app.route('/telegram_control_panel')
+@app.route('/telegram_panel')
+def telegram_control_panel():
+    """صفحه کنترل پنل تلگرام"""
+    return render_template('replit_telegram_control.html')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
