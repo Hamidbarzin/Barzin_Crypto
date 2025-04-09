@@ -37,6 +37,12 @@ UI_TRANSLATIONS = {
         'voice_notification': 'اعلان‌های صوتی',
         'settings': 'تنظیمات',
         
+        # برچسب‌های منوی موبایل
+        'mobile_cryptocurrencies': 'ارزها',
+        'mobile_alerts': 'هشدارها',
+        'mobile_news': 'اخبار',
+        'mobile_telegram': 'تلگرام',
+        
         # ترجمه‌های مربوط به تغییر زبان
         'language_settings': 'تنظیمات زبان',
         'current_language': 'زبان فعلی',
@@ -109,6 +115,12 @@ UI_TRANSLATIONS = {
         'telegram_control': 'Telegram Control',
         'voice_notification': 'Voice Notifications',
         'settings': 'Settings',
+        
+        # Mobile menu labels
+        'mobile_cryptocurrencies': 'Crypto',
+        'mobile_alerts': 'Alerts',
+        'mobile_news': 'News',
+        'mobile_telegram': 'Telegram',
         
         # Language change translations
         'language_settings': 'Language Settings',

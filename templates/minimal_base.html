@@ -243,27 +243,27 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/cryptocurrencies' or request.path == '/crypto' %}active{% endif %}" href="/cryptocurrencies">
-                            <i class="fas fa-coins me-1"></i> ارزهای دیجیتال
+                            <i class="fas fa-coins me-1"></i> {{ ui_text('cryptocurrencies', 'ارزهای دیجیتال') }}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/price_alerts' or request.path == '/alerts' %}active{% endif %}" href="/price_alerts">
-                            <i class="fas fa-bell me-1"></i> هشدارهای قیمت
+                            <i class="fas fa-bell me-1"></i> {{ ui_text('price_alerts', 'هشدارهای قیمت') }}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/crypto_news' or request.path == '/news' %}active{% endif %}" href="/crypto_news">
-                            <i class="fas fa-newspaper me-1"></i> اخبار
+                            <i class="fas fa-newspaper me-1"></i> {{ ui_text('news', 'اخبار') }}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/telegram_control_panel' or request.path == '/telegram-control-panel' %}active{% endif %}" href="/telegram-control-panel">
-                            <i class="fas fa-paper-plane me-1"></i> کنترل تلگرام
+                            <i class="fas fa-paper-plane me-1"></i> {{ ui_text('telegram_control', 'کنترل تلگرام') }}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/voice-notification' %}active{% endif %}" href="/voice-notification">
-                            <i class="fas fa-volume-up me-1"></i> اعلان‌های صوتی
+                            <i class="fas fa-volume-up me-1"></i> {{ ui_text('voice_notification', 'اعلان‌های صوتی') }}
                         </a>
                     </li>
                     <li class="nav-item">
@@ -308,25 +308,25 @@
                 <div class="col">
                     <a href="/cryptocurrencies" class="mobile-nav-item {% if request.path == '/cryptocurrencies' or request.path == '/crypto' %}active{% endif %}">
                         <i class="fas fa-coins"></i>
-                        <span>ارزها</span>
+                        <span>{{ ui_text('mobile_cryptocurrencies', 'ارزها') }}</span>
                     </a>
                 </div>
                 <div class="col">
                     <a href="/price_alerts" class="mobile-nav-item {% if request.path == '/price_alerts' or request.path == '/alerts' %}active{% endif %}">
                         <i class="fas fa-bell"></i>
-                        <span>هشدارها</span>
+                        <span>{{ ui_text('mobile_alerts', 'هشدارها') }}</span>
                     </a>
                 </div>
                 <div class="col">
                     <a href="/crypto_news" class="mobile-nav-item {% if request.path == '/crypto_news' or request.path == '/news' %}active{% endif %}">
                         <i class="fas fa-newspaper"></i>
-                        <span>اخبار</span>
+                        <span>{{ ui_text('mobile_news', 'اخبار') }}</span>
                     </a>
                 </div>
                 <div class="col">
                     <a href="/telegram-control-panel" class="mobile-nav-item {% if request.path == '/telegram-control-panel' %}active{% endif %}">
                         <i class="fas fa-paper-plane"></i>
-                        <span>تلگرام</span>
+                        <span>{{ ui_text('mobile_telegram', 'تلگرام') }}</span>
                     </a>
                 </div>
                 <div class="col">
