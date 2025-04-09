@@ -14,6 +14,7 @@ from crypto_bot.email_service import send_test_email, update_email_settings, las
 from crypto_bot.commodity_data import get_commodity_prices, get_forex_rates, get_economic_indicators
 from crypto_bot.ai_module import get_price_prediction, get_market_sentiment, get_price_patterns, get_trading_strategy
 from crypto_bot.crypto_news import get_crypto_news, get_market_insights, get_crypto_news_formatted_for_telegram
+from crypto_bot.voice_notification_service import voice_notification_service
 import replit_telegram_sender
 import telegram_scheduler_service
 
@@ -2569,6 +2570,64 @@ def api_telegram_send_news():
         return jsonify({
             "success": False,
             "message": f"خطا در ارسال اخبار به تلگرام: {str(e)}"
+        }), 500
+
+
+@app.route('/voice-notification')
+def voice_notification_page():
+    """صفحه اعلان‌های صوتی چندزبانه"""
+    inject_now()
+    return render_template('voice_notification.html')
+
+
+@app.route('/api/voice-notification/preview', methods=['POST'])
+def api_voice_notification_preview():
+    """
+    پیش‌نمایش اعلان صوتی
+    """
+    try:
+        # دریافت پارامترهای ورودی
+        params = request.json
+        
+        # ایجاد پیش‌نمایش
+        result = voice_notification_service.preview_notification(params)
+        
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"خطا در پیش‌نمایش اعلان صوتی: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": f"خطا در پیش‌نمایش اعلان صوتی: {str(e)}"
+        }), 500
+
+
+@app.route('/api/voice-notification/save', methods=['POST'])
+def api_voice_notification_save():
+    """
+    ذخیره تنظیمات اعلان صوتی
+    """
+    try:
+        # دریافت پارامترهای ورودی
+        params = request.json
+        
+        # ذخیره تنظیمات
+        success = voice_notification_service.save_user_settings(params)
+        
+        if success:
+            return jsonify({
+                "success": True,
+                "message": "تنظیمات با موفقیت ذخیره شد"
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "error": "خطا در ذخیره تنظیمات"
+            }), 500
+    except Exception as e:
+        logger.error(f"خطا در ذخیره تنظیمات اعلان صوتی: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": f"خطا در ذخیره تنظیمات اعلان صوتی: {str(e)}"
         }), 500
 
 

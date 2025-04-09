@@ -1,5 +1,6 @@
 {pkgs}: {
   deps = [
+    pkgs.espeak-ng
     pkgs.tk
     pkgs.tcl
     pkgs.qhull

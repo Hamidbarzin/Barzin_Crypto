@@ -125,3 +125,20 @@ EMAIL_FREQUENCIES = {
     'daily': 24 * 60 * 60,  # 24 hours
     'weekly': 7 * 24 * 60 * 60  # 7 days
 }
+
+# تنظیمات پیش‌فرض برای اعلان‌های صوتی
+DEFAULT_VOICE_SETTINGS = {
+    'crypto': 'BTC',
+    'event_type': 'price_increase',
+    'price_change': 5,
+    'language': 'fa',
+    'voice_gender': 'male',
+    'enabled': True,
+    'notification_types': {
+        'price_increase': True,
+        'price_decrease': True,
+        'target_reached': True,
+        'stop_loss': True,
+        'high_volatility': True
+    }
+}
