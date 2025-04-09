@@ -9,6 +9,7 @@ from crypto_bot.scheduler import start_scheduler, stop_scheduler
 from crypto_bot.technical_analysis import get_technical_analysis
 from crypto_bot.news_analyzer import get_latest_news
 from crypto_bot.signal_generator import generate_signals
+from crypto_bot.price_alert_service import set_price_alert, remove_price_alert, get_price_alerts, check_price_alerts
 from crypto_bot.email_service import send_test_email, update_email_settings, last_email_content, DISABLE_REAL_EMAIL
 from crypto_bot.commodity_data import get_commodity_prices, get_forex_rates, get_economic_indicators
 from crypto_bot.ai_module import get_price_prediction, get_market_sentiment, get_price_patterns, get_trading_strategy
@@ -2139,6 +2140,13 @@ def telegram_control_panel():
     return render_template('replit_telegram_control.html')
 
 
+@app.route('/price_alerts')
+@app.route('/alerts')
+def price_alerts_page():
+    """صفحه مدیریت هشدارهای قیمت"""
+    return render_template('price_alerts.html')
+
+
 # API‌های کنترل سرویس تلگرام
 @app.route('/api/telegram/start')
 def api_telegram_start():
@@ -2226,6 +2234,131 @@ def api_telegram_status():
             'message': f'خطا در دریافت وضعیت: {str(e)}',
             'running': False
         })
+
+
+# مسیرهای API برای مدیریت هشدارهای قیمت
+@app.route('/api/price-alerts', methods=['GET'])
+def api_get_price_alerts():
+    """
+    دریافت لیست هشدارهای قیمت
+    """
+    symbol = request.args.get('symbol')
+    alerts = get_price_alerts(symbol)
+    
+    # تبدیل داده‌ها به فرمت قابل سریال‌سازی
+    serializable_alerts = {}
+    for s, alert_list in alerts.items():
+        serializable_alerts[s] = [
+            {
+                "price": price,
+                "type": alert_type,
+                "triggered": triggered
+            }
+            for price, alert_type, triggered in alert_list
+        ]
+    
+    return jsonify({
+        "success": True,
+        "alerts": serializable_alerts
+    })
+
+
+@app.route('/api/price-alerts/set', methods=['POST'])
+def api_set_price_alert():
+    """
+    تنظیم هشدار قیمت جدید
+    """
+    data = request.json
+    
+    if not data or 'symbol' not in data or 'price' not in data:
+        return jsonify({
+            "success": False,
+            "message": "پارامترهای ورودی ناقص هستند. symbol و price الزامی هستند."
+        }), 400
+    
+    symbol = data['symbol']
+    
+    try:
+        price = float(data['price'])
+    except (ValueError, TypeError):
+        return jsonify({
+            "success": False,
+            "message": "فرمت قیمت نامعتبر است."
+        }), 400
+    
+    alert_type = data.get('type', 'above')
+    if alert_type not in ['above', 'below']:
+        return jsonify({
+            "success": False, 
+            "message": "نوع هشدار باید 'above' یا 'below' باشد."
+        }), 400
+    
+    success = set_price_alert(symbol, price, alert_type)
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "message": f"هشدار قیمت برای {symbol} {'بالاتر از' if alert_type == 'above' else 'پایین‌تر از'} {price} با موفقیت تنظیم شد."
+        })
+    else:
+        return jsonify({
+            "success": False,
+            "message": "خطا در تنظیم هشدار قیمت."
+        }), 500
+
+
+@app.route('/api/price-alerts/remove', methods=['POST'])
+def api_remove_price_alert():
+    """
+    حذف هشدار قیمت
+    """
+    data = request.json
+    
+    if not data or 'symbol' not in data or 'price' not in data:
+        return jsonify({
+            "success": False,
+            "message": "پارامترهای ورودی ناقص هستند. symbol و price الزامی هستند."
+        }), 400
+    
+    symbol = data['symbol']
+    
+    try:
+        price = float(data['price'])
+    except (ValueError, TypeError):
+        return jsonify({
+            "success": False,
+            "message": "فرمت قیمت نامعتبر است."
+        }), 400
+    
+    alert_type = data.get('type', 'above')
+    
+    success = remove_price_alert(symbol, price, alert_type)
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "message": f"هشدار قیمت برای {symbol} با موفقیت حذف شد."
+        })
+    else:
+        return jsonify({
+            "success": False,
+            "message": "هشدار قیمت مورد نظر یافت نشد."
+        }), 404
+
+
+@app.route('/api/price-alerts/check', methods=['GET'])
+def api_check_price_alerts():
+    """
+    بررسی هشدارهای قیمت
+    """
+    triggered = check_price_alerts()
+    
+    return jsonify({
+        "success": True,
+        "triggered": triggered,
+        "count": len(triggered)
+    })
+
 
 # Flask 2.0+ نیاز به رویکرد جدید برای before_first_request دارد
 with app.app_context():

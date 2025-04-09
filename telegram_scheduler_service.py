@@ -12,6 +12,7 @@ import logging
 import datetime
 import pytz
 import replit_telegram_sender
+from crypto_bot.price_alert_service import check_price_alerts
 
 # تنظیم لاگر
 logging.basicConfig(
@@ -38,8 +39,16 @@ class TelegramSchedulerService:
         self.thread = None
         self.running = False
         self.system_report_counter = 0
+        self.technical_analysis_counter = 0
+        self.trading_signals_counter = 0
         self.interval = 600  # 10 دقیقه = 600 ثانیه
         self.system_report_interval = 36  # هر 36 بار (6 ساعت)
+        self.technical_analysis_interval = 12  # هر 12 بار (2 ساعت)
+        self.trading_signals_interval = 24  # هر 24 بار (4 ساعت)
+        
+        # ارزهای مهم برای تحلیل تکنیکال
+        self.important_coins = ["BTC/USDT", "ETH/USDT", "BNB/USDT", "SOL/USDT", "XRP/USDT"]
+        self.current_coin_index = 0
     
     def start(self):
         """
@@ -92,8 +101,13 @@ class TelegramSchedulerService:
         return {
             "running": self.running,
             "system_report_counter": self.system_report_counter,
+            "technical_analysis_counter": self.technical_analysis_counter,
+            "trading_signals_counter": self.trading_signals_counter,
             "next_price_report": self._get_next_report_time(),
-            "next_system_report": self._get_next_system_report_time()
+            "next_system_report": self._get_next_system_report_time(),
+            "next_technical_analysis": self._get_next_technical_analysis_time(),
+            "next_trading_signals": self._get_next_trading_signals_time(),
+            "next_coin_for_analysis": self.important_coins[self.current_coin_index]
         }
     
     def _scheduler_loop(self):
@@ -117,13 +131,28 @@ class TelegramSchedulerService:
                 # ارسال گزارش قیمت
                 self._send_price_report()
                 
-                # افزایش شمارنده
+                # بررسی هشدارهای قیمت
+                self._check_price_alerts()
+                
+                # افزایش شمارنده‌ها
                 self.system_report_counter += 1
+                self.technical_analysis_counter += 1
+                self.trading_signals_counter += 1
                 
                 # ارسال گزارش سیستم هر ۶ ساعت
                 if self.system_report_counter >= self.system_report_interval:
                     self._send_system_report()
                     self.system_report_counter = 0
+                
+                # ارسال تحلیل تکنیکال هر ۲ ساعت
+                if self.technical_analysis_counter >= self.technical_analysis_interval:
+                    self._send_technical_analysis()
+                    self.technical_analysis_counter = 0
+                
+                # ارسال سیگنال‌های معاملاتی هر ۴ ساعت
+                if self.trading_signals_counter >= self.trading_signals_interval:
+                    self._send_trading_signals()
+                    self.trading_signals_counter = 0
         
         except Exception as e:
             logger.error(f"خطا در حلقه زمان‌بندی: {str(e)}")
@@ -221,6 +250,105 @@ class TelegramSchedulerService:
         seconds_left = reports_left * self.interval
         next_time = now + datetime.timedelta(seconds=seconds_left)
         return next_time.strftime("%Y-%m-%d %H:%M:%S")
+    
+    def _get_next_technical_analysis_time(self):
+        """
+        محاسبه زمان تحلیل تکنیکال بعدی
+        
+        Returns:
+            str: زمان تحلیل تکنیکال بعدی
+        """
+        if not self.running:
+            return "سرویس در حال اجرا نیست"
+        
+        now = datetime.datetime.now(toronto_tz)
+        reports_left = self.technical_analysis_interval - self.technical_analysis_counter
+        seconds_left = reports_left * self.interval
+        next_time = now + datetime.timedelta(seconds=seconds_left)
+        return next_time.strftime("%Y-%m-%d %H:%M:%S")
+    
+    def _get_next_trading_signals_time(self):
+        """
+        محاسبه زمان سیگنال‌های معاملاتی بعدی
+        
+        Returns:
+            str: زمان سیگنال‌های معاملاتی بعدی
+        """
+        if not self.running:
+            return "سرویس در حال اجرا نیست"
+        
+        now = datetime.datetime.now(toronto_tz)
+        reports_left = self.trading_signals_interval - self.trading_signals_counter
+        seconds_left = reports_left * self.interval
+        next_time = now + datetime.timedelta(seconds=seconds_left)
+        return next_time.strftime("%Y-%m-%d %H:%M:%S")
+        
+    def _send_technical_analysis(self):
+        """
+        ارسال تحلیل تکنیکال یک ارز
+        
+        Returns:
+            bool: موفقیت یا شکست ارسال تحلیل
+        """
+        # انتخاب ارز مورد نظر برای تحلیل
+        symbol = self.important_coins[self.current_coin_index]
+        
+        # بروزرسانی شاخص برای دفعه بعد
+        self.current_coin_index = (self.current_coin_index + 1) % len(self.important_coins)
+        
+        now_toronto = datetime.datetime.now(toronto_tz)
+        logger.info(f"ارسال تحلیل تکنیکال برای {symbol} ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        
+        try:
+            success = replit_telegram_sender.send_technical_analysis(symbol)
+            if success:
+                logger.info(f"تحلیل تکنیکال {symbol} با موفقیت ارسال شد")
+            else:
+                logger.error(f"خطا در ارسال تحلیل تکنیکال {symbol}")
+            return success
+        except Exception as e:
+            logger.error(f"استثنا در ارسال تحلیل تکنیکال {symbol}: {str(e)}")
+            return False
+    
+    def _send_trading_signals(self):
+        """
+        ارسال سیگنال‌های معاملاتی
+        
+        Returns:
+            bool: موفقیت یا شکست ارسال سیگنال‌ها
+        """
+        now_toronto = datetime.datetime.now(toronto_tz)
+        logger.info(f"ارسال سیگنال‌های معاملاتی ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        
+        try:
+            success = replit_telegram_sender.send_trading_signals()
+            if success:
+                logger.info("سیگنال‌های معاملاتی با موفقیت ارسال شد")
+            else:
+                logger.error("خطا در ارسال سیگنال‌های معاملاتی")
+            return success
+        except Exception as e:
+            logger.error(f"استثنا در ارسال سیگنال‌های معاملاتی: {str(e)}")
+            return False
+            
+    def _check_price_alerts(self):
+        """
+        بررسی هشدارهای قیمت
+        
+        Returns:
+            list: لیست هشدارهای فعال شده
+        """
+        now_toronto = datetime.datetime.now(toronto_tz)
+        logger.info(f"بررسی هشدارهای قیمت ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        
+        try:
+            triggered_alerts = check_price_alerts()
+            if triggered_alerts:
+                logger.info(f"{len(triggered_alerts)} هشدار قیمت فعال شد")
+            return triggered_alerts
+        except Exception as e:
+            logger.error(f"استثنا در بررسی هشدارهای قیمت: {str(e)}")
+            return []
 
 # نمونه سرویس که در main.py استفاده خواهد شد
 telegram_scheduler = TelegramSchedulerService()
