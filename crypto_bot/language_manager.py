@@ -63,6 +63,17 @@ UI_TRANSLATIONS = {
         'price_changes': 'تغییرات قیمت',
         'market_cap': 'ارزش بازار',
         
+        # نام ارزهای دیجیتال
+        'bitcoin': 'بیت‌کوین',
+        'ethereum': 'اتریوم',
+        'ripple': 'ریپل',
+        'solana': 'سولانا',
+        'binance_coin': 'بایننس کوین',
+        'technical_analysis': 'تحلیل تکنیکال',
+        'technical_analysis_bitcoin': 'تحلیل تکنیکال بیت‌کوین (تایم‌فریم ساعتی)',
+        'trading_signals': 'سیگنال‌های معاملاتی',
+        'btc_hourly_chart': 'نمودار قیمت BTC/USDT',
+        
         # صفحه هشدارهای قیمت
         'add_alert': 'افزودن هشدار',
         'alert_type': 'نوع هشدار',
@@ -97,6 +108,9 @@ UI_TRANSLATIONS = {
         
         # عمومی
         'loading': 'در حال بارگذاری...',
+        'loading_technical_analysis': 'در حال بارگذاری تحلیل تکنیکال...',
+        'loading_trading_signals': 'در حال بارگذاری سیگنال‌های معاملاتی...',
+        'loading_news': 'در حال بارگذاری اخبار...',
         'error': 'خطا',
         'success': 'موفقیت',
         'warning': 'هشدار',
@@ -142,6 +156,17 @@ UI_TRANSLATIONS = {
         'price_changes': 'Price Changes',
         'market_cap': 'Market Cap',
         
+        # Cryptocurrency names
+        'bitcoin': 'Bitcoin',
+        'ethereum': 'Ethereum',
+        'ripple': 'Ripple',
+        'solana': 'Solana',
+        'binance_coin': 'Binance Coin',
+        'technical_analysis': 'Technical Analysis',
+        'technical_analysis_bitcoin': 'Bitcoin Technical Analysis (Hourly Timeframe)',
+        'trading_signals': 'Trading Signals',
+        'btc_hourly_chart': 'BTC/USDT Price Chart',
+        
         # Price Alerts Page
         'add_alert': 'Add Alert',
         'alert_type': 'Alert Type',
@@ -176,6 +201,9 @@ UI_TRANSLATIONS = {
         
         # General
         'loading': 'Loading...',
+        'loading_technical_analysis': 'Loading Technical Analysis...',
+        'loading_trading_signals': 'Loading Trading Signals...',
+        'loading_news': 'Loading News...',
         'error': 'Error',
         'success': 'Success',
         'warning': 'Warning',
