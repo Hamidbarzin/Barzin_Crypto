@@ -69,10 +69,27 @@ UI_TRANSLATIONS = {
         'ripple': 'ریپل',
         'solana': 'سولانا',
         'binance_coin': 'بایننس کوین',
+        'tether': 'تتر',
+        'chainlink': 'چین‌لینک',
+        'avax': 'آواکس',
+        'render': 'رندر',
+        'fetch': 'فچر',
+        'worldcoin': 'ورلدکوین',
+        'polygon': 'پلیگان',
+        'arbitrum': 'آربیتروم',
+        'optimism': 'اپتیمیسم',
         'technical_analysis': 'تحلیل تکنیکال',
         'technical_analysis_bitcoin': 'تحلیل تکنیکال بیت‌کوین (تایم‌فریم ساعتی)',
         'trading_signals': 'سیگنال‌های معاملاتی',
         'btc_hourly_chart': 'نمودار قیمت BTC/USDT',
+        
+        # سیگنال‌های معاملاتی
+        'buy': 'خرید',
+        'sell': 'فروش',
+        'strong_buy': 'خرید قوی',
+        'strong_sell': 'فروش قوی',
+        'hold': 'نگهداری',
+        'wait': 'انتظار',
         
         # صفحه هشدارهای قیمت
         'add_alert': 'افزودن هشدار',
@@ -105,6 +122,19 @@ UI_TRANSLATIONS = {
         'target_reached': 'رسیدن به قیمت هدف',
         'stop_loss': 'رسیدن به حد ضرر',
         'high_volatility': 'نوسان بالا',
+        
+        # اطلاعات قیمت و معاملات
+        'current_price': 'قیمت فعلی',
+        'suggested_volume': 'حجم پیشنهادی',
+        'take_profit': 'حد سود',
+        'stop_loss': 'حد ضرر',
+        'monitoring_level': 'سطح نظارت',
+        'price_target_bullish': 'هدف قیمتی (صعودی)',
+        'price_target_bearish': 'هدف قیمتی (نزولی)',
+        'share': 'اشتراک‌گذاری',
+        'set_alert': 'تنظیم هشدار',
+        'show_signals_directly': 'نمایش مستقیم سیگنال‌ها',
+        'show_technical_directly': 'نمایش مستقیم تحلیل تکنیکال',
         
         # عمومی
         'loading': 'در حال بارگذاری...',
@@ -162,10 +192,27 @@ UI_TRANSLATIONS = {
         'ripple': 'Ripple',
         'solana': 'Solana',
         'binance_coin': 'Binance Coin',
+        'tether': 'Tether',
+        'chainlink': 'Chainlink',
+        'avax': 'Avalanche',
+        'render': 'Render',
+        'fetch': 'Fetch.ai',
+        'worldcoin': 'Worldcoin',
+        'polygon': 'Polygon',
+        'arbitrum': 'Arbitrum',
+        'optimism': 'Optimism',
         'technical_analysis': 'Technical Analysis',
         'technical_analysis_bitcoin': 'Bitcoin Technical Analysis (Hourly Timeframe)',
         'trading_signals': 'Trading Signals',
         'btc_hourly_chart': 'BTC/USDT Price Chart',
+        
+        # Trading signals
+        'buy': 'Buy',
+        'sell': 'Sell',
+        'strong_buy': 'Strong Buy',
+        'strong_sell': 'Strong Sell',
+        'hold': 'Hold',
+        'wait': 'Wait',
         
         # Price Alerts Page
         'add_alert': 'Add Alert',
@@ -198,6 +245,19 @@ UI_TRANSLATIONS = {
         'target_reached': 'Target Price Reached',
         'stop_loss': 'Stop Loss Reached',
         'high_volatility': 'High Volatility',
+        
+        # Price and Trading Information
+        'current_price': 'Current Price',
+        'suggested_volume': 'Suggested Volume',
+        'take_profit': 'Take Profit',
+        'stop_loss': 'Stop Loss',
+        'monitoring_level': 'Monitoring Level',
+        'price_target_bullish': 'Price Target (Bullish)',
+        'price_target_bearish': 'Price Target (Bearish)',
+        'share': 'Share',
+        'set_alert': 'Set Alert',
+        'show_signals_directly': 'Show Signals Directly',
+        'show_technical_directly': 'Show Technical Analysis Directly',
         
         # General
         'loading': 'Loading...',
