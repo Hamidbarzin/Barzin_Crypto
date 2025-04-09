@@ -131,7 +131,7 @@ DEFAULT_VOICE_SETTINGS = {
     'crypto': 'BTC',
     'event_type': 'price_increase',
     'price_change': 5,
-    'language': 'fa',
+    'language': 'fr',
     'voice_gender': 'male',
     'enabled': True,
     'notification_types': {

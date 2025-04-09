@@ -34,11 +34,10 @@ AUDIO_DIR.mkdir(parents=True, exist_ok=True)
 
 # لیست زبان‌های پشتیبانی شده
 SUPPORTED_LANGUAGES = {
-    'fa': 'فارسی (Persian)',
+    'fr': 'Français (French)',
     'en': 'English',
     'ar': 'العربية (Arabic)',
     'tr': 'Türkçe (Turkish)',
-    'fr': 'Français (French)',
     'de': 'Deutsch (German)',
     'es': 'Español (Spanish)',
     'ru': 'Русский (Russian)',
@@ -52,12 +51,12 @@ SUPPORTED_LANGUAGES = {
 
 # دیکشنری متن‌های اعلان برای هر زبان
 NOTIFICATION_TEXTS = {
-    'fa': {
-        'price_increase': '{crypto} با {percent}٪ افزایش به قیمت {price} دلار رسید.',
-        'price_decrease': 'قیمت {crypto} با {percent}٪ کاهش به {price} دلار رسید.',
-        'target_reached': 'هشدار: {crypto} به قیمت هدف {price} دلار رسید.',
-        'stop_loss': 'هشدار: {crypto} به قیمت حد ضرر {price} دلار رسید.',
-        'high_volatility': 'هشدار: {crypto} با {percent}٪ تغییر، نوسان بالایی دارد.'
+    'fr': {
+        'price_increase': 'Le {crypto} a augmenté de {percent}% pour atteindre {price} dollars.',
+        'price_decrease': 'Le prix du {crypto} a diminué de {percent}% pour atteindre {price} dollars.',
+        'target_reached': 'Alerte: {crypto} a atteint le prix cible de {price} dollars.',
+        'stop_loss': 'Alerte: {crypto} a atteint le prix stop loss de {price} dollars.',
+        'high_volatility': 'Alerte: {crypto} montre une forte volatilité avec un changement de {percent}%.'
     },
     'en': {
         'price_increase': '{crypto} has increased by {percent}% to {price} dollars.',
@@ -175,11 +174,11 @@ class VoiceNotificationService:
         crypto = params.get('crypto', 'BTC')
         event_type = params.get('event_type', 'price_increase')
         price_change = params.get('price_change', 5)
-        language = params.get('language', 'fa')
+        language = params.get('language', 'fr')
         
-        # اگر زبان پشتیبانی نشده باشد، از فارسی استفاده می‌کنیم
+        # اگر زبان پشتیبانی نشده باشد، از فرانسوی استفاده می‌کنیم
         if language not in NOTIFICATION_TEXTS:
-            language = 'fa'
+            language = 'fr'
         
         # اگر نوع رویداد پشتیبانی نشده باشد، از افزایش قیمت استفاده می‌کنیم
         if event_type not in NOTIFICATION_TEXTS[language]:
@@ -195,7 +194,7 @@ class VoiceNotificationService:
             price=price
         )
     
-    def generate_voice(self, text: str, language: str = 'fa', voice_gender: str = 'male') -> Optional[str]:
+    def generate_voice(self, text: str, language: str = 'fr', voice_gender: str = 'male') -> Optional[str]:
         """
         تبدیل متن به گفتار و ذخیره آن به عنوان فایل صوتی
         
@@ -291,7 +290,7 @@ class VoiceNotificationService:
             # تبدیل متن به گفتار
             audio_url = self.generate_voice(
                 text=text,
-                language=params.get('language', 'fa'),
+                language=params.get('language', 'fr'),
                 voice_gender=params.get('voice_gender', 'male')
             )
             
