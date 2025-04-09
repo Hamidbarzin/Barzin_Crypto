@@ -3,204 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>کنترل پنل تلگرام Crypto Barzin</title>
-    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <title>کنترل پنل تلگرام کریپتو برزین</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
     <style>
         body {
-            padding: 20px;
+            font-family: Tahoma, Arial, sans-serif;
             background-color: #181A20;
             color: #eaecef;
         }
         .header {
-            border-bottom: 2px solid #FCD535;
+            background-color: #FCD535;
+            color: #181A20;
+            padding: 15px 0;
             margin-bottom: 30px;
-            padding-bottom: 15px;
         }
-        h1, h2, h3 {
-            color: #FCD535;
+        .header h1 {
+            font-weight: bold;
+            color: #181A20;
         }
-        .card {
-            margin-bottom: 20px;
+        .feature-card {
             background-color: #2b3139;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+        .feature-card h3 {
+            color: #FCD535;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #3b4151;
+            padding-bottom: 10px;
+        }
+        .action-button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-yellow {
+            background-color: #FCD535;
+            color: #000;
             border: none;
         }
-        .card-header {
+        .btn-yellow:hover {
+            background-color: #ffdb4d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .status-container {
             background-color: #2b3139;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3b4151;
+        }
+        .status-label {
+            font-weight: bold;
+            color: #eaecef;
+        }
+        .status-value {
             color: #FCD535;
-            font-weight: bold;
-            border-bottom: 1px solid #3c434f;
-        }
-        .btn-primary {
-            background-color: #F0B90B;
-            border-color: #F0B90B;
-            color: #000;
-            font-weight: bold;
-        }
-        .btn-primary:hover {
-            background-color: #FCD535;
-            border-color: #FCD535;
-            color: #000;
-        }
-        .btn-secondary {
-            background-color: #4a545f;
-            border-color: #4a545f;
-        }
-        .btn-secondary:hover {
-            background-color: #5a6775;
-            border-color: #5a6775;
-        }
-        .alert-success {
-            background-color: rgba(14, 203, 129, 0.2);
-            color: #0ECB81;
-            border-color: #0ECB81;
-        }
-        .alert-danger {
-            background-color: rgba(246, 70, 93, 0.2);
-            color: #F6465D;
-            border-color: #F6465D;
         }
         .footer {
             margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid #3c434f;
-            text-align: center;
+            padding: 20px 0;
+            background-color: #1a1c24;
             color: #848E9C;
+            text-align: center;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #121317;
+            display: none;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .spinner-border {
+            color: #FCD535;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1 class="text-center">کنترل پنل تلگرام Crypto Barzin</h1>
+<body data-bs-theme="dark">
+    <div class="header text-center">
+        <div class="container">
+            <h1>کنترل پنل تلگرام کریپتو برزین</h1>
         </div>
-        
+    </div>
+
+    <div class="container">
         <div class="row">
-            <div class="col-md-12">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        ارسال پیام‌های تلگرام
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            از این بخش می‌توانید پیام‌های مختلف را به صورت دستی به تلگرام ارسال کنید.
-                        </div>
-                        
-                        <div id="status-message" class="alert d-none mb-3"></div>
-                        
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <div class="card h-100">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title">گزارش قیمت‌ها</h5>
-                                        <p class="card-text">ارسال گزارش قیمت‌های لحظه‌ای ارزهای دیجیتال</p>
-                                        <button id="send-price-report" class="btn btn-primary w-100">ارسال گزارش قیمت‌ها</button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-4 mb-3">
-                                <div class="card h-100">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title">گزارش سیستم</h5>
-                                        <p class="card-text">ارسال گزارش وضعیت سیستم و سرویس‌ها</p>
-                                        <button id="send-system-report" class="btn btn-primary w-100">ارسال گزارش سیستم</button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-4 mb-3">
-                                <div class="card h-100">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title">پیام تست</h5>
-                                        <p class="card-text">ارسال یک پیام تست ساده برای بررسی اتصال</p>
-                                        <button id="send-test-message" class="btn btn-primary w-100">ارسال پیام تست</button>
-                                    </div>
-                                </div>
-                            </div>
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <h3>عملیات سرویس تلگرام</h3>
+                    <p>سرویس تلگرام را شروع، متوقف یا تست کنید.</p>
+                    <button id="startService" class="btn btn-yellow action-button">شروع سرویس</button>
+                    <button id="stopService" class="btn btn-danger action-button">توقف سرویس</button>
+                    <button id="testMessage" class="btn btn-info action-button">ارسال پیام تست</button>
+                    <div id="serviceResult" class="result alert alert-info"></div>
+                    <div id="serviceLoading" class="loading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">در حال بارگذاری...</span>
                         </div>
                     </div>
                 </div>
-                
-                <div class="card mb-4">
-                    <div class="card-header">
-                        راهنمای استفاده
-                    </div>
-                    <div class="card-body">
-                        <h5>نحوه استفاده از سیستم تلگرام</h5>
-                        <ul>
-                            <li>برای ارسال گزارش قیمت‌ها، روی دکمه «ارسال گزارش قیمت‌ها» کلیک کنید.</li>
-                            <li>برای ارسال گزارش وضعیت سیستم، روی دکمه «ارسال گزارش سیستم» کلیک کنید.</li>
-                            <li>برای ارسال پیام تست، روی دکمه «ارسال پیام تست» کلیک کنید.</li>
-                            <li>برای راه‌اندازی سرویس خودکار ارسال پیام هر 10 دقیقه، از اسکریپت‌های مربوطه استفاده کنید.</li>
-                        </ul>
-                        
-                        <h5 class="mt-4">اسکریپت‌های مدیریت سرویس</h5>
-                        <ul>
-                            <li><code>اجرای_گزارش_دهنده_هر_۱۰_دقیقه.sh</code> - راه‌اندازی سرویس ارسال پیام هر 10 دقیقه</li>
-                            <li><code>توقف_گزارش_دهنده_هر_۱۰_دقیقه.sh</code> - توقف سرویس ارسال پیام هر 10 دقیقه</li>
-                            <li><code>اجرای_نظارت_تلگرام.sh</code> - راه‌اندازی سیستم نظارت بر سرویس تلگرام</li>
-                            <li><code>توقف_نظارت_تلگرام.sh</code> - توقف سیستم نظارت بر سرویس تلگرام</li>
-                            <li><code>اجرای_خودکار_همه_سرویس_های_تلگرام.sh</code> - راه‌اندازی تمام سرویس‌های تلگرام</li>
-                            <li><code>توقف_همه_سرویس_های_تلگرام.sh</code> - توقف تمام سرویس‌های تلگرام</li>
-                        </ul>
-                        
-                        <div class="mt-4 text-center">
-                            <a href="/static/راهنمای_کامل_تلگرام.md" target="_blank" class="btn btn-secondary">دانلود راهنمای کامل (فایل MD)</a>
+            </div>
+
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <h3>ارسال گزارش‌های دستی</h3>
+                    <p>گزارش‌های مختلف را به صورت دستی ارسال کنید.</p>
+                    <button id="sendPriceReport" class="btn btn-yellow action-button">ارسال گزارش قیمت</button>
+                    <button id="sendSystemReport" class="btn btn-warning action-button">ارسال گزارش سیستم</button>
+                    <div id="reportResult" class="result alert alert-info"></div>
+                    <div id="reportLoading" class="loading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">در حال بارگذاری...</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="footer">
-            <p>طراح و توسعه دهنده: حمید برزین</p>
-            <p>© ۱۴۰۴</p>
+
+        <div class="status-container">
+            <h3 class="mb-4 text-center">وضعیت سرویس تلگرام</h3>
+            <div id="statusContainer">
+                <div class="status-item">
+                    <span class="status-label">وضعیت فعلی:</span>
+                    <span class="status-value" id="currentStatus">در حال بارگذاری...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">گزارش قیمت بعدی:</span>
+                    <span class="status-value" id="nextPriceReport">در حال بارگذاری...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">گزارش سیستم بعدی:</span>
+                    <span class="status-value" id="nextSystemReport">در حال بارگذاری...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">شمارنده گزارش سیستم:</span>
+                    <span class="status-value" id="systemReportCounter">در حال بارگذاری...</span>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <button id="refreshStatus" class="btn btn-secondary action-button">بروزرسانی وضعیت</button>
+            </div>
         </div>
     </div>
-    
+
+    <footer class="footer">
+        <div class="container">
+            <p>طراح و توسعه دهنده: حمید برزین</p>
+            <p>© ۱۴۰۴ - تمام حقوق محفوظ است</p>
+        </div>
+    </footer>
+
     <script>
+        // اسکریپت‌های سایدبار و استاتیک
         document.addEventListener('DOMContentLoaded', function() {
-            const statusMessage = document.getElementById('status-message');
-            
-            function showStatus(message, isSuccess) {
-                statusMessage.textContent = message;
-                statusMessage.classList.remove('d-none', 'alert-success', 'alert-danger');
-                statusMessage.classList.add(isSuccess ? 'alert-success' : 'alert-danger');
-                
-                // Hide message after 5 seconds
-                setTimeout(() => {
-                    statusMessage.classList.add('d-none');
-                }, 5000);
-            }
-            
-            function sendRequest(endpoint) {
-                fetch(endpoint)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showStatus(data.message, true);
-                        } else {
-                            showStatus(data.message || 'خطا در ارسال درخواست', false);
-                        }
-                    })
-                    .catch(error => {
-                        showStatus('خطا در ارسال درخواست: ' + error.message, false);
-                    });
-            }
-            
-            // Event listeners for buttons
-            document.getElementById('send-price-report').addEventListener('click', function() {
-                sendRequest('/send_price_report');
+            // بارگذاری اولیه وضعیت
+            fetchStatus();
+
+            // دکمه‌های عملیات سرویس
+            document.getElementById('startService').addEventListener('click', function() {
+                callAPI('/api/telegram/start', 'serviceResult', 'serviceLoading');
             });
-            
-            document.getElementById('send-system-report').addEventListener('click', function() {
-                sendRequest('/send_system_report');
+
+            document.getElementById('stopService').addEventListener('click', function() {
+                callAPI('/api/telegram/stop', 'serviceResult', 'serviceLoading');
             });
-            
-            document.getElementById('send-test-message').addEventListener('click', function() {
-                sendRequest('/send_test_message_replit');
+
+            document.getElementById('testMessage').addEventListener('click', function() {
+                callAPI('/api/telegram/test', 'serviceResult', 'serviceLoading');
             });
+
+            // دکمه‌های گزارش
+            document.getElementById('sendPriceReport').addEventListener('click', function() {
+                callAPI('/send_telegram_price_report', 'reportResult', 'reportLoading');
+            });
+
+            document.getElementById('sendSystemReport').addEventListener('click', function() {
+                callAPI('/send_telegram_system_report', 'reportResult', 'reportLoading');
+            });
+
+            // بروزرسانی وضعیت
+            document.getElementById('refreshStatus').addEventListener('click', fetchStatus);
+
+            // تابع بروزرسانی منظم وضعیت (هر 30 ثانیه)
+            setInterval(fetchStatus, 30000);
         });
+
+        // تابع فراخوانی API
+        function callAPI(endpoint, resultId, loadingId) {
+            const resultElement = document.getElementById(resultId);
+            const loadingElement = document.getElementById(loadingId);
+            
+            resultElement.style.display = 'none';
+            loadingElement.style.display = 'block';
+            
+            fetch(endpoint)
+                .then(response => response.json())
+                .then(data => {
+                    resultElement.textContent = data.message || JSON.stringify(data);
+                    resultElement.style.display = 'block';
+                    loadingElement.style.display = 'none';
+                    
+                    // بروزرسانی وضعیت بعد از عملیات
+                    fetchStatus();
+                })
+                .catch(error => {
+                    resultElement.textContent = 'خطا در ارتباط: ' + error.message;
+                    resultElement.style.display = 'block';
+                    loadingElement.style.display = 'none';
+                });
+        }
+
+        // تابع دریافت وضعیت
+        function fetchStatus() {
+            fetch('/api/telegram/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('currentStatus').textContent = data.running ? 'فعال' : 'غیرفعال';
+                    document.getElementById('nextPriceReport').textContent = data.next_price_report || '---';
+                    document.getElementById('nextSystemReport').textContent = data.next_system_report || '---';
+                    document.getElementById('systemReportCounter').textContent = data.system_report_counter || '0';
+                    
+                    // تغییر رنگ وضعیت
+                    document.getElementById('currentStatus').style.color = data.running ? '#0ECB81' : '#F6465D';
+                })
+                .catch(error => {
+                    console.error('خطا در دریافت وضعیت:', error);
+                });
+        }
     </script>
 </body>
 </html>

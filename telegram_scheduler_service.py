@@ -1,0 +1,279 @@
+#!/usr/bin/env python3
+"""
+سرویس زمان‌بندی تلگرام داخلی
+
+این ماژول یک سرویس زمان‌بندی برای ارسال خودکار پیام‌های تلگرام
+با استفاده از ماژول replit_telegram_sender فراهم می‌کند.
+"""
+
+import threading
+import time
+import logging
+import datetime
+import pytz
+import replit_telegram_sender
+
+# تنظیم لاگر
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+logger = logging.getLogger("telegram_scheduler")
+
+# منطقه زمانی تورنتو
+toronto_tz = pytz.timezone('America/Toronto')
+
+class TelegramSchedulerService:
+    """
+    کلاس سرویس زمان‌بندی تلگرام
+    
+    این کلاس یک ترد جداگانه برای زمان‌بندی پیام‌های تلگرام ایجاد می‌کند
+    که به صورت خودکار پیام‌های تلگرام را ارسال می‌کند.
+    """
+    
+    def __init__(self):
+        """
+        مقداردهی اولیه کلاس
+        """
+        self.thread = None
+        self.running = False
+        self.system_report_counter = 0
+        self.interval = 600  # 10 دقیقه = 600 ثانیه
+        self.system_report_interval = 36  # هر 36 بار (6 ساعت)
+    
+    def start(self):
+        """
+        شروع سرویس زمان‌بندی
+        
+        Returns:
+            bool: وضعیت راه‌اندازی سرویس
+        """
+        if self.running:
+            logger.warning("سرویس از قبل در حال اجراست")
+            return False
+        
+        self.running = True
+        self.thread = threading.Thread(target=self._scheduler_loop, daemon=True)
+        self.thread.start()
+        
+        now_toronto = datetime.datetime.now(toronto_tz)
+        logger.info(f"سرویس زمان‌بندی تلگرام شروع شد ({now_toronto.strftime('%Y-%m-%d %H:%M:%S')} تورنتو)")
+        
+        # ارسال پیام تست در ابتدا
+        self._send_test_message()
+        
+        return True
+    
+    def stop(self):
+        """
+        توقف سرویس زمان‌بندی
+        
+        Returns:
+            bool: وضعیت توقف سرویس
+        """
+        if not self.running:
+            logger.warning("سرویس در حال اجرا نیست")
+            return False
+        
+        self.running = False
+        if self.thread:
+            self.thread.join(1.0)  # انتظار حداکثر 1 ثانیه برای پایان ترد
+            
+        logger.info("سرویس زمان‌بندی تلگرام متوقف شد")
+        return True
+    
+    def status(self):
+        """
+        دریافت وضعیت سرویس
+        
+        Returns:
+            dict: وضعیت سرویس
+        """
+        return {
+            "running": self.running,
+            "system_report_counter": self.system_report_counter,
+            "next_price_report": self._get_next_report_time(),
+            "next_system_report": self._get_next_system_report_time()
+        }
+    
+    def _scheduler_loop(self):
+        """
+        حلقه اصلی زمان‌بندی
+        
+        این متد در یک ترد جداگانه اجرا می‌شود و مسئول ارسال
+        پیام‌های زمان‌بندی شده است.
+        """
+        try:
+            # ارسال گزارش قیمت
+            self._send_price_report()
+            
+            while self.running:
+                # خواب بین گزارش‌ها
+                time.sleep(self.interval)
+                
+                if not self.running:
+                    break
+                
+                # ارسال گزارش قیمت
+                self._send_price_report()
+                
+                # افزایش شمارنده
+                self.system_report_counter += 1
+                
+                # ارسال گزارش سیستم هر ۶ ساعت
+                if self.system_report_counter >= self.system_report_interval:
+                    self._send_system_report()
+                    self.system_report_counter = 0
+        
+        except Exception as e:
+            logger.error(f"خطا در حلقه زمان‌بندی: {str(e)}")
+            self.running = False
+    
+    def _send_price_report(self):
+        """
+        ارسال گزارش قیمت
+        
+        Returns:
+            bool: موفقیت یا شکست ارسال پیام
+        """
+        now_toronto = datetime.datetime.now(toronto_tz)
+        logger.info(f"ارسال گزارش قیمت ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        
+        try:
+            success = replit_telegram_sender.send_price_report()
+            if success:
+                logger.info("گزارش قیمت با موفقیت ارسال شد")
+            else:
+                logger.error("خطا در ارسال گزارش قیمت")
+            return success
+        except Exception as e:
+            logger.error(f"استثنا در ارسال گزارش قیمت: {str(e)}")
+            return False
+    
+    def _send_system_report(self):
+        """
+        ارسال گزارش سیستم
+        
+        Returns:
+            bool: موفقیت یا شکست ارسال پیام
+        """
+        now_toronto = datetime.datetime.now(toronto_tz)
+        logger.info(f"ارسال گزارش سیستم ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        
+        try:
+            success = replit_telegram_sender.send_system_report()
+            if success:
+                logger.info("گزارش سیستم با موفقیت ارسال شد")
+            else:
+                logger.error("خطا در ارسال گزارش سیستم")
+            return success
+        except Exception as e:
+            logger.error(f"استثنا در ارسال گزارش سیستم: {str(e)}")
+            return False
+    
+    def _send_test_message(self):
+        """
+        ارسال پیام تست
+        
+        Returns:
+            bool: موفقیت یا شکست ارسال پیام
+        """
+        now_toronto = datetime.datetime.now(toronto_tz)
+        logger.info(f"ارسال پیام تست ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        
+        try:
+            success = replit_telegram_sender.send_test_message()
+            if success:
+                logger.info("پیام تست با موفقیت ارسال شد")
+            else:
+                logger.error("خطا در ارسال پیام تست")
+            return success
+        except Exception as e:
+            logger.error(f"استثنا در ارسال پیام تست: {str(e)}")
+            return False
+    
+    def _get_next_report_time(self):
+        """
+        محاسبه زمان گزارش بعدی
+        
+        Returns:
+            str: زمان گزارش بعدی
+        """
+        if not self.running:
+            return "سرویس در حال اجرا نیست"
+        
+        now = datetime.datetime.now(toronto_tz)
+        next_time = now + datetime.timedelta(seconds=self.interval)
+        return next_time.strftime("%Y-%m-%d %H:%M:%S")
+    
+    def _get_next_system_report_time(self):
+        """
+        محاسبه زمان گزارش سیستم بعدی
+        
+        Returns:
+            str: زمان گزارش سیستم بعدی
+        """
+        if not self.running:
+            return "سرویس در حال اجرا نیست"
+        
+        now = datetime.datetime.now(toronto_tz)
+        reports_left = self.system_report_interval - self.system_report_counter
+        seconds_left = reports_left * self.interval
+        next_time = now + datetime.timedelta(seconds=seconds_left)
+        return next_time.strftime("%Y-%m-%d %H:%M:%S")
+
+# نمونه سرویس که در main.py استفاده خواهد شد
+telegram_scheduler = TelegramSchedulerService()
+
+
+def start_scheduler():
+    """
+    شروع زمان‌بندی تلگرام
+    
+    Returns:
+        bool: وضعیت راه‌اندازی
+    """
+    return telegram_scheduler.start()
+
+
+def stop_scheduler():
+    """
+    توقف زمان‌بندی تلگرام
+    
+    Returns:
+        bool: وضعیت توقف
+    """
+    return telegram_scheduler.stop()
+
+
+def get_scheduler_status():
+    """
+    دریافت وضعیت زمان‌بندی
+    
+    Returns:
+        dict: وضعیت فعلی زمان‌بندی
+    """
+    return telegram_scheduler.status()
+
+
+# اگر این فایل به تنهایی اجرا شود، زمان‌بندی را شروع و به مدت ۱ دقیقه اجرا می‌کند
+if __name__ == "__main__":
+    print("شروع تست سرویس زمان‌بندی تلگرام...")
+    
+    if start_scheduler():
+        print("سرویس با موفقیت شروع شد")
+        print("در حال اجرا برای ۱ دقیقه...")
+        
+        # اجرای تست به مدت ۱ دقیقه
+        try:
+            time.sleep(60)
+        except KeyboardInterrupt:
+            print("تست با دستور کاربر متوقف شد")
+        
+        # توقف سرویس
+        if stop_scheduler():
+            print("سرویس با موفقیت متوقف شد")
+        else:
+            print("خطا در توقف سرویس")
+    else:
+        print("خطا در شروع سرویس")

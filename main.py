@@ -13,6 +13,7 @@ from crypto_bot.email_service import send_test_email, update_email_settings, las
 from crypto_bot.commodity_data import get_commodity_prices, get_forex_rates, get_economic_indicators
 from crypto_bot.ai_module import get_price_prediction, get_market_sentiment, get_price_patterns, get_trading_strategy
 import replit_telegram_sender
+import telegram_scheduler_service
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -2090,5 +2091,117 @@ def telegram_control_panel():
     """صفحه کنترل پنل تلگرام"""
     return render_template('replit_telegram_control.html')
 
+
+# API‌های کنترل سرویس تلگرام
+@app.route('/api/telegram/start')
+def api_telegram_start():
+    """
+    راه‌اندازی سرویس زمان‌بندی تلگرام
+    """
+    try:
+        result = telegram_scheduler_service.start_scheduler()
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'سرویس زمان‌بندی تلگرام با موفقیت راه‌اندازی شد'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'خطا در راه‌اندازی سرویس زمان‌بندی تلگرام (سرویس ممکن است از قبل فعال باشد)'
+            })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'خطا در راه‌اندازی سرویس: {str(e)}'
+        })
+
+
+@app.route('/api/telegram/stop')
+def api_telegram_stop():
+    """
+    توقف سرویس زمان‌بندی تلگرام
+    """
+    try:
+        result = telegram_scheduler_service.stop_scheduler()
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'سرویس زمان‌بندی تلگرام با موفقیت متوقف شد'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'خطا در توقف سرویس زمان‌بندی تلگرام (سرویس ممکن است از قبل غیرفعال باشد)'
+            })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'خطا در توقف سرویس: {str(e)}'
+        })
+
+
+@app.route('/api/telegram/test')
+def api_telegram_test():
+    """
+    ارسال پیام تست تلگرام
+    """
+    try:
+        result = replit_telegram_sender.send_test_message()
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'پیام تست با موفقیت ارسال شد'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'خطا در ارسال پیام تست'
+            })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'خطا در ارسال پیام: {str(e)}'
+        })
+
+
+@app.route('/api/telegram/status')
+def api_telegram_status():
+    """
+    دریافت وضعیت سرویس زمان‌بندی تلگرام
+    """
+    try:
+        status = telegram_scheduler_service.get_scheduler_status()
+        return jsonify(status)
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'خطا در دریافت وضعیت: {str(e)}',
+            'running': False
+        })
+
+# Flask 2.0+ نیاز به رویکرد جدید برای before_first_request دارد
+with app.app_context():
+    # راه‌اندازی زمان‌بندی تلگرام
+    try:
+        logger.info("در حال راه‌اندازی سرویس زمان‌بندی تلگرام با app_context...")
+        if telegram_scheduler_service.start_scheduler():
+            logger.info("سرویس زمان‌بندی تلگرام با موفقیت راه‌اندازی شد")
+        else:
+            logger.error("خطا در راه‌اندازی سرویس زمان‌بندی تلگرام")
+    except Exception as e:
+        logger.error(f"استثنا در راه‌اندازی سرویس زمان‌بندی تلگرام: {str(e)}")
+
+
 if __name__ == "__main__":
+    # راه‌اندازی زمان‌بندی تلگرام قبل از شروع برنامه
+    try:
+        logger.info("در حال راه‌اندازی سرویس زمان‌بندی تلگرام...")
+        if telegram_scheduler_service.start_scheduler():
+            logger.info("سرویس زمان‌بندی تلگرام با موفقیت راه‌اندازی شد")
+        else:
+            logger.error("خطا در راه‌اندازی سرویس زمان‌بندی تلگرام")
+    except Exception as e:
+        logger.error(f"استثنا در راه‌اندازی سرویس زمان‌بندی تلگرام: {str(e)}")
+    
     app.run(host="0.0.0.0", port=5000, debug=True)
