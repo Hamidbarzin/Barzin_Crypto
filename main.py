@@ -2061,6 +2061,53 @@ def send_telegram_system_report():
             'message': 'خطا در ارسال گزارش وضعیت سیستم به تلگرام'
         })
 
+@app.route('/send_technical_analysis')
+def send_telegram_technical_analysis():
+    """ارسال تحلیل تکنیکال به تلگرام"""
+    symbol = request.args.get('symbol')
+    try:
+        result = replit_telegram_sender.send_technical_analysis(symbol)
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'تحلیل تکنیکال با موفقیت به تلگرام ارسال شد'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'خطا در ارسال تحلیل تکنیکال به تلگرام'
+            })
+    except Exception as e:
+        logger.error(f"خطا در ارسال تحلیل تکنیکال به تلگرام: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'خطا در ارسال تحلیل تکنیکال به تلگرام'
+        })
+
+@app.route('/send_trading_signals')
+def send_telegram_trading_signals():
+    """ارسال سیگنال‌های معاملاتی به تلگرام"""
+    try:
+        result = replit_telegram_sender.send_trading_signals()
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'سیگنال‌های معاملاتی با موفقیت به تلگرام ارسال شد'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'خطا در ارسال سیگنال‌های معاملاتی به تلگرام'
+            })
+    except Exception as e:
+        logger.error(f"خطا در ارسال سیگنال‌های معاملاتی به تلگرام: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'خطا در ارسال سیگنال‌های معاملاتی به تلگرام'
+        })
+
 @app.route('/send_test_message_replit')
 def send_test_message_replit():
     """ارسال پیام تست با استفاده از ماژول جدید replit_telegram_sender"""
