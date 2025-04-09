@@ -1145,6 +1145,8 @@ def test_notification():
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
 
 @app.route('/telegram_test', methods=['GET'])
+@app.route('/test', methods=['GET'])
+@app.route('/telegram_test_page', methods=['GET'])
 def telegram_test_page():
     """صفحه تست تلگرام"""
     return render_template('telegram_test.html')

@@ -1,168 +1,171 @@
-{% extends "base.html" %}
-
-{% block title %}تست ارسال پیام تلگرام{% endblock %}
-
-{% block content %}
-<div class="container mt-5">
-    <div class="card border-primary">
-        <div class="card-header bg-primary text-white">
-            <h3 class="card-title mb-0">تست ارسال پیام تلگرام</h3>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست تلگرام - Crypto Barzin</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background-color: #181A20;
+            color: #eaecef;
+            padding: 20px;
+        }
+        .header {
+            background-color: #FCD535;
+            color: #000;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 5px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .btn-primary {
+            background-color: #FCD535;
+            color: #000;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #F0B90B;
+            color: #000;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background-color: rgba(14, 203, 129, 0.1);
+            border: 1px solid #0ECB81;
+        }
+        .error {
+            background-color: rgba(246, 70, 93, 0.1);
+            border: 1px solid #F6465D;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #FCD535;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            display: none;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #2b2f36;
+            text-align: center;
+            font-size: 0.9em;
+            color: #848E9C;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>تست تلگرام Crypto Barzin</h1>
         </div>
-        <div class="card-body">
-            <div class="alert alert-info" id="botInfo">
-                <h5 class="mb-3">اطلاعات بات تلگرام</h5>
-                <p>نام بات: <span id="botName">در حال بارگذاری...</span></p>
-                <p>نام کاربری: <span id="botUsername">در حال بارگذاری...</span></p>
-                <p>لینک بات: <a id="botLink" href="#" target="_blank">در حال بارگذاری...</a></p>
+        
+        <div class="mb-4">
+            <h3>ارسال پیام تست به تلگرام</h3>
+            <p>با کلیک بر روی دکمه زیر، یک پیام تست به بات تلگرام ارسال می‌شود.</p>
+            
+            <div class="mb-3">
+                <label for="chatId" class="form-label">آیدی چت (اختیاری):</label>
+                <input type="text" class="form-control" id="chatId" placeholder="برای استفاده از چت پیش‌فرض خالی بگذارید">
             </div>
             
-            <div class="mb-4">
-                <h5 class="mb-3">ارسال پیام تست</h5>
-                <p>ارسال یک پیام تست برای آزمایش عملکرد اعلان‌های تلگرام.</p>
-                
-                <div class="form-group mb-3">
-                    <label for="chatIdInput" class="form-label">چت آیدی تلگرام</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="chatIdInput" placeholder="چت آیدی خود را وارد کنید (عدد)" value="722627622">
-                        <div class="input-group-text bg-info text-white" data-bs-toggle="tooltip" 
-                             title="چت آیدی یک عدد صحیح است که شناسه منحصر به فرد شما در تلگرام است. برای دریافت چت آیدی خود، با ربات @userinfobot صحبت کنید.">
-                            <i class="fa fa-info-circle"></i>
-                        </div>
-                    </div>
-                    <small class="form-text text-muted">
-                        برای دریافت چت آیدی خود، با ربات <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a> در تلگرام صحبت کنید.
-                    </small>
-                </div>
-                
-                <div class="d-flex gap-2">
-                    <button id="sendTestButton" class="btn btn-success">
-                        <i class="fa fa-paper-plane me-2"></i>
-                        ارسال پیام تست
-                    </button>
-                    <a href="/" class="btn btn-secondary">
-                        <i class="fa fa-home me-2"></i>
-                        بازگشت به صفحه اصلی
-                    </a>
-                </div>
-            </div>
+            <button id="testBtn" class="btn btn-primary">ارسال پیام تست</button>
+            <div class="loader" id="loader"></div>
             
-            <div id="resultContainer" class="alert d-none">
+            <div class="result" id="result">
+                <h4 id="resultTitle"></h4>
+                <p id="resultMessage"></p>
             </div>
-            
-            <div class="mt-4">
-                <h5 class="mb-3">راهنمای اتصال به بات</h5>
-                <ol>
-                    <li>در تلگرام جستجو کنید: <span id="botUsernameGuide">در حال بارگذاری...</span></li>
-                    <li>روی دکمه Start یا شروع کلیک کنید</li>
-                    <li>دکمه «ارسال پیام تست» را بزنید تا یک پیام تست دریافت کنید</li>
-                </ol>
-            </div>
+        </div>
+        
+        <div class="mb-4">
+            <h3>راهنمای استفاده</h3>
+            <p>برای استفاده از بات تلگرام، مراحل زیر را دنبال کنید:</p>
+            <ol>
+                <li>به بات تلگرام <a href="https://t.me/CryptoBarzinBot" target="_blank">@CryptoBarzinBot</a> پیام دهید</li>
+                <li>دکمه <strong>/start</strong> را در بات بزنید</li>
+                <li>آیدی چت خود را در فیلد بالا وارد کنید (اختیاری)</li>
+                <li>روی دکمه «ارسال پیام تست» کلیک کنید</li>
+            </ol>
+        </div>
+        
+        <div class="footer">
+            <p>طراح و توسعه دهنده: حمید برزین</p>
+            <p>© ۱۴۰۴</p>
         </div>
     </div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // دریافت اطلاعات بات تلگرام
-    fetch('/api/telegram-bot-info')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success && data.data && data.data.available) {
-                const botInfo = data.data;
-                document.getElementById('botName').textContent = botInfo.name;
-                document.getElementById('botUsername').textContent = '@' + botInfo.username;
-                document.getElementById('botLink').href = botInfo.link;
-                document.getElementById('botLink').textContent = '@' + botInfo.username;
-                document.getElementById('botUsernameGuide').textContent = '@' + botInfo.username;
-            } else {
-                const errorMessage = data.data && data.data.message ? data.data.message : 'مشکل در اتصال به تلگرام';
-                document.getElementById('botInfo').classList.remove('alert-info');
-                document.getElementById('botInfo').classList.add('alert-warning');
-                document.getElementById('botInfo').innerHTML = '<p>دسترسی به بات تلگرام در حال حاضر مقدور نیست. خطا: ' + errorMessage + '</p>';
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching Telegram bot info:', error);
-            document.getElementById('botInfo').classList.remove('alert-info');
-            document.getElementById('botInfo').classList.add('alert-danger');
-            document.getElementById('botInfo').innerHTML = '<p>خطا در بارگذاری اطلاعات بات تلگرام: ' + error.message + '</p>';
-        });
-
-    // ارسال پیام تست
-    document.getElementById('sendTestButton').addEventListener('click', function() {
-        // حذف هر نتیجه قبلی
-        const resultContainer = document.getElementById('resultContainer');
-        resultContainer.classList.remove('d-none', 'alert-success', 'alert-danger');
-        resultContainer.innerHTML = '';
+    
+    <script>
+    document.getElementById('testBtn').addEventListener('click', function() {
+        const chatId = document.getElementById('chatId').value.trim();
+        const loader = document.getElementById('loader');
+        const result = document.getElementById('result');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultMessage = document.getElementById('resultMessage');
         
-        const button = this;
-        const originalText = button.innerHTML;
-        button.disabled = true;
-        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> در حال ارسال...';
+        // Hide previous result and show loader
+        result.style.display = 'none';
+        loader.style.display = 'block';
         
-        // دریافت چت آیدی از فیلد ورودی
-        const chatId = document.getElementById('chatIdInput').value;
-        
-        if (!chatId) {
-            resultContainer.classList.add('alert-danger', 'd-block');
-            resultContainer.innerHTML = '<strong>خطا!</strong> لطفاً چت آیدی خود را وارد کنید.';
-            
-            button.disabled = false;
-            button.innerHTML = originalText;
-            return;
+        // Prepare request data
+        const requestData = {};
+        if (chatId) {
+            requestData.chat_id = chatId;
         }
         
-        // نمایش پیغام در حال پردازش
-        resultContainer.classList.add('alert-info', 'd-block');
-        resultContainer.innerHTML = '<strong>درحال پردازش...</strong> در حال ارسال پیام به تلگرام، لطفاً منتظر بمانید.';
-        
-        // ارسال درخواست به سرور مستقیماً
+        // Send request to API
         fetch('/api/test-telegram', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ chat_id: chatId })
+            body: JSON.stringify(requestData)
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('خطا در دریافت پاسخ از سرور: ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // نمایش نتیجه
-                resultContainer.classList.remove('alert-info');
-                
-                // همیشه نتیجه را در کنسول نمایش می‌دهیم برای عیب‌یابی
-                console.log('Server response:', data);
-                
-                if (data.success) {
-                    resultContainer.classList.add('alert-success');
-                    resultContainer.innerHTML = '<strong>موفقیت!</strong> ' + data.message + 
-                                              '<br><small>اگر چت آیدی شما صحیح باشد و شما با بات گفتگو را آغاز کرده باشید، باید پیام را در تلگرام خود دریافت کنید.</small>';
-                } else {
-                    resultContainer.classList.add('alert-danger');
-                    resultContainer.innerHTML = '<strong>خطا!</strong> ' + data.message;
-                }
-                
-                // بازگرداندن دکمه به حالت اولیه
-                button.disabled = false;
-                button.innerHTML = originalText;
-            })
-            .catch(error => {
-                console.error('Error sending test message:', error);
-                resultContainer.classList.remove('alert-info');
-                resultContainer.classList.add('alert-danger', 'd-block');
-                resultContainer.innerHTML = '<strong>خطا!</strong> مشکلی در ارتباط با سرور رخ داده است: ' + error.message;
-                
-                // بازگرداندن دکمه به حالت اولیه
-                button.disabled = false;
-                button.innerHTML = originalText;
-            });
+        .then(response => response.json())
+        .then(data => {
+            // Hide loader
+            loader.style.display = 'none';
+            
+            // Show result
+            result.style.display = 'block';
+            result.className = 'result ' + (data.success ? 'success' : 'error');
+            resultTitle.innerText = data.success ? '✅ موفقیت‌آمیز' : '❌ خطا';
+            resultMessage.innerText = data.message || 'پیام تلگرام با موفقیت ارسال شد.';
+            
+            if (data.success) {
+                console.log('پیام با موفقیت ارسال شد:', data);
+            } else {
+                console.error('خطا در ارسال پیام:', data);
+            }
+        })
+        .catch(error => {
+            // Hide loader
+            loader.style.display = 'none';
+            
+            // Show error
+            result.style.display = 'block';
+            result.className = 'result error';
+            resultTitle.innerText = '❌ خطا';
+            resultMessage.innerText = 'خطا در ارتباط با سرور: ' + error.message;
+            console.error('خطا در ارسال درخواست:', error);
+        });
     });
-});
-</script>
-{% endblock %}
+    </script>
+</body>
+</html>
