@@ -13,6 +13,7 @@ import json
 from datetime import datetime
 import random
 import time
+import pytz  # برای کار با منطقه‌های زمانی مختلف
 
 # تنظیم لاگر
 logging.basicConfig(
@@ -169,8 +170,10 @@ def send_price_report():
         # دریافت قیمت‌های فعلی
         prices = get_crypto_prices()
         
-        # ساخت متن پیام
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # ساخت متن پیام با زمان تورنتو
+        toronto_timezone = pytz.timezone('America/Toronto')
+        toronto_time = datetime.now(toronto_timezone)
+        current_time = toronto_time.strftime("%Y-%m-%d %H:%M:%S")
         
         message = f"""
 🚀 <b>Crypto Barzin - گزارش قیمت‌ها</b>
@@ -208,7 +211,10 @@ def send_test_message():
     Returns:
         bool: موفقیت یا شکست ارسال پیام
     """
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # استفاده از زمان تورنتو
+    toronto_timezone = pytz.timezone('America/Toronto')
+    toronto_time = datetime.now(toronto_timezone)
+    current_time = toronto_time.strftime("%Y-%m-%d %H:%M:%S")
     
     message = f"""
 🤖 <b>Crypto Barzin - پیام تست</b>
@@ -217,7 +223,7 @@ def send_test_message():
 این یک پیام تست از سرویس تلگرام Replit است.
 سیستم به درستی در حال کار است.
 
-⏰ <b>زمان:</b> {current_time}
+⏰ <b>زمان:</b> {current_time} (تورنتو)
 """
     
     return send_message(message)
@@ -229,7 +235,10 @@ def send_system_report():
     Returns:
         bool: موفقیت یا شکست ارسال پیام
     """
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # استفاده از زمان تورنتو
+    toronto_timezone = pytz.timezone('America/Toronto')
+    toronto_time = datetime.now(toronto_timezone)
+    current_time = toronto_time.strftime("%Y-%m-%d %H:%M:%S")
     
     message = f"""
 🔧 <b>Crypto Barzin - گزارش سیستم</b>
@@ -238,7 +247,7 @@ def send_system_report():
 ✅ <b>وضعیت سرویس:</b> فعال
 ⚙️ <b>سرویس فعال:</b> سرویس تلگرام Replit
 
-⏰ <b>زمان گزارش:</b> {current_time}
+⏰ <b>زمان گزارش:</b> {current_time} (تورنتو)
 """
     
     return send_message(message)

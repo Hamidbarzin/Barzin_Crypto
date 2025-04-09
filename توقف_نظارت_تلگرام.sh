@@ -1,57 +1,63 @@
 #!/bin/bash
 
-# اسکریپت توقف نظارت بر سرویس تلگرام
-echo "در حال توقف نظارت بر سرویس تلگرام..."
+# این اسکریپت ناظر سرویس‌های تلگرام را متوقف می‌کند
+
+echo "در حال توقف ناظر سرویس‌های تلگرام..."
 
 # بررسی وجود فایل PID
-if [ ! -f "telegram_service_watchdog.pid" ]; then
-    echo "فایل PID یافت نشد. به نظر می‌رسد سرویس نظارت در حال اجرا نیست."
+if [ -f "watchdog.pid" ]; then
+    pid=$(cat watchdog.pid)
     
-    # بررسی وجود فرآیند به طور دستی
-    pids=$(ps aux | grep "telegram_service_watchdog.py" | grep -v grep | awk '{print $2}')
-    
-    if [ -z "$pids" ]; then
-        echo "هیچ فرآیند مربوط به نظارت تلگرام یافت نشد."
-        exit 1
-    else
-        echo "فرآیندهای مربوط به نظارت یافت شد. در حال توقف..."
-        for pid in $pids; do
-            kill $pid 2>/dev/null
-            echo "فرآیند $pid متوقف شد."
-        done
-    fi
-else
-    # خواندن PID از فایل
-    pid=$(cat telegram_service_watchdog.pid | python3 -c "import json,sys; print(json.load(sys.stdin).get('pid', 0))")
-    
-    if [ "$pid" -gt 0 ]; then
-        # توقف فرآیند
-        kill $pid 2>/dev/null
+    if ps -p $pid > /dev/null; then
+        echo "در حال توقف ناظر با PID: $pid"
+        kill $pid
         
-        # بررسی موفقیت
-        if ps -p $pid > /dev/null; then
-            echo "خطا در توقف سرویس. تلاش برای توقف اجباری..."
-            kill -9 $pid 2>/dev/null
-        else
-            echo "سرویس نظارت با موفقیت متوقف شد."
+        # منتظر می‌ماند تا فرآیند متوقف شود
+        for i in {1..10}; do
+            if ! ps -p $pid > /dev/null; then
+                echo "ناظر با موفقیت متوقف شد."
+                
+                # پاکسازی فایل PID اگر هنوز وجود داشته باشد
+                if [ -f "watchdog.pid" ]; then
+                    rm watchdog.pid
+                fi
+                
+                exit 0
+            fi
+            
+            echo "در حال انتظار برای توقف ناظر..."
+            sleep 1
+        done
+        
+        echo "ناظر در مدت زمان انتظار متوقف نشد. در حال اعمال سیگنال kill -9..."
+        kill -9 $pid
+        
+        # پاکسازی فایل PID
+        if [ -f "watchdog.pid" ]; then
+            rm watchdog.pid
         fi
     else
-        echo "PID نامعتبر در فایل"
+        echo "فرآیند مربوط به PID $pid یافت نشد. در حال پاکسازی فایل PID..."
+        rm watchdog.pid
     fi
+else
+    echo "فایل PID یافت نشد. ممکن است ناظر در حال اجرا نباشد."
     
-    # حذف فایل PID
-    rm telegram_service_watchdog.pid
+    # بررسی و توقف هر فرآیندی که با این نام اجرا شده است
+    pids=$(ps aux | grep "telegram_service_watchdog.py" | grep -v grep | awk '{print $2}')
+    
+    if [ -n "$pids" ]; then
+        echo "فرآیندهای مربوط به ناظر یافت شد. در حال توقف..."
+        
+        for p in $pids; do
+            echo "توقف فرآیند با PID: $p"
+            kill $p
+        done
+        
+        echo "تمام فرآیندهای ناظر متوقف شدند."
+    else
+        echo "هیچ فرآیندی برای ناظر یافت نشد."
+    fi
 fi
 
-# بررسی نهایی
-pids=$(ps aux | grep "telegram_service_watchdog.py" | grep -v grep | awk '{print $2}')
-if [ -n "$pids" ]; then
-    echo "هشدار: هنوز فرآیندهای نظارت در حال اجرا هستند:"
-    for pid in $pids; do
-        echo "PID: $pid"
-    done
-    echo "برای توقف کامل، از دستور زیر استفاده کنید:"
-    echo "kill -9 $pids"
-else
-    echo "نظارت تلگرام کاملاً متوقف شد."
-fi
+echo "عملیات توقف ناظر به پایان رسید."

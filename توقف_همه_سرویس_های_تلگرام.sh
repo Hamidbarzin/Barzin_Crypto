@@ -1,51 +1,56 @@
 #!/bin/bash
 
-# اسکریپت توقف همه سرویس‌های تلگرام
-echo "در حال توقف همه سرویس‌های تلگرام Crypto Barzin..."
+# این اسکریپت تمام سرویس‌های تلگرام را متوقف می‌کند
 
-# گام 1: توقف سیستم نظارت
-echo ""
-echo "گام 1: توقف سیستم نظارت..."
+echo "در حال توقف تمام سرویس‌های تلگرام..."
+
+# ابتدا ناظر را متوقف می‌کنیم
 ./توقف_نظارت_تلگرام.sh
-echo ""
 
-# گام 2: توقف گزارش‌دهنده هر 10 دقیقه
-echo "گام 2: توقف گزارش‌دهنده هر 10 دقیقه..."
+# کمی صبر می‌کنیم
+sleep 2
+
+# سپس سرویس ارسال پیام هر ۱۰ دقیقه را متوقف می‌کنیم
 ./توقف_گزارش_دهنده_هر_۱۰_دقیقه.sh
-echo ""
 
-# توقف اضطراری فرآیندهای باقیمانده
-echo "گام 3: بررسی و توقف فرآیندهای باقیمانده..."
+# کمی صبر می‌کنیم
+sleep 2
 
-telegram_pids=$(ps aux | grep "telegram" | grep -v grep | awk '{print $2}')
-if [ -n "$telegram_pids" ]; then
-    echo "فرآیندهای تلگرام باقیمانده:"
-    ps aux | grep "telegram" | grep -v grep
-    
-    echo "در حال توقف فرآیندهای باقیمانده..."
-    for pid in $telegram_pids; do
-        kill -9 $pid 2>/dev/null
-        echo "فرآیند $pid متوقف شد."
+echo "بررسی وضعیت فعلی سرویس‌ها:"
+
+# بررسی هر گونه فرآیند مربوط به سرویس‌های تلگرام
+pids_sender=$(ps aux | grep "ten_minute_telegram_sender.py" | grep -v grep | awk '{print $2}')
+pids_watchdog=$(ps aux | grep "telegram_service_watchdog.py" | grep -v grep | awk '{print $2}')
+
+if [ -n "$pids_sender" ]; then
+    echo "⚠️ فرآیندهای سرویس ارسال پیام هر ۱۰ دقیقه هنوز در حال اجرا هستند. در حال توقف اجباری..."
+    for p in $pids_sender; do
+        echo "توقف فرآیند با PID: $p"
+        kill -9 $p
     done
 else
-    echo "هیچ فرآیند تلگرام باقیمانده‌ای یافت نشد."
+    echo "✅ سرویس ارسال پیام هر ۱۰ دقیقه: متوقف شده"
 fi
 
-# پاک کردن فایل‌های PID
-if [ -f "telegram_service_watchdog.pid" ]; then
-    rm telegram_service_watchdog.pid
-    echo "فایل PID نظارت حذف شد."
+if [ -n "$pids_watchdog" ]; then
+    echo "⚠️ فرآیندهای ناظر سرویس‌های تلگرام هنوز در حال اجرا هستند. در حال توقف اجباری..."
+    for p in $pids_watchdog; do
+        echo "توقف فرآیند با PID: $p"
+        kill -9 $p
+    done
+else
+    echo "✅ ناظر سرویس‌های تلگرام: متوقف شده"
 fi
 
+# پاکسازی فایل‌های PID اضافی
 if [ -f "ten_minute_telegram_sender.pid" ]; then
+    echo "پاکسازی فایل PID سرویس ارسال پیام هر ۱۰ دقیقه"
     rm ten_minute_telegram_sender.pid
-    echo "فایل PID گزارش‌دهنده حذف شد."
 fi
 
-# اطلاعات نهایی
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🛑 همه سرویس‌های تلگرام Crypto Barzin متوقف شدند!"
-echo ""
-echo "🔄 برای راه‌اندازی مجدد همه سرویس‌ها:"
-echo "./اجرای_خودکار_همه_سرویس_های_تلگرام.sh"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+if [ -f "watchdog.pid" ]; then
+    echo "پاکسازی فایل PID ناظر سرویس‌های تلگرام"
+    rm watchdog.pid
+fi
+
+echo "تمام سرویس‌های تلگرام متوقف شدند."

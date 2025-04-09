@@ -1,53 +1,62 @@
 #!/bin/bash
 
-# اسکریپت توقف گزارش‌دهنده هر ۱۰ دقیقه
-echo "در حال توقف سرویس گزارش‌دهنده هر ۱۰ دقیقه..."
+# این اسکریپت سرویس ارسال پیام هر ۱۰ دقیقه را متوقف می‌کند
+
+echo "در حال توقف سرویس ارسال پیام تلگرام هر ۱۰ دقیقه..."
 
 # بررسی وجود فایل PID
 if [ -f "ten_minute_telegram_sender.pid" ]; then
-    pid=$(cat ten_minute_telegram_sender.pid | python3 -c "import json,sys; print(json.load(sys.stdin).get('pid', 0))")
+    pid=$(cat ten_minute_telegram_sender.pid)
     
     if ps -p $pid > /dev/null; then
         echo "در حال توقف سرویس با PID: $pid"
         kill $pid
-        echo "درخواست توقف ارسال شد"
-        sleep 2
         
-        # بررسی توقف کامل
-        if ps -p $pid > /dev/null; then
-            echo "سرویس هنوز در حال اجراست. در حال توقف اجباری..."
-            kill -9 $pid
+        # منتظر می‌ماند تا فرآیند متوقف شود
+        for i in {1..10}; do
+            if ! ps -p $pid > /dev/null; then
+                echo "سرویس با موفقیت متوقف شد."
+                
+                # پاکسازی فایل PID اگر هنوز وجود داشته باشد
+                if [ -f "ten_minute_telegram_sender.pid" ]; then
+                    rm ten_minute_telegram_sender.pid
+                fi
+                
+                exit 0
+            fi
+            
+            echo "در حال انتظار برای توقف سرویس..."
             sleep 1
-        fi
+        done
         
-        if ps -p $pid > /dev/null; then
-            echo "خطا: نمی‌توان سرویس را متوقف کرد."
-            exit 1
-        else
-            echo "سرویس با موفقیت متوقف شد."
+        echo "سرویس در مدت زمان انتظار متوقف نشد. در حال اعمال سیگنال kill -9..."
+        kill -9 $pid
+        
+        # پاکسازی فایل PID
+        if [ -f "ten_minute_telegram_sender.pid" ]; then
             rm ten_minute_telegram_sender.pid
         fi
     else
-        echo "سرویس در حال اجرا نیست. در حال پاکسازی فایل PID..."
+        echo "فرآیند مربوط به PID $pid یافت نشد. در حال پاکسازی فایل PID..."
         rm ten_minute_telegram_sender.pid
     fi
 else
-    echo "فایل PID یافت نشد. احتمالاً سرویس در حال اجرا نیست."
+    echo "فایل PID یافت نشد. ممکن است سرویس در حال اجرا نباشد."
     
-    # تلاش برای یافتن و توقف فرآیندهای احتمالی
-    pids=$(ps aux | grep "[t]en_minute_telegram_sender.py" | awk '{print $2}')
+    # بررسی و توقف هر فرآیندی که با این نام اجرا شده است
+    pids=$(ps aux | grep "ten_minute_telegram_sender.py" | grep -v grep | awk '{print $2}')
     
     if [ -n "$pids" ]; then
-        echo "فرآیندهای مرتبط یافت شد. در حال توقف..."
+        echo "فرآیندهای مربوط به سرویس یافت شد. در حال توقف..."
         
         for p in $pids; do
-            echo "توقف PID: $p"
+            echo "توقف فرآیند با PID: $p"
             kill $p
         done
         
-        echo "همه فرآیندهای مرتبط متوقف شدند."
+        echo "تمام فرآیندهای سرویس متوقف شدند."
     else
-        echo "هیچ فرآیند مرتبطی یافت نشد."
+        echo "هیچ فرآیندی برای سرویس یافت نشد."
     fi
 fi
 

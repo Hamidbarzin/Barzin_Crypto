@@ -17,6 +17,7 @@ dependencies = [
     "pandas>=2.2.3",
     "psycopg2-binary>=2.9.10",
     "python-telegram-bot>=22.0",
+    "pytz>=2025.2",
     "requests>=2.32.3",
     "schedule>=1.2.2",
     "sendgrid>=6.11.0",
