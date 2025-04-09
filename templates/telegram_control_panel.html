@@ -1,0 +1,211 @@
+{% extends "minimal_base.html" %}
+
+{% block title %}پنل مدیریت تلگرام{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">پنل مدیریت تلگرام Crypto Barzin</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0">گزارش‌های عمومی</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-success" id="btn-price-report">
+                                            <i class="fas fa-chart-line me-2"></i>ارسال گزارش قیمت
+                                        </button>
+                                        <button class="btn btn-primary" id="btn-system-report">
+                                            <i class="fas fa-server me-2"></i>ارسال گزارش سیستم
+                                        </button>
+                                        <button class="btn btn-warning" id="btn-test-message">
+                                            <i class="fas fa-vial me-2"></i>ارسال پیام تست
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">سیگنال‌ها و تحلیل‌ها</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-primary" id="btn-trading-signals">
+                                            <i class="fas fa-signal me-2"></i>ارسال سیگنال‌های معاملاتی
+                                        </button>
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control" id="technical-symbol" placeholder="نماد مورد نظر" value="BTC/USDT">
+                                            <button class="btn btn-secondary" id="btn-technical-analysis">
+                                                <i class="fas fa-chart-bar me-2"></i>ارسال تحلیل تکنیکال
+                                            </button>
+                                        </div>
+                                        <button class="btn btn-info" id="btn-crypto-news">
+                                            <i class="fas fa-newspaper me-2"></i>ارسال اخبار ارزهای دیجیتال
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-secondary text-white">
+                                    <h5 class="mb-0">نتایج</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="result-container" class="alert d-none">
+                                        <span id="result-message"></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <button class="btn btn-outline-primary" id="btn-refresh-status">
+                                            <i class="fas fa-sync-alt me-2"></i>بروزرسانی وضعیت
+                                        </button>
+                                        <div>
+                                            <a href="/telegram-reliability" class="btn btn-outline-info">
+                                                <i class="fas fa-chart-pie me-2"></i>آمار قابلیت اطمینان
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // نمایش نتیجه عملیات
+    function showResult(message, success = true) {
+        const resultContainer = document.getElementById('result-container');
+        const resultMessage = document.getElementById('result-message');
+        
+        resultContainer.className = success ? 'alert alert-success' : 'alert alert-danger';
+        resultMessage.textContent = message;
+        resultContainer.classList.remove('d-none');
+        
+        // اسکرول به سمت نتایج
+        resultContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // تابع عمومی برای ارسال درخواست API
+    async function callApi(endpoint, method = 'GET', data = null) {
+        try {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+            
+            if (data && (method === 'POST' || method === 'PUT')) {
+                options.body = JSON.stringify(data);
+            }
+            
+            const response = await fetch(endpoint, options);
+            const result = await response.json();
+            
+            if (result.success) {
+                showResult(result.message, true);
+            } else {
+                showResult(result.message || 'خطایی رخ داده است', false);
+            }
+            
+            return result;
+        } catch (error) {
+            console.error('خطا در ارسال درخواست:', error);
+            showResult(`خطا در ارسال درخواست: ${error.message}`, false);
+            return null;
+        }
+    }
+    
+    // ارسال گزارش قیمت
+    document.getElementById('btn-price-report').addEventListener('click', async function() {
+        this.disabled = true;
+        await callApi('/api/telegram/price_report');
+        this.disabled = false;
+    });
+    
+    // ارسال گزارش سیستم
+    document.getElementById('btn-system-report').addEventListener('click', async function() {
+        this.disabled = true;
+        await callApi('/api/telegram/system_report');
+        this.disabled = false;
+    });
+    
+    // ارسال پیام تست
+    document.getElementById('btn-test-message').addEventListener('click', async function() {
+        this.disabled = true;
+        await callApi('/api/telegram/test');
+        this.disabled = false;
+    });
+    
+    // ارسال سیگنال‌های معاملاتی
+    document.getElementById('btn-trading-signals').addEventListener('click', async function() {
+        this.disabled = true;
+        await callApi('/api/telegram/trading_signals');
+        this.disabled = false;
+    });
+    
+    // ارسال تحلیل تکنیکال
+    document.getElementById('btn-technical-analysis').addEventListener('click', async function() {
+        this.disabled = true;
+        const symbol = document.getElementById('technical-symbol').value || 'BTC/USDT';
+        await callApi(`/api/telegram/technical_analysis?symbol=${encodeURIComponent(symbol)}`);
+        this.disabled = false;
+    });
+    
+    // ارسال اخبار ارزهای دیجیتال
+    document.getElementById('btn-crypto-news').addEventListener('click', async function() {
+        this.disabled = true;
+        // فراخوانی API با متد POST
+        await callApi('/api/telegram/send-news', 'POST');
+        this.disabled = false;
+    });
+    
+    // بروزرسانی وضعیت
+    document.getElementById('btn-refresh-status').addEventListener('click', async function() {
+        this.disabled = true;
+        const result = await callApi('/api/telegram/status');
+        if (result && result.running) {
+            showResult(`سرویس زمان‌بندی تلگرام در حال اجراست. ایجاد شده در: ${result.created_at}`, true);
+        } else if (result) {
+            showResult('سرویس زمان‌بندی تلگرام در حال اجرا نیست.', false);
+        }
+        this.disabled = false;
+    });
+    
+    // بررسی وضعیت در هنگام بارگذاری صفحه
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            const response = await fetch('/api/telegram/status');
+            const result = await response.json();
+            
+            if (result.running) {
+                showResult(`سرویس زمان‌بندی تلگرام در حال اجراست. ایجاد شده در: ${result.created_at}`, true);
+            } else {
+                showResult('سرویس زمان‌بندی تلگرام در حال اجرا نیست.', false);
+            }
+        } catch (error) {
+            console.error('خطا در بررسی وضعیت:', error);
+            showResult('خطا در بررسی وضعیت سرویس زمان‌بندی تلگرام.', false);
+        }
+    });
+</script>
+{% endblock %}

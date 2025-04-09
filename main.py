@@ -2136,9 +2136,10 @@ def send_test_message_replit():
 @app.route('/telegram_control')
 @app.route('/telegram_control_panel')
 @app.route('/telegram_panel')
+@app.route('/telegram-control-panel')
 def telegram_control_panel():
     """صفحه کنترل پنل تلگرام"""
-    return render_template('replit_telegram_control.html')
+    return render_template('telegram_control_panel.html')
 
 
 @app.route('/telegram-reliability')
@@ -2436,6 +2437,111 @@ def api_get_market_insights():
         return jsonify({
             "success": False,
             "message": f"خطا در دریافت بینش‌های بازار: {str(e)}"
+        }), 500
+
+
+@app.route('/api/telegram/price_report', methods=['GET'])
+def api_telegram_price_report():
+    """
+    ارسال گزارش قیمت‌های ارزهای دیجیتال به تلگرام
+    """
+    try:
+        result = replit_telegram_sender.send_price_report()
+        
+        if result:
+            return jsonify({
+                "success": True,
+                "message": "گزارش قیمت با موفقیت ارسال شد"
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "message": "ارسال گزارش قیمت با شکست مواجه شد"
+            }), 500
+    except Exception as e:
+        logger.error(f"خطا در ارسال گزارش قیمت: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"خطا در ارسال گزارش قیمت: {str(e)}"
+        }), 500
+
+
+@app.route('/api/telegram/system_report', methods=['GET'])
+def api_telegram_system_report():
+    """
+    ارسال گزارش وضعیت سیستم به تلگرام
+    """
+    try:
+        result = replit_telegram_sender.send_system_report()
+        
+        if result:
+            return jsonify({
+                "success": True,
+                "message": "گزارش سیستم با موفقیت ارسال شد"
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "message": "ارسال گزارش سیستم با شکست مواجه شد"
+            }), 500
+    except Exception as e:
+        logger.error(f"خطا در ارسال گزارش سیستم: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"خطا در ارسال گزارش سیستم: {str(e)}"
+        }), 500
+
+
+@app.route('/api/telegram/trading_signals', methods=['GET'])
+def api_telegram_trading_signals():
+    """
+    ارسال سیگنال‌های معاملاتی به تلگرام
+    """
+    try:
+        result = replit_telegram_sender.send_trading_signals()
+        
+        if result:
+            return jsonify({
+                "success": True,
+                "message": "سیگنال‌های معاملاتی با موفقیت ارسال شد"
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "message": "ارسال سیگنال‌های معاملاتی با شکست مواجه شد"
+            }), 500
+    except Exception as e:
+        logger.error(f"خطا در ارسال سیگنال‌های معاملاتی: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"خطا در ارسال سیگنال‌های معاملاتی: {str(e)}"
+        }), 500
+
+
+@app.route('/api/telegram/technical_analysis', methods=['GET'])
+def api_telegram_technical_analysis():
+    """
+    ارسال تحلیل تکنیکال به تلگرام
+    """
+    try:
+        symbol = request.args.get('symbol', default='BTC/USDT')
+        result = replit_telegram_sender.send_technical_analysis(symbol=symbol)
+        
+        if result:
+            return jsonify({
+                "success": True,
+                "message": f"تحلیل تکنیکال {symbol} با موفقیت ارسال شد"
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "message": f"ارسال تحلیل تکنیکال {symbol} با شکست مواجه شد"
+            }), 500
+    except Exception as e:
+        logger.error(f"خطا در ارسال تحلیل تکنیکال: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"خطا در ارسال تحلیل تکنیکال: {str(e)}"
         }), 500
 
 

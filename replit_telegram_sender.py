@@ -183,7 +183,17 @@ def send_price_report():
         {"name": "Solana", "symbol": "SOL", "price": 178.65, "change": 2.3},
         {"name": "Cardano", "symbol": "ADA", "price": 0.45, "change": -1.2},
         {"name": "Ripple", "symbol": "XRP", "price": 0.59, "change": 0.3},
-        {"name": "Polkadot", "symbol": "DOT", "price": 7.32, "change": -0.7}
+        {"name": "Polkadot", "symbol": "DOT", "price": 7.32, "change": -0.7},
+        {"name": "Tether", "symbol": "USDT", "price": 0.9998, "change": 0.01},
+        {"name": "Polygon", "symbol": "MATIC", "price": 0.58, "change": 1.4},
+        {"name": "Dogecoin", "symbol": "DOGE", "price": 0.15, "change": -2.1},
+        {"name": "Chainlink", "symbol": "LINK", "price": 15.25, "change": 2.7},
+        {"name": "Litecoin", "symbol": "LTC", "price": 86.50, "change": 0.5},
+        {"name": "Arbitrum", "symbol": "ARB", "price": 1.06, "change": -1.8},
+        {"name": "Optimism", "symbol": "OP", "price": 2.32, "change": 3.5},
+        {"name": "Render", "symbol": "RNDR", "price": 7.28, "change": 5.6},
+        {"name": "Fetch.ai", "symbol": "FET", "price": 2.12, "change": 4.3},
+        {"name": "Worldcoin", "symbol": "WLD", "price": 4.45, "change": -3.2}
     ]
     
     # ساخت پیام
@@ -452,7 +462,14 @@ def send_trading_signals():
         {"symbol": "ETH/USDT", "name": "Ethereum", "price": random.uniform(1600, 1800), "change": random.uniform(-4, 4), "signal": "خنثی", "risk": "متوسط"},
         {"symbol": "SOL/USDT", "name": "Solana", "price": random.uniform(160, 180), "change": random.uniform(-5, 5), "signal": "فروش", "risk": "بالا"},
         {"symbol": "BNB/USDT", "name": "BNB", "price": random.uniform(600, 650), "change": random.uniform(-2, 2), "signal": "خرید", "risk": "کم"},
-        {"symbol": "XRP/USDT", "name": "Ripple", "price": random.uniform(0.5, 0.7), "change": random.uniform(-2, 2), "signal": "خنثی", "risk": "متوسط"}
+        {"symbol": "XRP/USDT", "name": "Ripple", "price": random.uniform(0.5, 0.7), "change": random.uniform(-2, 2), "signal": "خنثی", "risk": "متوسط"},
+        {"symbol": "USDT/USD", "name": "Tether", "price": random.uniform(0.999, 1.001), "change": random.uniform(-0.1, 0.1), "signal": "خنثی", "risk": "کم"},
+        {"symbol": "ADA/USDT", "name": "Cardano", "price": random.uniform(0.44, 0.48), "change": random.uniform(-3, 3), "signal": "خرید", "risk": "متوسط"},
+        {"symbol": "DOT/USDT", "name": "Polkadot", "price": random.uniform(7.0, 7.5), "change": random.uniform(-4, 4), "signal": "خنثی", "risk": "متوسط"},
+        {"symbol": "DOGE/USDT", "name": "Dogecoin", "price": random.uniform(0.14, 0.16), "change": random.uniform(-5, 5), "signal": "فروش", "risk": "بالا"},
+        {"symbol": "MATIC/USDT", "name": "Polygon", "price": random.uniform(0.55, 0.60), "change": random.uniform(-4, 4), "signal": "خرید", "risk": "متوسط"},
+        {"symbol": "LINK/USDT", "name": "Chainlink", "price": random.uniform(14.5, 15.5), "change": random.uniform(-3, 3), "signal": "خرید", "risk": "متوسط"},
+        {"symbol": "LTC/USDT", "name": "Litecoin", "price": random.uniform(83, 88), "change": random.uniform(-3, 3), "signal": "خنثی", "risk": "متوسط"}
     ]
     
     # اضافه کردن ایموجی به سیگنال‌ها
