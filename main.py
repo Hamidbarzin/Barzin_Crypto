@@ -1151,6 +1151,26 @@ def telegram_test_page():
     """صفحه تست تلگرام"""
     return render_template('telegram_test.html')
     
+@app.route('/direct_test', methods=['GET'])
+def direct_test_page():
+    """صفحه تست مستقیم تلگرام"""
+    return render_template('direct_telegram_test.html')
+    
+@app.route('/direct_test_telegram', methods=['GET'])
+def direct_test_telegram():
+    """ارسال مستقیم پیام تلگرام با استفاده از درخواست HTTP"""
+    try:
+        import super_simple_telegram
+        result = super_simple_telegram.send_simple_test()
+        
+        if result:
+            return jsonify({'success': True, 'message': 'پیام تلگرام با موفقیت ارسال شد'})
+        else:
+            return jsonify({'success': False, 'message': 'خطا در ارسال پیام تلگرام'})
+    except Exception as e:
+        logger.error(f"خطا در ارسال مستقیم پیام تلگرام: {str(e)}")
+        return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
+    
 @app.route('/telegram_simple', methods=['GET'])
 def telegram_simple_page():
     """صفحه ساده تست تلگرام"""

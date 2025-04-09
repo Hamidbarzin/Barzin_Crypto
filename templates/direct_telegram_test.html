@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست مستقیم تلگرام - Crypto Barzin</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background-color: #181A20;
+            color: #eaecef;
+            padding: 20px;
+        }
+        .header {
+            background-color: #FCD535;
+            color: #000;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 5px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .btn-primary {
+            background-color: #FCD535;
+            color: #000;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #F0B90B;
+            color: #000;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: rgba(14, 203, 129, 0.1);
+            border: 1px solid #0ECB81;
+        }
+        .error {
+            background-color: rgba(246, 70, 93, 0.1);
+            border: 1px solid #F6465D;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #2b2f36;
+            text-align: center;
+            font-size: 0.9em;
+            color: #848E9C;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>تست مستقیم تلگرام Crypto Barzin</h1>
+        </div>
+        
+        <div class="mb-4">
+            <p>این صفحه از روش ساده و مستقیم برای ارسال پیام تلگرام استفاده می‌کند.</p>
+            <p>با کلیک بر روی دکمه زیر، پیام تست مستقیماً به تلگرام ارسال می‌شود.</p>
+            <p>این روش بدون استفاده از API پیچیده، فقط با استفاده از درخواست HTTP مستقیم کار می‌کند.</p>
+            
+            <button id="testDirectBtn" class="btn btn-primary mb-3">ارسال پیام تست مستقیم</button>
+            
+            <div id="result" class="result d-none">
+                <h4 id="resultTitle"></h4>
+                <p id="resultMessage"></p>
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <h3>راهنمای استفاده</h3>
+            <p>این روش نیازی به تنظیمات پیچیده ندارد و مستقیماً از متغیرهای محیطی استفاده می‌کند.</p>
+        </div>
+        
+        <div class="footer">
+            <p>طراح و توسعه دهنده: حمید برزین</p>
+            <p>© ۱۴۰۴</p>
+        </div>
+    </div>
+    
+    <script>
+    document.getElementById('testDirectBtn').addEventListener('click', function() {
+        const resultDiv = document.getElementById('result');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultMessage = document.getElementById('resultMessage');
+        
+        // Show loading state
+        this.disabled = true;
+        this.textContent = 'در حال ارسال...';
+        resultDiv.className = 'result d-none';
+        
+        // Send direct request
+        fetch('/direct_test_telegram')
+            .then(response => response.json())
+            .then(data => {
+                // Reset button
+                this.disabled = false;
+                this.textContent = 'ارسال پیام تست مستقیم';
+                
+                // Show result
+                resultDiv.className = data.success ? 'result success' : 'result error';
+                resultDiv.classList.remove('d-none');
+                resultTitle.innerText = data.success ? '✅ موفقیت‌آمیز' : '❌ خطا';
+                resultMessage.innerText = data.message || 'پیام با موفقیت ارسال شد.';
+                
+                if (data.success) {
+                    console.log('پیام با موفقیت ارسال شد:', data);
+                } else {
+                    console.error('خطا در ارسال پیام:', data);
+                }
+            })
+            .catch(error => {
+                // Reset button
+                this.disabled = false;
+                this.textContent = 'ارسال پیام تست مستقیم';
+                
+                // Show error
+                resultDiv.className = 'result error';
+                resultDiv.classList.remove('d-none');
+                resultTitle.innerText = '❌ خطا';
+                resultMessage.innerText = 'خطا در ارتباط با سرور: ' + error.message;
+                console.error('خطا در ارسال درخواست:', error);
+            });
+    });
+    </script>
+</body>
+</html>
