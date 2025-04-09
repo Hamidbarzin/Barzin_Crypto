@@ -252,6 +252,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/crypto_news' or request.path == '/news' %}active{% endif %}" href="/crypto_news">
+                            <i class="fas fa-newspaper me-1"></i> اخبار
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if request.path == '/minimal_settings' %}active{% endif %}" href="/minimal_settings">
                             <i class="fas fa-cog me-1"></i> تنظیمات
                         </a>
@@ -270,25 +275,31 @@
     <div class="mobile-nav d-lg-none">
         <div class="container">
             <div class="row text-center">
-                <div class="col-3">
+                <div class="col">
                     <a href="/minimal_dashboard" class="mobile-nav-item {% if request.path == '/minimal_dashboard' or request.path == '/' %}active{% endif %}">
                         <i class="fas fa-chart-line"></i>
                         <span>داشبورد</span>
                     </a>
                 </div>
-                <div class="col-3">
+                <div class="col">
                     <a href="/cryptocurrencies" class="mobile-nav-item {% if request.path == '/cryptocurrencies' or request.path == '/crypto' %}active{% endif %}">
                         <i class="fas fa-coins"></i>
                         <span>ارزها</span>
                     </a>
                 </div>
-                <div class="col-3">
+                <div class="col">
                     <a href="/price_alerts" class="mobile-nav-item {% if request.path == '/price_alerts' or request.path == '/alerts' %}active{% endif %}">
                         <i class="fas fa-bell"></i>
                         <span>هشدارها</span>
                     </a>
                 </div>
-                <div class="col-3">
+                <div class="col">
+                    <a href="/crypto_news" class="mobile-nav-item {% if request.path == '/crypto_news' or request.path == '/news' %}active{% endif %}">
+                        <i class="fas fa-newspaper"></i>
+                        <span>اخبار</span>
+                    </a>
+                </div>
+                <div class="col">
                     <a href="/minimal_settings" class="mobile-nav-item {% if request.path == '/minimal_settings' %}active{% endif %}">
                         <i class="fas fa-cog"></i>
                         <span>تنظیمات</span>

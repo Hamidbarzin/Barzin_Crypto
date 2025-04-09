@@ -41,10 +41,12 @@ class TelegramSchedulerService:
         self.system_report_counter = 0
         self.technical_analysis_counter = 0
         self.trading_signals_counter = 0
+        self.crypto_news_counter = 0
         self.interval = 600  # 10 دقیقه = 600 ثانیه
         self.system_report_interval = 36  # هر 36 بار (6 ساعت)
         self.technical_analysis_interval = 12  # هر 12 بار (2 ساعت)
         self.trading_signals_interval = 24  # هر 24 بار (4 ساعت)
+        self.crypto_news_interval = 48  # هر 48 بار (8 ساعت)
         
         # ارزهای مهم برای تحلیل تکنیکال
         self.important_coins = ["BTC/USDT", "ETH/USDT", "BNB/USDT", "SOL/USDT", "XRP/USDT"]
@@ -103,10 +105,12 @@ class TelegramSchedulerService:
             "system_report_counter": self.system_report_counter,
             "technical_analysis_counter": self.technical_analysis_counter,
             "trading_signals_counter": self.trading_signals_counter,
+            "crypto_news_counter": self.crypto_news_counter,
             "next_price_report": self._get_next_report_time(),
             "next_system_report": self._get_next_system_report_time(),
             "next_technical_analysis": self._get_next_technical_analysis_time(),
             "next_trading_signals": self._get_next_trading_signals_time(),
+            "next_crypto_news": self._get_next_crypto_news_time(),
             "next_coin_for_analysis": self.important_coins[self.current_coin_index]
         }
     
@@ -138,6 +142,7 @@ class TelegramSchedulerService:
                 self.system_report_counter += 1
                 self.technical_analysis_counter += 1
                 self.trading_signals_counter += 1
+                self.crypto_news_counter += 1
                 
                 # ارسال گزارش سیستم هر ۶ ساعت
                 if self.system_report_counter >= self.system_report_interval:
@@ -153,6 +158,11 @@ class TelegramSchedulerService:
                 if self.trading_signals_counter >= self.trading_signals_interval:
                     self._send_trading_signals()
                     self.trading_signals_counter = 0
+                    
+                # ارسال اخبار ارزهای دیجیتال هر ۸ ساعت
+                if self.crypto_news_counter >= self.crypto_news_interval:
+                    self._send_crypto_news()
+                    self.crypto_news_counter = 0
         
         except Exception as e:
             logger.error(f"خطا در حلقه زمان‌بندی: {str(e)}")
@@ -349,6 +359,45 @@ class TelegramSchedulerService:
         except Exception as e:
             logger.error(f"استثنا در بررسی هشدارهای قیمت: {str(e)}")
             return []
+            
+    def _send_crypto_news(self):
+        """
+        ارسال اخبار ارزهای دیجیتال
+        
+        Returns:
+            bool: موفقیت یا شکست ارسال اخبار
+        """
+        now_toronto = datetime.datetime.now(toronto_tz)
+        logger.info(f"ارسال اخبار ارزهای دیجیتال ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        
+        try:
+            # استفاده از api_telegram_send_news در main.py
+            # این متد از ماژول get_crypto_news_formatted_for_telegram استفاده می‌کند
+            success = replit_telegram_sender.send_crypto_news()
+            if success:
+                logger.info("اخبار ارزهای دیجیتال با موفقیت ارسال شد")
+            else:
+                logger.error("خطا در ارسال اخبار ارزهای دیجیتال")
+            return success
+        except Exception as e:
+            logger.error(f"استثنا در ارسال اخبار ارزهای دیجیتال: {str(e)}")
+            return False
+            
+    def _get_next_crypto_news_time(self):
+        """
+        محاسبه زمان اخبار ارزهای دیجیتال بعدی
+        
+        Returns:
+            str: زمان اخبار ارزهای دیجیتال بعدی
+        """
+        if not self.running:
+            return "سرویس در حال اجرا نیست"
+        
+        now = datetime.datetime.now(toronto_tz)
+        reports_left = self.crypto_news_interval - self.crypto_news_counter
+        seconds_left = reports_left * self.interval
+        next_time = now + datetime.timedelta(seconds=seconds_left)
+        return next_time.strftime("%Y-%m-%d %H:%M:%S")
 
 # نمونه سرویس که در main.py استفاده خواهد شد
 telegram_scheduler = TelegramSchedulerService()

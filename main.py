@@ -13,6 +13,7 @@ from crypto_bot.price_alert_service import set_price_alert, remove_price_alert, 
 from crypto_bot.email_service import send_test_email, update_email_settings, last_email_content, DISABLE_REAL_EMAIL
 from crypto_bot.commodity_data import get_commodity_prices, get_forex_rates, get_economic_indicators
 from crypto_bot.ai_module import get_price_prediction, get_market_sentiment, get_price_patterns, get_trading_strategy
+from crypto_bot.crypto_news import get_crypto_news, get_market_insights, get_crypto_news_formatted_for_telegram
 import replit_telegram_sender
 import telegram_scheduler_service
 
@@ -2147,6 +2148,13 @@ def price_alerts_page():
     return render_template('price_alerts.html')
 
 
+@app.route('/crypto_news')
+@app.route('/news')
+def crypto_news_page():
+    """صفحه اخبار ارزهای دیجیتال"""
+    return render_template('crypto_news.html')
+
+
 # API‌های کنترل سرویس تلگرام
 @app.route('/api/telegram/start')
 def api_telegram_start():
@@ -2358,6 +2366,77 @@ def api_check_price_alerts():
         "triggered": triggered,
         "count": len(triggered)
     })
+
+
+# API‌های مربوط به اخبار ارزهای دیجیتال
+@app.route('/api/crypto-news', methods=['GET'])
+def api_get_crypto_news():
+    """
+    دریافت اخبار ارزهای دیجیتال
+    """
+    try:
+        limit = request.args.get('limit', default=10, type=int)
+        translate = request.args.get('translate', default=True, type=lambda v: v.lower() == 'true')
+        
+        news = get_crypto_news(limit=limit, translate=translate)
+        
+        return jsonify({
+            "success": True,
+            "news": news
+        })
+    except Exception as e:
+        logger.error(f"خطا در دریافت اخبار: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"خطا در دریافت اخبار: {str(e)}"
+        }), 500
+
+
+@app.route('/api/market-insights', methods=['GET'])
+def api_get_market_insights():
+    """
+    دریافت تحلیل‌ها و بینش‌های بازار ارزهای دیجیتال
+    """
+    try:
+        insights = get_market_insights()
+        
+        return jsonify({
+            "success": True,
+            "data": insights
+        })
+    except Exception as e:
+        logger.error(f"خطا در دریافت بینش‌های بازار: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"خطا در دریافت بینش‌های بازار: {str(e)}"
+        }), 500
+
+
+@app.route('/api/telegram/send-news', methods=['POST'])
+def api_telegram_send_news():
+    """
+    ارسال اخبار ارزهای دیجیتال به تلگرام
+    """
+    try:
+        news_message = get_crypto_news_formatted_for_telegram()
+        result = replit_telegram_sender.send_message(news_message, parse_mode="Markdown")
+        
+        if result:
+            return jsonify({
+                "success": True,
+                "message": "اخبار ارزهای دیجیتال با موفقیت به تلگرام ارسال شد"
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "message": "خطا در ارسال اخبار به تلگرام"
+            }), 500
+    except Exception as e:
+        logger.error(f"خطا در ارسال اخبار به تلگرام: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"خطا در ارسال اخبار به تلگرام: {str(e)}"
+        }), 500
 
 
 # Flask 2.0+ نیاز به رویکرد جدید برای before_first_request دارد
