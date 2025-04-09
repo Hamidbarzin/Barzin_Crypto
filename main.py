@@ -1159,8 +1159,6 @@ def telegram_simple_page():
 @app.route('/api/test-telegram', methods=['POST', 'GET'])
 def test_telegram():
     """ارسال پیام تلگرام تست برای بررسی عملکرد اعلان‌ها"""
-    from crypto_bot.telegram_service import send_test_notification
-    
     # اطلاعات لاگینگ اضافی برای عیب‌یابی
     logger.info("درخواست تست تلگرام دریافت شد")
     
@@ -1201,19 +1199,29 @@ def test_telegram():
                 logger.info(f"چت آیدی به عدد صحیح تبدیل شد: {chat_id}")
     except Exception as e:
         logger.warning(f"خطا در تبدیل چت آیدی به عدد: {str(e)}")
-        
+    
     try:
-        # ارسال پیام تست
-        logger.info(f"ارسال پیام تست به چت آیدی: {chat_id}")
-        result = send_test_notification(chat_id)
-        logger.info(f"نتیجه ارسال پیام: {result}")
+        # روش ۱: استفاده از سیستم ساده جدید
+        logger.info("تلاش برای ارسال پیام با روش ساده جدید")
+        import super_simple_telegram
+        result = super_simple_telegram.send_simple_test()
+        logger.info(f"نتیجه ارسال پیام با روش ساده: {result}")
         
-        if isinstance(result, dict):
-            return jsonify(result)
-        elif result:
-            return jsonify({'success': True, 'message': 'پیام تلگرام با موفقیت ارسال شد'})
+        if result:
+            return jsonify({'success': True, 'message': 'پیام تلگرام با موفقیت ارسال شد (روش ساده)'})
+            
+        # روش ۲: استفاده از سیستم قدیمی اگر روش جدید موفق نبود
+        logger.info("تلاش برای ارسال پیام با روش قدیمی")
+        from crypto_bot.telegram_service import send_test_notification
+        result2 = send_test_notification(chat_id)
+        logger.info(f"نتیجه ارسال پیام با روش قدیمی: {result2}")
+        
+        if isinstance(result2, dict):
+            return jsonify(result2)
+        elif result2:
+            return jsonify({'success': True, 'message': 'پیام تلگرام با موفقیت ارسال شد (روش قدیمی)'})
         else:
-            return jsonify({'success': False, 'message': 'خطا در ارسال پیام تلگرام. لطفاً تنظیمات تلگرام را بررسی کنید'})
+            return jsonify({'success': False, 'message': 'خطا در ارسال پیام تلگرام. هر دو روش ناموفق بودند.'})
     except Exception as e:
         logger.error(f"خطا در ارسال پیام تلگرام تست: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})

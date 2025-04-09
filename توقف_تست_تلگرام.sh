@@ -1,24 +1,24 @@
 #!/bin/bash
 
-# اسکریپت برای توقف گزارش‌دهنده ۱۰ دقیقه‌ای تلگرام
-# این اسکریپت فرآیند گزارش‌دهنده را متوقف می‌کند
+# اسکریپت برای توقف تست تلگرام
+# این اسکریپت فرآیند تست تلگرام را متوقف می‌کند
 
-echo "توقف گزارش‌دهنده ۱۰ دقیقه‌ای تلگرام..."
+echo "توقف اسکریپت تست تلگرام..."
 
 # بررسی وجود فایل PID
-if [ ! -f "new_ten_minute_reporter.pid" ]; then
-    echo "خطا: فایل PID پیدا نشد. به نظر می‌رسد گزارش‌دهنده در حال اجرا نیست."
+if [ ! -f "telegram_test_sender.pid" ]; then
+    echo "خطا: فایل PID پیدا نشد. به نظر می‌رسد اسکریپت تست در حال اجرا نیست."
     exit 1
 fi
 
 # خواندن PID از فایل
-PID=$(cat new_ten_minute_reporter.pid)
+PID=$(cat telegram_test_sender.pid)
 
 # بررسی اینکه آیا فرآیند هنوز در حال اجراست
 if ! ps -p $PID > /dev/null; then
     echo "هشدار: فرآیند با PID $PID پیدا نشد."
     echo "حذف فایل PID قدیمی..."
-    rm -f new_ten_minute_reporter.pid
+    rm -f telegram_test_sender.pid
     exit 1
 fi
 
@@ -40,7 +40,7 @@ if ps -p $PID > /dev/null; then
     exit 1
 else
     echo "فرآیند با موفقیت متوقف شد."
-    rm -f new_ten_minute_reporter.pid
+    rm -f telegram_test_sender.pid
     echo "فایل PID حذف شد."
     exit 0
 fi

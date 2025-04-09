@@ -19,17 +19,17 @@ if [ -f "ten_minute_reporter.pid" ]; then
 fi
 
 # راه‌اندازی گزارش‌دهنده در پس‌زمینه
-nohup python ten_minute_reporter.py > ten_minute_reporter.log 2>&1 &
+nohup python new_ten_minute_reporter.py > new_ten_minute_reporter.log 2>&1 &
 
 # کمی صبر کنید تا فرآیند شروع شود و فایل PID ایجاد شود
 sleep 2
 
 # بررسی اینکه آیا فرآیند به درستی شروع شده است
-if [ -f "ten_minute_reporter.pid" ]; then
-    PID=$(cat ten_minute_reporter.pid)
+if [ -f "new_ten_minute_reporter.pid" ]; then
+    PID=$(cat new_ten_minute_reporter.pid)
     if ps -p $PID > /dev/null; then
         echo "گزارش‌دهنده ۱۰ دقیقه‌ای با موفقیت شروع شد با PID: $PID"
-        echo "لاگ‌ها در فایل ten_minute_reporter.log ذخیره می‌شوند"
+        echo "لاگ‌ها در فایل new_ten_minute_reporter.log ذخیره می‌شوند"
         echo "برای توقف، از دستور زیر استفاده کنید: bash توقف_گزارش_دهنده_۱۰_دقیقه‌ای.sh"
         exit 0
     fi

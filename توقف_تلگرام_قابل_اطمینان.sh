@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# توقف سرویس تلگرام بسیار ساده
-echo "توقف سرویس تلگرام بسیار ساده..."
+# توقف سرویس تلگرام با قابلیت اطمینان بالا
+echo "توقف سرویس تلگرام با قابلیت اطمینان بالا..."
 
-# بررسی وجود فایل PID
-if [ -f super_simple_scheduler.pid ]; then
+# بررسی وجود فایل pid
+if [ -f reliable_telegram.pid ]; then
     # خواندن شناسه فرآیند
-    PID=$(cat super_simple_scheduler.pid)
+    PID=$(cat reliable_telegram.pid)
     
     # بررسی وجود فرآیند
     if ps -p $PID > /dev/null; then
@@ -27,14 +27,14 @@ if [ -f super_simple_scheduler.pid ]; then
         echo "فرآیند با شناسه $PID در حال اجرا نیست."
     fi
     
-    # حذف فایل PID
-    rm super_simple_scheduler.pid
+    # حذف فایل pid
+    rm reliable_telegram.pid
 else
-    echo "فایل شناسه فرآیند (super_simple_scheduler.pid) پیدا نشد."
+    echo "فایل شناسه فرآیند (reliable_telegram.pid) پیدا نشد."
     echo "جستجوی دستی فرآیندها..."
     
     # جستجوی دستی فرآیندها
-    RUNNING_PIDS=$(ps aux | grep "[s]uper_simple_scheduler.py" | awk '{print $2}')
+    RUNNING_PIDS=$(ps aux | grep "[r]eliable_telegram_service.py" | awk '{print $2}')
     
     if [ -n "$RUNNING_PIDS" ]; then
         echo "یافتن فرآیندهای در حال اجرا: $RUNNING_PIDS"
@@ -50,7 +50,3 @@ else
         echo "هیچ فرآیند مرتبطی در حال اجرا نیست."
     fi
 fi
-
-echo ""
-echo "برای راه‌اندازی مجدد سرویس، از دستور زیر استفاده کنید:"
-echo "  ./اجرای_تلگرام_ساده.sh"

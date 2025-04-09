@@ -1,34 +1,41 @@
 #!/bin/bash
 
 # اسکریپت برای راه‌اندازی تست تلگرام
-# این اسکریپت برای دیباگ مشکل ارسال گزارش‌های تلگرام استفاده می‌شود
+# این اسکریپت هر دقیقه یک پیام تست به تلگرام ارسال می‌کند
 
-echo "شروع تست ارسال پیام تلگرام..."
+echo "شروع اسکریپت تست تلگرام..."
 
-# بررسی وجود فایل log قبلی
-if [ -f "test_10min_telegram.log" ]; then
-    echo "حذف فایل لاگ قبلی..."
-    rm -f test_10min_telegram.log
+# بررسی وجود فایل PID قبلی
+if [ -f "telegram_test_sender.pid" ]; then
+    PID=$(cat telegram_test_sender.pid)
+    if ps -p $PID > /dev/null; then
+        echo "هشدار: اسکریپت تست از قبل در حال اجراست با PID: $PID"
+        echo "برای راه‌اندازی مجدد، ابتدا فرآیند قبلی را متوقف کنید."
+        exit 1
+    else
+        echo "فایل PID قدیمی پیدا شد، اما فرآیند فعال نیست. حذف فایل PID قدیمی..."
+        rm -f telegram_test_sender.pid
+    fi
 fi
 
-# راه‌اندازی در پس‌زمینه
-nohup python test_10min_telegram.py > test_10min_telegram.log 2>&1 &
-PID=$!
+# راه‌اندازی اسکریپت در پس‌زمینه
+nohup python telegram_test_sender.py > telegram_test_sender.log 2>&1 &
+echo $! > telegram_test_sender.pid
 
-echo "تست تلگرام با موفقیت شروع شد با PID: $PID"
-echo "لاگ‌ها در فایل test_10min_telegram.log ذخیره می‌شوند"
-echo "برای توقف، از دستور زیر استفاده کنید: pkill -f test_10min_telegram.py"
-
-# نمایش قسمتی از لاگ‌ها
+# کمی صبر کنید تا فرآیند شروع شود
 sleep 2
-if [ -f "test_10min_telegram.log" ]; then
-    echo ""
-    echo "بخشی از لاگ‌ها:"
-    echo "----------------"
-    tail -n 15 test_10min_telegram.log
-    echo "----------------"
+
+# بررسی اینکه آیا فرآیند به درستی شروع شده است
+if [ -f "telegram_test_sender.pid" ]; then
+    PID=$(cat telegram_test_sender.pid)
+    if ps -p $PID > /dev/null; then
+        echo "اسکریپت تست تلگرام با موفقیت شروع شد با PID: $PID"
+        echo "لاگ‌ها در فایل telegram_test_sender.log ذخیره می‌شوند"
+        exit 0
+    fi
 fi
 
-echo ""
-echo "برای مشاهده لاگ‌ها به صورت زنده:"
-echo "tail -f test_10min_telegram.log"
+# اگر به اینجا برسیم، یعنی مشکلی در راه‌اندازی وجود داشته است
+echo "خطا: اسکریپت تست تلگرام راه‌اندازی نشد"
+echo "لطفاً لاگ‌ها را بررسی کنید: cat telegram_test_sender.log"
+exit 1
