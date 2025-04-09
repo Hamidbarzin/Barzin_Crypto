@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl" data-bs-theme="dark">
+<html lang="{{ session.get('language', 'fa') }}" dir="{{ 'rtl' if session.get('language', 'fa') == 'fa' else 'ltr' }}" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -238,7 +238,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/minimal_dashboard' or request.path == '/' %}active{% endif %}" href="/minimal_dashboard">
-                            <i class="fas fa-chart-line me-1"></i> داشبورد
+                            <i class="fas fa-chart-line me-1"></i> {{ ui_text('dashboard', 'داشبورد') }}
                         </a>
                     </li>
                     <li class="nav-item">
@@ -268,8 +268,22 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/minimal_settings' %}active{% endif %}" href="/minimal_settings">
-                            <i class="fas fa-cog me-1"></i> تنظیمات
+                            <i class="fas fa-cog me-1"></i> {{ ui_text('settings', 'تنظیمات') }}
                         </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-globe me-1"></i> {{ ui_text('language', 'زبان') }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                            {% for lang in languages %}
+                            <li>
+                                <a class="dropdown-item {% if current_language == lang.code %}active{% endif %}" href="/set-language/{{ lang.code }}">
+                                    {{ lang.flag }} {{ lang.name }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     </li>
                 </ul>
             </div>
@@ -288,7 +302,7 @@
                 <div class="col">
                     <a href="/minimal_dashboard" class="mobile-nav-item {% if request.path == '/minimal_dashboard' or request.path == '/' %}active{% endif %}">
                         <i class="fas fa-chart-line"></i>
-                        <span>داشبورد</span>
+                        <span>{{ ui_text('dashboard', 'داشبورد') }}</span>
                     </a>
                 </div>
                 <div class="col">
@@ -318,7 +332,7 @@
                 <div class="col">
                     <a href="/minimal_settings" class="mobile-nav-item {% if request.path == '/minimal_settings' %}active{% endif %}">
                         <i class="fas fa-cog"></i>
-                        <span>تنظیمات</span>
+                        <span>{{ ui_text('settings', 'تنظیمات') }}</span>
                     </a>
                 </div>
             </div>
@@ -333,7 +347,7 @@
         <div class="row">
             <div class="col-12 text-center">
                 <p class="text-muted small">
-                    طراح و توسعه دهنده: حمید برزین | {{ developer_year }} &copy;
+                    {{ ui_text('developer_footer', 'طراح و توسعه دهنده: حمید برزین') }} | {{ developer_year }} &copy;
                 </p>
             </div>
         </div>

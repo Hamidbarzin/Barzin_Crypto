@@ -1,14 +1,14 @@
 {% extends "minimal_base.html" %}
 
-{% block title %}داشبورد | برزین کریپتو{% endblock %}
+{% block title %}{{ ui_text('dashboard', 'داشبورد') }} | {{ ui_text('title', 'برزین کریپتو') }}{% endblock %}
 
 {% block content %}
 
 <div id="dashboard-content">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="mb-3">داشبورد</h1>
-            <p class="text-muted">آخرین تحلیل‌ها، سیگنال‌ها و قیمت‌های بازار ارز دیجیتال</p>
+            <h1 class="mb-3">{{ ui_text('dashboard', 'داشبورد') }}</h1>
+            <p class="text-muted">{{ ui_text('market_overview', 'آخرین تحلیل‌ها، سیگنال‌ها و قیمت‌های بازار ارز دیجیتال') }}</p>
         </div>
     </div>
 

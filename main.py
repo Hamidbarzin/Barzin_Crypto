@@ -15,6 +15,10 @@ from crypto_bot.commodity_data import get_commodity_prices, get_forex_rates, get
 from crypto_bot.ai_module import get_price_prediction, get_market_sentiment, get_price_patterns, get_trading_strategy
 from crypto_bot.crypto_news import get_crypto_news, get_market_insights, get_crypto_news_formatted_for_telegram
 from crypto_bot.voice_notification_service import voice_notification_service
+from crypto_bot.language_manager import (
+    get_language_code, get_ui_text, get_language_info, 
+    get_all_languages, SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
+)
 import replit_telegram_sender
 import telegram_scheduler_service
 
@@ -25,13 +29,19 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "crypto_bot_secret_key")
 
-# Add datetime and developer info to all templates
+# Add datetime, language and developer info to all templates
 @app.context_processor
 def inject_now():
+    current_language = session.get('language', DEFAULT_LANGUAGE)
+    all_languages = get_all_languages()
+    
     return {
         'now': datetime.now(),
         'developer_name': 'حمید برزین',
-        'developer_year': '۱۴۰۴'
+        'developer_year': '۱۴۰۴',
+        'current_language': current_language,
+        'languages': all_languages,
+        'ui_text': lambda key, default="": get_ui_text(current_language, key, default)
     }
 
 # Initialize session defaults
@@ -47,6 +57,8 @@ def initialize_session():
         session['watched_currencies'] = DEFAULT_CURRENCIES[:3]  # Start with BTC, ETH, XRP
     if 'scheduler_running' not in session:
         session['scheduler_running'] = False
+    if 'language' not in session:
+        session['language'] = DEFAULT_LANGUAGE
     if 'include_middle_east' not in session:
         session['include_middle_east'] = True  # Default to including Middle Eastern news sources
 
@@ -2001,7 +2013,8 @@ def minimal_settings():
         'news_sources': 'major',
         'daily_report_time': '16:00',
         'weekly_report_day': '4',
-        'update_frequency': '60'
+        'update_frequency': '60',
+        'language': session.get('language', DEFAULT_LANGUAGE)
     }
     
     bot_username = 'GrowthFinderBot'
@@ -2016,7 +2029,15 @@ def minimal_settings():
         except Exception as e:
             logger.error(f"Error getting bot username: {e}")
     
-    return render_template('minimal_settings.html', settings=settings, bot_username=bot_username)
+    # دریافت تمام زبان‌های پشتیبانی شده
+    languages = get_all_languages()
+    current_language = get_language_info(session.get('language'))
+    
+    return render_template('minimal_settings.html', 
+                          settings=settings, 
+                          bot_username=bot_username,
+                          languages=languages,
+                          current_language=current_language)
 
 @app.route('/send_price_report')
 def send_telegram_price_report():
@@ -2578,6 +2599,23 @@ def voice_notification_page():
     """صفحه اعلان‌های صوتی چندزبانه"""
     inject_now()
     return render_template('voice_notification.html')
+    
+    
+@app.route('/set-language/<language_code>')
+def set_language(language_code):
+    """تنظیم زبان سایت"""
+    if language_code in SUPPORTED_LANGUAGES:
+        session['language'] = language_code
+        language_name = SUPPORTED_LANGUAGES[language_code]['name']
+        success_message = get_ui_text(language_code, 'language_changed', 'Language changed successfully.')
+        success_message = success_message.format(language_name=language_name)
+        flash(success_message, 'success')
+    else:
+        error_message = get_ui_text(get_language_code(), 'language_change_error', 'Invalid language code.')
+        flash(error_message, 'error')
+    
+    # برگشت به صفحه قبلی یا صفحه اصلی
+    return redirect(request.referrer or url_for('index'))
 
 
 @app.route('/api/voice-notification/preview', methods=['POST'])
