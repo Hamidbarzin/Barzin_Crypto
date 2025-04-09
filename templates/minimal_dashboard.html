@@ -79,28 +79,25 @@
         </div>
     </div>
 
-    <!-- Tabs for Technical Analysis, Trading Signals, and News -->
-    <div class="row">
+    <!-- Simple Section Switcher instead of tabs -->
+    <div class="row mb-4">
         <div class="col-12">
-            <ul class="nav nav-tabs mb-3" id="dashboard-tabs">
-                <li class="nav-item">
-                    <button class="nav-link active" id="technical-tab" onclick="showTab('technical')">
-                        <i class="fas fa-chart-bar me-1"></i> تحلیل تکنیکال
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" id="signals-tab" onclick="showTab('signals')">
-                        <i class="fas fa-signal me-1"></i> سیگنال‌های معاملاتی
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" id="news-tab" onclick="showTab('news')">
-                        <i class="fas fa-newspaper me-1"></i> اخبار
-                    </button>
-                </li>
-            </ul>
+            <div class="d-flex justify-content-center gap-2">
+                <button class="btn btn-primary active" id="technical-btn" onclick="switchSection('technical')">
+                    <i class="fas fa-chart-bar me-1"></i> تحلیل تکنیکال
+                </button>
+                <button class="btn btn-outline-primary" id="signals-btn" onclick="switchSection('signals')">
+                    <i class="fas fa-signal me-1"></i> سیگنال‌های معاملاتی
+                </button>
+                <button class="btn btn-outline-primary" id="news-btn" onclick="switchSection('news')">
+                    <i class="fas fa-newspaper me-1"></i> اخبار
+                </button>
+            </div>
+        </div>
+    </div>
             
-            <div class="tab-content" id="dashboard-content">
+    <!-- Section Content Container -->
+    <div class="sections-container">
                 <!-- Technical Analysis Tab -->
                 <div class="tab-pane active" id="technical-pane" role="tabpanel" aria-labelledby="technical-tab">
                     <div class="card crypto-card">
@@ -425,29 +422,39 @@
 {% block extra_scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // تابع نمایش تب مورد نظر
-        window.showTab = function(tabName) {
-            console.log('Showing tab:', tabName);
+        // تابع تغییر بخش
+        window.switchSection = function(sectionName) {
+            console.log('Switching to section:', sectionName);
             
-            // مخفی کردن همه تب‌ها
-            document.querySelectorAll('.tab-pane').forEach(function(tab) {
-                tab.style.display = 'none';
+            // غیرفعال کردن همه دکمه‌ها
+            document.querySelectorAll('.btn').forEach(btn => {
+                if (btn.id.includes('-btn')) {
+                    btn.classList.remove('btn-primary');
+                    btn.classList.remove('active');
+                    btn.classList.add('btn-outline-primary');
+                }
             });
             
-            // غیرفعال کردن همه دکمه‌های تب
-            document.querySelectorAll('#dashboard-tabs .nav-link').forEach(function(button) {
-                button.classList.remove('active');
+            // فعال کردن دکمه انتخاب شده
+            const activeBtn = document.getElementById(sectionName + '-btn');
+            if (activeBtn) {
+                activeBtn.classList.remove('btn-outline-primary');
+                activeBtn.classList.add('btn-primary');
+                activeBtn.classList.add('active');
+            }
+            
+            // مخفی کردن همه بخش‌ها
+            document.querySelectorAll('.tab-pane').forEach(section => {
+                section.style.display = 'none';
             });
             
-            // نمایش تب مورد نظر
-            const tabPane = document.getElementById(tabName + '-pane');
-            if (tabPane) {
-                tabPane.style.display = 'block';
-                // فعال کردن دکمه تب مربوطه
-                document.getElementById(tabName + '-tab').classList.add('active');
+            // نمایش بخش مورد نظر
+            const targetPane = document.getElementById(sectionName + '-pane');
+            if (targetPane) {
+                targetPane.style.display = 'block';
                 
-                // اگر تب سیگنال‌ها است، قیمت‌ها را به‌روز کن
-                if (tabName === 'signals') {
+                // به‌روزرسانی قیمت‌ها در بخش سیگنال‌ها
+                if (sectionName === 'signals') {
                     updateSignalPrices();
                 }
             }
@@ -459,7 +466,7 @@
                 console.log('Updating signal prices');
                 
                 // دریافت قیمت بیت‌کوین
-                const btcPrice = document.getElementById('BTC-USDT-price').textContent;
+                const btcPrice = document.getElementById('BTC-USDT-price')?.textContent;
                 if (btcPrice && btcPrice !== '--') {
                     const btcSignalPrice = document.getElementById('btc-signal-price');
                     if (btcSignalPrice) {
@@ -469,7 +476,7 @@
                 }
                 
                 // دریافت قیمت اتریوم
-                const ethPrice = document.getElementById('ETH-USDT-price').textContent;
+                const ethPrice = document.getElementById('ETH-USDT-price')?.textContent;
                 if (ethPrice && ethPrice !== '--') {
                     const ethSignalPrice = document.getElementById('eth-signal-price');
                     if (ethSignalPrice) {
@@ -482,19 +489,40 @@
             }
         }
         
-        // تنظیم وضعیت اولیه تب‌ها
-        const allTabPanes = document.querySelectorAll('.tab-pane');
-        allTabPanes.forEach(function(tab) {
-            // همه تب‌ها را مخفی کن به جز تب فعال
-            if (!tab.classList.contains('active')) {
-                tab.style.display = 'none';
-            } else {
-                tab.style.display = 'block';
-            }
-        });
+        // افزودن دکمه‌های آزمایشی برای مشاهده مستقیم بخش سیگنال‌ها
+        const container = document.querySelector('.container');
+        const testButtons = document.createElement('div');
+        testButtons.className = 'row mt-3 mb-3';
+        testButtons.innerHTML = `
+            <div class="col-12 d-flex justify-content-center gap-2">
+                <button class="btn btn-sm btn-danger" onclick="showSignalsDirectly()">
+                    نمایش مستقیم سیگنال‌ها
+                </button>
+                <button class="btn btn-sm btn-warning" onclick="showTechnicalDirectly()">
+                    نمایش مستقیم تحلیل تکنیکال
+                </button>
+            </div>
+        `;
+        container.prepend(testButtons);
         
-        // به‌روزرسانی قیمت‌ها در بارگذاری اولیه صفحه
-        updateSignalPrices();
+        // افزودن توابع دسترسی سریع
+        window.showSignalsDirectly = function() {
+            document.getElementById('signals-pane').style.display = 'block';
+            document.getElementById('technical-pane').style.display = 'none';
+            document.getElementById('news-pane').style.display = 'none';
+            updateSignalPrices();
+        };
+        
+        window.showTechnicalDirectly = function() {
+            document.getElementById('signals-pane').style.display = 'none';
+            document.getElementById('technical-pane').style.display = 'block';
+            document.getElementById('news-pane').style.display = 'none';
+        };
+        
+        // تنظیم وضعیت اولیه بخش‌ها
+        document.getElementById('technical-pane').style.display = 'block';
+        document.getElementById('signals-pane').style.display = 'none';
+        document.getElementById('news-pane').style.display = 'none';
         
         // به‌روزرسانی خودکار قیمت‌ها هر ۳۰ ثانیه
         setInterval(updateSignalPrices, 30000);
