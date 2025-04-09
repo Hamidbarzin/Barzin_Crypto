@@ -120,22 +120,38 @@ class TelegramSchedulerService:
         
         این متد در یک ترد جداگانه اجرا می‌شود و مسئول ارسال
         پیام‌های زمان‌بندی شده است.
+        
+        برای محیط replit، از بازه‌های زمانی کوچکتر استفاده می‌کنیم تا
+        در صورت قطع شدن ترد، زودتر به مشکل پی ببریم
         """
         try:
-            # ارسال گزارش قیمت
+            # ارسال گزارش قیمت اولیه
+            logger.info("ارسال گزارش قیمت اولیه...")
             self._send_price_report()
             
+            # شمارنده برای ارسال پیام هر 10 دقیقه
+            counter = 0
+            # بازه زمانی کوچکتر برای بررسی وضعیت
+            small_interval = 60  # 1 دقیقه
+            ticks_for_report = self.interval // small_interval
+            
             while self.running:
-                # خواب بین گزارش‌ها
-                time.sleep(self.interval)
+                # خواب با بازه کوچکتر برای کنترل بهتر
+                time.sleep(small_interval)
                 
                 if not self.running:
                     break
                 
-                # ارسال گزارش قیمت
-                self._send_price_report()
+                counter += 1
+                logger.info(f"تیک شماره {counter} از {ticks_for_report} برای ارسال گزارش بعدی")
                 
-                # بررسی هشدارهای قیمت
+                # هر 10 دقیقه گزارش قیمت ارسال کن
+                if counter >= ticks_for_report:
+                    logger.info("زمان ارسال گزارش قیمت فرا رسیده...")
+                    self._send_price_report()
+                    counter = 0
+                
+                # بررسی هشدارهای قیمت در هر تیک
                 self._check_price_alerts()
                 
                 # افزایش شمارنده‌ها

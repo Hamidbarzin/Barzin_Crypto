@@ -2141,6 +2141,12 @@ def telegram_control_panel():
     return render_template('replit_telegram_control.html')
 
 
+@app.route('/telegram-reliability')
+def telegram_reliability_dashboard():
+    """صفحه داشبورد قابلیت اطمینان تلگرام"""
+    return render_template('telegram_reliability.html')
+
+
 @app.route('/price_alerts')
 @app.route('/alerts')
 def price_alerts_page():
@@ -2235,6 +2241,27 @@ def api_telegram_status():
     """
     try:
         status = telegram_scheduler_service.get_scheduler_status()
+        
+        # بررسی وضعیت قابلیت اطمینان
+        reliability_data = {}
+        try:
+            # ابتدا تلاش برای وارد کردن نسخه ساده‌سازی شده
+            try:
+                from crypto_bot.simple_reliability_monitor import get_reliability_stats
+                reliability_data = get_reliability_stats()
+                app.logger.info("استفاده از ماژول ساده‌سازی شده نشانگر قابلیت اطمینان")
+            except ImportError:
+                # اگر نسخه ساده‌سازی شده در دسترس نبود، استفاده از نسخه اصلی
+                from crypto_bot.telegram_reliability_monitor import get_reliability_stats
+                reliability_data = get_reliability_stats()
+                app.logger.info("استفاده از ماژول اصلی نشانگر قابلیت اطمینان")
+        except Exception as e:
+            app.logger.error(f"خطا در دریافت آمار قابلیت اطمینان: {str(e)}")
+            reliability_data = {"error": str(e)}
+        
+        # اضافه کردن داده‌های قابلیت اطمینان به وضعیت
+        status['reliability'] = reliability_data
+        
         return jsonify(status)
     except Exception as e:
         return jsonify({

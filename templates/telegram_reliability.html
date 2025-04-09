@@ -1,0 +1,285 @@
+{% extends "minimal_base.html" %}
+
+{% block title %}قابلیت اطمینان ارسال تلگرام{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">قابلیت اطمینان سرویس تلگرام</h5>
+                </div>
+                <div class="card-body" id="reliability-overview">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">در حال بارگذاری...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">آمار کلی</h5>
+                </div>
+                <div class="card-body" id="overall-stats">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border text-info" role="status">
+                            <span class="visually-hidden">در حال بارگذاری...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">آمار 24 ساعت اخیر</h5>
+                </div>
+                <div class="card-body" id="last-24h-stats">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border text-success" role="status">
+                            <span class="visually-hidden">در حال بارگذاری...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">آمار انواع پیام‌ها</h5>
+                </div>
+                <div class="card-body" id="message-types-stats">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border text-warning" role="status">
+                            <span class="visually-hidden">در حال بارگذاری...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">رویدادهای اخیر</h5>
+                </div>
+                <div class="card-body" id="recent-events">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border text-secondary" role="status">
+                            <span class="visually-hidden">در حال بارگذاری...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // تابع کمکی برای فرمت کردن زمان
+    function formatDatetime(isoString) {
+        if (!isoString) return 'نامشخص';
+        const date = new Date(isoString);
+        return date.toLocaleString('fa-IR');
+    }
+    
+    // تابع کمکی برای تعیین رنگ بر اساس نرخ موفقیت
+    function getSuccessRateColor(rate) {
+        if (rate >= 95) return 'success';
+        if (rate >= 80) return 'info';
+        if (rate >= 60) return 'warning';
+        return 'danger';
+    }
+    
+    // تابع کمکی برای تعیین ایموجی وضعیت
+    function getStatusEmoji(status) {
+        if (status) return '✅';
+        return '❌';
+    }
+    
+    // بارگذاری داده‌ها
+    function loadReliabilityData() {
+        fetch('/api/telegram/status')
+            .then(response => response.json())
+            .then(data => {
+                displayReliabilityData(data);
+            })
+            .catch(error => {
+                console.error('خطا در بارگذاری داده‌ها:', error);
+                showErrorMessage();
+            });
+    }
+    
+    // نمایش پیام خطا
+    function showErrorMessage() {
+        const errorHtml = '<div class="alert alert-danger">خطا در بارگذاری داده‌های قابلیت اطمینان. لطفاً صفحه را مجدداً بارگذاری کنید.</div>';
+        document.getElementById('reliability-overview').innerHTML = errorHtml;
+        document.getElementById('overall-stats').innerHTML = errorHtml;
+        document.getElementById('last-24h-stats').innerHTML = errorHtml;
+        document.getElementById('message-types-stats').innerHTML = errorHtml;
+        document.getElementById('recent-events').innerHTML = errorHtml;
+    }
+    
+    // نمایش داده‌های قابلیت اطمینان
+    function displayReliabilityData(data) {
+        if (!data || !data.reliability) {
+            showErrorMessage();
+            return;
+        }
+        
+        const reliability = data.reliability;
+        
+        // نمایش خلاصه کلی
+        let overviewHtml = '<div class="row">';
+        overviewHtml += '<div class="col-md-6">';
+        overviewHtml += `<h4>زمان کارکرد: ${reliability.uptime.days} روز</h4>`;
+        overviewHtml += `<p>راه‌اندازی‌های مجدد: ${reliability.uptime.restarts}</p>`;
+        overviewHtml += `<p>آخرین راه‌اندازی مجدد: ${reliability.uptime.last_restart_hours_ago} ساعت پیش</p>`;
+        overviewHtml += '</div>';
+        overviewHtml += '<div class="col-md-6">';
+        overviewHtml += `<h4>نرخ موفقیت کلی: <span class="text-${getSuccessRateColor(reliability.overall.success_rate)}">${reliability.overall.success_rate}%</span></h4>`;
+        
+        // نسخه ساده‌سازی شده ممکن است آمار 24 ساعت گذشته را نداشته باشد
+        if (reliability.last_24h) {
+            overviewHtml += `<p>نرخ موفقیت 24 ساعت اخیر: <span class="text-${getSuccessRateColor(reliability.last_24h.success_rate)}">${reliability.last_24h.success_rate}%</span></p>`;
+        }
+        
+        overviewHtml += '</div>';
+        overviewHtml += '</div>';
+        document.getElementById('reliability-overview').innerHTML = overviewHtml;
+        
+        // نمایش آمار کلی
+        let overallHtml = '<ul class="list-group">';
+        overallHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">کل پیام‌های ارسالی <span class="badge bg-primary rounded-pill">${reliability.overall.total_sent}</span></li>`;
+        overallHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">ارسال‌های موفق <span class="badge bg-success rounded-pill">${reliability.overall.successful}</span></li>`;
+        overallHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">ارسال‌های ناموفق <span class="badge bg-danger rounded-pill">${reliability.overall.failed}</span></li>`;
+        overallHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">نرخ موفقیت <span class="badge bg-${getSuccessRateColor(reliability.overall.success_rate)} rounded-pill">${reliability.overall.success_rate}%</span></li>`;
+        overallHtml += '</ul>';
+        document.getElementById('overall-stats').innerHTML = overallHtml;
+        
+        // نمایش آمار 24 ساعت اخیر - نسخه ساده‌سازی شده ممکن است این داده را نداشته باشد
+        if (reliability.last_24h) {
+            let last24hHtml = '<ul class="list-group">';
+            last24hHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">کل پیام‌های ارسالی <span class="badge bg-primary rounded-pill">${reliability.last_24h.total_sent}</span></li>`;
+            last24hHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">ارسال‌های موفق <span class="badge bg-success rounded-pill">${reliability.last_24h.successful}</span></li>`;
+            last24hHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">ارسال‌های ناموفق <span class="badge bg-danger rounded-pill">${reliability.last_24h.failed}</span></li>`;
+            last24hHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">نرخ موفقیت <span class="badge bg-${getSuccessRateColor(reliability.last_24h.success_rate)} rounded-pill">${reliability.last_24h.success_rate}%</span></li>`;
+            last24hHtml += '</ul>';
+            document.getElementById('last-24h-stats').innerHTML = last24hHtml;
+        } else {
+            // اگر داده‌های 24 ساعت گذشته موجود نیست
+            document.getElementById('last-24h-stats').innerHTML = '<div class="alert alert-info">در نسخه ساده‌سازی شده، آمار 24 ساعت گذشته در دسترس نیست.</div>';
+        }
+        
+        // نمایش آمار انواع پیام‌ها
+        if (reliability.message_types && reliability.message_types.length > 0) {
+            let messageTypesHtml = '<div class="table-responsive"><table class="table table-striped">';
+            messageTypesHtml += '<thead><tr><th>نوع پیام</th><th>تعداد کل</th><th>موفق</th><th>ناموفق</th><th>نرخ موفقیت</th></tr></thead>';
+            messageTypesHtml += '<tbody>';
+            
+            for (const type of reliability.message_types) {
+                messageTypesHtml += '<tr>';
+                messageTypesHtml += `<td>${type.type}</td>`;
+                messageTypesHtml += `<td>${type.total}</td>`;
+                messageTypesHtml += `<td>${type.successful}</td>`;
+                messageTypesHtml += `<td>${type.failed}</td>`;
+                messageTypesHtml += `<td><span class="badge bg-${getSuccessRateColor(type.success_rate)}">${type.success_rate}%</span></td>`;
+                messageTypesHtml += '</tr>';
+            }
+            
+            messageTypesHtml += '</tbody></table></div>';
+            document.getElementById('message-types-stats').innerHTML = messageTypesHtml;
+        } else {
+            // در نسخه ساده‌سازی شده، آمار انواع پیام‌ها به شکل لیست وجود ندارد
+            // پس سعی می‌کنیم از رویدادهای اخیر استفاده کنیم
+            if (reliability.recent_events && reliability.recent_events.length > 0) {
+                // ساخت دیکشنری از انواع پیام‌ها
+                const messageTypes = {};
+                for (const event of reliability.recent_events) {
+                    const type = event.message_type || 'نامشخص';
+                    if (!messageTypes[type]) {
+                        messageTypes[type] = { type, total: 0, successful: 0, failed: 0 };
+                    }
+                    messageTypes[type].total++;
+                    if (event.success) {
+                        messageTypes[type].successful++;
+                    } else {
+                        messageTypes[type].failed++;
+                    }
+                }
+                
+                // محاسبه نرخ موفقیت و تبدیل به آرایه
+                const typesArray = Object.values(messageTypes).map(t => {
+                    t.success_rate = t.total > 0 ? Math.round((t.successful / t.total) * 100) : 0;
+                    return t;
+                });
+                
+                // نمایش جدول
+                let messageTypesHtml = '<div class="table-responsive"><table class="table table-striped">';
+                messageTypesHtml += '<thead><tr><th>نوع پیام</th><th>تعداد کل</th><th>موفق</th><th>ناموفق</th><th>نرخ موفقیت</th></tr></thead>';
+                messageTypesHtml += '<tbody>';
+                
+                for (const type of typesArray) {
+                    messageTypesHtml += '<tr>';
+                    messageTypesHtml += `<td>${type.type}</td>`;
+                    messageTypesHtml += `<td>${type.total}</td>`;
+                    messageTypesHtml += `<td>${type.successful}</td>`;
+                    messageTypesHtml += `<td>${type.failed}</td>`;
+                    messageTypesHtml += `<td><span class="badge bg-${getSuccessRateColor(type.success_rate)}">${type.success_rate}%</span></td>`;
+                    messageTypesHtml += '</tr>';
+                }
+                
+                messageTypesHtml += '</tbody></table></div>';
+                messageTypesHtml += '<div class="alert alert-info mt-2">در نسخه ساده‌سازی شده، آمار انواع پیام‌ها بر اساس رویدادهای اخیر محاسبه شده است.</div>';
+                document.getElementById('message-types-stats').innerHTML = messageTypesHtml;
+            } else {
+                document.getElementById('message-types-stats').innerHTML = '<div class="alert alert-info">هنوز هیچ پیامی ارسال نشده است.</div>';
+            }
+        }
+        
+        // نمایش رویدادهای اخیر
+        if (reliability.recent_events && reliability.recent_events.length > 0) {
+            let recentEventsHtml = '<div class="table-responsive"><table class="table table-striped">';
+            recentEventsHtml += '<thead><tr><th>نوع پیام</th><th>وضعیت</th><th>زمان</th><th>خطا</th></tr></thead>';
+            recentEventsHtml += '<tbody>';
+            
+            // نمایش رویدادها از جدیدترین به قدیمی‌ترین
+            const sortedEvents = [...reliability.recent_events].reverse();
+            
+            for (const event of sortedEvents) {
+                recentEventsHtml += '<tr>';
+                recentEventsHtml += `<td>${event.message_type || 'نامشخص'}</td>`;
+                const statusColor = event.success ? 'success' : 'danger';
+                const statusText = event.success ? 'موفق' : 'ناموفق';
+                recentEventsHtml += `<td><span class="badge bg-${statusColor}">${statusText}</span></td>`;
+                recentEventsHtml += `<td>${formatDatetime(event.timestamp)}</td>`;
+                recentEventsHtml += `<td>${event.error || '-'}</td>`;
+                recentEventsHtml += '</tr>';
+            }
+            
+            recentEventsHtml += '</tbody></table></div>';
+            document.getElementById('recent-events').innerHTML = recentEventsHtml;
+        } else {
+            document.getElementById('recent-events').innerHTML = '<div class="alert alert-info">هنوز هیچ رویدادی ثبت نشده است.</div>';
+        }
+    }
+    
+    // بارگذاری داده‌ها هنگام لود صفحه
+    document.addEventListener('DOMContentLoaded', loadReliabilityData);
+</script>
+{% endblock %}

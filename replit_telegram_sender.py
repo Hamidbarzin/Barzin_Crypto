@@ -11,6 +11,55 @@ import requests
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("replit_telegram")
 
+# وارد کردن ماژول نشانگر قابلیت اطمینان
+# تنظیم متغیرهای پیش‌فرض برای حل مشکل LSP
+# ماژول قابلیت اطمینان برای استفاده در توابع send_message و غیره لازم است
+RELIABILITY_MONITOR_AVAILABLE = False
+record_message_attempt = None
+record_service_restart = None
+get_reliability_stats = None
+get_reliability_summary = None
+
+try:
+    # ابتدا تلاش برای وارد کردن نسخه ساده‌سازی شده (ترجیح می‌دهیم)
+    from crypto_bot.simple_reliability_monitor import (
+        record_message_attempt,
+        record_service_restart,
+        get_reliability_stats,
+        get_reliability_summary
+    )
+    RELIABILITY_MONITOR_AVAILABLE = True
+    logger.info("ماژول ساده‌سازی شده نشانگر قابلیت اطمینان بارگذاری شد")
+except ImportError:
+    # اگر نسخه ساده‌سازی شده در دسترس نبود، استفاده از نسخه اصلی
+    try:
+        from crypto_bot.telegram_reliability_monitor import (
+            record_message_attempt,
+            record_service_restart,
+            get_reliability_stats,
+            get_reliability_summary
+        )
+        RELIABILITY_MONITOR_AVAILABLE = True
+        logger.info("ماژول اصلی نشانگر قابلیت اطمینان بارگذاری شد")
+    except ImportError:
+        logger.warning("هیچ ماژول نشانگر قابلیت اطمینانی در دسترس نیست")
+        # تعریف توابع جایگزین در صورت عدم وجود ماژول
+        def record_message_attempt(message_type, success, error_message=None):
+            logger.info(f"[پیاده‌سازی نشده] ثبت پیام: {message_type}, موفق: {success}")
+            
+        def record_service_restart():
+            logger.info("[پیاده‌سازی نشده] ثبت راه‌اندازی مجدد سرویس")
+            
+        def get_reliability_stats():
+            return {
+                "overall": {"total_sent": 0, "successful": 0, "failed": 0, "success_rate": 0},
+                "uptime": {"days": 0, "restarts": 0, "last_restart_hours_ago": 0},
+                "recent_events": []
+            }
+            
+        def get_reliability_summary():
+            return "اطلاعات آماری در دسترس نیست"
+
 # تنظیم کنید - کلید API تلگرام و شناسه چت
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 DEFAULT_CHAT_ID = os.environ.get("DEFAULT_CHAT_ID")
@@ -19,7 +68,7 @@ DEFAULT_CHAT_ID = os.environ.get("DEFAULT_CHAT_ID")
 tehran_tz = pytz.timezone('Asia/Tehran')
 toronto_tz = pytz.timezone('America/Toronto')
 
-def send_message(text, chat_id=None, parse_mode=None, disable_web_page_preview=True, retries=3, delay=2):
+def send_message(text, chat_id=None, parse_mode=None, disable_web_page_preview=True, retries=3, delay=2, message_type="general"):
     """
     ارسال پیام به تلگرام
     
@@ -30,17 +79,28 @@ def send_message(text, chat_id=None, parse_mode=None, disable_web_page_preview=T
         disable_web_page_preview (bool, optional): غیرفعال کردن پیش‌نمایش وب‌سایت.
         retries (int, optional): تعداد تلاش‌های مجدد در صورت خطا.
         delay (int, optional): تاخیر بین تلاش‌های مجدد بر حسب ثانیه.
+        message_type (str, optional): نوع پیام برای ثبت در نشانگر قابلیت اطمینان.
         
     Returns:
         bool: موفقیت یا شکست ارسال پیام
     """
     if not TELEGRAM_BOT_TOKEN:
         logger.error("TELEGRAM_BOT_TOKEN یافت نشد")
+        
+        # ثبت خطا در نشانگر قابلیت اطمینان
+        if RELIABILITY_MONITOR_AVAILABLE:
+            record_message_attempt(message_type, False, "TELEGRAM_BOT_TOKEN یافت نشد")
+            
         return False
     
     if not chat_id:
         if not DEFAULT_CHAT_ID:
             logger.error("DEFAULT_CHAT_ID یافت نشد")
+            
+            # ثبت خطا در نشانگر قابلیت اطمینان
+            if RELIABILITY_MONITOR_AVAILABLE:
+                record_message_attempt(message_type, False, "DEFAULT_CHAT_ID یافت نشد")
+                
             return False
         chat_id = DEFAULT_CHAT_ID
     
@@ -66,9 +126,20 @@ def send_message(text, chat_id=None, parse_mode=None, disable_web_page_preview=T
             
             if response.status_code == 200:
                 logger.info("پیام با موفقیت ارسال شد")
+                
+                # ثبت موفقیت در نشانگر قابلیت اطمینان
+                if RELIABILITY_MONITOR_AVAILABLE:
+                    record_message_attempt(message_type, True)
+                    
                 return True
             else:
-                logger.error(f"خطا در ارسال پیام: {response.status_code} - {response.text}")
+                error_message = f"خطا در ارسال پیام: {response.status_code} - {response.text}"
+                logger.error(error_message)
+                
+                # اگر آخرین تلاش است، خطا را ثبت کن
+                if attempt == retries - 1:
+                    if RELIABILITY_MONITOR_AVAILABLE:
+                        record_message_attempt(message_type, False, error_message)
                 
                 # اگر خطای 429 (Too Many Requests) دریافت شد، زمان انتظار را افزایش دهید
                 if response.status_code == 429:
@@ -79,8 +150,14 @@ def send_message(text, chat_id=None, parse_mode=None, disable_web_page_preview=T
                     # برای سایر خطاها، با تاخیر معمولی دوباره تلاش کنید
                     time.sleep(delay)
         except Exception as e:
-            logger.error(f"استثنا در ارسال پیام: {str(e)}")
+            error_message = f"استثنا در ارسال پیام: {str(e)}"
+            logger.error(error_message)
             time.sleep(delay)
+            
+            # اگر آخرین تلاش است، خطا را ثبت کن
+            if attempt == retries - 1:
+                if RELIABILITY_MONITOR_AVAILABLE:
+                    record_message_attempt(message_type, False, error_message)
     
     logger.error(f"پس از {retries} تلاش، ارسال پیام با شکست مواجه شد")
     return False
@@ -133,13 +210,25 @@ def send_price_report():
         # اضافه کردن اطلاعات ارز به پیام
         message += f"{emoji} <b>{coin['name']} ({coin['symbol']})</b>: {price_str} ({change_str})\n"
     
+    # اگر نشانگر قابلیت اطمینان فعال است، خلاصه آن را اضافه کن
+    if RELIABILITY_MONITOR_AVAILABLE:
+        try:
+            reliability_summary = get_reliability_summary()
+            # فقط در صورتی که داده کافی وجود داشته باشد
+            if "وضعیت سیستم تلگرام" in reliability_summary and len(reliability_summary) > 50:
+                message += f"""
+{reliability_summary}
+"""
+        except Exception as e:
+            logger.warning(f"خطا در دریافت خلاصه قابلیت اطمینان: {str(e)}")
+    
     # اضافه کردن اطلاعات زمان به پیام
     message += f"""
 ⏰ <b>زمان:</b> {current_time} (تورنتو)
 """
     
     # ارسال پیام به تلگرام
-    return send_message(message, parse_mode="HTML")
+    return send_message(message, parse_mode="HTML", message_type="price_report")
 
 
 def send_test_message():
@@ -164,7 +253,15 @@ def send_test_message():
 ⏰ <b>زمان:</b> {current_time} (تورنتو)
 """
     
-    return send_message(message)
+    # ثبت راه‌اندازی مجدد سرویس
+    if RELIABILITY_MONITOR_AVAILABLE:
+        try:
+            record_service_restart()
+            logger.info("راه‌اندازی مجدد سرویس با موفقیت ثبت شد")
+        except Exception as e:
+            logger.warning(f"خطا در ثبت راه‌اندازی مجدد سرویس: {str(e)}")
+    
+    return send_message(message, parse_mode="HTML", message_type="test_message")
 
 
 def send_system_report():
@@ -193,11 +290,29 @@ def send_system_report():
 • <b>بازدید API:</b> {random.randint(150, 500)} درخواست در ساعت اخیر
 • <b>استفاده از حافظه:</b> {random.randint(20, 80)}%
 • <b>استفاده از CPU:</b> {random.randint(10, 60)}%
-
+"""
+    
+    # اگر نشانگر قابلیت اطمینان فعال است، خلاصه کامل آن را اضافه کن
+    if RELIABILITY_MONITOR_AVAILABLE:
+        try:
+            reliability_summary = get_reliability_summary()
+            # در گزارش سیستم، همیشه خلاصه قابلیت اطمینان را نمایش بده
+            message += f"""
+<b>📊 آمار قابلیت اطمینان سیستم:</b>
+{reliability_summary}
+"""
+        except Exception as e:
+            logger.warning(f"خطا در دریافت خلاصه قابلیت اطمینان: {str(e)}")
+            message += """
+<b>📊 آمار قابلیت اطمینان سیستم:</b>
+• خطا در دریافت اطلاعات آماری
+"""
+    
+    message += f"""
 ⏰ <b>زمان گزارش:</b> {current_time} (تورنتو)
 """
     
-    return send_message(message, parse_mode="HTML")
+    return send_message(message, parse_mode="HTML", message_type="system_report")
 
 
 def send_technical_analysis(symbol="BTC/USDT"):
@@ -313,7 +428,10 @@ def send_technical_analysis(symbol="BTC/USDT"):
 ⏰ <b>زمان تحلیل:</b> {current_time} (تورنتو)
 """
     
-    return send_message(message, parse_mode="HTML")
+    # نوع پیام برای ثبت در نشانگر قابلیت اطمینان
+    message_type = f"technical_analysis_{coin_name}"
+    
+    return send_message(message, parse_mode="HTML", message_type=message_type)
 
 
 def send_trading_signals():
@@ -398,7 +516,7 @@ def send_trading_signals():
 ⏰ <b>زمان گزارش:</b> {current_time} (تورنتو)
 """
     
-    return send_message(message, parse_mode="HTML")
+    return send_message(message, parse_mode="HTML", message_type="trading_signals")
 
 
 def send_crypto_news():
@@ -418,15 +536,15 @@ def send_crypto_news():
             logger.error("اخبار دریافت شده خالی یا ناقص است")
             news_text = "⚠️ متأسفانه در دریافت اخبار ارزهای دیجیتال خطایی رخ داده است."
         
-        return send_message(news_text, parse_mode="Markdown")
+        return send_message(news_text, parse_mode="Markdown", message_type="crypto_news")
     except ImportError:
         logger.error("خطا در دسترسی به ماژول اخبار ارزهای دیجیتال")
         error_message = "❌ خطا در دسترسی به ماژول اخبار ارزهای دیجیتال"
-        return send_message(error_message)
+        return send_message(error_message, message_type="crypto_news")
     except Exception as e:
         logger.error(f"خطا در ارسال اخبار ارزهای دیجیتال: {str(e)}")
         error_message = f"❌ خطا در ارسال اخبار ارزهای دیجیتال: {str(e)}"
-        return send_message(error_message)
+        return send_message(error_message, message_type="crypto_news")
 
 
 # تست ارسال پیام
