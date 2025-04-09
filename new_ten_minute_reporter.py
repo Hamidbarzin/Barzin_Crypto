@@ -203,9 +203,9 @@ def send_periodic_report():
         symbol = random.choice(list(prices.keys()))
         technical_data = get_random_technical_data(symbol)
         
-        # ارسال تحلیل تکنیکال
+        # ارسال تحلیل تکنیکال با نمودار
         logger.info(f"ارسال تحلیل تکنیکال برای {symbol}")
-        analysis_result = formatter.send_coin_analysis(symbol, technical_data)
+        analysis_result = formatter.send_coin_analysis(symbol, technical_data, with_chart=True)
         logger.info(f"نتیجه ارسال تحلیل تکنیکال: {analysis_result}")
         
         # ارسال سیگنال‌های معاملاتی
@@ -233,7 +233,7 @@ def send_alive_message():
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         message = f"""
-🤖 <b>وضعیت سیستم</b>
+🤖 <b>Crypto Barzin - وضعیت سیستم</b>
 ━━━━━━━━━━━━━━━━━━
 
 سیستم گزارش‌دهی ۱۰ دقیقه‌ای در حال اجرا است.

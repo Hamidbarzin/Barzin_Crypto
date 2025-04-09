@@ -4,6 +4,7 @@
 
 این ماژول به راحتی قالب‌های مختلف برای گزارش قیمت، تحلیل تکنیکال و سیگنال‌های خرید و فروش 
 را فراهم می‌کند و با ماژول simple_telegram_sender.py کار می‌کند.
+همچنین قابلیت ارسال نمودارهای تحلیل تکنیکال را با استفاده از ماژول chart_generator.py دارد.
 """
 
 import os
@@ -22,6 +23,23 @@ try:
 except ImportError:
     logger.error("خطا در بارگذاری ماژول ارسال پیام تلگرام")
     telegram = None
+
+# وارد کردن ماژول تولید نمودار
+try:
+    from chart_generator import generate_candlestick_chart, generate_technical_chart, generate_all_charts
+    logger.info("ماژول تولید نمودار با موفقیت بارگذاری شد")
+    CHARTS_ENABLED = True
+except ImportError:
+    logger.warning("ماژول تولید نمودار در دسترس نیست. قابلیت ارسال نمودار غیرفعال خواهد بود.")
+    CHARTS_ENABLED = False
+    
+    # تعریف توابع جایگزین
+    def generate_candlestick_chart(*args, **kwargs):
+        return None
+    def generate_technical_chart(*args, **kwargs):
+        return None
+    def generate_all_charts(*args, **kwargs):
+        return {}
 
 def format_price(price):
     """
@@ -85,7 +103,7 @@ def format_market_overview(prices=None):
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     message = f"""
-🌟 <b>گزارش کلی بازار ارزهای دیجیتال</b>
+🌟 <b>Crypto Barzin - گزارش بازار</b>
 ━━━━━━━━━━━━━━━━━━
 
 📊 <b>قیمت‌های لحظه‌ای بازار:</b>
@@ -157,7 +175,7 @@ def format_coin_analysis(symbol="BTC/USDT", data=None):
     coin_name = symbol.split('/')[0]
     
     message = f"""
-📊 <b>تحلیل تکنیکال {coin_name}</b>
+📊 <b>Crypto Barzin - تحلیل {coin_name}</b>
 ━━━━━━━━━━━━━━━━━━
 
 """
@@ -252,7 +270,7 @@ def format_trading_signals(signals=None):
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     message = f"""
-💰 <b>سیگنال‌های معاملاتی</b>
+💰 <b>Crypto Barzin - سیگنال‌های معاملاتی</b>
 ━━━━━━━━━━━━━━━━━━
 
 """
@@ -317,13 +335,14 @@ def send_market_overview(prices=None):
     message = format_market_overview(prices)
     return telegram.send_message(text=message, parse_mode="HTML")
 
-def send_coin_analysis(symbol="BTC/USDT", data=None):
+def send_coin_analysis(symbol="BTC/USDT", data=None, with_chart=True):
     """
     ارسال تحلیل تکنیکال یک ارز دیجیتال
     
     Args:
         symbol (str): نماد ارز
         data (dict): دیکشنری داده‌های تحلیل تکنیکال (اختیاری)
+        with_chart (bool): آیا نمودار تحلیل تکنیکال نیز ارسال شود؟
     
     Returns:
         bool: موفقیت یا شکست ارسال پیام
@@ -332,8 +351,39 @@ def send_coin_analysis(symbol="BTC/USDT", data=None):
         logger.error("ماژول ارسال پیام تلگرام در دسترس نیست")
         return False
     
+    # ارسال متن تحلیل
     message = format_coin_analysis(symbol, data)
-    return telegram.send_message(text=message, parse_mode="HTML")
+    success = telegram.send_message(text=message, parse_mode="HTML")
+    
+    # اگر نمودار درخواست شده و ماژول تولید نمودار فعال است
+    if with_chart and CHARTS_ENABLED:
+        try:
+            logger.info(f"تولید نمودار برای {symbol}...")
+            
+            # تولید نمودار کندل استیک
+            candlestick_chart = generate_candlestick_chart(symbol=symbol)
+            if candlestick_chart:
+                logger.info(f"ارسال نمودار کندل استیک برای {symbol}")
+                telegram.send_photo(
+                    photo_path=candlestick_chart,
+                    caption=f"📊 نمودار کندل استیک {symbol.split('/')[0]} - تاریخ: {datetime.now().strftime('%Y-%m-%d')}"
+                )
+            
+            # تولید نمودار تحلیل تکنیکال
+            technical_chart = generate_technical_chart(symbol=symbol)
+            if technical_chart:
+                logger.info(f"ارسال نمودار تحلیل تکنیکال برای {symbol}")
+                telegram.send_photo(
+                    photo_path=technical_chart,
+                    caption=f"📉 تحلیل تکنیکال {symbol.split('/')[0]} - شامل MACD و RSI - تاریخ: {datetime.now().strftime('%Y-%m-%d')}"
+                )
+                
+            # اگر حداقل یک نمودار ارسال شد
+            return True
+        except Exception as e:
+            logger.error(f"خطا در تولید یا ارسال نمودار: {e}")
+    
+    return success
 
 def send_trading_signals(signals=None):
     """
@@ -366,7 +416,7 @@ def send_test_message():
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     message = f"""
-🚀 <b>پیام تست سیستم گزارش‌دهی تلگرام</b>
+🚀 <b>Crypto Barzin - پیام تست</b>
 ━━━━━━━━━━━━━━━━━━
 
 سیستم گزارش‌دهی تلگرام فعال است و به درستی کار می‌کند.
@@ -381,6 +431,53 @@ def send_test_message():
     """
     
     return telegram.send_message(text=message, parse_mode="HTML")
+
+def send_chart(symbol="BTC/USDT"):
+    """
+    فقط نمودار را برای یک ارز ارسال می‌کند
+    
+    Args:
+        symbol (str): نماد ارز
+        
+    Returns:
+        bool: موفقیت یا شکست ارسال نمودار
+    """
+    if telegram is None:
+        logger.error("ماژول ارسال پیام تلگرام در دسترس نیست")
+        return False
+    
+    if not CHARTS_ENABLED:
+        logger.error("ماژول تولید نمودار در دسترس نیست")
+        return False
+    
+    success = False
+    try:
+        logger.info(f"تولید نمودار برای {symbol}...")
+        
+        # تولید نمودار کندل استیک
+        candlestick_chart = generate_candlestick_chart(symbol=symbol)
+        if candlestick_chart:
+            logger.info(f"ارسال نمودار کندل استیک برای {symbol}")
+            telegram.send_photo(
+                photo_path=candlestick_chart,
+                caption=f"📊 نمودار کندل استیک {symbol.split('/')[0]} - تاریخ: {datetime.now().strftime('%Y-%m-%d')}"
+            )
+            success = True
+        
+        # تولید نمودار تحلیل تکنیکال
+        technical_chart = generate_technical_chart(symbol=symbol)
+        if technical_chart:
+            logger.info(f"ارسال نمودار تحلیل تکنیکال برای {symbol}")
+            telegram.send_photo(
+                photo_path=technical_chart,
+                caption=f"📉 تحلیل تکنیکال {symbol.split('/')[0]} - شامل MACD و RSI - تاریخ: {datetime.now().strftime('%Y-%m-%d')}"
+            )
+            success = True
+        
+        return success
+    except Exception as e:
+        logger.error(f"خطا در تولید یا ارسال نمودار: {e}")
+        return False
 
 # اگر این فایل به صورت مستقیم اجرا شود
 if __name__ == "__main__":
@@ -407,9 +504,14 @@ if __name__ == "__main__":
             # ارسال سیگنال‌های معاملاتی
             send_trading_signals()
             
+        elif command == "chart":
+            # فقط ارسال نمودار
+            symbol = sys.argv[2] if len(sys.argv) > 2 else "BTC/USDT"
+            send_chart(symbol)
+            
         else:
             print(f"دستور ناشناخته: {command}")
-            print("دستورات قابل قبول: test, market, analysis, signals")
+            print("دستورات قابل قبول: test, market, analysis, signals, chart")
     else:
         # بدون پارامتر، فقط یک پیام تست ارسال می‌کنیم
         send_test_message()
