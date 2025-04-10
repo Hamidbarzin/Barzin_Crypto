@@ -19,14 +19,14 @@ _telegram = None
 _telegram_error = None
 
 try:
-    import telegram
-    import asyncio
+    # Using the new PTB v20+ API
+    from telegram import Bot
     from telegram.error import TelegramError
     from telegram.constants import ParseMode
     TELEGRAM_AVAILABLE = True
-    _telegram = telegram
+    _telegram = Bot
     _telegram_error = TelegramError
-    logger.info("کتابخانه python-telegram-bot با موفقیت بارگذاری شد.")
+    logger.info("Python-telegram-bot library loaded successfully.")
 except ImportError:
     logger.warning("کتابخانه python-telegram-bot نصب نشده است. قابلیت‌های تلگرام غیرفعال خواهند بود.")
 
@@ -112,9 +112,9 @@ def send_telegram_message(chat_id, message, parse_mode=None, max_retries=3, retr
 
     # تبدیل ParseMode به نوع مناسب
     if parse_mode == 'HTML':
-        parse_mode_enum = ParseMode.HTML
+        parse_mode_enum = 'HTML'
     elif parse_mode == 'Markdown':
-        parse_mode_enum = ParseMode.MARKDOWN_V2
+        parse_mode_enum = 'MarkdownV2' 
     else:
         parse_mode_enum = parse_mode
     
