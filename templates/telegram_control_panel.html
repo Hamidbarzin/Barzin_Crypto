@@ -8,7 +8,7 @@
         <div class="col-md-12">
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">پنل مدیریت تلگرام Crypto Barzin</h5>
+                    <h5 class="mb-0">پنل مدیریت تلگرام Crypto Barzin <span id="service-status"></span></h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -185,7 +185,7 @@
     }
     
     // تابع عمومی برای ارسال درخواست API
-    async function callApi(endpoint, method = 'GET', data = null) {
+    async function callApi(endpoint, method = 'GET', data = null, showMessages = true) {
         try {
             const options = {
                 method: method,
@@ -201,16 +201,20 @@
             const response = await fetch(endpoint, options);
             const result = await response.json();
             
-            if (result.success) {
-                showResult(result.message, true);
-            } else {
-                showResult(result.message || 'خطایی رخ داده است', false);
+            if (showMessages) {
+                if (result.success) {
+                    showResult(result.message, true);
+                } else {
+                    showResult(result.message || 'خطایی رخ داده است', false);
+                }
             }
             
             return result;
         } catch (error) {
             console.error('خطا در ارسال درخواست:', error);
-            showResult(`خطا در ارسال درخواست: ${error.message}`, false);
+            if (showMessages) {
+                showResult(`خطا در ارسال درخواست: ${error.message}`, false);
+            }
             return null;
         }
     }
@@ -305,17 +309,19 @@
     });
     
     // تابع بروزرسانی وضعیت
-    async function refreshStatus() {
+    async function refreshStatus(showMessages = false) {
         try {
             const response = await fetch('/api/telegram/status');
             const result = await response.json();
             
             if (result) {
-                // نمایش وضعیت سرویس
-                if (result.running) {
-                    showResult(`سرویس زمان‌بندی تلگرام در حال اجراست. گزارش قیمت بعدی: ${result.next_price_report}`, true);
-                } else {
-                    showResult('سرویس زمان‌بندی تلگرام در حال اجرا نیست.', false);
+                // نمایش وضعیت سرویس (اختیاری)
+                if (showMessages) {
+                    if (result.running) {
+                        showResult(`سرویس زمان‌بندی تلگرام در حال اجراست. گزارش قیمت بعدی: ${result.next_price_report}`, true);
+                    } else {
+                        showResult('سرویس زمان‌بندی تلگرام در حال اجرا نیست.', false);
+                    }
                 }
                 
                 // بروزرسانی فرم تنظیمات با مقادیر فعلی
@@ -334,10 +340,27 @@
                         break;
                     }
                 }
+                
+                // آپدیت وضعیت سرویس در صفحه
+                updateServiceStatusDisplay(result.running);
             }
         } catch (error) {
             console.error('خطا در بررسی وضعیت:', error);
-            showResult('خطا در بررسی وضعیت سرویس زمان‌بندی تلگرام.', false);
+            if (showMessages) {
+                showResult('خطا در بررسی وضعیت سرویس زمان‌بندی تلگرام.', false);
+            }
+        }
+    }
+    
+    // تابع بروزرسانی نمایش وضعیت سرویس در صفحه
+    function updateServiceStatusDisplay(isRunning) {
+        const statusElement = document.getElementById('service-status');
+        if (statusElement) {
+            if (isRunning) {
+                statusElement.innerHTML = '<span class="badge bg-success">فعال</span>';
+            } else {
+                statusElement.innerHTML = '<span class="badge bg-danger">غیرفعال</span>';
+            }
         }
     }
     

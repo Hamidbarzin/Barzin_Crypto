@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 318,
-    "successful": 312,
+    "total_sent": 321,
+    "successful": 315,
     "failed": 6,
     "history": [
       {
@@ -1599,12 +1599,27 @@
         "message_type": "price_report",
         "success": true,
         "timestamp": "2025-04-10T01:03:59.195032-04:00"
+      },
+      {
+        "message_type": "technical_analysis_BTC",
+        "success": true,
+        "timestamp": "2025-04-10T01:08:00.413619-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T01:09:29.947867-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T01:09:29.974028-04:00"
       }
     ]
   },
   "uptime": {
     "start_time": "2025-04-09T18:29:20.816437-04:00",
-    "last_restart": "2025-04-10T01:03:58.617735-04:00",
-    "restarts": 129
+    "last_restart": "2025-04-10T01:09:29.460568-04:00",
+    "restarts": 130
   }
 }
