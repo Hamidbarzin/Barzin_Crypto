@@ -16,7 +16,7 @@ from crypto_bot.ai_module import get_price_prediction, get_market_sentiment, get
 from crypto_bot.crypto_news import get_crypto_news, get_market_insights, get_crypto_news_formatted_for_telegram
 from crypto_bot.voice_notification_service import voice_notification_service
 from crypto_bot.language_manager import (
-    get_language_code, get_ui_text, get_language_info, 
+    get_language_code, get_ui_text, get_language_info, get_language_dir,
     get_all_languages, SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 )
 from crypto_bot.telegram_auth import verify_password, change_password, register_user, login_required
@@ -60,7 +60,8 @@ def inject_now():
         'current_language': current_language_info,
         'current_language_code': current_language_code,
         'languages': all_languages,
-        'ui_text': lambda key, default="": get_ui_text(key, default, current_language_code)
+        'ui_text': lambda key, default="": get_ui_text(key, default, current_language_code),
+        'get_language_dir': get_language_dir
     }
 
 # Initialize session defaults

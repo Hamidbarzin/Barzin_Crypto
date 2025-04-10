@@ -1,14 +1,14 @@
 {% extends "minimal_base.html" %}
 
-{% block title %}تنظیمات | برزین کریپتو{% endblock %}
+{% block title %}{{ ui_text('settings', 'تنظیمات') }} | {{ ui_text('title', 'برزین کریپتو') }}{% endblock %}
 
 {% block content %}
 
 <div id="notification-settings-content">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="mb-3">تنظیمات</h1>
-            <p class="text-muted">تنظیمات اعلان‌ها، تلگرام و گزارش‌های دوره‌ای</p>
+            <h1 class="mb-3">{{ ui_text('settings', 'تنظیمات') }}</h1>
+            <p class="text-muted">{{ ui_text('settings_description', 'تنظیمات اعلان‌ها، تلگرام و گزارش‌های دوره‌ای') }}</p>
         </div>
     </div>
 
@@ -19,11 +19,11 @@
                 <!-- Language Settings -->
                 <div class="card mb-4 crypto-card">
                     <div class="card-header">
-                        <h5 class="mb-0">تنظیمات زبان</h5>
+                        <h5 class="mb-0">{{ ui_text('language_settings', 'تنظیمات زبان') }}</h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label">زبان برنامه</label>
+                            <label class="form-label">{{ ui_text('application_language', 'زبان برنامه') }}</label>
                             <div class="d-flex align-items-center">
                                 <a href="/set-language/fa" class="btn btn-outline-primary me-2 {% if session.language == 'fa' or not session.language %}active{% endif %}">
                                     🇮🇷 فارسی
@@ -46,7 +46,7 @@
                 <!-- Notification Channels -->
                 <div class="card mb-4 crypto-card">
                     <div class="card-header">
-                        <h5 class="mb-0">کانال‌های اعلان</h5>
+                        <h5 class="mb-0">{{ ui_text('notification_channels', 'کانال‌های اعلان') }}</h5>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
@@ -102,7 +102,7 @@
                 <!-- Notification Types -->
                 <div class="card mb-4 crypto-card">
                     <div class="card-header">
-                        <h5 class="mb-0">انواع اعلان‌ها</h5>
+                        <h5 class="mb-0">{{ ui_text('notification_types', 'انواع اعلان‌ها') }}</h5>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
@@ -165,7 +165,7 @@
                 <!-- Report Schedule -->
                 <div class="card mb-4 crypto-card">
                     <div class="card-header">
-                        <h5 class="mb-0">زمان‌بندی گزارش‌های دوره‌ای</h5>
+                        <h5 class="mb-0">{{ ui_text('report_schedule', 'زمان‌بندی گزارش‌های دوره‌ای') }}</h5>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
