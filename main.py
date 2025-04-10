@@ -1992,16 +1992,25 @@ def get_email_message():
 @app.route('/minimal_dashboard')
 def minimal_dashboard():
     """صفحه داشبورد با طراحی مینیمال"""
-    inject_now()
+    # inject_now() is called automatically by context_processor, no need to call it manually
+    
     # استفاده از نسخه جدید داشبورد اگر پارامتر new در URL وجود داشته باشد
     if 'new' in request.args:
         return render_template('new_minimal_dashboard.html')
-    return render_template('minimal_dashboard.html')
+    
+    # Let's add some debug context to make sure translations work
+    current_language = session.get('language', DEFAULT_LANGUAGE)
+    try:
+        return render_template('minimal_dashboard.html')
+    except Exception as e:
+        app.logger.error(f"Error rendering minimal_dashboard.html: {e}")
+        # Fallback to ultra simple template
+        return f"<html><body><h1>Dashboard Error</h1><p>{str(e)}</p><p>Current language: {current_language}</p></body></html>"
 
 @app.route('/minimal_settings')
 def minimal_settings():
     """صفحه تنظیمات با طراحی مینیمال"""
-    inject_now()
+    # inject_now() is called automatically by context_processor, no need to call it manually
     
     # Load notification settings
     settings = {
@@ -2031,13 +2040,18 @@ def minimal_settings():
     
     # دریافت تمام زبان‌های پشتیبانی شده
     languages = get_all_languages()
-    current_language = get_language_info(session.get('language'))
+    current_language = get_language_info(session.get('language', DEFAULT_LANGUAGE))
     
-    return render_template('minimal_settings.html', 
-                          settings=settings, 
-                          bot_username=bot_username,
-                          languages=languages,
-                          current_language=current_language)
+    try:
+        return render_template('minimal_settings.html', 
+                              settings=settings, 
+                              bot_username=bot_username,
+                              languages=languages,
+                              current_language=current_language)
+    except Exception as e:
+        app.logger.error(f"Error rendering minimal_settings.html: {e}")
+        # Fallback to ultra simple template
+        return f"<html><body><h1>Settings Error</h1><p>{str(e)}</p></body></html>"
 
 @app.route('/send_price_report')
 def send_telegram_price_report():
@@ -2604,20 +2618,26 @@ def voice_notification_page():
 @app.route('/set-language/<language_code>')
 def set_language(language_code):
     """تنظیم زبان سایت"""
-    if language_code in SUPPORTED_LANGUAGES:
-        session['language'] = language_code
-        language_info = get_language_info(language_code)
-        language_name = language_info['name']
-        success_message = get_ui_text('language_changed', 'Language changed successfully.', language_code)
-        success_message = success_message.format(language_name=language_name)
-        flash(success_message, 'success')
-    else:
-        current_language = session.get('language', DEFAULT_LANGUAGE)
-        error_message = get_ui_text('language_change_error', 'Invalid language code.', current_language)
-        flash(error_message, 'error')
+    current_language = session.get('language', DEFAULT_LANGUAGE)
+    
+    try:
+        if language_code in SUPPORTED_LANGUAGES:
+            session['language'] = language_code
+            language_info = get_language_info(language_code)
+            language_name = language_info['native_name']
+            success_message = get_ui_text('language_changed', f'زبان با موفقیت به {language_name} تغییر کرد.', language_code)
+            flash(success_message, 'success')
+        else:
+            error_message = get_ui_text('language_change_error', 'کد زبان نامعتبر است.', current_language)
+            flash(error_message, 'error')
+        
+        logger.info(f"Language set to {language_code}, previous was {current_language}")
+    except Exception as e:
+        logger.error(f"Error setting language to {language_code}: {e}")
+        flash(f"خطا در تغییر زبان: {str(e)}", 'error')
     
     # برگشت به صفحه قبلی یا صفحه اصلی
-    return redirect(request.referrer or url_for('index'))
+    return redirect(request.referrer or url_for('minimal_dashboard'))
 
 
 @app.route('/api/voice-notification/preview', methods=['POST'])
