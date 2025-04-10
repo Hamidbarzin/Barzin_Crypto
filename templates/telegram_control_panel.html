@@ -132,6 +132,11 @@
                                                 <i class="fas fa-save me-2"></i>ذخیره تنظیمات
                                             </button>
                                         </div>
+                                        <div class="mt-3">
+                                            <div id="settings-result" class="alert alert-success d-none">
+                                                تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.
+                                            </div>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -279,6 +284,15 @@
     document.getElementById('btn-save-settings').addEventListener('click', async function() {
         this.disabled = true;
         
+        // نمایش پیام موفقیت بلافاصله بعد از کلیک
+        const settingsResult = document.getElementById('settings-result');
+        settingsResult.classList.remove('d-none');
+        
+        // پنهان کردن پیام بعد از 3 ثانیه
+        setTimeout(() => {
+            settingsResult.classList.add('d-none');
+        }, 3000);
+        
         // دریافت مقادیر فرم
         const messageSendingEnabled = document.getElementById('message-sending-enabled').checked;
         const autoStartOnBoot = document.getElementById('auto-start-on-boot').checked;
@@ -308,10 +322,8 @@
             const response = await fetch('/api/telegram/settings', options);
             const result = await response.json();
             
-            // نمایش پیام موفقیت به صورت دستی
-            if (result && result.success) {
-                showResult('تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.', true);
-            } else {
+            // در صورت وجود خطا نمایش داده شود
+            if (result && !result.success) {
                 showResult(result.message || 'خطا در ذخیره تنظیمات', false);
             }
         } catch (error) {
