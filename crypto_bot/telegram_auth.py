@@ -8,6 +8,7 @@
 import os
 import json
 import hashlib
+from datetime import datetime
 from functools import wraps
 from flask import session, redirect, url_for, flash, request
 
@@ -101,6 +102,47 @@ def change_password(username, new_password):
         print(f"خطا در تغییر رمز عبور: {str(e)}")
     
     return False
+
+def register_user(username, password):
+    """
+    ثبت‌نام کاربر جدید
+    
+    Args:
+        username (str): نام کاربری
+        password (str): رمز عبور
+        
+    Returns:
+        tuple: (bool, str) - وضعیت موفقیت و پیام خطا در صورت وجود
+    """
+    init_auth()  # اطمینان از وجود فایل احراز هویت
+    
+    try:
+        with open(AUTH_FILE, 'r', encoding='utf-8') as f:
+            users = json.load(f)
+        
+        # بررسی تکراری نبودن نام کاربری
+        if username in users:
+            return False, "این نام کاربری قبلاً ثبت شده است."
+        
+        # بررسی طول رمز عبور
+        if len(password) < 6:
+            return False, "رمز عبور باید حداقل ۶ کاراکتر باشد."
+        
+        # اضافه کردن کاربر جدید
+        users[username] = {
+            'password_hash': hash_password(password),
+            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        # ذخیره تغییرات
+        with open(AUTH_FILE, 'w', encoding='utf-8') as f:
+            json.dump(users, f, indent=4)
+        
+        return True, "کاربر جدید با موفقیت ثبت‌نام شد."
+    except Exception as e:
+        error_message = f"خطا در ثبت‌نام کاربر: {str(e)}"
+        print(error_message)
+        return False, error_message
 
 def login_required(view_func):
     """
