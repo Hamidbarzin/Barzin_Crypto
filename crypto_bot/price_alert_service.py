@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-سرویس هشدار قیمت ارزهای دیجیتال
+Cryptocurrency Price Alert Service
 
-این ماژول وظیفه نظارت بر قیمت‌های ارزهای دیجیتال و ارسال 
-هشدار در صورت رسیدن به محدوده‌های خاص را بر عهده دارد.
+This module is responsible for monitoring cryptocurrency prices 
+and sending alerts when prices reach specific thresholds.
 """
 
 import logging
@@ -14,85 +14,85 @@ from typing import Dict, List, Optional, Tuple, Any
 from crypto_bot import market_data
 import replit_telegram_sender
 
-# تنظیم لاگر
+# Setup logger
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger("price_alert")
 
-# منطقه زمانی تورنتو
+# Toronto timezone
 toronto_tz = pytz.timezone('America/Toronto')
 
-# لیست محدوده‌های قیمتی برای هشدار
-# ساختار: {symbol: [(price, type, triggered)]}
-# type می‌تواند "above" یا "below" باشد
+# List of price ranges for alerts
+# Structure: {symbol: [(price, type, triggered)]}
+# type can be "above" or "below"
 price_alerts: Dict[str, List[Tuple[float, str, bool]]] = {}
 
 
 def set_price_alert(symbol: str, price: float, alert_type: str = "above") -> bool:
     """
-    تنظیم هشدار قیمت برای یک ارز خاص
+    Set price alert for a specific cryptocurrency
     
     Args:
-        symbol (str): نماد ارز (مثلاً BTC/USDT)
-        price (float): قیمت هدف
-        alert_type (str): نوع هشدار ("above" برای بالاتر از قیمت، "below" برای پایین‌تر از قیمت)
+        symbol (str): Currency symbol (e.g. BTC/USDT)
+        price (float): Target price
+        alert_type (str): Alert type ("above" for price above target, "below" for price below target)
         
     Returns:
-        bool: وضعیت تنظیم هشدار
+        bool: Alert setting status
     """
     if symbol not in price_alerts:
         price_alerts[symbol] = []
     
-    # اگر هشدار مشابهی قبلاً تنظیم شده، آن را به‌روزرسانی می‌کنیم
+    # If a similar alert already exists, update it
     for i, (old_price, old_type, _) in enumerate(price_alerts[symbol]):
         if abs(old_price - price) < 0.001 and old_type == alert_type:
             price_alerts[symbol][i] = (price, alert_type, False)
-            logger.info(f"هشدار قیمت برای {symbol} بروزرسانی شد: {alert_type} {price}")
+            logger.info(f"Price alert for {symbol} updated: {alert_type} {price}")
             return True
     
-    # هشدار جدید اضافه می‌کنیم
+    # Add a new alert
     price_alerts[symbol].append((price, alert_type, False))
-    logger.info(f"هشدار قیمت برای {symbol} تنظیم شد: {alert_type} {price}")
+    logger.info(f"Price alert for {symbol} set: {alert_type} {price}")
     return True
 
 
 def remove_price_alert(symbol: str, price: float, alert_type: str = "above") -> bool:
     """
-    حذف هشدار قیمت برای یک ارز خاص
+    Remove price alert for a specific cryptocurrency
     
     Args:
-        symbol (str): نماد ارز (مثلاً BTC/USDT)
-        price (float): قیمت هدف
-        alert_type (str): نوع هشدار ("above" برای بالاتر از قیمت، "below" برای پایین‌تر از قیمت)
+        symbol (str): Currency symbol (e.g. BTC/USDT)
+        price (float): Target price
+        alert_type (str): Alert type ("above" for price above target, "below" for price below target)
         
     Returns:
-        bool: وضعیت حذف هشدار
+        bool: Alert removal status
     """
     if symbol not in price_alerts:
-        logger.warning(f"هیچ هشداری برای {symbol} وجود ندارد")
+        logger.warning(f"No alerts exist for {symbol}")
         return False
     
     for i, (old_price, old_type, _) in enumerate(price_alerts[symbol]):
         if abs(old_price - price) < 0.001 and old_type == alert_type:
             price_alerts[symbol].pop(i)
-            logger.info(f"هشدار قیمت برای {symbol} حذف شد: {alert_type} {price}")
+            logger.info(f"Price alert for {symbol} removed: {alert_type} {price}")
             return True
     
-    logger.warning(f"هشدار قیمت مورد نظر برای {symbol} یافت نشد: {alert_type} {price}")
+    logger.warning(f"Price alert for {symbol} not found: {alert_type} {price}")
     return False
 
 
 def get_price_alerts(symbol: Optional[str] = None) -> Dict[str, List[Tuple[float, str, bool]]]:
     """
-    دریافت لیست هشدارهای قیمت
+    Get the list of price alerts
     
     Args:
-        symbol (Optional[str]): نماد ارز برای فیلتر (اگر None باشد همه هشدارها برگردانده می‌شوند)
+        symbol (Optional[str]): Currency symbol filter (if None, all alerts are returned)
         
     Returns:
-        Dict[str, List[Tuple[float, str, bool]]]: دیکشنری هشدارهای قیمت
+        Dict[str, List[Tuple[float, str, bool]]]: Dictionary of price alerts
     """
     if symbol:
         return {symbol: price_alerts.get(symbol, [])}
@@ -101,13 +101,13 @@ def get_price_alerts(symbol: Optional[str] = None) -> Dict[str, List[Tuple[float
 
 def _format_price_for_message(price: float) -> str:
     """
-    فرمت کردن قیمت برای نمایش در پیام
+    Format price for display in message
     
     Args:
-        price (float): قیمت
+        price (float): Price value
         
     Returns:
-        str: قیمت فرمت شده
+        str: Formatted price string
     """
     if price >= 1000:
         return f"{price:,.0f}"
