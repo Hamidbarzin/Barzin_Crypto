@@ -2188,44 +2188,45 @@ def send_test_message_replit():
             'message': 'خطا در ارسال پیام تست به تلگرام'
         })
 
-@app.route('/telegram_register')
-def telegram_register():
-    """صفحه ثبت‌نام کاربر جدید کنترل پنل تلگرام"""
-    inject_now()
-    return render_template('telegram_register.html')
-
-@app.route('/telegram_register_process', methods=['POST'])
-def telegram_register_process():
-    """پردازش فرم ثبت‌نام کاربر جدید کنترل پنل تلگرام"""
-    username = request.form.get('username')
-    password = request.form.get('password')
-    confirm_password = request.form.get('confirm_password')
-    
-    # بررسی تکمیل تمام فیلدها
-    if not username or not password or not confirm_password:
-        flash('تمام فیلدها باید تکمیل شوند.', 'danger')
-        return redirect(url_for('telegram_register'))
-    
-    # بررسی طول نام کاربری
-    if len(username) < 3:
-        flash('نام کاربری باید حداقل ۳ کاراکتر باشد.', 'danger')
-        return redirect(url_for('telegram_register'))
-    
-    # بررسی تطابق رمزهای عبور
-    if password != confirm_password:
-        flash('رمز عبور و تکرار آن مطابقت ندارند.', 'danger')
-        return redirect(url_for('telegram_register'))
-    
-    # ثبت‌نام کاربر جدید
-    success, message = register_user(username, password)
-    
-    if success:
-        flash(message, 'success')
-        # هدایت به صفحه ورود
-        return redirect(url_for('telegram_login'))
-    else:
-        flash(message, 'danger')
-        return redirect(url_for('telegram_register'))
+# صفحات ثبت‌نام غیرفعال شدند
+# @app.route('/telegram_register')
+# def telegram_register():
+#     """صفحه ثبت‌نام کاربر جدید کنترل پنل تلگرام"""
+#     inject_now()
+#     return render_template('telegram_register.html')
+#
+# @app.route('/telegram_register_process', methods=['POST'])
+# def telegram_register_process():
+#     """پردازش فرم ثبت‌نام کاربر جدید کنترل پنل تلگرام"""
+#     username = request.form.get('username')
+#     password = request.form.get('password')
+#     confirm_password = request.form.get('confirm_password')
+#     
+#     # بررسی تکمیل تمام فیلدها
+#     if not username or not password or not confirm_password:
+#         flash('تمام فیلدها باید تکمیل شوند.', 'danger')
+#         return redirect(url_for('telegram_register'))
+#     
+#     # بررسی طول نام کاربری
+#     if len(username) < 3:
+#         flash('نام کاربری باید حداقل ۳ کاراکتر باشد.', 'danger')
+#         return redirect(url_for('telegram_register'))
+#     
+#     # بررسی تطابق رمزهای عبور
+#     if password != confirm_password:
+#         flash('رمز عبور و تکرار آن مطابقت ندارند.', 'danger')
+#         return redirect(url_for('telegram_register'))
+#     
+#     # ثبت‌نام کاربر جدید
+#     success, message = register_user(username, password)
+#     
+#     if success:
+#         flash(message, 'success')
+#         # هدایت به صفحه ورود
+#         return redirect(url_for('telegram_login'))
+#     else:
+#         flash(message, 'danger')
+#         return redirect(url_for('telegram_register'))
 
 @app.route('/telegram_login')
 def telegram_login():

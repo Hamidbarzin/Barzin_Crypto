@@ -1,5 +1,9 @@
 {
     "admin": {
         "password_hash": "dec81b5a17f9058fdfd5fd80f2357e51e88588b98ea4cc5e1cd9994f548a396a"
+    },
+    "barzin": {
+        "password_hash": "6e2e02a24eaae54df9c64e57a9c4e9f8941d36a1e3c88b0a19946d4a0fa59d9e",
+        "created_at": "2025-04-10 02:44:00"
     }
 }
