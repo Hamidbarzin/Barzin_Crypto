@@ -147,9 +147,10 @@ class TelegramSchedulerService:
             
             # Counter for sending messages every 1 hour
             counter = 0
-            # Smaller interval for status checks
-            small_interval = 300  # 5 minutes
-            ticks_for_report = self.interval // small_interval  # Number of ticks needed to reach report time
+            # Smaller interval for status checks - default was 5 minutes (300 seconds)
+            # Increased to 60 minutes (3600 seconds) to match the reporting interval
+            small_interval = 3600  # 60 minutes
+            ticks_for_report = 1  # Send report once per interval
             
             while self.running:
                 # Sleep with smaller interval for better control
@@ -184,11 +185,13 @@ class TelegramSchedulerService:
                         logger.info(f"Outside active hours ({self.active_hours_start} AM to {self.active_hours_end} PM), report not sent")
                     counter = 0
                 
-                # Check price alerts on every tick
-                try:
-                    self._check_price_alerts()
-                except Exception as e:
-                    logger.error(f"Error checking price alerts: {str(e)}")
+                # Only check price alerts once per hour (to avoid checking too frequently)
+                # This helps prevent spam notifications
+                if counter == 1:
+                    try:
+                        self._check_price_alerts()
+                    except Exception as e:
+                        logger.error(f"Error checking price alerts: {str(e)}")
                 
                 # Increment counters
                 self.system_report_counter += 1
