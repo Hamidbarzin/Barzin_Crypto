@@ -132,88 +132,88 @@ class TelegramSchedulerService:
     
     def _scheduler_loop(self):
         """
-        حلقه اصلی زمان‌بندی
+        Main scheduling loop
         
-        این متد در یک ترد جداگانه اجرا می‌شود و مسئول ارسال
-        پیام‌های زمان‌بندی شده است.
+        This method runs in a separate thread and is responsible for sending
+        scheduled messages.
         
-        برای محیط replit، از بازه‌های زمانی کوچکتر استفاده می‌کنیم تا
-        در صورت قطع شدن ترد، زودتر به مشکل پی ببریم
+        For the replit environment, we use smaller time intervals so that
+        if the thread is interrupted, we detect the problem sooner
         """
         try:
-            # ارسال گزارش قیمت اولیه
-            logger.info("ارسال گزارش قیمت اولیه...")
+            # Send initial price report
+            logger.info("Sending initial price report...")
             self._send_price_report()
             
-            # شمارنده برای ارسال پیام هر 1 ساعت
+            # Counter for sending messages every 1 hour
             counter = 0
-            # بازه زمانی کوچکتر برای بررسی وضعیت
-            small_interval = 300  # 5 دقیقه
-            ticks_for_report = self.interval // small_interval  # تعداد تیک لازم برای رسیدن به زمان گزارش
+            # Smaller interval for status checks
+            small_interval = 300  # 5 minutes
+            ticks_for_report = self.interval // small_interval  # Number of ticks needed to reach report time
             
             while self.running:
-                # خواب با بازه کوچکتر برای کنترل بهتر
+                # Sleep with smaller interval for better control
                 time.sleep(small_interval)
                 
                 if not self.running:
                     break
                 
-                # بررسی زمان فعلی در تورنتو
+                # Check current time in Toronto
                 now_toronto = datetime.datetime.now(toronto_tz)
                 current_hour = now_toronto.hour
                 
-                # فقط بین ساعت‌های تعیین شده ارسال کن
+                # Only send between specified hours
                 is_active_hours = self.active_hours_start <= current_hour < self.active_hours_end
                 
-                # اگر ارسال پیام غیرفعال شده، فعال نیست
+                # If message sending is disabled, not active
                 is_active_hours = is_active_hours and self.message_sending_enabled
                 
                 counter += 1
-                logger.info(f"تیک شماره {counter} از {ticks_for_report} برای ارسال گزارش بعدی")
+                logger.info(f"Tick {counter} of {ticks_for_report} for next report")
                 
-                # هر 1 ساعت گزارش قیمت ارسال کن (اگر در ساعات فعال هستیم)
+                # Send price report every 1 hour (if in active hours)
                 if counter >= ticks_for_report and is_active_hours:
-                    logger.info("زمان ارسال گزارش قیمت فرا رسیده...")
+                    logger.info("Time to send price report...")
                     self._send_price_report()
                     counter = 0
-                # اگر به تعداد تیک لازم رسیدیم ولی در ساعات غیرفعال هستیم، فقط شمارنده را ریست کن
+                # If we reached the required number of ticks but are in inactive hours, just reset the counter
                 elif counter >= ticks_for_report and not is_active_hours:
                     if not self.message_sending_enabled:
-                        logger.info("ارسال پیام غیرفعال شده، گزارش ارسال نمی‌شود")
+                        logger.info("Message sending disabled, report not sent")
                     else:
-                        logger.info(f"خارج از ساعات فعال ({self.active_hours_start} صبح تا {self.active_hours_end} شب) هستیم، گزارش ارسال نمی‌شود")
+                        logger.info(f"Outside active hours ({self.active_hours_start} AM to {self.active_hours_end} PM), report not sent")
                     counter = 0
                 
-                # بررسی هشدارهای قیمت در هر تیک
+                # Check price alerts on every tick
                 try:
                     self._check_price_alerts()
                 except Exception as e:
-                    logger.error(f"خطا در بررسی هشدارهای قیمت: {str(e)}")
+                    logger.error(f"Error checking price alerts: {str(e)}")
                 
-                # افزایش شمارنده‌ها
+                # Increment counters
                 self.system_report_counter += 1
                 self.technical_analysis_counter += 1
                 self.trading_signals_counter += 1
                 self.crypto_news_counter += 1
                 
-                # فقط اگر ارسال پیام فعال باشد، گزارش‌ها ارسال شوند
+                # Only if message sending is active, send reports
                 if self.message_sending_enabled and is_active_hours:
-                    # ارسال گزارش سیستم هر ۶ ساعت
+                    # Send system report every 6 hours
                     if self.system_report_counter >= self.system_report_interval:
                         self._send_system_report()
                         self.system_report_counter = 0
                     
-                    # ارسال تحلیل تکنیکال هر ۲ ساعت
+                    # Send technical analysis every 2 hours
                     if self.technical_analysis_counter >= self.technical_analysis_interval:
                         self._send_technical_analysis()
                         self.technical_analysis_counter = 0
                     
-                    # ارسال سیگنال‌های معاملاتی هر ۴ ساعت
+                    # Send trading signals every 4 hours
                     if self.trading_signals_counter >= self.trading_signals_interval:
                         self._send_trading_signals()
                         self.trading_signals_counter = 0
                         
-                    # ارسال اخبار ارزهای دیجیتال هر ۸ ساعت
+                    # Send crypto news every 8 hours
                     if self.crypto_news_counter >= self.crypto_news_interval:
                         self._send_crypto_news()
                         self.crypto_news_counter = 0
@@ -221,99 +221,99 @@ class TelegramSchedulerService:
                       self.technical_analysis_counter >= self.technical_analysis_interval or
                       self.trading_signals_counter >= self.trading_signals_interval or
                       self.crypto_news_counter >= self.crypto_news_interval):
-                    # ریست کردن شمارنده‌ها وقتی به مقدار حداکثر رسیده‌اند
+                    # Reset counters when they reach maximum values
                     if self.system_report_counter >= self.system_report_interval:
-                        logger.info("ارسال پیام غیرفعال است، گزارش سیستم ارسال نمی‌شود")
+                        logger.info("Message sending disabled, system report not sent")
                         self.system_report_counter = 0
                     
                     if self.technical_analysis_counter >= self.technical_analysis_interval:
-                        logger.info("ارسال پیام غیرفعال است، تحلیل تکنیکال ارسال نمی‌شود")
+                        logger.info("Message sending disabled, technical analysis not sent")
                         self.technical_analysis_counter = 0
                     
                     if self.trading_signals_counter >= self.trading_signals_interval:
-                        logger.info("ارسال پیام غیرفعال است، سیگنال‌های معاملاتی ارسال نمی‌شوند")
+                        logger.info("Message sending disabled, trading signals not sent")
                         self.trading_signals_counter = 0
                     
                     if self.crypto_news_counter >= self.crypto_news_interval:
-                        logger.info("ارسال پیام غیرفعال است، اخبار ارزهای دیجیتال ارسال نمی‌شوند")
+                        logger.info("Message sending disabled, crypto news not sent")
                         self.crypto_news_counter = 0
         
         except Exception as e:
-            logger.error(f"خطا در حلقه زمان‌بندی: {str(e)}")
+            logger.error(f"Error in scheduling loop: {str(e)}")
             self.running = False
     
     def _send_price_report(self):
         """
-        ارسال گزارش قیمت
+        Send price report
         
         Returns:
-            bool: موفقیت یا شکست ارسال پیام
+            bool: Success or failure of message sending
         """
         now_toronto = datetime.datetime.now(toronto_tz)
-        logger.info(f"ارسال گزارش قیمت ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        logger.info(f"Sending price report ({now_toronto.strftime('%H:%M:%S')} Toronto)...")
         
         try:
             success = replit_telegram_sender.send_price_report()
             if success:
-                logger.info("گزارش قیمت با موفقیت ارسال شد")
+                logger.info("Price report sent successfully")
             else:
-                logger.error("خطا در ارسال گزارش قیمت")
+                logger.error("Error sending price report")
             return success
         except Exception as e:
-            logger.error(f"استثنا در ارسال گزارش قیمت: {str(e)}")
+            logger.error(f"Exception in sending price report: {str(e)}")
             return False
     
     def _send_system_report(self):
         """
-        ارسال گزارش سیستم
+        Send system report
         
         Returns:
-            bool: موفقیت یا شکست ارسال پیام
+            bool: Success or failure of message sending
         """
         now_toronto = datetime.datetime.now(toronto_tz)
-        logger.info(f"ارسال گزارش سیستم ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        logger.info(f"Sending system report ({now_toronto.strftime('%H:%M:%S')} Toronto)...")
         
         try:
             success = replit_telegram_sender.send_system_report()
             if success:
-                logger.info("گزارش سیستم با موفقیت ارسال شد")
+                logger.info("System report sent successfully")
             else:
-                logger.error("خطا در ارسال گزارش سیستم")
+                logger.error("Error sending system report")
             return success
         except Exception as e:
-            logger.error(f"استثنا در ارسال گزارش سیستم: {str(e)}")
+            logger.error(f"Exception in sending system report: {str(e)}")
             return False
     
     def _send_test_message(self):
         """
-        ارسال پیام تست
+        Send test message
         
         Returns:
-            bool: موفقیت یا شکست ارسال پیام
+            bool: Success or failure of message sending
         """
         now_toronto = datetime.datetime.now(toronto_tz)
-        logger.info(f"ارسال پیام تست ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        logger.info(f"Sending test message ({now_toronto.strftime('%H:%M:%S')} Toronto)...")
         
         try:
             success = replit_telegram_sender.send_test_message()
             if success:
-                logger.info("پیام تست با موفقیت ارسال شد")
+                logger.info("Test message sent successfully")
             else:
-                logger.error("خطا در ارسال پیام تست")
+                logger.error("Error sending test message")
             return success
         except Exception as e:
-            logger.error(f"استثنا در ارسال پیام تست: {str(e)}")
+            logger.error(f"Exception in sending test message: {str(e)}")
             return False
     
     def _get_next_report_time(self):
         """
-        محاسبه زمان گزارش بعدی
+        Calculate next report time
         
         Returns:
-            str: زمان گزارش بعدی
+            str: Next report time
         """
         if not self.running:
-            return "سرویس در حال اجرا نیست"
+            return "Service is not running"
         
         now = datetime.datetime.now(toronto_tz)
         next_time = now + datetime.timedelta(seconds=self.interval)
@@ -321,13 +321,13 @@ class TelegramSchedulerService:
     
     def _get_next_system_report_time(self):
         """
-        محاسبه زمان گزارش سیستم بعدی
+        Calculate next system report time
         
         Returns:
-            str: زمان گزارش سیستم بعدی
+            str: Next system report time
         """
         if not self.running:
-            return "سرویس در حال اجرا نیست"
+            return "Service is not running"
         
         now = datetime.datetime.now(toronto_tz)
         reports_left = self.system_report_interval - self.system_report_counter
@@ -337,13 +337,13 @@ class TelegramSchedulerService:
     
     def _get_next_technical_analysis_time(self):
         """
-        محاسبه زمان تحلیل تکنیکال بعدی
+        Calculate next technical analysis time
         
         Returns:
-            str: زمان تحلیل تکنیکال بعدی
+            str: Next technical analysis time
         """
         if not self.running:
-            return "سرویس در حال اجرا نیست"
+            return "Service is not running"
         
         now = datetime.datetime.now(toronto_tz)
         reports_left = self.technical_analysis_interval - self.technical_analysis_counter
@@ -353,13 +353,13 @@ class TelegramSchedulerService:
     
     def _get_next_trading_signals_time(self):
         """
-        محاسبه زمان سیگنال‌های معاملاتی بعدی
+        Calculate next trading signals time
         
         Returns:
-            str: زمان سیگنال‌های معاملاتی بعدی
+            str: Next trading signals time
         """
         if not self.running:
-            return "سرویس در حال اجرا نیست"
+            return "Service is not running"
         
         now = datetime.datetime.now(toronto_tz)
         reports_left = self.trading_signals_interval - self.trading_signals_counter
@@ -369,103 +369,103 @@ class TelegramSchedulerService:
         
     def _send_technical_analysis(self):
         """
-        ارسال تحلیل تکنیکال یک ارز
+        Send technical analysis for a currency
         
         Returns:
-            bool: موفقیت یا شکست ارسال تحلیل
+            bool: Success or failure of sending analysis
         """
-        # انتخاب ارز مورد نظر برای تحلیل
+        # Select the currency to analyze
         symbol = self.important_coins[self.current_coin_index]
         
-        # بروزرسانی شاخص برای دفعه بعد
+        # Update index for next time
         self.current_coin_index = (self.current_coin_index + 1) % len(self.important_coins)
         
         now_toronto = datetime.datetime.now(toronto_tz)
-        logger.info(f"ارسال تحلیل تکنیکال برای {symbol} ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        logger.info(f"Sending technical analysis for {symbol} ({now_toronto.strftime('%H:%M:%S')} Toronto)...")
         
         try:
             success = replit_telegram_sender.send_technical_analysis(symbol)
             if success:
-                logger.info(f"تحلیل تکنیکال {symbol} با موفقیت ارسال شد")
+                logger.info(f"Technical analysis for {symbol} sent successfully")
             else:
-                logger.error(f"خطا در ارسال تحلیل تکنیکال {symbol}")
+                logger.error(f"Error sending technical analysis for {symbol}")
             return success
         except Exception as e:
-            logger.error(f"استثنا در ارسال تحلیل تکنیکال {symbol}: {str(e)}")
+            logger.error(f"Exception in sending technical analysis for {symbol}: {str(e)}")
             return False
     
     def _send_trading_signals(self):
         """
-        ارسال سیگنال‌های معاملاتی
+        Send trading signals
         
         Returns:
-            bool: موفقیت یا شکست ارسال سیگنال‌ها
+            bool: Success or failure of sending signals
         """
         now_toronto = datetime.datetime.now(toronto_tz)
-        logger.info(f"ارسال سیگنال‌های معاملاتی ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        logger.info(f"Sending trading signals ({now_toronto.strftime('%H:%M:%S')} Toronto)...")
         
         try:
             success = replit_telegram_sender.send_trading_signals()
             if success:
-                logger.info("سیگنال‌های معاملاتی با موفقیت ارسال شد")
+                logger.info("Trading signals sent successfully")
             else:
-                logger.error("خطا در ارسال سیگنال‌های معاملاتی")
+                logger.error("Error sending trading signals")
             return success
         except Exception as e:
-            logger.error(f"استثنا در ارسال سیگنال‌های معاملاتی: {str(e)}")
+            logger.error(f"Exception in sending trading signals: {str(e)}")
             return False
             
     def _check_price_alerts(self):
         """
-        بررسی هشدارهای قیمت
+        Check price alerts
         
         Returns:
-            list: لیست هشدارهای فعال شده
+            list: List of triggered alerts
         """
         now_toronto = datetime.datetime.now(toronto_tz)
-        logger.info(f"بررسی هشدارهای قیمت ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        logger.info(f"Checking price alerts ({now_toronto.strftime('%H:%M:%S')} Toronto)...")
         
         try:
             triggered_alerts = check_price_alerts()
             if triggered_alerts:
-                logger.info(f"{len(triggered_alerts)} هشدار قیمت فعال شد")
+                logger.info(f"{len(triggered_alerts)} price alerts triggered")
             return triggered_alerts
         except Exception as e:
-            logger.error(f"استثنا در بررسی هشدارهای قیمت: {str(e)}")
+            logger.error(f"Exception in checking price alerts: {str(e)}")
             return []
             
     def _send_crypto_news(self):
         """
-        ارسال اخبار ارزهای دیجیتال
+        Send cryptocurrency news
         
         Returns:
-            bool: موفقیت یا شکست ارسال اخبار
+            bool: Success or failure of sending news
         """
         now_toronto = datetime.datetime.now(toronto_tz)
-        logger.info(f"ارسال اخبار ارزهای دیجیتال ({now_toronto.strftime('%H:%M:%S')} تورنتو)...")
+        logger.info(f"Sending cryptocurrency news ({now_toronto.strftime('%H:%M:%S')} Toronto)...")
         
         try:
-            # استفاده از api_telegram_send_news در main.py
-            # این متد از ماژول get_crypto_news_formatted_for_telegram استفاده می‌کند
+            # Using api_telegram_send_news in main.py
+            # This method uses get_crypto_news_formatted_for_telegram module
             success = replit_telegram_sender.send_crypto_news()
             if success:
-                logger.info("اخبار ارزهای دیجیتال با موفقیت ارسال شد")
+                logger.info("Cryptocurrency news sent successfully")
             else:
-                logger.error("خطا در ارسال اخبار ارزهای دیجیتال")
+                logger.error("Error sending cryptocurrency news")
             return success
         except Exception as e:
-            logger.error(f"استثنا در ارسال اخبار ارزهای دیجیتال: {str(e)}")
+            logger.error(f"Exception in sending cryptocurrency news: {str(e)}")
             return False
             
     def _get_next_crypto_news_time(self):
         """
-        محاسبه زمان اخبار ارزهای دیجیتال بعدی
+        Calculate next cryptocurrency news time
         
         Returns:
-            str: زمان اخبار ارزهای دیجیتال بعدی
+            str: Next cryptocurrency news time
         """
         if not self.running:
-            return "سرویس در حال اجرا نیست"
+            return "Service is not running"
         
         now = datetime.datetime.now(toronto_tz)
         reports_left = self.crypto_news_interval - self.crypto_news_counter
@@ -473,49 +473,49 @@ class TelegramSchedulerService:
         next_time = now + datetime.timedelta(seconds=seconds_left)
         return next_time.strftime("%Y-%m-%d %H:%M:%S")
 
-# نمونه سرویس که در main.py استفاده خواهد شد
+# Service instance to be used in main.py
 telegram_scheduler = TelegramSchedulerService()
 
 
 def start_scheduler():
     """
-    شروع زمان‌بندی تلگرام
+    Start Telegram scheduling
     
     Returns:
-        bool: وضعیت راه‌اندازی
+        bool: Startup status
     """
     return telegram_scheduler.start()
 
 
 def stop_scheduler():
     """
-    توقف زمان‌بندی تلگرام
+    Stop Telegram scheduling
     
     Returns:
-        bool: وضعیت توقف
+        bool: Stop status
     """
     return telegram_scheduler.stop()
 
 
 def get_scheduler_status():
     """
-    دریافت وضعیت زمان‌بندی
+    Get scheduling status
     
     Returns:
-        dict: وضعیت فعلی زمان‌بندی
+        dict: Current scheduling status
     """
     return telegram_scheduler.status()
 
 
 def update_scheduler_settings(settings):
     """
-    بروزرسانی تنظیمات زمان‌بندی
+    Update scheduler settings
     
     Args:
-        settings (dict): تنظیمات جدید
+        settings (dict): New settings
         
     Returns:
-        dict: وضعیت بروزرسانی شده
+        dict: Updated status
     """
     if 'message_sending_enabled' in settings:
         telegram_scheduler.message_sending_enabled = bool(settings['message_sending_enabled'])
@@ -525,7 +525,7 @@ def update_scheduler_settings(settings):
         
     if 'active_hours_start' in settings:
         try:
-            # اطمینان از اینکه مقدار بین 0 تا 23 است
+            # Ensure value is between 0 and 23
             active_hours_start = int(settings['active_hours_start'])
             if 0 <= active_hours_start <= 23:
                 telegram_scheduler.active_hours_start = active_hours_start
@@ -534,7 +534,7 @@ def update_scheduler_settings(settings):
             
     if 'active_hours_end' in settings:
         try:
-            # اطمینان از اینکه مقدار بین 0 تا 24 است
+            # Ensure value is between 0 and 24
             active_hours_end = int(settings['active_hours_end'])
             if 1 <= active_hours_end <= 24:
                 telegram_scheduler.active_hours_end = active_hours_end
@@ -543,35 +543,35 @@ def update_scheduler_settings(settings):
             
     if 'interval' in settings:
         try:
-            # اطمینان از اینکه مقدار حداقل 60 ثانیه است
+            # Ensure value is at least 60 seconds
             interval = int(settings['interval'])
             if interval >= 60:
                 telegram_scheduler.interval = interval
         except (ValueError, TypeError):
             pass
     
-    # بازگرداندن وضعیت فعلی
+    # Return current status
     return telegram_scheduler.status()
 
 
-# اگر این فایل به تنهایی اجرا شود، زمان‌بندی را شروع و به مدت ۱ دقیقه اجرا می‌کند
+# If this file is run directly, start scheduling and run for 1 minute
 if __name__ == "__main__":
-    print("شروع تست سرویس زمان‌بندی تلگرام...")
+    print("Starting Telegram scheduling service test...")
     
     if start_scheduler():
-        print("سرویس با موفقیت شروع شد")
-        print("در حال اجرا برای ۱ دقیقه...")
+        print("Service started successfully")
+        print("Running for 1 minute...")
         
-        # اجرای تست به مدت ۱ دقیقه
+        # Run test for 1 minute
         try:
             time.sleep(60)
         except KeyboardInterrupt:
-            print("تست با دستور کاربر متوقف شد")
+            print("Test stopped by user command")
         
-        # توقف سرویس
+        # Stop service
         if stop_scheduler():
-            print("سرویس با موفقیت متوقف شد")
+            print("Service stopped successfully")
         else:
-            print("خطا در توقف سرویس")
+            print("Error stopping service")
     else:
-        print("خطا در شروع سرویس")
+        print("Error starting service")
