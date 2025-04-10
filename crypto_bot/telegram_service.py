@@ -19,10 +19,9 @@ _telegram = None
 _telegram_error = None
 
 try:
-    # Using the new PTB v20+ API
-    from telegram import Bot
+    # Using the PTB v13.x API
+    from telegram import Bot, ParseMode
     from telegram.error import TelegramError
-    from telegram.constants import ParseMode
     TELEGRAM_AVAILABLE = True
     _telegram = Bot
     _telegram_error = TelegramError
@@ -598,9 +597,9 @@ def send_telegram_photo(chat_id, photo_path, caption=None, parse_mode='HTML', ma
         
     # Convert ParseMode to appropriate type
     if parse_mode == 'HTML':
-        parse_mode_enum = ParseMode.HTML
+        parse_mode_enum = 'HTML'
     elif parse_mode == 'Markdown':
-        parse_mode_enum = ParseMode.MARKDOWN_V2
+        parse_mode_enum = 'MARKDOWN_V2'
     else:
         parse_mode_enum = parse_mode
     
