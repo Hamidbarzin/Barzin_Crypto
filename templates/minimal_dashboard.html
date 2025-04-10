@@ -593,8 +593,12 @@
                                   coinSymbol === 'SOL' ? 'rgba(0, 255, 179, 0.1)' : 'rgba(0, 102, 255, 0.1)';
             
             // ایجاد نمودار
-            if (window.priceChart) {
-                window.priceChart.destroy();
+            try {
+                if (window.priceChart instanceof Chart) {
+                    window.priceChart.destroy();
+                }
+            } catch (error) {
+                console.log('خطا در حذف نمودار قبلی:', error);
             }
             
             window.priceChart = new Chart(ctx, {
