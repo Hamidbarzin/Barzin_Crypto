@@ -178,23 +178,23 @@ def send_price_report():
     
     # داده‌های قیمت - در نسخه واقعی از API دریافت می‌شود
     coins = [
-        {"name": "Bitcoin", "symbol": "BTC", "price": 83245.25, "change": 1.2},
-        {"name": "Ethereum", "symbol": "ETH", "price": 1672.30, "change": -0.5},
-        {"name": "BNB", "symbol": "BNB", "price": 626.75, "change": 0.8},
-        {"name": "Solana", "symbol": "SOL", "price": 178.65, "change": 2.3},
-        {"name": "Cardano", "symbol": "ADA", "price": 0.45, "change": -1.2},
-        {"name": "Ripple", "symbol": "XRP", "price": 0.59, "change": 0.3},
-        {"name": "Polkadot", "symbol": "DOT", "price": 7.32, "change": -0.7},
-        {"name": "Tether", "symbol": "USDT", "price": 0.9998, "change": 0.01},
-        {"name": "Polygon", "symbol": "MATIC", "price": 0.58, "change": 1.4},
-        {"name": "Dogecoin", "symbol": "DOGE", "price": 0.15, "change": -2.1},
-        {"name": "Chainlink", "symbol": "LINK", "price": 15.25, "change": 2.7},
-        {"name": "Litecoin", "symbol": "LTC", "price": 86.50, "change": 0.5},
-        {"name": "Arbitrum", "symbol": "ARB", "price": 1.06, "change": -1.8},
-        {"name": "Optimism", "symbol": "OP", "price": 2.32, "change": 3.5},
-        {"name": "Render", "symbol": "RNDR", "price": 7.28, "change": 5.6},
-        {"name": "Fetch.ai", "symbol": "FET", "price": 2.12, "change": 4.3},
-        {"name": "Worldcoin", "symbol": "WLD", "price": 4.45, "change": -3.2}
+        {"name": "Bitcoin", "symbol": "BTC", "price": 83245.25, "change": 1.2, "recommendation": "خرید"},
+        {"name": "Ethereum", "symbol": "ETH", "price": 1672.30, "change": -0.5, "recommendation": "نگهداری"},
+        {"name": "BNB", "symbol": "BNB", "price": 626.75, "change": 0.8, "recommendation": "خرید"},
+        {"name": "Solana", "symbol": "SOL", "price": 178.65, "change": 2.3, "recommendation": "خرید"},
+        {"name": "Cardano", "symbol": "ADA", "price": 0.45, "change": -1.2, "recommendation": "فروش"},
+        {"name": "Ripple", "symbol": "XRP", "price": 0.59, "change": 0.3, "recommendation": "نگهداری"},
+        {"name": "Polkadot", "symbol": "DOT", "price": 7.32, "change": -0.7, "recommendation": "نگهداری"},
+        {"name": "Tether", "symbol": "USDT", "price": 0.9998, "change": 0.01, "recommendation": "نگهداری"},
+        {"name": "Polygon", "symbol": "MATIC", "price": 0.58, "change": 1.4, "recommendation": "خرید"},
+        {"name": "Dogecoin", "symbol": "DOGE", "price": 0.15, "change": -2.1, "recommendation": "فروش"},
+        {"name": "Chainlink", "symbol": "LINK", "price": 15.25, "change": 2.7, "recommendation": "خرید"},
+        {"name": "Litecoin", "symbol": "LTC", "price": 86.50, "change": 0.5, "recommendation": "نگهداری"},
+        {"name": "Arbitrum", "symbol": "ARB", "price": 1.06, "change": -1.8, "recommendation": "نگهداری"},
+        {"name": "Optimism", "symbol": "OP", "price": 2.32, "change": 3.5, "recommendation": "خرید"},
+        {"name": "Render", "symbol": "RNDR", "price": 7.28, "change": 5.6, "recommendation": "خرید"},
+        {"name": "Fetch.ai", "symbol": "FET", "price": 2.12, "change": 4.3, "recommendation": "خرید"},
+        {"name": "Worldcoin", "symbol": "WLD", "price": 4.45, "change": -3.2, "recommendation": "فروش"}
     ]
     
     # ساخت پیام
@@ -202,6 +202,32 @@ def send_price_report():
 💰 <b>Crypto Barzin - گزارش قیمت‌ها</b>
 ━━━━━━━━━━━━━━━━━━
 
+📊 <b>نمودار کندل‌استیک اخیر Bitcoin (BTC/USDT):</b>
+https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1.svg
+
+📈 <b>وضعیت بازار:</b> {"🟢 صعودی" if sum(c["change"] for c in coins) > 0 else "🔴 نزولی"}
+
+"""
+    
+    # بخش توصیه‌های خرید و فروش
+    buy_recommendations = [coin for coin in coins if coin["recommendation"] == "خرید"]
+    sell_recommendations = [coin for coin in coins if coin["recommendation"] == "فروش"]
+    
+    message += """
+🟢 <b>توصیه‌های خرید:</b>
+"""
+    for coin in buy_recommendations[:3]:  # نمایش 3 توصیه برتر
+        message += f"• <b>{coin['name']} ({coin['symbol']})</b>\n"
+    
+    message += """
+🔴 <b>توصیه‌های فروش:</b>
+"""
+    for coin in sell_recommendations[:3]:  # نمایش 3 توصیه برتر
+        message += f"• <b>{coin['name']} ({coin['symbol']})</b>\n"
+    
+    message += """
+━━━━━━━━━━━━━━━━━━
+<b>قیمت‌های لحظه‌ای:</b>
 """
     
     # اضافه کردن قیمت‌ها به پیام
@@ -209,6 +235,9 @@ def send_price_report():
         # تعیین ایموجی و فرمت تغییرات بر اساس مثبت یا منفی بودن
         emoji = "🟢" if coin["change"] >= 0 else "🔴"
         change_str = f"+{coin['change']}%" if coin["change"] >= 0 else f"{coin['change']}%"
+        
+        # تعیین ایموجی برای توصیه
+        rec_emoji = "🟢" if coin["recommendation"] == "خرید" else ("🔴" if coin["recommendation"] == "فروش" else "🟡")
         
         # فرمت قیمت بر اساس مقدار آن
         if coin["price"] >= 100:
@@ -219,7 +248,7 @@ def send_price_report():
             price_str = f"${coin['price']:.4f}"
         
         # اضافه کردن اطلاعات ارز به پیام - با تأکید بر دلار آمریکا
-        message += f"{emoji} <b>{coin['name']} ({coin['symbol']})</b>: {price_str} USD ({change_str})\n"
+        message += f"{emoji} <b>{coin['name']} ({coin['symbol']})</b>: {price_str} USD ({change_str}) {rec_emoji}\n"
     
     # اگر نشانگر قابلیت اطمینان فعال است، خلاصه آن را اضافه کن
     if RELIABILITY_MONITOR_AVAILABLE:
@@ -413,6 +442,19 @@ def send_technical_analysis(symbol="BTC/USDT"):
         target_str = "تعیین نشده"
         sl_str = "تعیین نشده"
     
+    # نمودار کندل‌استیک
+    candlestick_url = ""
+    if coin_name == "BTC":
+        candlestick_url = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1.svg"
+    elif coin_name == "ETH":
+        candlestick_url = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1027.svg"
+    elif coin_name == "SOL":
+        candlestick_url = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/5426.svg"
+    elif coin_name == "BNB":
+        candlestick_url = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1839.svg"
+    elif coin_name == "XRP":
+        candlestick_url = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/52.svg"
+    
     # ساخت پیام
     message = f"""
 📊 <b>Crypto Barzin - تحلیل تکنیکال</b>
@@ -422,7 +464,16 @@ def send_technical_analysis(symbol="BTC/USDT"):
 💲 <b>قیمت فعلی:</b> {price_str}
 📈 <b>تغییرات 24 ساعته:</b> {change_emoji} {change_str}
 
-<b>🔹 شاخص‌های تکنیکال:</b>
+"""
+
+    # اضافه کردن نمودار کندل‌استیک اگر موجود باشد
+    if candlestick_url:
+        message += f"""<b>📈 نمودار کندل‌استیک هفتگی:</b>
+{candlestick_url}
+
+"""
+
+    message += f"""<b>🔹 شاخص‌های تکنیکال:</b>
 • <b>RSI (14):</b> {rsi_emoji} {rsi:.2f} ({rsi_status})
 • <b>MACD:</b> {macd_emoji} {macd:.2f} ({macd_status})
 • <b>میانگین متحرک:</b> {ma_emoji} {ma_status}
@@ -505,6 +556,12 @@ def send_trading_signals():
     message = f"""
 🎯 <b>Crypto Barzin - سیگنال‌های معاملاتی</b>
 ━━━━━━━━━━━━━━━━━━
+
+📊 <b>نمودار کندل‌استیک BTC/USDT:</b>
+https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1.svg
+
+📊 <b>نمودار کندل‌استیک ETH/USDT:</b>
+https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1027.svg
 
 <b>🟢 سیگنال‌های خرید:</b>
 """

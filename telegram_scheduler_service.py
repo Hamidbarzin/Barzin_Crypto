@@ -148,8 +148,8 @@ class TelegramSchedulerService:
             # شمارنده برای ارسال پیام هر 1 ساعت
             counter = 0
             # بازه زمانی کوچکتر برای بررسی وضعیت
-            small_interval = 60  # 1 دقیقه
-            ticks_for_report = 60  # 60 دقیقه / 1 دقیقه = 60 تیک
+            small_interval = 300  # 5 دقیقه
+            ticks_for_report = self.interval // small_interval  # تعداد تیک لازم برای رسیدن به زمان گزارش
             
             while self.running:
                 # خواب با بازه کوچکتر برای کنترل بهتر
