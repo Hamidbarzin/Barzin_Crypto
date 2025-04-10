@@ -2621,17 +2621,21 @@ def set_language(language_code):
     current_language = session.get('language', DEFAULT_LANGUAGE)
     
     try:
-        if language_code in SUPPORTED_LANGUAGES:
-            session['language'] = language_code
-            language_info = get_language_info(language_code)
+        # تبدیل کد زبان به فرمت استاندارد (en یا fa)
+        # برای مثال، اگر english یا persian ارسال شده، تبدیل به en یا fa می‌شود
+        actual_language_code = get_language_code(language_code)
+        
+        if actual_language_code in SUPPORTED_LANGUAGES:
+            session['language'] = actual_language_code
+            language_info = get_language_info(actual_language_code)
             language_name = language_info['native_name']
-            success_message = get_ui_text('language_changed', f'زبان با موفقیت به {language_name} تغییر کرد.', language_code)
+            success_message = get_ui_text('language_changed', f'زبان با موفقیت به {language_name} تغییر کرد.', actual_language_code)
             flash(success_message, 'success')
         else:
             error_message = get_ui_text('language_change_error', 'کد زبان نامعتبر است.', current_language)
             flash(error_message, 'error')
         
-        logger.info(f"Language set to {language_code}, previous was {current_language}")
+        logger.info(f"Language set to {language_code} (actual: {actual_language_code}), previous was {current_language}")
     except Exception as e:
         logger.error(f"Error setting language to {language_code}: {e}")
         flash(f"خطا در تغییر زبان: {str(e)}", 'error')
