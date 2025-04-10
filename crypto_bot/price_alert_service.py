@@ -119,42 +119,42 @@ def _format_price_for_message(price: float) -> str:
 
 def check_price_alerts() -> List[Dict[str, Any]]:
     """
-    بررسی وضعیت قیمت‌ها و ارسال هشدار در صورت رسیدن به محدوده‌های خاص
+    Check prices and send alerts when reaching specific thresholds
     
     Returns:
-        List[Dict[str, Any]]: لیست هشدارهای فعال شده
+        List[Dict[str, Any]]: List of triggered alerts
     """
     triggered_alerts = []
     
     for symbol, alerts in price_alerts.items():
-        # دریافت قیمت فعلی
+        # Get current price
         try:
             prices_data = market_data.get_current_prices([symbol])
             if symbol not in prices_data or "price" not in prices_data[symbol]:
-                logger.warning(f"امکان دریافت قیمت برای {symbol} وجود ندارد")
+                logger.warning(f"Unable to get price for {symbol}")
                 continue
             current_price = prices_data[symbol]["price"]
         except Exception as e:
-            logger.error(f"خطا در دریافت قیمت {symbol}: {str(e)}")
+            logger.error(f"Error getting price for {symbol}: {str(e)}")
             continue
         
-        # بررسی هشدارها
+        # Check alerts
         for i, (target_price, alert_type, triggered) in enumerate(alerts):
-            # اگر هشدار قبلاً فعال شده باید دوباره بررسی کنیم که آیا باید مجدد فعال شود یا خیر
+            # If the alert was previously triggered, check if it should be reset
             if triggered:
-                # هشدار "above": اگر قیمت به پایین برگشته و حداقل ۱٪ پایین‌تر از قیمت هدف باشد، بازنشانی شود
+                # "above" alert: if price drops at least 1% below target price, reset it
                 if alert_type == "above" and current_price < target_price * 0.99:
                     alerts[i] = (target_price, alert_type, False)
-                    logger.info(f"هشدار {symbol} از نوع {alert_type} در قیمت {target_price} بازنشانی شد")
+                    logger.info(f"Alert for {symbol} of type {alert_type} at price {target_price} reset")
                 
-                # هشدار "below": اگر قیمت به بالا برگشته و حداقل ۱٪ بالاتر از قیمت هدف باشد، بازنشانی شود
+                # "below" alert: if price rises at least 1% above target price, reset it
                 elif alert_type == "below" and current_price > target_price * 1.01:
                     alerts[i] = (target_price, alert_type, False)
-                    logger.info(f"هشدار {symbol} از نوع {alert_type} در قیمت {target_price} بازنشانی شد")
+                    logger.info(f"Alert for {symbol} of type {alert_type} at price {target_price} reset")
                 
                 continue
             
-            # بررسی شرایط فعال‌سازی هشدار
+            # Check alert trigger conditions
             alert_triggered = False
             
             if alert_type == "above" and current_price >= target_price:
@@ -163,10 +163,10 @@ def check_price_alerts() -> List[Dict[str, Any]]:
                 alert_triggered = True
             
             if alert_triggered:
-                # هشدار فعال شد
+                # Alert is triggered
                 alerts[i] = (target_price, alert_type, True)
                 
-                # پیام هشدار را تولید می‌کنیم
+                # Generate alert information
                 alert_info = {
                     "symbol": symbol,
                     "current_price": current_price,
@@ -177,26 +177,26 @@ def check_price_alerts() -> List[Dict[str, Any]]:
                 
                 triggered_alerts.append(alert_info)
                 
-                # ارسال هشدار تلگرام
+                # Send Telegram alert
                 alert_message = generate_alert_message(alert_info)
                 try:
                     replit_telegram_sender.send_message(alert_message, parse_mode="HTML")
-                    logger.info(f"هشدار قیمت برای {symbol} ارسال شد: {alert_type} {target_price}")
+                    logger.info(f"Price alert for {symbol} sent: {alert_type} {target_price}")
                 except Exception as e:
-                    logger.error(f"خطا در ارسال هشدار قیمت به تلگرام: {str(e)}")
+                    logger.error(f"Error sending price alert to Telegram: {str(e)}")
     
     return triggered_alerts
 
 
 def generate_alert_message(alert_info: Dict[str, Any]) -> str:
     """
-    تولید پیام هشدار قیمت
+    Generate price alert message
     
     Args:
-        alert_info (Dict[str, Any]): اطلاعات هشدار
+        alert_info (Dict[str, Any]): Alert information
         
     Returns:
-        str: پیام هشدار
+        str: Formatted alert message
     """
     symbol = alert_info["symbol"]
     current_price = alert_info["current_price"]
@@ -204,19 +204,19 @@ def generate_alert_message(alert_info: Dict[str, Any]) -> str:
     alert_type = alert_info["alert_type"]
     alert_time = alert_info["time"].strftime("%H:%M:%S")
     
-    # فرمت‌بندی قیمت‌ها
+    # Format prices
     formatted_current = _format_price_for_message(current_price)
     formatted_target = _format_price_for_message(target_price)
     
-    # مشخص کردن نوع هشدار
+    # Determine alert type
     if alert_type == "above":
-        direction = "بالاتر از"
+        direction = "بالاتر از"  # Persian: "above"
         emoji = "🔺"
     else:
-        direction = "پایین‌تر از"
+        direction = "پایین‌تر از"  # Persian: "below" 
         emoji = "🔻"
     
-    # محاسبه درصد تغییر
+    # Calculate percent change
     percent_change = abs((current_price - target_price) / target_price * 100)
     
     message = f"""🚨 <b>هشدار قیمت {emoji}</b> 🚨
@@ -236,29 +236,29 @@ def generate_alert_message(alert_info: Dict[str, Any]) -> str:
     return message
 
 
-# اضافه کردن چند هشدار پیش‌فرض
-set_price_alert("BTC/USDT", 82000, "above")  # هشدار به بالا رفتن قیمت بیت‌کوین از 82000
-set_price_alert("BTC/USDT", 81500, "below")  # هشدار به پایین رفتن قیمت بیت‌کوین از 81500
-set_price_alert("ETH/USDT", 1650, "above")   # هشدار به بالا رفتن قیمت اتریوم از 1650
-set_price_alert("ETH/USDT", 1580, "below")   # هشدار به پایین رفتن قیمت اتریوم از 1580
+# Add default price alerts
+set_price_alert("BTC/USDT", 82000, "above")  # Alert when Bitcoin price rises above 82000
+set_price_alert("BTC/USDT", 81500, "below")  # Alert when Bitcoin price falls below 81500
+set_price_alert("ETH/USDT", 1650, "above")   # Alert when Ethereum price rises above 1650
+set_price_alert("ETH/USDT", 1580, "below")   # Alert when Ethereum price falls below 1580
 
-# تابع اصلی برای تست
+# Main function for testing
 if __name__ == "__main__":
-    print("در حال تست سرویس هشدار قیمت...")
+    print("Testing price alert service...")
     
-    # تست تنظیم هشدار
+    # Test setting alerts
     set_price_alert("BTC/USDT", 80000, "above")
     set_price_alert("ETH/USDT", 1500, "below")
     
-    # نمایش هشدارهای تنظیم شده
-    print("هشدارهای تنظیم شده:")
+    # Display configured alerts
+    print("Configured alerts:")
     print(get_price_alerts())
     
-    # تست بررسی هشدارها
-    print("در حال بررسی هشدارها...")
+    # Test checking alerts
+    print("Checking alerts...")
     triggered = check_price_alerts()
     
     if triggered:
-        print(f"{len(triggered)} هشدار فعال شد")
+        print(f"{len(triggered)} alerts activated")
     else:
-        print("هیچ هشداری فعال نشد")
+        print("No alerts activated")
