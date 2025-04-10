@@ -72,18 +72,21 @@ def get_language_info(language_code):
     """
     lang_info = {
         'en': {
+            'code': 'en',
             'name': 'English',
             'native_name': 'English',
             'direction': 'ltr',
             'icon': '🇺🇸'
         },
         'fa': {
+            'code': 'fa',
             'name': 'Persian',
             'native_name': 'فارسی',
             'direction': 'rtl',
             'icon': '🇮🇷'
         },
         'fr': {
+            'code': 'fr',
             'name': 'French',
             'native_name': 'Français',
             'direction': 'ltr',
