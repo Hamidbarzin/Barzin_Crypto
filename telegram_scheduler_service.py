@@ -47,7 +47,7 @@ class TelegramSchedulerService:
         self.technical_analysis_counter = 0
         self.trading_signals_counter = 0
         self.crypto_news_counter = 0
-        self.interval = 1800  # 30 دقیقه = 1800 ثانیه
+        self.interval = 3600  # 1 ساعت = 3600 ثانیه
         self.system_report_interval = 12  # هر 12 بار (6 ساعت)
         self.technical_analysis_interval = 4  # هر 4 بار (2 ساعت)
         self.trading_signals_interval = 8  # هر 8 بار (4 ساعت)
@@ -145,11 +145,11 @@ class TelegramSchedulerService:
             logger.info("ارسال گزارش قیمت اولیه...")
             self._send_price_report()
             
-            # شمارنده برای ارسال پیام هر نیم ساعت
+            # شمارنده برای ارسال پیام هر 1 ساعت
             counter = 0
             # بازه زمانی کوچکتر برای بررسی وضعیت
             small_interval = 60  # 1 دقیقه
-            ticks_for_report = 30  # 30 دقیقه / 1 دقیقه = 30 تیک
+            ticks_for_report = 60  # 60 دقیقه / 1 دقیقه = 60 تیک
             
             while self.running:
                 # خواب با بازه کوچکتر برای کنترل بهتر
@@ -171,7 +171,7 @@ class TelegramSchedulerService:
                 counter += 1
                 logger.info(f"تیک شماره {counter} از {ticks_for_report} برای ارسال گزارش بعدی")
                 
-                # هر نیم ساعت گزارش قیمت ارسال کن (اگر در ساعات فعال هستیم)
+                # هر 1 ساعت گزارش قیمت ارسال کن (اگر در ساعات فعال هستیم)
                 if counter >= ticks_for_report and is_active_hours:
                     logger.info("زمان ارسال گزارش قیمت فرا رسیده...")
                     self._send_price_report()
