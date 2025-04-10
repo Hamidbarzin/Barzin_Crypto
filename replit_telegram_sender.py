@@ -86,21 +86,21 @@ def send_message(text, chat_id=None, parse_mode=None, disable_web_page_preview=T
         bool: موفقیت یا شکست ارسال پیام
     """
     if not TELEGRAM_BOT_TOKEN:
-        logger.error("TELEGRAM_BOT_TOKEN یافت نشد")
+        logger.error("TELEGRAM_BOT_TOKEN not found")
         
-        # ثبت خطا در نشانگر قابلیت اطمینان
+        # Record error in reliability monitor
         if RELIABILITY_MONITOR_AVAILABLE:
-            record_message_attempt(message_type, False, "TELEGRAM_BOT_TOKEN یافت نشد")
+            record_message_attempt(message_type, False, "TELEGRAM_BOT_TOKEN not found")
             
         return False
     
     if not chat_id:
         if not DEFAULT_CHAT_ID:
-            logger.error("DEFAULT_CHAT_ID یافت نشد")
+            logger.error("DEFAULT_CHAT_ID not found")
             
-            # ثبت خطا در نشانگر قابلیت اطمینان
+            # Record error in reliability monitor
             if RELIABILITY_MONITOR_AVAILABLE:
-                record_message_attempt(message_type, False, "DEFAULT_CHAT_ID یافت نشد")
+                record_message_attempt(message_type, False, "DEFAULT_CHAT_ID not found")
                 
             return False
         chat_id = DEFAULT_CHAT_ID
@@ -254,13 +254,13 @@ def send_price_report():
     if RELIABILITY_MONITOR_AVAILABLE:
         try:
             reliability_summary = get_reliability_summary()
-            # فقط در صورتی که داده کافی وجود داشته باشد
-            if "وضعیت سیستم تلگرام" in reliability_summary and len(reliability_summary) > 50:
+            # Only if there is enough data
+            if "Telegram system status" in reliability_summary and len(reliability_summary) > 50:
                 message += f"""
 {reliability_summary}
 """
         except Exception as e:
-            logger.warning(f"خطا در دریافت خلاصه قابلیت اطمینان: {str(e)}")
+            logger.warning(f"Error retrieving reliability summary: {str(e)}")
     
     # اضافه کردن اطلاعات زمان به پیام
     message += f"""
@@ -342,10 +342,10 @@ def send_system_report():
 {reliability_summary}
 """
         except Exception as e:
-            logger.warning(f"خطا در دریافت خلاصه قابلیت اطمینان: {str(e)}")
+            logger.warning(f"Error retrieving reliability summary: {str(e)}")
             message += """
 <b>📊 آمار قابلیت اطمینان سیستم:</b>
-• خطا در دریافت اطلاعات آماری
+• Error retrieving statistical information
 """
     
     message += f"""
@@ -609,26 +609,26 @@ def send_crypto_news():
         
         news_text = get_crypto_news_formatted_for_telegram()
         
-        # اگر خبری یافت نشد، پیام خطا ارسال کن
+        # If no news was found, send error message
         if not news_text or len(news_text) < 10:
-            logger.error("اخبار دریافت شده خالی یا ناقص است")
-            news_text = "⚠️ متأسفانه در دریافت اخبار ارزهای دیجیتال خطایی رخ داده است."
+            logger.error("Received crypto news is empty or incomplete")
+            news_text = "⚠️ Sorry, an error occurred while retrieving cryptocurrency news."
         
         return send_message(news_text, parse_mode="Markdown", message_type="crypto_news")
     except ImportError:
-        logger.error("خطا در دسترسی به ماژول اخبار ارزهای دیجیتال")
-        error_message = "❌ خطا در دسترسی به ماژول اخبار ارزهای دیجیتال"
+        logger.error("Error accessing the crypto news module")
+        error_message = "❌ Error accessing the crypto news module"
         return send_message(error_message, message_type="crypto_news")
     except Exception as e:
-        logger.error(f"خطا در ارسال اخبار ارزهای دیجیتال: {str(e)}")
-        error_message = f"❌ خطا در ارسال اخبار ارزهای دیجیتال: {str(e)}"
+        logger.error(f"Error sending cryptocurrency news: {str(e)}")
+        error_message = f"❌ Error sending cryptocurrency news: {str(e)}"
         return send_message(error_message, message_type="crypto_news")
 
 
-# تست ارسال پیام
+# Test message sending
 if __name__ == "__main__":
     result = send_test_message()
     if result:
-        print("پیام با موفقیت ارسال شد.")
+        print("Message sent successfully.")
     else:
-        print("ارسال پیام با شکست مواجه شد.")
+        print("Message sending failed.")

@@ -3043,9 +3043,9 @@ def api_voice_notification_save():
 with app.app_context():
     # بررسی تنظیمات راه‌اندازی خودکار سرویس زمان‌بندی تلگرام
     try:
-        logger.info("در حال بررسی تنظیمات راه‌اندازی خودکار سرویس زمان‌بندی تلگرام...")
+        logger.info("Checking Telegram scheduling service auto-start settings...")
         if telegram_scheduler_service.telegram_scheduler.auto_start_on_boot:
-            logger.info("در حال راه‌اندازی سرویس زمان‌بندی تلگرام با app_context...")
+            logger.info("Starting Telegram scheduling service with app_context...")
             if telegram_scheduler_service.start_scheduler():
                 logger.info("سرویس زمان‌بندی تلگرام با موفقیت راه‌اندازی شد")
             else:
