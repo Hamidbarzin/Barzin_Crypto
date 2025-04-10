@@ -314,17 +314,8 @@
             const result = await response.json();
             
             if (result && result.success) {
-                // نمایش پیام موفقیت ساده
-                const settingsResult = document.getElementById('settings-result');
-                settingsResult.classList.remove('d-none');
-                
-                // پنهان کردن پیام بعد از 5 ثانیه
-                setTimeout(() => {
-                    settingsResult.classList.add('d-none');
-                }, 5000);
-                
-                // هشدار جاوااسکریپت هم نمایش دهد
-                alert('تنظیمات با موفقیت ذخیره شد.');
+                // هدایت به صفحه پیام موفقیت
+                window.location.href = '/telegram-success';
             } else {
                 showResult(result.message || 'خطا در ذخیره تنظیمات', false);
             }

@@ -1,0 +1,35 @@
+{% extends "minimal_base.html" %}
+
+{% block title %}پیام موفقیت{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card text-center">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">موفقیت‌آمیز</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4 text-success">
+                        <i class="fas fa-check-circle fa-5x"></i>
+                    </div>
+                    <h5 class="card-title mb-3">تنظیمات با موفقیت ذخیره شد</h5>
+                    <p class="card-text mb-4">تغییرات شما با موفقیت ثبت شد و اکنون تنظیمات جدید در حال اجرا هستند.</p>
+                    <a href="/telegram-control" class="btn btn-primary">بازگشت به پنل کنترل</a>
+                </div>
+                <div class="card-footer text-muted">
+                    <small>این صفحه در 5 ثانیه به پنل کنترل تلگرام برمی‌گردد.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // انتقال خودکار به صفحه اصلی بعد از 5 ثانیه
+    setTimeout(function() {
+        window.location.href = '/telegram-control';
+    }, 5000);
+</script>
+{% endblock %}

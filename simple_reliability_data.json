@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 340,
-    "successful": 334,
+    "total_sent": 344,
+    "successful": 338,
     "failed": 6,
     "history": [
       {
@@ -1709,12 +1709,32 @@
         "message_type": "trading_signals",
         "success": true,
         "timestamp": "2025-04-10T01:27:07.898267-04:00"
+      },
+      {
+        "message_type": "system_report",
+        "success": true,
+        "timestamp": "2025-04-10T01:31:17.102519-04:00"
+      },
+      {
+        "message_type": "technical_analysis_BNB",
+        "success": true,
+        "timestamp": "2025-04-10T01:31:17.594414-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T01:32:51.952052-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T01:32:51.981472-04:00"
       }
     ]
   },
   "uptime": {
     "start_time": "2025-04-09T18:29:20.816437-04:00",
-    "last_restart": "2025-04-10T01:18:46.404713-04:00",
-    "restarts": 136
+    "last_restart": "2025-04-10T01:32:51.462952-04:00",
+    "restarts": 137
   }
 }

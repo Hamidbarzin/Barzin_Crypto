@@ -2208,6 +2208,12 @@ def telegram_control_panel():
                            settings_saved=settings_saved)
 
 
+@app.route('/telegram-success')
+def telegram_success_message():
+    """صفحه پیام موفقیت برای ذخیره تنظیمات تلگرام"""
+    inject_now()
+    return render_template('telegram_success_message.html')
+
 @app.route('/telegram-reliability')
 def telegram_reliability_dashboard():
     """صفحه داشبورد قابلیت اطمینان تلگرام"""
