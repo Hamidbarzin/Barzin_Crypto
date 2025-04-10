@@ -1,1 +1,0 @@
-stop_smart_robot.sh
