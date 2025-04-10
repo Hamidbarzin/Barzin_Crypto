@@ -154,7 +154,7 @@ def check_price_alerts() -> List[Dict[str, Any]]:
                 
                 continue
             
-            # Check alert trigger conditions
+            # بررسی شرایط فعال‌سازی هشدار
             alert_triggered = False
             
             if alert_type == "above" and current_price >= target_price:
@@ -163,10 +163,10 @@ def check_price_alerts() -> List[Dict[str, Any]]:
                 alert_triggered = True
             
             if alert_triggered:
-                # Alert is triggered
+                # هشدار فعال شد
                 alerts[i] = (target_price, alert_type, True)
                 
-                # Generate alert information
+                # پیام هشدار را تولید می‌کنیم
                 alert_info = {
                     "symbol": symbol,
                     "current_price": current_price,
@@ -177,13 +177,13 @@ def check_price_alerts() -> List[Dict[str, Any]]:
                 
                 triggered_alerts.append(alert_info)
                 
-                # Send Telegram alert
+                # ارسال هشدار تلگرام
                 alert_message = generate_alert_message(alert_info)
                 try:
                     replit_telegram_sender.send_message(alert_message, parse_mode="HTML")
-                    logger.info(f"Price alert for {symbol} sent: {alert_type} {target_price}")
+                    logger.info(f"هشدار قیمت برای {symbol} ارسال شد: {alert_type} {target_price}")
                 except Exception as e:
-                    logger.error(f"Error sending price alert to Telegram: {str(e)}")
+                    logger.error(f"خطا در ارسال هشدار قیمت به تلگرام: {str(e)}")
     
     return triggered_alerts
 
@@ -204,19 +204,19 @@ def generate_alert_message(alert_info: Dict[str, Any]) -> str:
     alert_type = alert_info["alert_type"]
     alert_time = alert_info["time"].strftime("%H:%M:%S")
     
-    # Format prices
+    # فرمت کردن قیمت‌ها
     formatted_current = _format_price_for_message(current_price)
     formatted_target = _format_price_for_message(target_price)
     
-    # Determine alert type
+    # مشخص کردن نوع هشدار
     if alert_type == "above":
-        direction = "بالاتر از"  # Persian: "above"
+        direction = "بالاتر از"
         emoji = "🔺"
     else:
-        direction = "پایین‌تر از"  # Persian: "below" 
+        direction = "پایین‌تر از"
         emoji = "🔻"
     
-    # Calculate percent change
+    # محاسبه درصد تغییر
     percent_change = abs((current_price - target_price) / target_price * 100)
     
     message = f"""🚨 <b>هشدار قیمت {emoji}</b> 🚨
