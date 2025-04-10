@@ -218,8 +218,8 @@ def send_price_report():
         else:
             price_str = f"${coin['price']:.4f}"
         
-        # اضافه کردن اطلاعات ارز به پیام
-        message += f"{emoji} <b>{coin['name']} ({coin['symbol']})</b>: {price_str} ({change_str})\n"
+        # اضافه کردن اطلاعات ارز به پیام - با تأکید بر دلار آمریکا
+        message += f"{emoji} <b>{coin['name']} ({coin['symbol']})</b>: {price_str} USD ({change_str})\n"
     
     # اگر نشانگر قابلیت اطمینان فعال است، خلاصه آن را اضافه کن
     if RELIABILITY_MONITOR_AVAILABLE:
@@ -389,6 +389,9 @@ def send_technical_analysis(symbol="BTC/USDT"):
     change_emoji = "🟢" if change >= 0 else "🔴"
     change_str = f"{'+' if change >= 0 else ''}{change:.2f}%"
     
+    # اضافه کردن USD به قیمت
+    price_str = f"{price_str} USD"
+    
     rsi_status = "فروش بیش از حد" if rsi < 30 else ("خرید بیش از حد" if rsi > 70 else "خنثی")
     rsi_emoji = "🟢" if rsi < 30 else ("🔴" if rsi > 70 else "🟡")
     
@@ -399,13 +402,13 @@ def send_technical_analysis(symbol="BTC/USDT"):
     if "خرید" in signal:
         target_price = price * (1 + random.uniform(0.05, 0.2))
         stop_loss = price * (1 - random.uniform(0.03, 0.1))
-        target_str = f"${target_price:,.2f}" if target_price >= 1 else f"${target_price:.6f}"
-        sl_str = f"${stop_loss:,.2f}" if stop_loss >= 1 else f"${stop_loss:.6f}"
+        target_str = f"${target_price:,.2f} USD" if target_price >= 1 else f"${target_price:.6f} USD"
+        sl_str = f"${stop_loss:,.2f} USD" if stop_loss >= 1 else f"${stop_loss:.6f} USD"
     elif "فروش" in signal:
         target_price = price * (1 - random.uniform(0.05, 0.2))
         stop_loss = price * (1 + random.uniform(0.03, 0.1))
-        target_str = f"${target_price:,.2f}" if target_price >= 1 else f"${target_price:.6f}"
-        sl_str = f"${stop_loss:,.2f}" if stop_loss >= 1 else f"${stop_loss:.6f}"
+        target_str = f"${target_price:,.2f} USD" if target_price >= 1 else f"${target_price:.6f} USD"
+        sl_str = f"${stop_loss:,.2f} USD" if stop_loss >= 1 else f"${stop_loss:.6f} USD"
     else:
         target_str = "تعیین نشده"
         sl_str = "تعیین نشده"
@@ -484,11 +487,11 @@ def send_trading_signals():
         
         # فرمت کردن قیمت‌ها
         if symbols[i]["price"] >= 1000:
-            symbols[i]["price_str"] = f"${symbols[i]['price']:,.0f}"
+            symbols[i]["price_str"] = f"${symbols[i]['price']:,.0f} USD"
         elif symbols[i]["price"] >= 1:
-            symbols[i]["price_str"] = f"${symbols[i]['price']:,.2f}"
+            symbols[i]["price_str"] = f"${symbols[i]['price']:,.2f} USD"
         else:
-            symbols[i]["price_str"] = f"${symbols[i]['price']:.4f}"
+            symbols[i]["price_str"] = f"${symbols[i]['price']:.4f} USD"
         
         # فرمت کردن تغییرات
         symbols[i]["change_emoji"] = "🟢" if symbols[i]["change"] >= 0 else "🔴"

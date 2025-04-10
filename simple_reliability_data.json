@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 266,
-    "successful": 260,
+    "total_sent": 279,
+    "successful": 273,
     "failed": 6,
     "history": [
       {
@@ -1339,12 +1339,77 @@
         "message_type": "test_message",
         "success": true,
         "timestamp": "2025-04-10T00:28:39.922546-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T00:30:36.460753-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T00:30:36.536453-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T00:30:43.214864-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T00:30:43.232441-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T00:31:20.203285-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T00:31:20.231263-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T00:31:36.927469-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T00:31:36.955095-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T00:31:42.014045-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T00:31:42.041499-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T00:31:56.338792-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T00:32:12.323347-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T00:32:12.360347-04:00"
       }
     ]
   },
   "uptime": {
     "start_time": "2025-04-09T18:29:20.816437-04:00",
-    "last_restart": "2025-04-10T00:28:39.408833-04:00",
-    "restarts": 105
+    "last_restart": "2025-04-10T00:32:11.834577-04:00",
+    "restarts": 112
   }
 }
