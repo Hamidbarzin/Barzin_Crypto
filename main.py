@@ -40,13 +40,13 @@ def inject_now():
     logger.debug(f"Inject_now: current language code = {current_language_code}")
     logger.debug(f"Inject_now: current language info = {current_language_info}")
     
-    # اطمینان از وجود کلید code
+    # Ensure 'code' key exists
     if 'code' not in current_language_info:
         logger.warning(f"Language info for {current_language_code} does not contain 'code' key")
-        # اگر کلید کد وجود ندارد، آن را اضافه کنیم
+        # If the code key doesn't exist, add it
         current_language_info['code'] = current_language_code
     
-    # بررسی صحت همه زبان‌ها
+    # Verify all languages
     for lang in all_languages:
         if 'code' not in lang:
             logger.warning(f"Language {lang.get('name', 'unknown')} does not have 'code' key")
@@ -55,8 +55,8 @@ def inject_now():
     
     return {
         'now': datetime.now(),
-        'developer_name': 'حمید برزین',
-        'developer_year': '۱۴۰۴',
+        'developer_name': 'Hamid Barzin',
+        'developer_year': '2024',
         'current_language': current_language_info,
         'current_language_code': current_language_code,
         'languages': all_languages,
@@ -77,7 +77,7 @@ def initialize_session():
         session['watched_currencies'] = DEFAULT_CURRENCIES[:3]  # Start with BTC, ETH, XRP
     if 'scheduler_running' not in session:
         session['scheduler_running'] = False
-    # همیشه زبان انگلیسی را تنظیم کن
+    # Always set English language
     session['language'] = 'en'
     if 'include_middle_east' not in session:
         session['include_middle_east'] = True  # Default to including Middle Eastern news sources

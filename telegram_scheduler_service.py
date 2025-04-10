@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-سرویس زمان‌بندی تلگرام داخلی
+Internal Telegram Scheduling Service
 
-این ماژول یک سرویس زمان‌بندی برای ارسال خودکار پیام‌های تلگرام
-با استفاده از ماژول replit_telegram_sender فراهم می‌کند.
+This module provides a scheduling service for automatically sending Telegram messages
+using the replit_telegram_sender module.
 """
 
 import threading
@@ -16,30 +16,30 @@ import os
 import json
 from crypto_bot.price_alert_service import check_price_alerts
 
-# تنظیم لاگر
+# Setup logger
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger("telegram_scheduler")
 
-# منطقه زمانی تورنتو
+# Toronto timezone
 toronto_tz = pytz.timezone('America/Toronto')
 
-# مسیر ذخیره فایل تنظیمات
+# Settings file path
 SETTINGS_FILE = "telegram_scheduler_settings.json"
 
 class TelegramSchedulerService:
     """
-    کلاس سرویس زمان‌بندی تلگرام
+    Telegram Scheduling Service Class
     
-    این کلاس یک ترد جداگانه برای زمان‌بندی پیام‌های تلگرام ایجاد می‌کند
-    که به صورت خودکار پیام‌های تلگرام را ارسال می‌کند.
+    This class creates a separate thread for scheduling Telegram messages
+    that automatically sends Telegram messages.
     """
     
     def __init__(self):
         """
-        مقداردهی اولیه کلاس
+        Initialize the class
         """
         self.thread = None
         self.running = False
@@ -47,31 +47,31 @@ class TelegramSchedulerService:
         self.technical_analysis_counter = 0
         self.trading_signals_counter = 0
         self.crypto_news_counter = 0
-        self.interval = 3600  # 1 ساعت = 3600 ثانیه
-        self.system_report_interval = 12  # هر 12 بار (6 ساعت)
-        self.technical_analysis_interval = 4  # هر 4 بار (2 ساعت)
-        self.trading_signals_interval = 8  # هر 8 بار (4 ساعت)
-        self.crypto_news_interval = 16  # هر 16 بار (8 ساعت)
+        self.interval = 3600  # 1 hour = 3600 seconds
+        self.system_report_interval = 12  # Every 12 times (6 hours)
+        self.technical_analysis_interval = 4  # Every 4 times (2 hours)
+        self.trading_signals_interval = 8  # Every 8 times (4 hours)
+        self.crypto_news_interval = 16  # Every 16 times (8 hours)
         
-        # تنظیمات قابل تغییر توسط کاربر
-        self.active_hours_start = 8  # ساعت شروع (8 صبح)
-        self.active_hours_end = 22   # ساعت پایان (10 شب)
-        self.message_sending_enabled = True  # آیا ارسال پیام فعال است؟
-        self.auto_start_on_boot = True  # آیا سرویس به صورت خودکار در راه‌اندازی برنامه شروع شود؟
+        # User-configurable settings
+        self.active_hours_start = 8  # Start hour (8 AM)
+        self.active_hours_end = 22   # End hour (10 PM)
+        self.message_sending_enabled = True  # Is message sending enabled?
+        self.auto_start_on_boot = True  # Should the service start automatically on boot?
         
-        # ارزهای مهم برای تحلیل تکنیکال
+        # Important coins for technical analysis
         self.important_coins = ["BTC/USDT", "ETH/USDT", "BNB/USDT", "SOL/USDT", "XRP/USDT"]
         self.current_coin_index = 0
     
     def start(self):
         """
-        شروع سرویس زمان‌بندی
+        Start the scheduling service
         
         Returns:
-            bool: وضعیت راه‌اندازی سرویس
+            bool: Service startup status
         """
         if self.running:
-            logger.warning("سرویس از قبل در حال اجراست")
+            logger.warning("Service is already running")
             return False
         
         self.running = True
@@ -79,37 +79,37 @@ class TelegramSchedulerService:
         self.thread.start()
         
         now_toronto = datetime.datetime.now(toronto_tz)
-        logger.info(f"سرویس زمان‌بندی تلگرام شروع شد ({now_toronto.strftime('%Y-%m-%d %H:%M:%S')} تورنتو)")
+        logger.info(f"Telegram scheduling service started ({now_toronto.strftime('%Y-%m-%d %H:%M:%S')} Toronto)")
         
-        # ارسال پیام تست در ابتدا
+        # Send test message at startup
         self._send_test_message()
         
         return True
     
     def stop(self):
         """
-        توقف سرویس زمان‌بندی
+        Stop the scheduling service
         
         Returns:
-            bool: وضعیت توقف سرویس
+            bool: Service stop status
         """
         if not self.running:
-            logger.warning("سرویس در حال اجرا نیست")
+            logger.warning("Service is not running")
             return False
         
         self.running = False
         if self.thread:
-            self.thread.join(1.0)  # انتظار حداکثر 1 ثانیه برای پایان ترد
+            self.thread.join(1.0)  # Wait maximum 1 second for thread termination
             
-        logger.info("سرویس زمان‌بندی تلگرام متوقف شد")
+        logger.info("Telegram scheduling service stopped")
         return True
     
     def status(self):
         """
-        دریافت وضعیت سرویس
+        Get service status
         
         Returns:
-            dict: وضعیت سرویس
+            dict: Service status
         """
         return {
             "running": self.running,
