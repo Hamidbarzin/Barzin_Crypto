@@ -29,9 +29,9 @@ try:
         get_reliability_summary
     )
     RELIABILITY_MONITOR_AVAILABLE = True
-    logger.info("ماژول ساده‌سازی شده نشانگر قابلیت اطمینان بارگذاری شد")
+    logger.info("Simplified reliability monitor module loaded")
 except ImportError:
-    # اگر نسخه ساده‌سازی شده در دسترس نبود، استفاده از نسخه اصلی
+    # If simplified version is not available, use the original version
     try:
         from crypto_bot.telegram_reliability_monitor import (
             record_message_attempt,
@@ -40,15 +40,15 @@ except ImportError:
             get_reliability_summary
         )
         RELIABILITY_MONITOR_AVAILABLE = True
-        logger.info("ماژول اصلی نشانگر قابلیت اطمینان بارگذاری شد")
+        logger.info("Main reliability monitor module loaded")
     except ImportError:
-        logger.warning("هیچ ماژول نشانگر قابلیت اطمینانی در دسترس نیست")
-        # تعریف توابع جایگزین در صورت عدم وجود ماژول
+        logger.warning("No reliability monitor module available")
+        # Define fallback functions if module doesn't exist
         def record_message_attempt(message_type, success, error_message=None):
-            logger.info(f"[پیاده‌سازی نشده] ثبت پیام: {message_type}, موفق: {success}")
+            logger.info(f"[Not implemented] Recording message: {message_type}, success: {success}")
             
         def record_service_restart():
-            logger.info("[پیاده‌سازی نشده] ثبت راه‌اندازی مجدد سرویس")
+            logger.info("[Not implemented] Recording service restart")
             
         def get_reliability_stats():
             return {
@@ -58,7 +58,7 @@ except ImportError:
             }
             
         def get_reliability_summary():
-            return "اطلاعات آماری در دسترس نیست"
+            return "Statistical information not available"
 
 # تنظیم کنید - کلید API تلگرام و شناسه چت
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
@@ -119,48 +119,48 @@ def send_message(text, chat_id=None, parse_mode=None, disable_web_page_preview=T
     if parse_mode:
         params["parse_mode"] = parse_mode
     
-    logger.info("در حال ارسال پیام به تلگرام...")
+    logger.info("Sending message to Telegram...")
     
     for attempt in range(retries):
         try:
             response = requests.post(url, params=params, timeout=10)
             
             if response.status_code == 200:
-                logger.info("پیام با موفقیت ارسال شد")
+                logger.info("Message sent successfully")
                 
-                # ثبت موفقیت در نشانگر قابلیت اطمینان
+                # Record success in reliability monitor
                 if RELIABILITY_MONITOR_AVAILABLE:
                     record_message_attempt(message_type, True)
                     
                 return True
             else:
-                error_message = f"خطا در ارسال پیام: {response.status_code} - {response.text}"
+                error_message = f"Error sending message: {response.status_code} - {response.text}"
                 logger.error(error_message)
                 
-                # اگر آخرین تلاش است، خطا را ثبت کن
+                # If this is the last attempt, record the error
                 if attempt == retries - 1:
                     if RELIABILITY_MONITOR_AVAILABLE:
                         record_message_attempt(message_type, False, error_message)
                 
-                # اگر خطای 429 (Too Many Requests) دریافت شد، زمان انتظار را افزایش دهید
+                # If rate limit error (429) was received, increase wait time
                 if response.status_code == 429:
                     retry_after = int(response.json().get('parameters', {}).get('retry_after', delay * 2))
-                    logger.info(f"خطای محدودیت نرخ درخواست. در انتظار برای {retry_after} ثانیه...")
+                    logger.info(f"Rate limit error. Waiting for {retry_after} seconds...")
                     time.sleep(retry_after)
                 else:
                     # برای سایر خطاها، با تاخیر معمولی دوباره تلاش کنید
                     time.sleep(delay)
         except Exception as e:
-            error_message = f"استثنا در ارسال پیام: {str(e)}"
+            error_message = f"Exception in sending message: {str(e)}"
             logger.error(error_message)
             time.sleep(delay)
             
-            # اگر آخرین تلاش است، خطا را ثبت کن
+            # If this is the last attempt, record the error
             if attempt == retries - 1:
                 if RELIABILITY_MONITOR_AVAILABLE:
                     record_message_attempt(message_type, False, error_message)
     
-    logger.error(f"پس از {retries} تلاش، ارسال پیام با شکست مواجه شد")
+    logger.error(f"After {retries} attempts, message sending failed")
     return False
 
 
@@ -297,9 +297,9 @@ def send_test_message():
     if RELIABILITY_MONITOR_AVAILABLE:
         try:
             record_service_restart()
-            logger.info("راه‌اندازی مجدد سرویس با موفقیت ثبت شد")
+            logger.info("Service restart recorded successfully")
         except Exception as e:
-            logger.warning(f"خطا در ثبت راه‌اندازی مجدد سرویس: {str(e)}")
+            logger.warning(f"Error recording service restart: {str(e)}")
     
     return send_message(message, parse_mode="HTML", message_type="test_message")
 
