@@ -2188,10 +2188,75 @@ def send_test_message_replit():
             'message': 'خطا در ارسال پیام تست به تلگرام'
         })
 
+@app.route('/telegram_login')
+def telegram_login():
+    """صفحه ورود به کنترل پنل تلگرام"""
+    return render_template('telegram_login.html')
+
+@app.route('/telegram_login_process', methods=['POST'])
+def telegram_login_process():
+    """پردازش فرم ورود به کنترل پنل تلگرام"""
+    username = request.form.get('username')
+    password = request.form.get('password')
+    
+    if verify_password(username, password):
+        session['telegram_auth'] = True
+        session['telegram_username'] = username
+        
+        # اگر آدرس بعدی ذخیره شده، به آن هدایت کن
+        next_url = session.pop('next_url', url_for('telegram_control_panel'))
+        return redirect(next_url)
+    else:
+        flash('نام کاربری یا رمز عبور اشتباه است', 'danger')
+        return redirect(url_for('telegram_login'))
+
+@app.route('/telegram_logout')
+def telegram_logout():
+    """خروج از حساب کاربری کنترل پنل تلگرام"""
+    session.pop('telegram_auth', None)
+    session.pop('telegram_username', None)
+    flash('با موفقیت خارج شدید', 'success')
+    return redirect(url_for('telegram_login'))
+
+@app.route('/telegram_change_password')
+@login_required
+def telegram_change_password():
+    """صفحه تغییر رمز عبور کنترل پنل تلگرام"""
+    return render_template('telegram_change_password.html')
+
+@app.route('/telegram_change_password_process', methods=['POST'])
+@login_required
+def telegram_change_password_process():
+    """پردازش فرم تغییر رمز عبور کنترل پنل تلگرام"""
+    current_password = request.form.get('current_password')
+    new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm_password')
+    
+    username = session.get('telegram_username')
+    
+    # بررسی رمز عبور فعلی
+    if not verify_password(username, current_password):
+        flash('رمز عبور فعلی اشتباه است', 'danger')
+        return redirect(url_for('telegram_change_password'))
+    
+    # بررسی تطابق رمز عبور جدید و تکرار آن
+    if new_password != confirm_password:
+        flash('رمز عبور جدید و تکرار آن مطابقت ندارند', 'danger')
+        return redirect(url_for('telegram_change_password'))
+    
+    # تغییر رمز عبور
+    if change_password(username, new_password):
+        flash('رمز عبور با موفقیت تغییر یافت', 'success')
+        return redirect(url_for('telegram_control_panel'))
+    else:
+        flash('خطا در تغییر رمز عبور', 'danger')
+        return redirect(url_for('telegram_change_password'))
+
 @app.route('/telegram_control', methods=['GET', 'POST'])
 @app.route('/telegram_control_panel', methods=['GET', 'POST'])
 @app.route('/telegram_panel', methods=['GET', 'POST'])
 @app.route('/telegram-control-panel', methods=['GET', 'POST'])
+@login_required
 def telegram_control_panel():
     """صفحه کنترل پنل تلگرام"""
     inject_now()
