@@ -278,7 +278,7 @@
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
                             {% for lang in languages %}
                             <li>
-                                <a class="dropdown-item {% if current_language.name == lang.name %}active{% endif %}" href="/set-language/{{ lang.name|lower }}">
+                                <a class="dropdown-item {% if session.language == lang.code %}active{% endif %}" href="/set-language/{{ lang.code }}">
                                     {{ lang.icon }} {{ lang.native_name }}
                                 </a>
                             </li>

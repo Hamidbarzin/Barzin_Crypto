@@ -32,16 +32,18 @@ app.secret_key = os.environ.get("SESSION_SECRET", "crypto_bot_secret_key")
 # Add datetime, language and developer info to all templates
 @app.context_processor
 def inject_now():
-    current_language = session.get('language', DEFAULT_LANGUAGE)
+    current_language_code = session.get('language', DEFAULT_LANGUAGE)
     all_languages = get_all_languages()
+    current_language_info = get_language_info(current_language_code)
     
     return {
         'now': datetime.now(),
         'developer_name': 'حمید برزین',
         'developer_year': '۱۴۰۴',
-        'current_language': current_language,
+        'current_language': current_language_info,
+        'current_language_code': current_language_code,
         'languages': all_languages,
-        'ui_text': lambda key, default="": get_ui_text(key, default, current_language)
+        'ui_text': lambda key, default="": get_ui_text(key, default, current_language_code)
     }
 
 # Initialize session defaults
