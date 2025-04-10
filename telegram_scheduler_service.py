@@ -12,6 +12,8 @@ import logging
 import datetime
 import pytz
 import replit_telegram_sender
+import os
+import json
 from crypto_bot.price_alert_service import check_price_alerts
 
 # تنظیم لاگر
@@ -23,6 +25,9 @@ logger = logging.getLogger("telegram_scheduler")
 
 # منطقه زمانی تورنتو
 toronto_tz = pytz.timezone('America/Toronto')
+
+# مسیر ذخیره فایل تنظیمات
+SETTINGS_FILE = "telegram_scheduler_settings.json"
 
 class TelegramSchedulerService:
     """
@@ -52,6 +57,7 @@ class TelegramSchedulerService:
         self.active_hours_start = 8  # ساعت شروع (8 صبح)
         self.active_hours_end = 22   # ساعت پایان (10 شب)
         self.message_sending_enabled = True  # آیا ارسال پیام فعال است؟
+        self.auto_start_on_boot = True  # آیا سرویس به صورت خودکار در راه‌اندازی برنامه شروع شود؟
         
         # ارزهای مهم برای تحلیل تکنیکال
         self.important_coins = ["BTC/USDT", "ETH/USDT", "BNB/USDT", "SOL/USDT", "XRP/USDT"]

@@ -2767,11 +2767,16 @@ with app.app_context():
 if __name__ == "__main__":
     # راه‌اندازی زمان‌بندی تلگرام قبل از شروع برنامه
     try:
-        logger.info("در حال راه‌اندازی سرویس زمان‌بندی تلگرام...")
-        if telegram_scheduler_service.start_scheduler():
-            logger.info("سرویس زمان‌بندی تلگرام با موفقیت راه‌اندازی شد")
+        # بررسی تنظیمات راه‌اندازی خودکار
+        logger.info("در حال بررسی تنظیمات راه‌اندازی خودکار سرویس زمان‌بندی تلگرام...")
+        if telegram_scheduler_service.telegram_scheduler.auto_start_on_boot:
+            logger.info("در حال راه‌اندازی سرویس زمان‌بندی تلگرام...")
+            if telegram_scheduler_service.start_scheduler():
+                logger.info("سرویس زمان‌بندی تلگرام با موفقیت راه‌اندازی شد")
+            else:
+                logger.error("خطا در راه‌اندازی سرویس زمان‌بندی تلگرام")
         else:
-            logger.error("خطا در راه‌اندازی سرویس زمان‌بندی تلگرام")
+            logger.info("راه‌اندازی خودکار سرویس زمان‌بندی تلگرام غیرفعال است")
     except Exception as e:
         logger.error(f"استثنا در راه‌اندازی سرویس زمان‌بندی تلگرام: {str(e)}")
     
