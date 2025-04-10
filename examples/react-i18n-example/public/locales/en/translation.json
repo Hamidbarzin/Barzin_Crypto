@@ -1,0 +1,51 @@
+{
+  "app": {
+    "title": "Crypto Barzin",
+    "description": "Real-time cryptocurrency analysis and trading signals"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "market_overview": "Market Overview",
+    "top_currencies": "Top Currencies",
+    "price_changes": "Price Changes",
+    "trading_signals": "Trading Signals"
+  },
+  "crypto": {
+    "price": "Price",
+    "change": "24h Change",
+    "volume": "Volume",
+    "signals": {
+      "buy": "Buy",
+      "sell": "Sell",
+      "hold": "Hold",
+      "wait": "Wait"
+    },
+    "details": {
+      "current_price": "Current Price",
+      "suggested_volume": "Suggested Volume",
+      "take_profit": "Take Profit",
+      "stop_loss": "Stop Loss",
+      "monitoring_level": "Monitoring Level"
+    }
+  },
+  "language": {
+    "select": "Select Language",
+    "english": "English",
+    "persian": "Persian"
+  },
+  "errors": {
+    "loading": "Error loading data",
+    "api": "API connection failed"
+  },
+  "loading": "Loading...",
+  "show_signals_directly": "Show Signals Directly",
+  "set_alert": "Set Alert",
+  "bitcoin": "Bitcoin",
+  "ethereum": "Ethereum",
+  "solana": "Solana",
+  "binance_coin": "Binance Coin"
+}

@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 111,
-    "successful": 110,
+    "total_sent": 114,
+    "successful": 113,
     "failed": 1,
     "history": [
       {
@@ -559,6 +559,21 @@
         "message_type": "test_message",
         "success": true,
         "timestamp": "2025-04-09T20:00:34.705593-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-09T20:10:40.595428-04:00"
+      },
+      {
+        "message_type": "technical_analysis_BTC",
+        "success": true,
+        "timestamp": "2025-04-09T20:12:41.645903-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-09T20:20:43.431722-04:00"
       }
     ]
   },

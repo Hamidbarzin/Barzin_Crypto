@@ -1,0 +1,132 @@
+# Persian translations for Flask-Babel example
+# Copyright (C) 2025 Hamid Barzin
+# This file is distributed under the same license as the PROJECT project.
+# Hamid Barzin <info@crypto-barzin.example>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: info@crypto-barzin.example\n"
+"POT-Creation-Date: 2025-04-10 12:34+0000\n"
+"PO-Revision-Date: 2025-04-10 12:45+0000\n"
+"Last-Translator: Hamid Barzin <info@crypto-barzin.example>\n"
+"Language-Team: Persian <fa@li.org>\n"
+"Language: fa\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.14.0\n"
+
+# API Error Messages
+msgid "Symbol is required"
+msgstr "نماد ارز الزامی است"
+
+msgid "Target price is required"
+msgstr "قیمت هدف الزامی است"
+
+msgid "Price alert created successfully"
+msgstr "هشدار قیمت با موفقیت ایجاد شد"
+
+msgid "An error occurred: %(error)s"
+msgstr "خطایی رخ داد: %(error)s"
+
+msgid "Invalid language code"
+msgstr "کد زبان نامعتبر است"
+
+msgid "Language changed successfully"
+msgstr "زبان با موفقیت تغییر یافت"
+
+# User Messages
+msgid "Welcome to Crypto Advisor"
+msgstr "به مشاور ارز دیجیتال خوش آمدید"
+
+msgid "Your BTC alert was triggered"
+msgstr "هشدار بیت‌کوین شما فعال شد"
+
+msgid "System maintenance scheduled for tomorrow"
+msgstr "نگهداری سیستم برای فردا برنامه‌ریزی شده است"
+
+# Portfolio Messages
+msgid "Your portfolio has grown by %(percent)s%% in the last 24 hours"
+msgstr "پورتفولیوی شما در ۲۴ ساعت گذشته %(percent)s٪ رشد داشته است"
+
+msgid "Consider taking some profits"
+msgstr "بهتر است بخشی از سود خود را برداشت کنید"
+
+msgid "Performing well"
+msgstr "عملکرد خوب"
+
+msgid "Strong buy signal"
+msgstr "سیگنال قوی خرید"
+
+# Crypto Names
+msgid "Bitcoin"
+msgstr "بیت‌کوین"
+
+msgid "Ethereum"
+msgstr "اتریوم"
+
+# UI Elements
+msgid "Crypto Barzin"
+msgstr "کریپتو برزین"
+
+msgid "Multilingual Flask Application Example"
+msgstr "مثال برنامه Flask چندزبانه"
+
+msgid "Select Language"
+msgstr "انتخاب زبان"
+
+msgid "English"
+msgstr "انگلیسی"
+
+msgid "Persian"
+msgstr "فارسی"
+
+msgid "API Examples with Multilingual Support"
+msgstr "مثال‌های API با پشتیبانی چندزبانه"
+
+msgid "Price Alert API"
+msgstr "API هشدار قیمت"
+
+msgid "Create a price alert for cryptocurrency"
+msgstr "ایجاد هشدار قیمت برای ارز دیجیتال"
+
+msgid "Symbol"
+msgstr "نماد"
+
+msgid "Price"
+msgstr "قیمت"
+
+msgid "Alert Type"
+msgstr "نوع هشدار"
+
+msgid "Price Above"
+msgstr "قیمت بالاتر از"
+
+msgid "Price Below"
+msgstr "قیمت پایین‌تر از"
+
+msgid "Create Alert"
+msgstr "ایجاد هشدار"
+
+msgid "Response will appear here"
+msgstr "پاسخ اینجا نمایش داده می‌شود"
+
+msgid "User Messages API"
+msgstr "API پیام‌های کاربر"
+
+msgid "Get user messages in current language"
+msgstr "دریافت پیام‌های کاربر به زبان فعلی"
+
+msgid "Get Messages"
+msgstr "دریافت پیام‌ها"
+
+msgid "Portfolio Summary API"
+msgstr "API خلاصه پورتفولیو"
+
+msgid "Get portfolio summary in current language"
+msgstr "دریافت خلاصه پورتفولیو به زبان فعلی"
+
+msgid "Get Portfolio"
+msgstr "دریافت پورتفولیو"

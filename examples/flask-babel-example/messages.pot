@@ -1,0 +1,130 @@
+# Translation template for Flask-Babel example
+# Copyright (C) 2025 Hamid Barzin
+# This file is distributed under the same license as the PROJECT project.
+# Hamid Barzin <info@crypto-barzin.example>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: info@crypto-barzin.example\n"
+"POT-Creation-Date: 2025-04-10 12:34+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.14.0\n"
+
+# API Error Messages
+msgid "Symbol is required"
+msgstr ""
+
+msgid "Target price is required"
+msgstr ""
+
+msgid "Price alert created successfully"
+msgstr ""
+
+msgid "An error occurred: %(error)s"
+msgstr ""
+
+msgid "Invalid language code"
+msgstr ""
+
+msgid "Language changed successfully"
+msgstr ""
+
+# User Messages
+msgid "Welcome to Crypto Advisor"
+msgstr ""
+
+msgid "Your BTC alert was triggered"
+msgstr ""
+
+msgid "System maintenance scheduled for tomorrow"
+msgstr ""
+
+# Portfolio Messages
+msgid "Your portfolio has grown by %(percent)s%% in the last 24 hours"
+msgstr ""
+
+msgid "Consider taking some profits"
+msgstr ""
+
+msgid "Performing well"
+msgstr ""
+
+msgid "Strong buy signal"
+msgstr ""
+
+# Crypto Names
+msgid "Bitcoin"
+msgstr ""
+
+msgid "Ethereum"
+msgstr ""
+
+# UI Elements
+msgid "Crypto Barzin"
+msgstr ""
+
+msgid "Multilingual Flask Application Example"
+msgstr ""
+
+msgid "Select Language"
+msgstr ""
+
+msgid "English"
+msgstr ""
+
+msgid "Persian"
+msgstr ""
+
+msgid "API Examples with Multilingual Support"
+msgstr ""
+
+msgid "Price Alert API"
+msgstr ""
+
+msgid "Create a price alert for cryptocurrency"
+msgstr ""
+
+msgid "Symbol"
+msgstr ""
+
+msgid "Price"
+msgstr ""
+
+msgid "Alert Type"
+msgstr ""
+
+msgid "Price Above"
+msgstr ""
+
+msgid "Price Below"
+msgstr ""
+
+msgid "Create Alert"
+msgstr ""
+
+msgid "Response will appear here"
+msgstr ""
+
+msgid "User Messages API"
+msgstr ""
+
+msgid "Get user messages in current language"
+msgstr ""
+
+msgid "Get Messages"
+msgstr ""
+
+msgid "Portfolio Summary API"
+msgstr ""
+
+msgid "Get portfolio summary in current language"
+msgstr ""
+
+msgid "Get Portfolio"
+msgstr ""

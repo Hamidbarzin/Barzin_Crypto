@@ -1,0 +1,51 @@
+{
+  "app": {
+    "title": "کریپتو برزین",
+    "description": "تحلیل بلادرنگ ارزهای دیجیتال و سیگنال‌های معاملاتی"
+  },
+  "nav": {
+    "home": "خانه",
+    "dashboard": "داشبورد",
+    "settings": "تنظیمات"
+  },
+  "dashboard": {
+    "market_overview": "نمای کلی بازار",
+    "top_currencies": "ارزهای برتر",
+    "price_changes": "تغییرات قیمت",
+    "trading_signals": "سیگنال‌های معاملاتی"
+  },
+  "crypto": {
+    "price": "قیمت",
+    "change": "تغییر ۲۴ ساعته",
+    "volume": "حجم معاملات",
+    "signals": {
+      "buy": "خرید",
+      "sell": "فروش",
+      "hold": "نگهداری",
+      "wait": "انتظار"
+    },
+    "details": {
+      "current_price": "قیمت فعلی",
+      "suggested_volume": "حجم پیشنهادی",
+      "take_profit": "حد سود",
+      "stop_loss": "حد ضرر",
+      "monitoring_level": "سطح نظارت"
+    }
+  },
+  "language": {
+    "select": "انتخاب زبان",
+    "english": "انگلیسی",
+    "persian": "فارسی"
+  },
+  "errors": {
+    "loading": "خطا در بارگذاری داده‌ها",
+    "api": "خطا در اتصال به API"
+  },
+  "loading": "در حال بارگذاری...",
+  "show_signals_directly": "نمایش مستقیم سیگنال‌ها",
+  "set_alert": "تنظیم هشدار",
+  "bitcoin": "بیت‌کوین",
+  "ethereum": "اتریوم",
+  "solana": "سولانا",
+  "binance_coin": "بایننس کوین"
+}
