@@ -16,37 +16,7 @@
         <!-- Main Settings Form -->
         <div class="col-lg-8">
             <form id="notification-settings-form">
-                <!-- Language Settings -->
-                <div class="card mb-4 crypto-card">
-                    <div class="card-header">
-                        <h5 class="mb-0">{{ ui_text('language_settings', 'تنظیمات زبان') }}</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">{{ ui_text('application_language', 'زبان برنامه') }}</label>
-                            <div class="d-flex align-items-center">
-                                <a href="/set-language/fa" class="btn btn-outline-primary me-2 {% if session.language == 'fa' or not session.language %}active{% endif %}">
-                                    🇮🇷 فارسی
-                                </a>
-                                <a href="/set-language/en" class="btn btn-outline-primary me-2 {% if session.language == 'en' %}active{% endif %}">
-                                    🇬🇧 English
-                                </a>
-                                <a href="/set-language/fr" class="btn btn-outline-primary me-2 {% if session.language == 'fr' %}active{% endif %}">
-                                    🇫🇷 Français
-                                </a>
-                            </div>
-                            <div class="small text-muted mt-2">
-                                {% if session.language == 'en' %}
-                                {{ ui_text('current_language_ltr', 'Current language: English (Left to Right)') }}
-                                {% elif session.language == 'fr' %}
-                                {{ ui_text('current_language_ltr', 'Langue actuelle: Français (De gauche à droite)') }}
-                                {% else %}
-                                {{ ui_text('current_language_rtl', 'زبان فعلی: فارسی (راست به چپ)') }}
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
                 
                 <!-- Notification Channels -->
                 <div class="card mb-4 crypto-card">

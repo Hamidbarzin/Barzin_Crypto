@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ session.get('language', 'fa') }}" dir="{{ get_language_dir(session.get('language', 'fa')) }}" data-bs-theme="dark">
+<html lang="en" dir="ltr" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -271,20 +271,7 @@
                             <i class="fas fa-cog me-1"></i> {{ ui_text('settings', 'تنظیمات') }}
                         </a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-globe me-1"></i> {{ ui_text('language', 'زبان') }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-                            {% for lang in languages %}
-                            <li>
-                                <a class="dropdown-item {% if session.language == lang.code %}active{% endif %}" href="/set-language/{{ lang.code }}">
-                                    {{ lang.icon }} {{ lang.native_name }}
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
+
                 </ul>
             </div>
         </div>

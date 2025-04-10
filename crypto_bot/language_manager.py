@@ -12,11 +12,11 @@ from functools import lru_cache
 # تنظیم لاگر
 logger = logging.getLogger(__name__)
 
-# زبان‌های پشتیبانی شده
-SUPPORTED_LANGUAGES = ['en', 'fa', 'fr']
+# زبان‌های پشتیبانی شده - فقط انگلیسی
+SUPPORTED_LANGUAGES = ['en']
 
 # زبان پیش‌فرض
-DEFAULT_LANGUAGE = 'fa'
+DEFAULT_LANGUAGE = 'en'
 
 # مسیر فایل‌های ترجمه
 LOCALES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'locales')
