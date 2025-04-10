@@ -26,8 +26,8 @@ logger = logging.getLogger("always_on_service")
 LOCK_FILE = '.smart_bot_lock'
 PID_FILE = '.smart_bot_pid'
 
-# تعیین URL
-BASE_URL = os.environ.get("APP_URL", "http://localhost:5000")
+# تعیین URL - از localhost استفاده نمی‌کنیم چون در replit محیط‌های مختلف هستند
+BASE_URL = os.environ.get("APP_URL", "https://456c040e-8bc3-434b-9dda-ccfefc1876f5-00-3po21xtoto5mt.picard.replit.dev")
 TELEGRAM_STATUS_URL = f"{BASE_URL}/api/telegram/status"
 TELEGRAM_START_URL = f"{BASE_URL}/api/telegram/start"
 

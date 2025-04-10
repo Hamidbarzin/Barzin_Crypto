@@ -20,8 +20,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger("startup_script")
 
-# تعیین URL پایه
-BASE_URL = os.environ.get("APP_URL", "http://localhost:5000")
+# تعیین URL پایه - از localhost استفاده نمی‌کنیم چون در replit محیط‌های مختلف هستند
+BASE_URL = os.environ.get("APP_URL", "https://456c040e-8bc3-434b-9dda-ccfefc1876f5-00-3po21xtoto5mt.picard.replit.dev")
 
 def check_server_ready():
     """
