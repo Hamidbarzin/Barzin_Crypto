@@ -2193,7 +2193,10 @@ def send_test_message_replit():
 @app.route('/telegram-control-panel')
 def telegram_control_panel():
     """صفحه کنترل پنل تلگرام"""
-    return render_template('telegram_control_panel.html')
+    inject_now()
+    # دریافت وضعیت فعلی سرویس زمان‌بندی
+    scheduler_status = telegram_scheduler_service.get_scheduler_status()
+    return render_template('telegram_control_panel.html', scheduler_status=scheduler_status)
 
 
 @app.route('/telegram-reliability')

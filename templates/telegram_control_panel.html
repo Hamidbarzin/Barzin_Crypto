@@ -57,8 +57,82 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-dark text-white">
+                                    <h5 class="mb-0">کنترل سرویس زمان‌بندی</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-success flex-grow-1" id="btn-start-service">
+                                            <i class="fas fa-play me-2"></i>راه‌اندازی سرویس
+                                        </button>
+                                        <button class="btn btn-danger flex-grow-1" id="btn-stop-service">
+                                            <i class="fas fa-stop me-2"></i>توقف سرویس
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card mb-4">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">تنظیمات زمان‌بندی ارسال پیام</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="scheduler-settings-form">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="form-check form-switch mb-3">
+                                                    <input class="form-check-input" type="checkbox" id="message-sending-enabled" checked>
+                                                    <label class="form-check-label" for="message-sending-enabled">ارسال خودکار پیام فعال باشد</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="active-hours-start" class="form-label">ساعت شروع ارسال پیام (8 = 8 صبح)</label>
+                                                <input type="number" class="form-control" id="active-hours-start" min="0" max="23" value="8">
+                                                <div class="form-text">ساعت به وقت تورنتو - بین 0 تا 23</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="active-hours-end" class="form-label">ساعت پایان ارسال پیام (22 = 10 شب)</label>
+                                                <input type="number" class="form-control" id="active-hours-end" min="1" max="24" value="22">
+                                                <div class="form-text">ساعت به وقت تورنتو - بین 1 تا 24</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-md-12">
+                                                <label for="interval" class="form-label">فاصله زمانی ارسال گزارش قیمت (به ثانیه)</label>
+                                                <select class="form-select" id="interval">
+                                                    <option value="300">5 دقیقه (300 ثانیه)</option>
+                                                    <option value="600">10 دقیقه (600 ثانیه)</option>
+                                                    <option value="900">15 دقیقه (900 ثانیه)</option>
+                                                    <option value="1800" selected>30 دقیقه (1800 ثانیه)</option>
+                                                    <option value="3600">1 ساعت (3600 ثانیه)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-grid">
+                                            <button type="button" class="btn btn-success" id="btn-save-settings">
+                                                <i class="fas fa-save me-2"></i>ذخیره تنظیمات
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-2">
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-header bg-secondary text-white">
@@ -191,21 +265,86 @@
         this.disabled = false;
     });
     
-    // بررسی وضعیت در هنگام بارگذاری صفحه
-    document.addEventListener('DOMContentLoaded', async function() {
+    // ذخیره تنظیمات
+    document.getElementById('btn-save-settings').addEventListener('click', async function() {
+        this.disabled = true;
+        
+        // دریافت مقادیر فرم
+        const messageSendingEnabled = document.getElementById('message-sending-enabled').checked;
+        const activeHoursStart = parseInt(document.getElementById('active-hours-start').value, 10);
+        const activeHoursEnd = parseInt(document.getElementById('active-hours-end').value, 10);
+        const interval = parseInt(document.getElementById('interval').value, 10);
+        
+        // ساخت آبجکت تنظیمات
+        const settings = {
+            message_sending_enabled: messageSendingEnabled,
+            active_hours_start: activeHoursStart,
+            active_hours_end: activeHoursEnd,
+            interval: interval
+        };
+        
+        // ارسال درخواست به API
+        await callApi('/api/telegram/settings', 'POST', settings);
+        
+        // بروزرسانی وضعیت
+        refreshStatus();
+        
+        this.disabled = false;
+    });
+    
+    // تابع بروزرسانی وضعیت
+    async function refreshStatus() {
         try {
             const response = await fetch('/api/telegram/status');
             const result = await response.json();
             
-            if (result.running) {
-                showResult(`سرویس زمان‌بندی تلگرام در حال اجراست. ایجاد شده در: ${result.created_at}`, true);
-            } else {
-                showResult('سرویس زمان‌بندی تلگرام در حال اجرا نیست.', false);
+            if (result) {
+                // نمایش وضعیت سرویس
+                if (result.running) {
+                    showResult(`سرویس زمان‌بندی تلگرام در حال اجراست. گزارش قیمت بعدی: ${result.next_price_report}`, true);
+                } else {
+                    showResult('سرویس زمان‌بندی تلگرام در حال اجرا نیست.', false);
+                }
+                
+                // بروزرسانی فرم تنظیمات با مقادیر فعلی
+                document.getElementById('message-sending-enabled').checked = result.message_sending_enabled;
+                document.getElementById('active-hours-start').value = result.active_hours_start;
+                document.getElementById('active-hours-end').value = result.active_hours_end;
+                
+                // تنظیم dropdown فاصله زمانی
+                const intervalSelect = document.getElementById('interval');
+                for(let i = 0; i < intervalSelect.options.length; i++) {
+                    if (parseInt(intervalSelect.options[i].value, 10) === result.interval) {
+                        intervalSelect.selectedIndex = i;
+                        break;
+                    }
+                }
             }
         } catch (error) {
             console.error('خطا در بررسی وضعیت:', error);
             showResult('خطا در بررسی وضعیت سرویس زمان‌بندی تلگرام.', false);
         }
+    }
+    
+    // راه‌اندازی سرویس
+    document.getElementById('btn-start-service').addEventListener('click', async function() {
+        this.disabled = true;
+        await callApi('/api/telegram/start');
+        setTimeout(refreshStatus, 1000); // بروزرسانی وضعیت پس از 1 ثانیه
+        this.disabled = false;
+    });
+    
+    // توقف سرویس
+    document.getElementById('btn-stop-service').addEventListener('click', async function() {
+        this.disabled = true;
+        await callApi('/api/telegram/stop');
+        setTimeout(refreshStatus, 1000); // بروزرسانی وضعیت پس از 1 ثانیه
+        this.disabled = false;
+    });
+    
+    // بررسی وضعیت در هنگام بارگذاری صفحه
+    document.addEventListener('DOMContentLoaded', async function() {
+        refreshStatus();
     });
 </script>
 {% endblock %}
