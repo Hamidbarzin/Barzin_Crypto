@@ -22,6 +22,7 @@ from crypto_bot.language_manager import (
 from crypto_bot.telegram_auth import verify_password, change_password, register_user, login_required
 import replit_telegram_sender
 import telegram_scheduler_service
+from api_routes import api
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
