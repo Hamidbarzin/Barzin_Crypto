@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 373,
-    "successful": 367,
+    "total_sent": 374,
+    "successful": 368,
     "failed": 6,
     "history": [
       {
@@ -1874,6 +1874,11 @@
         "message_type": "test_message",
         "success": true,
         "timestamp": "2025-04-10T02:10:04.741709-04:00"
+      },
+      {
+        "message_type": "general",
+        "success": true,
+        "timestamp": "2025-04-10T02:11:05.296724-04:00"
       }
     ]
   },
