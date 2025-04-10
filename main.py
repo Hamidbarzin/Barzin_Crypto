@@ -2187,13 +2187,66 @@ def send_test_message_replit():
             'message': 'خطا در ارسال پیام تست به تلگرام'
         })
 
-@app.route('/telegram_control')
-@app.route('/telegram_control_panel')
-@app.route('/telegram_panel')
-@app.route('/telegram-control-panel')
+@app.route('/telegram_control', methods=['GET', 'POST'])
+@app.route('/telegram_control_panel', methods=['GET', 'POST'])
+@app.route('/telegram_panel', methods=['GET', 'POST'])
+@app.route('/telegram-control-panel', methods=['GET', 'POST'])
 def telegram_control_panel():
     """صفحه کنترل پنل تلگرام"""
     inject_now()
+    
+    # اگر متد POST باشد، تنظیمات را ذخیره می‌کنیم
+    if request.method == 'POST':
+        try:
+            # لاگ کردن تمام داده‌های دریافتی برای دیباگ
+            logger.info(f"داده‌های دریافتی از فرم: {request.form}")
+            
+            # دریافت مقادیر از فرم
+            message_sending_enabled = request.form.get('message_sending_enabled') == 'on'
+            auto_start_on_boot = request.form.get('auto_start_on_boot') == 'on'
+            
+            # تبدیل مقادیر عددی
+            try:
+                active_hours_start = int(request.form.get('active_hours_start', 8))
+                active_hours_end = int(request.form.get('active_hours_end', 22))
+                interval = int(request.form.get('interval', 1800))
+            except (ValueError, TypeError) as e:
+                logger.error(f"خطا در تبدیل مقادیر عددی: {str(e)}")
+                # مقادیر پیش‌فرض
+                active_hours_start = 8
+                active_hours_end = 22
+                interval = 1800
+            
+            # ساخت دیکشنری تنظیمات
+            settings = {
+                'message_sending_enabled': message_sending_enabled,
+                'auto_start_on_boot': auto_start_on_boot,
+                'active_hours_start': active_hours_start,
+                'active_hours_end': active_hours_end,
+                'interval': interval
+            }
+            
+            # بروزرسانی تنظیمات
+            updated_status = telegram_scheduler_service.update_scheduler_settings(settings)
+            logger.info(f"تنظیمات با موفقیت به‌روزرسانی شد: {settings}")
+            
+            # ذخیره پیام موفقیت در جلسه
+            session['settings_saved'] = True
+            
+            # ذخیره تاریخ آخرین تنظیمات
+            session['last_settings_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            
+        except Exception as e:
+            # ثبت خطای دقیق
+            error_message = str(e)
+            logger.error(f"خطای دقیق در بروزرسانی تنظیمات: {error_message}")
+            
+            # ثبت اطلاعات اضافی دیباگ 
+            import traceback
+            logger.error(f"جزئیات خطا: {traceback.format_exc()}")
+            
+            # ذخیره خطا در session
+            session['settings_error'] = error_message
     
     # دریافت وضعیت فعلی سرویس زمان‌بندی
     status = telegram_scheduler_service.get_scheduler_status()
