@@ -27,7 +27,8 @@ try:
     _telegram = Bot
     _telegram_error = TelegramError
     logger.info("Python-telegram-bot library loaded successfully.")
-except ImportError:
+except ImportError as e:
+    logger.warning(f"Python-telegram-bot library not installed ({str(e)}). Telegram features will be disabled.")
     logger.warning("کتابخانه python-telegram-bot نصب نشده است. قابلیت‌های تلگرام غیرفعال خواهند بود.")
 
 # دریافت توکن بات Telegram از متغیرهای محیطی
