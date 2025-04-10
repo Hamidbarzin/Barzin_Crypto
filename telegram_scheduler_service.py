@@ -42,11 +42,11 @@ class TelegramSchedulerService:
         self.technical_analysis_counter = 0
         self.trading_signals_counter = 0
         self.crypto_news_counter = 0
-        self.interval = 120  # 2 دقیقه = 120 ثانیه
-        self.system_report_interval = 180  # هر 180 بار (6 ساعت)
-        self.technical_analysis_interval = 60  # هر 60 بار (2 ساعت)
-        self.trading_signals_interval = 120  # هر 120 بار (4 ساعت)
-        self.crypto_news_interval = 240  # هر 240 بار (8 ساعت)
+        self.interval = 1800  # 30 دقیقه = 1800 ثانیه
+        self.system_report_interval = 12  # هر 12 بار (6 ساعت)
+        self.technical_analysis_interval = 4  # هر 4 بار (2 ساعت)
+        self.trading_signals_interval = 8  # هر 8 بار (4 ساعت)
+        self.crypto_news_interval = 16  # هر 16 بار (8 ساعت)
         
         # ارزهای مهم برای تحلیل تکنیکال
         self.important_coins = ["BTC/USDT", "ETH/USDT", "BNB/USDT", "SOL/USDT", "XRP/USDT"]
@@ -129,11 +129,11 @@ class TelegramSchedulerService:
             logger.info("ارسال گزارش قیمت اولیه...")
             self._send_price_report()
             
-            # شمارنده برای ارسال پیام هر 2 دقیقه
+            # شمارنده برای ارسال پیام هر نیم ساعت
             counter = 0
             # بازه زمانی کوچکتر برای بررسی وضعیت
             small_interval = 60  # 1 دقیقه
-            ticks_for_report = self.interval // small_interval
+            ticks_for_report = 30  # 30 دقیقه / 1 دقیقه = 30 تیک
             
             while self.running:
                 # خواب با بازه کوچکتر برای کنترل بهتر
@@ -142,13 +142,24 @@ class TelegramSchedulerService:
                 if not self.running:
                     break
                 
+                # بررسی زمان فعلی در تورنتو
+                now_toronto = datetime.datetime.now(toronto_tz)
+                current_hour = now_toronto.hour
+                
+                # فقط بین ساعت 8 صبح تا 10 شب ارسال کن
+                is_active_hours = 8 <= current_hour < 22
+                
                 counter += 1
                 logger.info(f"تیک شماره {counter} از {ticks_for_report} برای ارسال گزارش بعدی")
                 
-                # هر 2 دقیقه گزارش قیمت ارسال کن
-                if counter >= ticks_for_report:
+                # هر نیم ساعت گزارش قیمت ارسال کن (اگر در ساعات فعال هستیم)
+                if counter >= ticks_for_report and is_active_hours:
                     logger.info("زمان ارسال گزارش قیمت فرا رسیده...")
                     self._send_price_report()
+                    counter = 0
+                # اگر به تعداد تیک لازم رسیدیم ولی در ساعات غیرفعال هستیم، فقط شمارنده را ریست کن
+                elif counter >= ticks_for_report and not is_active_hours:
+                    logger.info("خارج از ساعات فعال (8 صبح تا 10 شب) هستیم، گزارش ارسال نمی‌شود")
                     counter = 0
                 
                 # بررسی هشدارهای قیمت در هر تیک
