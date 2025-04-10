@@ -20,10 +20,10 @@ _telegram_error = None
 
 try:
     # Using the PTB v13.x API
-    from telegram import Bot, ParseMode
+    import telegram
     from telegram.error import TelegramError
     TELEGRAM_AVAILABLE = True
-    _telegram = Bot
+    _telegram = telegram
     _telegram_error = TelegramError
     logger.info("Python-telegram-bot library loaded successfully.")
 except ImportError as e:
