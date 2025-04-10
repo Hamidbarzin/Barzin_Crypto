@@ -163,7 +163,10 @@ class TelegramSchedulerService:
                     counter = 0
                 
                 # بررسی هشدارهای قیمت در هر تیک
-                self._check_price_alerts()
+                try:
+                    self._check_price_alerts()
+                except Exception as e:
+                    logger.error(f"خطا در بررسی هشدارهای قیمت: {str(e)}")
                 
                 # افزایش شمارنده‌ها
                 self.system_report_counter += 1
