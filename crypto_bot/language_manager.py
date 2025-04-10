@@ -13,7 +13,7 @@ from functools import lru_cache
 logger = logging.getLogger(__name__)
 
 # زبان‌های پشتیبانی شده
-SUPPORTED_LANGUAGES = ['en', 'fa']
+SUPPORTED_LANGUAGES = ['en', 'fa', 'fr']
 
 # زبان پیش‌فرض
 DEFAULT_LANGUAGE = 'fa'
