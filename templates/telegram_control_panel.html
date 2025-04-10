@@ -319,20 +319,8 @@
             const result = await response.json();
             
             if (result && result.success) {
-                // نمایش پیام موفقیت با استایل بهتر
-                const settingsResult = document.getElementById('settings-result');
-                settingsResult.classList.remove('d-none');
-                
-                // اسکرول به پیام موفقیت
-                settingsResult.scrollIntoView({ behavior: 'smooth' });
-                
-                // مخفی کردن اتوماتیک پیام موفقیت بعد از 5 ثانیه
-                setTimeout(() => {
-                    settingsResult.classList.add('d-none');
-                }, 5000);
-                
-                // نمایش پیام موفقیت در بخش نتایج نیز
-                showResult('تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.', true);
+                // هدایت به صفحه جدید نمایش موفقیت و بازگشت خودکار
+                window.location.href = '/telegram-settings-saved';
             } else {
                 showResult(result.message || 'خطا در ذخیره تنظیمات', false);
             }

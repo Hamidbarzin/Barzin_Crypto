@@ -2214,6 +2214,13 @@ def telegram_success_message():
     inject_now()
     return render_template('telegram_success_message.html')
 
+
+@app.route('/telegram-settings-saved')
+def telegram_settings_saved():
+    """صفحه نمایش موفقیت در ذخیره تنظیمات تلگرام (صفحه جدید)"""
+    inject_now()
+    return render_template('telegram_settings_saved.html')
+
 @app.route('/telegram-reliability')
 def telegram_reliability_dashboard():
     """صفحه داشبورد قابلیت اطمینان تلگرام"""
