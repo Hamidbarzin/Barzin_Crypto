@@ -2194,18 +2194,36 @@ def send_test_message_replit():
 def telegram_control_panel():
     """صفحه کنترل پنل تلگرام"""
     inject_now()
-    # دریافت وضعیت فعلی سرویس زمان‌بندی
-    scheduler_status = telegram_scheduler_service.get_scheduler_status()
     
-    # بررسی وجود پیام موفقیت در جلسه
+    # دریافت وضعیت فعلی سرویس زمان‌بندی
+    status = telegram_scheduler_service.get_scheduler_status()
+    
+    # بررسی وجود پیام موفقیت و خطا در جلسه
     settings_saved = False
+    settings_error = None
+    
     if session.get('settings_saved'):
         settings_saved = True
         session.pop('settings_saved', None)  # حذف پیام پس از استفاده
     
-    return render_template('telegram_control_panel.html', 
-                           scheduler_status=scheduler_status,
-                           settings_saved=settings_saved)
+    if session.get('settings_error'):
+        settings_error = session.get('settings_error')
+        session.pop('settings_error', None)  # حذف پیام خطا پس از استفاده
+    
+    # پارامتر error از query string
+    error_param = request.args.get('error', '0')
+    has_error = error_param == '1'
+    
+    # لاگ کردن متغیرهای مهم برای دیباگ
+    app.logger.info(f"بارگذاری صفحه تنظیمات تلگرام. ذخیره شده: {settings_saved}, خطا: {settings_error}, پارامتر خطا: {error_param}")
+    
+    return render_template(
+        'telegram_control_panel.html', 
+        status=status,
+        settings_saved=settings_saved,
+        settings_error=settings_error,
+        has_error=has_error
+    )
 
 
 @app.route('/telegram-success')
