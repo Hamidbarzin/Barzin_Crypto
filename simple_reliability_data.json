@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 344,
-    "successful": 338,
+    "total_sent": 345,
+    "successful": 339,
     "failed": 6,
     "history": [
       {
@@ -1729,6 +1729,11 @@
         "message_type": "price_report",
         "success": true,
         "timestamp": "2025-04-10T01:32:51.981472-04:00"
+      },
+      {
+        "message_type": "general",
+        "success": true,
+        "timestamp": "2025-04-10T01:33:52.719476-04:00"
       }
     ]
   },

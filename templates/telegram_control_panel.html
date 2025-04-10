@@ -314,8 +314,14 @@
             const result = await response.json();
             
             if (result && result.success) {
-                // هدایت به صفحه پیام موفقیت
-                window.location.href = '/telegram-success';
+                // نمایش پیام موفقیت ساده با استفاده از alert
+                alert('تنظیمات با موفقیت ذخیره شد.');
+                
+                // نمایش پیام موفقیت در صفحه
+                showResult('تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.', true);
+                
+                // اسکرول به پیام موفقیت
+                document.getElementById('result-container').scrollIntoView({ behavior: 'smooth' });
             } else {
                 showResult(result.message || 'خطا در ذخیره تنظیمات', false);
             }
