@@ -60,7 +60,7 @@ def inject_now():
         'current_language': current_language_info,
         'current_language_code': current_language_code,
         'languages': all_languages,
-        'ui_text': lambda key, default="": get_ui_text(key, default, current_language_code),
+        'ui_text': lambda key, default="": get_ui_text(key, default, session.get('language', DEFAULT_LANGUAGE)),
         'get_language_dir': get_language_dir
     }
 
