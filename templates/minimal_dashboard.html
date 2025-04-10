@@ -127,6 +127,7 @@
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-sm btn-secondary active">BTC</button>
                                 <button type="button" class="btn btn-sm btn-outline-secondary">ETH</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary">SOL</button>
                                 <button type="button" class="btn btn-sm btn-outline-secondary">XRP</button>
                             </div>
                         </div>
@@ -547,6 +548,41 @@
         
         // به‌روزرسانی خودکار قیمت‌ها هر ۳۰ ثانیه
         setInterval(updateSignalPrices, 30000);
+        
+        // تنظیم رویدادهای کلیک روی تب‌های ارزی در تحلیل تکنیکال
+        document.querySelectorAll('.btn-group[role="group"] button').forEach(button => {
+            button.addEventListener('click', function() {
+                // برداشتن وضعیت فعال از همه دکمه‌ها
+                document.querySelectorAll('.btn-group[role="group"] button').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.remove('btn-secondary');
+                    btn.classList.add('btn-outline-secondary');
+                });
+                
+                // فعال کردن دکمه انتخاب شده
+                this.classList.remove('btn-outline-secondary');
+                this.classList.add('btn-secondary');
+                this.classList.add('active');
+                
+                // تغییر محتوای نمودار و عنوان بر اساس ارز انتخاب شده
+                const coinText = this.textContent.trim();
+                const chartText = document.querySelector('.chart-container p');
+                const titleElement = document.querySelector('#technical-pane .card-header h5');
+                
+                if (chartText) {
+                    chartText.textContent = `نمودار قیمت ${coinText}/USDT`;
+                }
+                
+                if (titleElement) {
+                    let coinName = 'بیت‌کوین';
+                    if (coinText === 'ETH') coinName = 'اتریوم';
+                    if (coinText === 'SOL') coinName = 'سولانا';
+                    if (coinText === 'XRP') coinName = 'ریپل';
+                    
+                    titleElement.textContent = `تحلیل تکنیکال ${coinName} (تایم‌فریم ساعتی)`;
+                }
+            });
+        });
     });
 </script>
 {% endblock %}
