@@ -77,8 +77,8 @@ def initialize_session():
         session['watched_currencies'] = DEFAULT_CURRENCIES[:3]  # Start with BTC, ETH, XRP
     if 'scheduler_running' not in session:
         session['scheduler_running'] = False
-    if 'language' not in session:
-        session['language'] = DEFAULT_LANGUAGE
+    # همیشه زبان انگلیسی را تنظیم کن
+    session['language'] = 'en'
     if 'include_middle_east' not in session:
         session['include_middle_east'] = True  # Default to including Middle Eastern news sources
 
