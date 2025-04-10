@@ -1,1 +1,56 @@
-{}
+{
+  "dashboard": "Dashboard",
+  "title": "Crypto Barzin",
+  "market_overview": "Latest analysis, signals, and cryptocurrency market prices",
+  "price_card": {
+    "current_price": "Current Price",
+    "24h_change": "24h Change",
+    "market_cap": "Market Cap",
+    "volume": "Volume",
+    "all_time_high": "All-Time High",
+    "updated": "Updated at"
+  },
+  "signal_card": {
+    "trading_signals": "Trading Signals",
+    "signal": "Signal",
+    "recommendation": "Recommendation",
+    "trend": "Trend",
+    "risk": "Risk",
+    "target_price": "Target Price",
+    "more_details": "More Details"
+  },
+  "news_card": {
+    "latest_news": "Latest News",
+    "read_more": "Read More",
+    "source": "Source",
+    "published": "Published"
+  },
+  "chart_card": {
+    "price_chart": "Price Chart",
+    "timeframe": "Timeframe",
+    "indicators": "Indicators",
+    "full_screen": "Full Screen"
+  },
+  "analysis_card": {
+    "technical_analysis": "Technical Analysis",
+    "indicators": "Indicators",
+    "support": "Support",
+    "resistance": "Resistance",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly"
+  },
+  "alerts_card": {
+    "price_alerts": "Price Alerts",
+    "active_alerts": "Active Alerts",
+    "set_alert": "Set Alert",
+    "no_alerts": "No alerts have been set"
+  },
+  "ai_card": {
+    "ai_prediction": "AI Prediction",
+    "market_sentiment": "Market Sentiment",
+    "price_pattern": "Price Pattern",
+    "prediction": "Prediction"
+  },
+  "update_time": "Last updated at"
+}

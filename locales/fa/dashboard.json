@@ -1,1 +1,56 @@
-{}
+{
+  "dashboard": "داشبورد",
+  "title": "کریپتو برزین",
+  "market_overview": "آخرین تحلیل‌ها، سیگنال‌ها و قیمت‌های بازار ارز دیجیتال",
+  "price_card": {
+    "current_price": "قیمت فعلی",
+    "24h_change": "تغییر ۲۴ ساعته",
+    "market_cap": "ارزش بازار",
+    "volume": "حجم معاملات",
+    "all_time_high": "بالاترین قیمت تاریخی",
+    "updated": "به‌روزرسانی شده در"
+  },
+  "signal_card": {
+    "trading_signals": "سیگنال‌های معاملاتی",
+    "signal": "سیگنال",
+    "recommendation": "توصیه",
+    "trend": "روند",
+    "risk": "ریسک",
+    "target_price": "قیمت هدف",
+    "more_details": "جزئیات بیشتر"
+  },
+  "news_card": {
+    "latest_news": "آخرین اخبار",
+    "read_more": "ادامه مطلب",
+    "source": "منبع",
+    "published": "منتشر شده"
+  },
+  "chart_card": {
+    "price_chart": "نمودار قیمت",
+    "timeframe": "بازه زمانی",
+    "indicators": "شاخص‌ها",
+    "full_screen": "تمام صفحه"
+  },
+  "analysis_card": {
+    "technical_analysis": "تحلیل تکنیکال",
+    "indicators": "شاخص‌ها",
+    "support": "حمایت",
+    "resistance": "مقاومت",
+    "daily": "روزانه",
+    "weekly": "هفتگی",
+    "monthly": "ماهانه"
+  },
+  "alerts_card": {
+    "price_alerts": "هشدارهای قیمت",
+    "active_alerts": "هشدارهای فعال",
+    "set_alert": "تنظیم هشدار",
+    "no_alerts": "هیچ هشداری تنظیم نشده است"
+  },
+  "ai_card": {
+    "ai_prediction": "پیش‌بینی هوش مصنوعی",
+    "market_sentiment": "احساسات بازار",
+    "price_pattern": "الگوی قیمت",
+    "prediction": "پیش‌بینی"
+  },
+  "update_time": "آخرین به‌روزرسانی در"
+}
