@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 345,
-    "successful": 339,
+    "total_sent": 346,
+    "successful": 340,
     "failed": 6,
     "history": [
       {
@@ -1734,6 +1734,11 @@
         "message_type": "general",
         "success": true,
         "timestamp": "2025-04-10T01:33:52.719476-04:00"
+      },
+      {
+        "message_type": "technical_analysis_BTC",
+        "success": true,
+        "timestamp": "2025-04-10T01:37:03.606501-04:00"
       }
     ]
   },
