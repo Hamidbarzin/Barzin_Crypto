@@ -155,8 +155,11 @@ class TelegramSchedulerService:
                 now_toronto = datetime.datetime.now(toronto_tz)
                 current_hour = now_toronto.hour
                 
-                # فقط بین ساعت 8 صبح تا 10 شب ارسال کن
-                is_active_hours = 8 <= current_hour < 22
+                # فقط بین ساعت‌های تعیین شده ارسال کن
+                is_active_hours = self.active_hours_start <= current_hour < self.active_hours_end
+                
+                # اگر ارسال پیام غیرفعال شده، فعال نیست
+                is_active_hours = is_active_hours and self.message_sending_enabled
                 
                 counter += 1
                 logger.info(f"تیک شماره {counter} از {ticks_for_report} برای ارسال گزارش بعدی")
@@ -168,7 +171,10 @@ class TelegramSchedulerService:
                     counter = 0
                 # اگر به تعداد تیک لازم رسیدیم ولی در ساعات غیرفعال هستیم، فقط شمارنده را ریست کن
                 elif counter >= ticks_for_report and not is_active_hours:
-                    logger.info("خارج از ساعات فعال (8 صبح تا 10 شب) هستیم، گزارش ارسال نمی‌شود")
+                    if not self.message_sending_enabled:
+                        logger.info("ارسال پیام غیرفعال شده، گزارش ارسال نمی‌شود")
+                    else:
+                        logger.info(f"خارج از ساعات فعال ({self.active_hours_start} صبح تا {self.active_hours_end} شب) هستیم، گزارش ارسال نمی‌شود")
                     counter = 0
                 
                 # بررسی هشدارهای قیمت در هر تیک
@@ -469,6 +475,50 @@ def get_scheduler_status():
     Returns:
         dict: وضعیت فعلی زمان‌بندی
     """
+    return telegram_scheduler.status()
+
+
+def update_scheduler_settings(settings):
+    """
+    بروزرسانی تنظیمات زمان‌بندی
+    
+    Args:
+        settings (dict): تنظیمات جدید
+        
+    Returns:
+        dict: وضعیت بروزرسانی شده
+    """
+    if 'message_sending_enabled' in settings:
+        telegram_scheduler.message_sending_enabled = bool(settings['message_sending_enabled'])
+        
+    if 'active_hours_start' in settings:
+        try:
+            # اطمینان از اینکه مقدار بین 0 تا 23 است
+            active_hours_start = int(settings['active_hours_start'])
+            if 0 <= active_hours_start <= 23:
+                telegram_scheduler.active_hours_start = active_hours_start
+        except (ValueError, TypeError):
+            pass
+            
+    if 'active_hours_end' in settings:
+        try:
+            # اطمینان از اینکه مقدار بین 0 تا 24 است
+            active_hours_end = int(settings['active_hours_end'])
+            if 1 <= active_hours_end <= 24:
+                telegram_scheduler.active_hours_end = active_hours_end
+        except (ValueError, TypeError):
+            pass
+            
+    if 'interval' in settings:
+        try:
+            # اطمینان از اینکه مقدار حداقل 60 ثانیه است
+            interval = int(settings['interval'])
+            if interval >= 60:
+                telegram_scheduler.interval = interval
+        except (ValueError, TypeError):
+            pass
+    
+    # بازگرداندن وضعیت فعلی
     return telegram_scheduler.status()
 
 

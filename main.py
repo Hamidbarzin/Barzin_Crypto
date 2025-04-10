@@ -2326,6 +2326,35 @@ def api_telegram_status():
         })
 
 
+@app.route('/api/telegram/settings', methods=['POST'])
+def api_telegram_settings():
+    """
+    بروزرسانی تنظیمات زمان‌بندی تلگرام
+    """
+    try:
+        # دریافت داده‌های JSON از درخواست
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'success': False,
+                'message': 'داده JSON موردنیاز است'
+            })
+        
+        # بروزرسانی تنظیمات
+        updated_status = telegram_scheduler_service.update_scheduler_settings(data)
+        
+        return jsonify({
+            'success': True,
+            'message': 'تنظیمات با موفقیت بروزرسانی شد',
+            'status': updated_status
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'خطا در بروزرسانی تنظیمات: {str(e)}'
+        })
+
+
 # مسیرهای API برای مدیریت هشدارهای قیمت
 @app.route('/api/price-alerts', methods=['GET'])
 def api_get_price_alerts():
