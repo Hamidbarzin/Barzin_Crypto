@@ -2284,8 +2284,8 @@ def telegram_save_settings():
             # ذخیره تاریخ آخرین تنظیمات
             session['last_settings_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             
-            # هدایت به صفحه موفقیت
-            return redirect('/telegram-settings-saved')
+            # هدایت به صفحه اصلی تنظیمات با پیام موفقیت
+            return redirect('/telegram_control_panel')
             
         except Exception as e:
             # ثبت خطای دقیق
