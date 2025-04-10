@@ -6,24 +6,35 @@
 به طور منظم گزارش‌های قیمت را به تلگرام ارسال می‌کند.
 """
 
-import time
-import requests
-import logging
-from datetime import datetime
 import os
+import time
+import logging
+import requests
+import datetime
+import pytz
 
 # تنظیم لاگر
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
-logger = logging.getLogger("telegram_replit_workflow")
+logger = logging.getLogger("telegram_workflow")
 
-# تعیین URL
+# تعیین URL پایه
 BASE_URL = os.environ.get("APP_URL", "http://localhost:5000")
-PRICE_REPORT_URL = f"{BASE_URL}/send_price_report"
-SYSTEM_REPORT_URL = f"{BASE_URL}/send_system_report"
-TEST_MESSAGE_URL = f"{BASE_URL}/send_test_message_replit"
+
+# لیست API endpoint های قابل فراخوانی
+API_ENDPOINTS = {
+    "price_report": f"{BASE_URL}/api/telegram/price_report",
+    "system_report": f"{BASE_URL}/api/telegram/system_report",
+    "technical_analysis": f"{BASE_URL}/api/telegram/technical_analysis",
+    "trading_signals": f"{BASE_URL}/api/telegram/trading_signals",
+    "news": f"{BASE_URL}/api/telegram/send_news",
+    "check_alerts": f"{BASE_URL}/api/price-alerts/check"
+}
+
+# منطقه زمانی تورنتو
+toronto_tz = pytz.timezone('America/Toronto')
 
 def call_endpoint(url):
     """
@@ -36,61 +47,63 @@ def call_endpoint(url):
         bool: موفقیت یا شکست
     """
     try:
-        logger.info(f"فراخوانی {url}...")
-        response = requests.get(url, timeout=10)
+        logger.info(f"فراخوانی {url}")
+        response = requests.get(url, timeout=30)
         
         if response.status_code == 200:
             data = response.json()
             if data.get('success', False):
-                logger.info(f"موفقیت: {data.get('message', '')}")
+                logger.info(f"فراخوانی {url} با موفقیت انجام شد")
                 return True
             else:
-                logger.error(f"خطا: {data.get('message', 'خطای ناشناخته')}")
+                logger.error(f"خطا در فراخوانی {url}: {data.get('message', 'خطای ناشناخته')}")
                 return False
         else:
-            logger.error(f"خطا در فراخوانی API. کد وضعیت: {response.status_code}")
+            logger.error(f"خطا در فراخوانی {url}. کد وضعیت: {response.status_code}")
             return False
     except Exception as e:
-        logger.error(f"خطا در فراخوانی API: {str(e)}")
+        logger.error(f"استثنا در فراخوانی {url}: {str(e)}")
         return False
 
 def main():
     """
     تابع اصلی برنامه
     """
-    logger.info("ورک‌فلوی تلگرام شروع شد")
+    logger.info("ورک‌فلوی ارسال پیام تلگرام آغاز شد")
     
-    # ارسال پیام تست در ابتدا
-    call_endpoint(TEST_MESSAGE_URL)
+    # بررسی زمان فعلی در تورنتو
+    toronto_time = datetime.datetime.now(toronto_tz)
+    hour = toronto_time.hour
     
-    # شمارنده برای ارسال گزارش سیستم
-    system_report_counter = 0
-    
-    try:
-        while True:
-            # ارسال گزارش قیمت
-            success = call_endpoint(PRICE_REPORT_URL)
-            logger.info(f"نتیجه ارسال گزارش قیمت: {success}")
-            
-            # افزایش شمارنده گزارش سیستم
-            system_report_counter += 1
-            
-            # اگر ۶ ساعت (۳۶ بار ۱۰ دقیقه) گذشته، گزارش سیستم ارسال کن
-            if system_report_counter >= 36:
-                call_endpoint(SYSTEM_REPORT_URL)
-                system_report_counter = 0
-            
-            # ۱۰ دقیقه صبر کن
-            logger.info(f"انتظار برای ۱۰ دقیقه بعدی ({datetime.now().strftime('%H:%M:%S')})...")
-            time.sleep(600)  # 10 minutes = 600 seconds
-            
-    except KeyboardInterrupt:
-        logger.info("برنامه با دستور کاربر متوقف شد")
-    except Exception as e:
-        logger.error(f"خطا در اجرای برنامه: {str(e)}")
-        return 1
+    # بررسی ساعات فعال (8 صبح تا 10 شب تورنتو)
+    if 8 <= hour < 22:
+        logger.info(f"زمان فعلی تورنتو: {toronto_time.strftime('%H:%M:%S')} - در محدوده ساعات فعال")
         
-    return 0
+        # ارسال گزارش قیمت
+        call_endpoint(API_ENDPOINTS["price_report"])
+        
+        # بررسی هشدارهای قیمت
+        call_endpoint(API_ENDPOINTS["check_alerts"])
+        
+        # بر اساس ساعت، گزارش‌های دیگر را ارسال کن
+        if hour % 6 == 0:  # هر 6 ساعت
+            call_endpoint(API_ENDPOINTS["system_report"])
+            
+        if hour % 2 == 0:  # هر 2 ساعت
+            call_endpoint(API_ENDPOINTS["technical_analysis"])
+            
+        if hour % 4 == 0:  # هر 4 ساعت
+            call_endpoint(API_ENDPOINTS["trading_signals"])
+            
+        if hour % 8 == 0:  # هر 8 ساعت
+            call_endpoint(API_ENDPOINTS["news"])
+    else:
+        logger.info(f"زمان فعلی تورنتو: {toronto_time.strftime('%H:%M:%S')} - خارج از محدوده ساعات فعال")
+    
+    logger.info("اجرای ورک‌فلو به پایان رسید")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        logger.error(f"خطا در اجرای ورک‌فلو: {str(e)}")
