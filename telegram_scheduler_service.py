@@ -114,6 +114,7 @@ class TelegramSchedulerService:
         return {
             "running": self.running,
             "message_sending_enabled": self.message_sending_enabled,
+            "auto_start_on_boot": self.auto_start_on_boot,
             "active_hours_start": self.active_hours_start,
             "active_hours_end": self.active_hours_end,
             "interval": self.interval,
@@ -496,6 +497,9 @@ def update_scheduler_settings(settings):
     """
     if 'message_sending_enabled' in settings:
         telegram_scheduler.message_sending_enabled = bool(settings['message_sending_enabled'])
+        
+    if 'auto_start_on_boot' in settings:
+        telegram_scheduler.auto_start_on_boot = bool(settings['auto_start_on_boot'])
         
     if 'active_hours_start' in settings:
         try:

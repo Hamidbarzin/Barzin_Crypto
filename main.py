@@ -2753,13 +2753,17 @@ def api_voice_notification_save():
 
 # Flask 2.0+ نیاز به رویکرد جدید برای before_first_request دارد
 with app.app_context():
-    # راه‌اندازی زمان‌بندی تلگرام
+    # بررسی تنظیمات راه‌اندازی خودکار سرویس زمان‌بندی تلگرام
     try:
-        logger.info("در حال راه‌اندازی سرویس زمان‌بندی تلگرام با app_context...")
-        if telegram_scheduler_service.start_scheduler():
-            logger.info("سرویس زمان‌بندی تلگرام با موفقیت راه‌اندازی شد")
+        logger.info("در حال بررسی تنظیمات راه‌اندازی خودکار سرویس زمان‌بندی تلگرام...")
+        if telegram_scheduler_service.telegram_scheduler.auto_start_on_boot:
+            logger.info("در حال راه‌اندازی سرویس زمان‌بندی تلگرام با app_context...")
+            if telegram_scheduler_service.start_scheduler():
+                logger.info("سرویس زمان‌بندی تلگرام با موفقیت راه‌اندازی شد")
+            else:
+                logger.error("خطا در راه‌اندازی سرویس زمان‌بندی تلگرام")
         else:
-            logger.error("خطا در راه‌اندازی سرویس زمان‌بندی تلگرام")
+            logger.info("راه‌اندازی خودکار سرویس زمان‌بندی تلگرام غیرفعال است")
     except Exception as e:
         logger.error(f"استثنا در راه‌اندازی سرویس زمان‌بندی تلگرام: {str(e)}")
 

@@ -316,6 +316,9 @@
                 
                 // بروزرسانی فرم تنظیمات با مقادیر فعلی
                 document.getElementById('message-sending-enabled').checked = result.message_sending_enabled;
+                if ('auto_start_on_boot' in result) {
+                    document.getElementById('auto-start-on-boot').checked = result.auto_start_on_boot;
+                }
                 document.getElementById('active-hours-start').value = result.active_hours_start;
                 document.getElementById('active-hours-end').value = result.active_hours_end;
                 
