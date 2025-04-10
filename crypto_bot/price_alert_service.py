@@ -237,10 +237,10 @@ def generate_alert_message(alert_info: Dict[str, Any]) -> str:
 
 
 # اضافه کردن چند هشدار پیش‌فرض
-set_price_alert("BTC/USDT", 90000, "above")
-set_price_alert("BTC/USDT", 75000, "below")
-set_price_alert("ETH/USDT", 2000, "above")
-set_price_alert("ETH/USDT", 1500, "below")
+set_price_alert("BTC/USDT", 82000, "above")  # هشدار به بالا رفتن قیمت بیت‌کوین از 82000
+set_price_alert("BTC/USDT", 81500, "below")  # هشدار به پایین رفتن قیمت بیت‌کوین از 81500
+set_price_alert("ETH/USDT", 1650, "above")   # هشدار به بالا رفتن قیمت اتریوم از 1650
+set_price_alert("ETH/USDT", 1580, "below")   # هشدار به پایین رفتن قیمت اتریوم از 1580
 
 # تابع اصلی برای تست
 if __name__ == "__main__":
