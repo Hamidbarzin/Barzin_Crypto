@@ -34,9 +34,11 @@
                             </div>
                             <div class="small text-muted mt-2">
                                 {% if session.language == 'en' %}
-                                Current language: English (Left to Right)
+                                {{ ui_text('current_language_ltr', 'Current language: English (Left to Right)') }}
+                                {% elif session.language == 'fr' %}
+                                {{ ui_text('current_language_ltr', 'Langue actuelle: Français (De gauche à droite)') }}
                                 {% else %}
-                                زبان فعلی: فارسی (راست به چپ)
+                                {{ ui_text('current_language_rtl', 'زبان فعلی: فارسی (راست به چپ)') }}
                                 {% endif %}
                             </div>
                         </div>
@@ -243,7 +245,7 @@
             <!-- System Controls -->
             <div class="card mb-4 crypto-card">
                 <div class="card-header">
-                    <h5 class="mb-0">کنترل سیستم</h5>
+                    <h5 class="mb-0">{{ ui_text('system_controls', 'کنترل سیستم') }}</h5>
                 </div>
                 <div class="card-body">
                     <p class="text-muted">مدیریت سرویس‌های ربات و راه‌اندازی گزارش‌دهی خودکار</p>
@@ -284,7 +286,7 @@
             <!-- Telegram Bot Setup -->
             <div class="card mb-4 crypto-card">
                 <div class="card-header">
-                    <h5 class="mb-0">راهنمای تنظیم ربات تلگرام</h5>
+                    <h5 class="mb-0">{{ ui_text('telegram_bot_setup', 'راهنمای تنظیم ربات تلگرام') }}</h5>
                 </div>
                 <div class="card-body">
                     <ol class="ps-3">
@@ -303,7 +305,7 @@
             <!-- Status Info -->
             <div class="card crypto-card">
                 <div class="card-header">
-                    <h5 class="mb-0">وضعیت سیستم</h5>
+                    <h5 class="mb-0">{{ ui_text('system_status', 'وضعیت سیستم') }}</h5>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
