@@ -196,25 +196,47 @@ class TelegramSchedulerService:
                 self.trading_signals_counter += 1
                 self.crypto_news_counter += 1
                 
-                # ارسال گزارش سیستم هر ۶ ساعت
-                if self.system_report_counter >= self.system_report_interval:
-                    self._send_system_report()
-                    self.system_report_counter = 0
-                
-                # ارسال تحلیل تکنیکال هر ۲ ساعت
-                if self.technical_analysis_counter >= self.technical_analysis_interval:
-                    self._send_technical_analysis()
-                    self.technical_analysis_counter = 0
-                
-                # ارسال سیگنال‌های معاملاتی هر ۴ ساعت
-                if self.trading_signals_counter >= self.trading_signals_interval:
-                    self._send_trading_signals()
-                    self.trading_signals_counter = 0
+                # فقط اگر ارسال پیام فعال باشد، گزارش‌ها ارسال شوند
+                if self.message_sending_enabled and is_active_hours:
+                    # ارسال گزارش سیستم هر ۶ ساعت
+                    if self.system_report_counter >= self.system_report_interval:
+                        self._send_system_report()
+                        self.system_report_counter = 0
                     
-                # ارسال اخبار ارزهای دیجیتال هر ۸ ساعت
-                if self.crypto_news_counter >= self.crypto_news_interval:
-                    self._send_crypto_news()
-                    self.crypto_news_counter = 0
+                    # ارسال تحلیل تکنیکال هر ۲ ساعت
+                    if self.technical_analysis_counter >= self.technical_analysis_interval:
+                        self._send_technical_analysis()
+                        self.technical_analysis_counter = 0
+                    
+                    # ارسال سیگنال‌های معاملاتی هر ۴ ساعت
+                    if self.trading_signals_counter >= self.trading_signals_interval:
+                        self._send_trading_signals()
+                        self.trading_signals_counter = 0
+                        
+                    # ارسال اخبار ارزهای دیجیتال هر ۸ ساعت
+                    if self.crypto_news_counter >= self.crypto_news_interval:
+                        self._send_crypto_news()
+                        self.crypto_news_counter = 0
+                elif not self.message_sending_enabled and (self.system_report_counter >= self.system_report_interval or 
+                      self.technical_analysis_counter >= self.technical_analysis_interval or
+                      self.trading_signals_counter >= self.trading_signals_interval or
+                      self.crypto_news_counter >= self.crypto_news_interval):
+                    # ریست کردن شمارنده‌ها وقتی به مقدار حداکثر رسیده‌اند
+                    if self.system_report_counter >= self.system_report_interval:
+                        logger.info("ارسال پیام غیرفعال است، گزارش سیستم ارسال نمی‌شود")
+                        self.system_report_counter = 0
+                    
+                    if self.technical_analysis_counter >= self.technical_analysis_interval:
+                        logger.info("ارسال پیام غیرفعال است، تحلیل تکنیکال ارسال نمی‌شود")
+                        self.technical_analysis_counter = 0
+                    
+                    if self.trading_signals_counter >= self.trading_signals_interval:
+                        logger.info("ارسال پیام غیرفعال است، سیگنال‌های معاملاتی ارسال نمی‌شوند")
+                        self.trading_signals_counter = 0
+                    
+                    if self.crypto_news_counter >= self.crypto_news_interval:
+                        logger.info("ارسال پیام غیرفعال است، اخبار ارزهای دیجیتال ارسال نمی‌شوند")
+                        self.crypto_news_counter = 0
         
         except Exception as e:
             logger.error(f"خطا در حلقه زمان‌بندی: {str(e)}")
