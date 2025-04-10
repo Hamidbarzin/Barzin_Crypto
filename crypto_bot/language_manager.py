@@ -1,351 +1,344 @@
-#!/usr/bin/env python3
 """
-سیستم مدیریت زبان برای برنامه
+ماژول مدیریت زبان برای پشتیبانی از چندزبانگی در سیستم
 
-این ماژول تنظیمات و توابع لازم برای پشتیبانی چندزبانگی در برنامه را فراهم می‌کند.
+این ماژول امکان ترجمه متن‌ها را در بخش‌های مختلف برنامه (وب، API و تلگرام) فراهم می‌کند.
 """
 
 import os
-from typing import Dict, Any, List
+import json
+import logging
+from functools import lru_cache
+
+# تنظیم لاگر
+logger = logging.getLogger(__name__)
 
 # زبان‌های پشتیبانی شده
-SUPPORTED_LANGUAGES = {
-    'fa': {
-        'name': 'فارسی',
-        'direction': 'rtl',
-        'flag': '🇮🇷'
-    },
-    'en': {
-        'name': 'English',
-        'direction': 'ltr',
-        'flag': '🇬🇧'
-    }
-}
+SUPPORTED_LANGUAGES = ['en', 'fa']
 
 # زبان پیش‌فرض
 DEFAULT_LANGUAGE = 'fa'
 
-# ترجمه‌های متن‌های رابط کاربری
-UI_TRANSLATIONS = {
-    'fa': {
-        'title': 'Crypto Barzin',
-        'dashboard': 'داشبورد',
-        'cryptocurrencies': 'ارزهای دیجیتال',
-        'price_alerts': 'هشدارهای قیمت',
-        'news': 'اخبار',
-        'telegram_control': 'کنترل تلگرام',
-        'voice_notification': 'اعلان‌های صوتی',
-        'settings': 'تنظیمات',
-        
-        # برچسب‌های منوی موبایل
-        'mobile_cryptocurrencies': 'ارزها',
-        'mobile_alerts': 'هشدارها',
-        'mobile_news': 'اخبار',
-        'mobile_telegram': 'تلگرام',
-        
-        # ترجمه‌های مربوط به تغییر زبان
-        'language_settings': 'تنظیمات زبان',
-        'current_language': 'زبان فعلی',
-        'language_changed': 'زبان به {language_name} تغییر یافت.',
-        'language_change_error': 'کد زبان نامعتبر است.',
-        'language_persian': 'فارسی (راست به چپ)',
-        'language_english': 'انگلیسی (چپ به راست)',
-        'app_language': 'زبان برنامه',
-        
-        # منوی اصلی
-        'home': 'خانه',
-        'help': 'راهنما',
-        'about': 'درباره ما',
-        
-        # داشبورد
-        'market_overview': 'نمای کلی بازار',
-        'top_currencies': 'ارزهای برتر',
-        'price_changes': 'تغییرات قیمت',
-        'market_cap': 'ارزش بازار',
-        
-        # نام ارزهای دیجیتال
-        'bitcoin': 'بیت‌کوین',
-        'ethereum': 'اتریوم',
-        'ripple': 'ریپل',
-        'solana': 'سولانا',
-        'binance_coin': 'بایننس کوین',
-        'tether': 'تتر',
-        'chainlink': 'چین‌لینک',
-        'avax': 'آواکس',
-        'render': 'رندر',
-        'fetch': 'فچر',
-        'worldcoin': 'ورلدکوین',
-        'polygon': 'پلیگان',
-        'arbitrum': 'آربیتروم',
-        'optimism': 'اپتیمیسم',
-        'technical_analysis': 'تحلیل تکنیکال',
-        'technical_analysis_bitcoin': 'تحلیل تکنیکال بیت‌کوین (تایم‌فریم ساعتی)',
-        'trading_signals': 'سیگنال‌های معاملاتی',
-        'btc_hourly_chart': 'نمودار قیمت BTC/USDT',
-        
-        # سیگنال‌های معاملاتی
-        'buy': 'خرید',
-        'sell': 'فروش',
-        'strong_buy': 'خرید قوی',
-        'strong_sell': 'فروش قوی',
-        'hold': 'نگهداری',
-        'wait': 'انتظار',
-        
-        # صفحه هشدارهای قیمت
-        'add_alert': 'افزودن هشدار',
-        'alert_type': 'نوع هشدار',
-        'price_target': 'قیمت هدف',
-        'alert_status': 'وضعیت هشدار',
-        'active': 'فعال',
-        'inactive': 'غیرفعال',
-        'delete': 'حذف',
-        'save': 'ذخیره',
-        'cancel': 'انصراف',
-        
-        # اعلان‌های صوتی
-        'voice_notification_title': 'اعلان صوتی چندزبانه',
-        'voice_settings': 'تنظیمات اعلان',
-        'preview_sound': 'پیش‌نمایش صدا',
-        'notification_history': 'تاریخچه اعلان‌ها',
-        'crypto': 'ارز دیجیتال',
-        'event_type': 'نوع رویداد',
-        'price_change': 'میزان تغییر قیمت',
-        'language': 'زبان اعلان',
-        'voice_gender': 'جنسیت صدا',
-        'male': 'مرد',
-        'female': 'زن',
-        'preview': 'پیش‌نمایش صدا',
-        'save_settings': 'ذخیره تنظیمات',
-        'no_history': 'تاریخچه‌ای موجود نیست',
-        'price_increase': 'افزایش قیمت',
-        'price_decrease': 'کاهش قیمت',
-        'target_reached': 'رسیدن به قیمت هدف',
-        'stop_loss': 'رسیدن به حد ضرر',
-        'high_volatility': 'نوسان بالا',
-        
-        # اطلاعات قیمت و معاملات
-        'current_price': 'قیمت فعلی',
-        'suggested_volume': 'حجم پیشنهادی',
-        'take_profit': 'حد سود',
-        'stop_loss': 'حد ضرر',
-        'monitoring_level': 'سطح نظارت',
-        'price_target_bullish': 'هدف قیمتی (صعودی)',
-        'price_target_bearish': 'هدف قیمتی (نزولی)',
-        'share': 'اشتراک‌گذاری',
-        'set_alert': 'تنظیم هشدار',
-        'show_signals_directly': 'نمایش مستقیم سیگنال‌ها',
-        'show_technical_directly': 'نمایش مستقیم تحلیل تکنیکال',
-        
-        # توضیحات سیگنال‌ها
-        'eth_sell_signal': 'اتریوم در نزدیکی مقاومت کلیدی قرار گرفته و شاخص‌های تکنیکال نشان‌دهنده اشباع خرید هستند. RSI بالای ۷۰ قرار دارد و الگوی واگرایی منفی با MACD مشاهده می‌شود. احتمال اصلاح قیمت وجود دارد.',
-        'sol_buy_signal': 'سولانا در حال شکستن یک الگوی مقاومتی کلیدی است و با حجم معاملات بالا در حال حرکت است. میانگین‌های متحرک حمایت قوی را نشان می‌دهند و پتانسیل رشد قابل توجهی وجود دارد.',
-        'bnb_wait_signal': 'بایننس کوین در یک محدوده قیمتی باریک در حال معامله است. در صورت شکست سطح مقاومت ۵۸۰ دلار، سیگنال خرید فعال می‌شود. پیشنهاد می‌شود تا زمان شکست این سطح، معامله‌ای انجام نشود.',
-        'signal_validity': 'ایجاد شده: امروز {time} | اعتبار: {hours} ساعت',
-        
-        # عمومی
-        'loading': 'در حال بارگذاری...',
-        'loading_technical_analysis': 'در حال بارگذاری تحلیل تکنیکال...',
-        'loading_trading_signals': 'در حال بارگذاری سیگنال‌های معاملاتی...',
-        'loading_news': 'در حال بارگذاری اخبار...',
-        'error': 'خطا',
-        'success': 'موفقیت',
-        'warning': 'هشدار',
-        'info': 'اطلاعات',
-        'search': 'جستجو',
-        'play': 'پخش',
-        'download': 'دانلود',
-        'close': 'بستن',
-    },
-    'en': {
-        'title': 'Crypto Barzin',
-        'dashboard': 'Dashboard',
-        'cryptocurrencies': 'Cryptocurrencies',
-        'price_alerts': 'Price Alerts',
-        'news': 'News',
-        'telegram_control': 'Telegram Control',
-        'voice_notification': 'Voice Notifications',
-        'settings': 'Settings',
-        
-        # Mobile menu labels
-        'mobile_cryptocurrencies': 'Crypto',
-        'mobile_alerts': 'Alerts',
-        'mobile_news': 'News',
-        'mobile_telegram': 'Telegram',
-        
-        # Language change translations
-        'language_settings': 'Language Settings',
-        'current_language': 'Current Language',
-        'language_changed': 'Language changed to {language_name}.',
-        'language_change_error': 'Invalid language code.',
-        'language_persian': 'Persian (Right to Left)',
-        'language_english': 'English (Left to Right)',
-        'app_language': 'Application Language',
-        
-        # Main Menu
-        'home': 'Home',
-        'help': 'Help',
-        'about': 'About',
-        
-        # Dashboard
-        'market_overview': 'Market Overview',
-        'top_currencies': 'Top Currencies',
-        'price_changes': 'Price Changes',
-        'market_cap': 'Market Cap',
-        
-        # Cryptocurrency names
-        'bitcoin': 'Bitcoin',
-        'ethereum': 'Ethereum',
-        'ripple': 'Ripple',
-        'solana': 'Solana',
-        'binance_coin': 'Binance Coin',
-        'tether': 'Tether',
-        'chainlink': 'Chainlink',
-        'avax': 'Avalanche',
-        'render': 'Render',
-        'fetch': 'Fetch.ai',
-        'worldcoin': 'Worldcoin',
-        'polygon': 'Polygon',
-        'arbitrum': 'Arbitrum',
-        'optimism': 'Optimism',
-        'technical_analysis': 'Technical Analysis',
-        'technical_analysis_bitcoin': 'Bitcoin Technical Analysis (Hourly Timeframe)',
-        'trading_signals': 'Trading Signals',
-        'btc_hourly_chart': 'BTC/USDT Price Chart',
-        
-        # Trading signals
-        'buy': 'Buy',
-        'sell': 'Sell',
-        'strong_buy': 'Strong Buy',
-        'strong_sell': 'Strong Sell',
-        'hold': 'Hold',
-        'wait': 'Wait',
-        
-        # Price Alerts Page
-        'add_alert': 'Add Alert',
-        'alert_type': 'Alert Type',
-        'price_target': 'Price Target',
-        'alert_status': 'Alert Status',
-        'active': 'Active',
-        'inactive': 'Inactive',
-        'delete': 'Delete',
-        'save': 'Save',
-        'cancel': 'Cancel',
-        
-        # Voice Notifications
-        'voice_notification_title': 'Multilingual Voice Notification',
-        'voice_settings': 'Notification Settings',
-        'preview_sound': 'Sound Preview',
-        'notification_history': 'Notification History',
-        'crypto': 'Cryptocurrency',
-        'event_type': 'Event Type',
-        'price_change': 'Price Change',
-        'language': 'Language',
-        'voice_gender': 'Voice Gender',
-        'male': 'Male',
-        'female': 'Female',
-        'preview': 'Preview Sound',
-        'save_settings': 'Save Settings',
-        'no_history': 'No history available',
-        'price_increase': 'Price Increase',
-        'price_decrease': 'Price Decrease',
-        'target_reached': 'Target Price Reached',
-        'stop_loss': 'Stop Loss Reached',
-        'high_volatility': 'High Volatility',
-        
-        # Price and Trading Information
-        'current_price': 'Current Price',
-        'suggested_volume': 'Suggested Volume',
-        'take_profit': 'Take Profit',
-        'stop_loss': 'Stop Loss',
-        'monitoring_level': 'Monitoring Level',
-        'price_target_bullish': 'Price Target (Bullish)',
-        'price_target_bearish': 'Price Target (Bearish)',
-        'share': 'Share',
-        'set_alert': 'Set Alert',
-        'show_signals_directly': 'Show Signals Directly',
-        'show_technical_directly': 'Show Technical Analysis Directly',
-        
-        # Signal descriptions
-        'eth_sell_signal': 'Ethereum is near a key resistance level and technical indicators show overbought conditions. RSI is above 70 and a negative divergence pattern with MACD is observed. A price correction is likely.',
-        'sol_buy_signal': 'Solana is breaking through a key resistance pattern with high trading volume. Moving averages show strong support and there is significant growth potential.',
-        'bnb_wait_signal': 'Binance Coin is trading in a narrow price range. If it breaks the $580 resistance level, a buy signal will be activated. It is recommended not to trade until this level is broken.',
-        'signal_validity': 'Created: Today {time} | Valid for: {hours} hours',
-        
-        # General
-        'loading': 'Loading...',
-        'loading_technical_analysis': 'Loading Technical Analysis...',
-        'loading_trading_signals': 'Loading Trading Signals...',
-        'loading_news': 'Loading News...',
-        'error': 'Error',
-        'success': 'Success',
-        'warning': 'Warning',
-        'info': 'Information',
-        'search': 'Search',
-        'play': 'Play',
-        'download': 'Download',
-        'close': 'Close',
-    }
-}
+# مسیر فایل‌های ترجمه
+LOCALES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'locales')
 
-def get_language_code(language_code: str = "") -> str:
+# دیکشنری‌های ترجمه
+translations = {}
+
+# توابع افزوده برای استفاده در main.py
+def get_language_code(lang_name):
     """
-    دریافت کد زبان معتبر
+    دریافت کد زبان بر اساس نام آن
     
     Args:
-        language_code (str, optional): کد زبان درخواستی
-        
+        lang_name (str): نام زبان (مثلاً English یا فارسی)
+    
     Returns:
-        str: کد زبان معتبر
+        str: کد زبان (مثلاً en یا fa)
     """
-    if language_code and language_code in SUPPORTED_LANGUAGES:
-        return language_code
-    return DEFAULT_LANGUAGE
+    lang_map = {
+        'english': 'en',
+        'انگلیسی': 'en',
+        'persian': 'fa',
+        'فارسی': 'fa',
+        'french': 'fr',
+        'فرانسوی': 'fr'
+    }
+    return lang_map.get(lang_name.lower(), DEFAULT_LANGUAGE)
 
-
-def get_ui_text(language_code: str, key: str, default: str = "") -> str:
+def get_ui_text(key, default="", language=None):
     """
     دریافت متن ترجمه شده برای رابط کاربری
     
     Args:
-        language_code (str): کد زبان
-        key (str): کلید متن
+        key (str): کلید ترجمه
         default (str, optional): متن پیش‌فرض در صورت عدم وجود ترجمه
+        language (str, optional): زبان ترجمه
+    
+    Returns:
+        str: متن ترجمه شده یا متن پیش‌فرض
+    """
+    result = get_translation(key, language)
+    return result if result != key else default
+
+def get_language_info(language_code):
+    """
+    دریافت اطلاعات زبان بر اساس کد آن
+    
+    Args:
+        language_code (str): کد زبان
+    
+    Returns:
+        dict: اطلاعات زبان
+    """
+    lang_info = {
+        'en': {
+            'name': 'English',
+            'native_name': 'English',
+            'direction': 'ltr',
+            'icon': '🇺🇸'
+        },
+        'fa': {
+            'name': 'Persian',
+            'native_name': 'فارسی',
+            'direction': 'rtl',
+            'icon': '🇮🇷'
+        },
+        'fr': {
+            'name': 'French',
+            'native_name': 'Français',
+            'direction': 'ltr',
+            'icon': '🇫🇷'
+        }
+    }
+    return lang_info.get(language_code, lang_info[DEFAULT_LANGUAGE])
+
+def get_all_languages():
+    """
+    دریافت لیست همه زبان‌های پشتیبانی شده
+    
+    Returns:
+        list: لیست دیکشنری‌های اطلاعات زبان
+    """
+    return [get_language_info(lang) for lang in SUPPORTED_LANGUAGES]
+
+
+def load_translations():
+    """بارگذاری تمام فایل‌های ترجمه"""
+    global translations
+    
+    try:
+        # اطمینان از وجود دایرکتوری‌های لازم
+        if not os.path.exists(LOCALES_DIR):
+            os.makedirs(LOCALES_DIR)
+            logger.info(f"Created locales directory at {LOCALES_DIR}")
         
+        # بارگذاری فایل‌های ترجمه برای هر زبان
+        for lang in SUPPORTED_LANGUAGES:
+            translations[lang] = {}
+            
+            # مسیر فایل‌های ترجمه برای این زبان
+            lang_dir = os.path.join(LOCALES_DIR, lang)
+            if not os.path.exists(lang_dir):
+                os.makedirs(lang_dir)
+                logger.info(f"Created language directory for {lang}")
+            
+            # بررسی فایل‌های ترجمه موجود
+            for filename in ['common.json', 'dashboard.json', 'crypto.json', 'telegram.json', 'settings.json']:
+                file_path = os.path.join(lang_dir, filename)
+                
+                if os.path.exists(file_path):
+                    try:
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            # استخراج فضای نام از نام فایل (حذف پسوند .json)
+                            namespace = filename.rsplit('.', 1)[0]
+                            translations[lang][namespace] = json.load(f)
+                            logger.info(f"Loaded {lang}/{namespace} translations")
+                    except Exception as e:
+                        logger.error(f"Error loading {file_path}: {e}")
+                else:
+                    logger.warning(f"Translation file {file_path} does not exist")
+                    
+                    # ایجاد فایل خالی برای استفاده بعدی
+                    with open(file_path, 'w', encoding='utf-8') as f:
+                        f.write('{}')
+                    logger.info(f"Created empty translation file at {file_path}")
+    
+    except Exception as e:
+        logger.error(f"Error in load_translations: {e}")
+
+
+@lru_cache(maxsize=128)
+def get_translation(key, language=None, namespace='common', **kwargs):
+    """
+    ترجمه کلید به زبان مشخص شده
+    
+    Args:
+        key (str): کلید ترجمه، می‌تواند به صورت ساده ('title') یا نقطه‌گذاری شده ('app.title') باشد
+        language (str, optional): زبان ترجمه (en یا fa)
+        namespace (str, optional): فضای نام ترجمه (common, dashboard, crypto و ...)
+        **kwargs: متغیرهای جایگزین در متن ترجمه
+    
     Returns:
         str: متن ترجمه شده
     """
-    language = get_language_code(language_code)
-    if key in UI_TRANSLATIONS.get(language, {}):
-        return UI_TRANSLATIONS[language][key]
+    # بررسی وجود زبان و تنظیم مقدار پیش‌فرض
+    if not language or language not in SUPPORTED_LANGUAGES:
+        language = DEFAULT_LANGUAGE
     
-    # اگر ترجمه وجود نداشت، از متن پیش‌فرض یا کلید استفاده کن
-    return default or key
+    # اطمینان از بارگذاری ترجمه‌ها
+    if not translations:
+        load_translations()
+    
+    # استخراج کلید ترجمه و فضای نام
+    if '.' in key and namespace == 'common':
+        parts = key.split('.', 1)
+        if len(parts) == 2:
+            namespace, key = parts
+    
+    # جستجوی ترجمه در دیکشنری ترجمه‌ها
+    try:
+        # اگر کلید چندبخشی با نقطه باشد، آن را بخش‌بخش بررسی می‌کنیم
+        if '.' in key:
+            parts = key.split('.')
+            current = translations.get(language, {}).get(namespace, {})
+            
+            for part in parts:
+                if not isinstance(current, dict) or part not in current:
+                    # کلید یافت نشد، برگشت به متن اصلی
+                    return key
+                current = current[part]
+            
+            result = current
+        else:
+            # کلید ساده
+            result = translations.get(language, {}).get(namespace, {}).get(key, key)
+        
+        # اگر ترجمه یافت نشد، از زبان پیش‌فرض استفاده می‌کنیم
+        if result == key and language != DEFAULT_LANGUAGE:
+            result = get_translation(key, DEFAULT_LANGUAGE, namespace, **kwargs)
+        
+        # جایگزینی متغیرها در متن ترجمه
+        if isinstance(result, str) and kwargs:
+            try:
+                result = result.format(**kwargs)
+            except KeyError as e:
+                logger.warning(f"Missing format key in translation: {e}")
+            except Exception as e:
+                logger.error(f"Error formatting translation: {e}")
+        
+        return result
+    
+    except Exception as e:
+        logger.error(f"Translation error for key '{key}' in {language}/{namespace}: {e}")
+        return key
 
 
-def get_language_info(language_code: str = "") -> Dict[str, Any]:
+def save_translation(key, text, language, namespace='common'):
     """
-    دریافت اطلاعات زبان
+    ذخیره یا به‌روزرسانی یک ترجمه در فایل
     
     Args:
-        language_code (str, optional): کد زبان
-        
-    Returns:
-        Dict[str, Any]: اطلاعات زبان
-    """
-    language = get_language_code(language_code)
-    return SUPPORTED_LANGUAGES.get(language, SUPPORTED_LANGUAGES[DEFAULT_LANGUAGE])
-
-
-def get_all_languages() -> List[Dict[str, Any]]:
-    """
-    دریافت لیست تمام زبان‌های پشتیبانی شده
+        key (str): کلید ترجمه
+        text (str): متن ترجمه
+        language (str): زبان ترجمه
+        namespace (str, optional): فضای نام ترجمه
     
     Returns:
-        List[Dict[str, Any]]: لیست زبان‌ها
+        bool: موفقیت یا شکست ذخیره‌سازی
     """
-    result = []
-    for code, info in SUPPORTED_LANGUAGES.items():
-        language_info = info.copy()
-        language_info['code'] = code
-        result.append(language_info)
-    return result
+    try:
+        # اطمینان از بارگذاری ترجمه‌ها
+        if not translations:
+            load_translations()
+        
+        # مسیر فایل ترجمه
+        file_path = os.path.join(LOCALES_DIR, language, f"{namespace}.json")
+        
+        # بارگذاری ترجمه‌های فعلی
+        current_translations = {}
+        if os.path.exists(file_path):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                current_translations = json.load(f)
+        
+        # اگر کلید چندبخشی با نقطه باشد، آن را بخش‌بخش در دیکشنری قرار می‌دهیم
+        if '.' in key:
+            parts = key.split('.')
+            current = current_translations
+            
+            for i, part in enumerate(parts):
+                if i == len(parts) - 1:
+                    current[part] = text
+                else:
+                    if part not in current or not isinstance(current[part], dict):
+                        current[part] = {}
+                    current = current[part]
+        else:
+            # کلید ساده
+            current_translations[key] = text
+        
+        # ذخیره ترجمه‌های به‌روز شده
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(current_translations, f, ensure_ascii=False, indent=2)
+        
+        # به‌روزرسانی دیکشنری ترجمه‌ها در حافظه
+        if namespace not in translations.get(language, {}):
+            if language not in translations:
+                translations[language] = {}
+            translations[language][namespace] = {}
+        
+        translations[language][namespace] = current_translations
+        
+        # حذف کش
+        get_translation.cache_clear()
+        
+        logger.info(f"Saved translation for key '{key}' in {language}/{namespace}")
+        return True
+    
+    except Exception as e:
+        logger.error(f"Error saving translation for key '{key}' in {language}/{namespace}: {e}")
+        return False
+
+
+def get_language_dir(language):
+    """
+    تعیین جهت متن بر اساس زبان
+    
+    Args:
+        language (str): کد زبان
+    
+    Returns:
+        str: جهت متن ('rtl' یا 'ltr')
+    """
+    rtl_languages = ['fa', 'ar', 'he']
+    return 'rtl' if language in rtl_languages else 'ltr'
+
+
+def get_user_language(user_id=None, request=None):
+    """
+    تشخیص زبان کاربر از منابع مختلف
+    
+    Args:
+        user_id (any, optional): شناسه کاربر (برای تلگرام)
+        request (flask.Request, optional): درخواست HTTP (برای وب)
+    
+    Returns:
+        str: کد زبان تشخیص داده شده
+    """
+    # اولویت 1: زبان ذخیره شده کاربر در دیتابیس (اگر شناسه کاربر داده شده باشد)
+    if user_id:
+        # این قسمت باید با دیتابیس واقعی پیاده‌سازی شود
+        # فعلاً فرض می‌کنیم همه کاربران فارسی زبان هستند
+        return DEFAULT_LANGUAGE
+    
+    # اولویت 2: زبان ذخیره شده در کوکی یا سشن (اگر درخواست HTTP داده شده باشد)
+    if request:
+        try:
+            # بررسی کوکی
+            if 'language' in request.cookies:
+                lang = request.cookies.get('language')
+                if lang in SUPPORTED_LANGUAGES:
+                    return lang
+            
+            # بررسی پارامتر URL
+            if 'lang' in request.args:
+                lang = request.args.get('lang')
+                if lang in SUPPORTED_LANGUAGES:
+                    return lang
+            
+            # بررسی هدر Accept-Language
+            if request.accept_languages:
+                lang = request.accept_languages.best_match(SUPPORTED_LANGUAGES)
+                if lang:
+                    return lang
+        except Exception as e:
+            logger.error(f"Error detecting language from request: {e}")
+    
+    # اولویت 3: زبان پیش‌فرض
+    return DEFAULT_LANGUAGE
+
+
+# ایجاد نسخه کوتاه‌تر برای راحتی استفاده
+_ = get_translation
+
+# بارگذاری ترجمه‌ها در شروع
+load_translations()

@@ -1,0 +1,84 @@
+{
+  "app": {
+    "title": "Crypto Barzin",
+    "description": "Cryptocurrency Analysis and Trading Signals",
+    "footerText": "Designed and Developed by: Hamid Barzin",
+    "copyright": "© 2025"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "cryptoList": "Cryptocurrencies",
+    "signals": "Signals",
+    "telegram": "Telegram",
+    "settings": "Settings",
+    "priceAlerts": "Price Alerts",
+    "news": "News",
+    "ai": "AI"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "refresh": "Refresh",
+    "apply": "Apply",
+    "send": "Send",
+    "loading": "Loading...",
+    "share": "Share",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "view": "View",
+    "create": "Create"
+  },
+  "languages": {
+    "title": "Language",
+    "en": "English",
+    "fa": "Persian",
+    "fr": "French",
+    "selectLanguage": "Select Language"
+  },
+  "status": {
+    "success": "Operation completed successfully",
+    "error": "Error performing operation",
+    "warning": "Warning",
+    "info": "Information",
+    "loading": "Loading...",
+    "online": "Online",
+    "offline": "Offline",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "time": {
+    "now": "Now",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "minutes": "minutes",
+    "hours": "hours",
+    "days": "days",
+    "weeks": "weeks",
+    "months": "months",
+    "years": "years",
+    "ago": "ago",
+    "later": "later"
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "on": "On",
+    "off": "Off",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "all": "All",
+    "none": "None",
+    "more": "More",
+    "less": "Less",
+    "details": "Details",
+    "summary": "Summary",
+    "filter": "Filter"
+  },
+  "language_changed": "Language changed to English.",
+  "language_change_error": "Invalid language code."
+}

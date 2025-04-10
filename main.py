@@ -41,7 +41,7 @@ def inject_now():
         'developer_year': '۱۴۰۴',
         'current_language': current_language,
         'languages': all_languages,
-        'ui_text': lambda key, default="": get_ui_text(current_language, key, default)
+        'ui_text': lambda key, default="": get_ui_text(key, default, current_language)
     }
 
 # Initialize session defaults
@@ -2606,12 +2606,14 @@ def set_language(language_code):
     """تنظیم زبان سایت"""
     if language_code in SUPPORTED_LANGUAGES:
         session['language'] = language_code
-        language_name = SUPPORTED_LANGUAGES[language_code]['name']
-        success_message = get_ui_text(language_code, 'language_changed', 'Language changed successfully.')
+        language_info = get_language_info(language_code)
+        language_name = language_info['name']
+        success_message = get_ui_text('language_changed', 'Language changed successfully.', language_code)
         success_message = success_message.format(language_name=language_name)
         flash(success_message, 'success')
     else:
-        error_message = get_ui_text(get_language_code(), 'language_change_error', 'Invalid language code.')
+        current_language = session.get('language', DEFAULT_LANGUAGE)
+        error_message = get_ui_text('language_change_error', 'Invalid language code.', current_language)
         flash(error_message, 'error')
     
     # برگشت به صفحه قبلی یا صفحه اصلی

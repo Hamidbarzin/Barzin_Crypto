@@ -1,0 +1,99 @@
+{
+  "welcome": "Welcome to Crypto Barzin Bot!",
+  "language_changed": "Language changed to English.",
+  "commands": {
+    "start": "Start",
+    "help": "Help",
+    "settings": "Settings",
+    "prices": "Prices",
+    "signals": "Signals",
+    "alerts": "Alerts",
+    "news": "News",
+    "analysis": "Analysis",
+    "report": "Report"
+  },
+  "help_text": "Crypto Barzin Bot Help Guide:\n\n/start - Start or restart the bot\n/help - Show this help message\n/settings - Bot settings\n/prices - View current prices\n/signals - Get trading signals\n/alerts - Manage price alerts\n/news - Get latest news\n/analysis - Request technical analysis\n/report - Get market report",
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "notifications": "Notifications",
+    "timezone": "Timezone",
+    "update_frequency": "Update Frequency",
+    "default_coins": "Default Coins",
+    "saved": "Settings saved successfully."
+  },
+  "notifications": {
+    "enabled": "Notifications enabled.",
+    "disabled": "Notifications disabled.",
+    "price_alerts": "Price Alerts",
+    "signals": "Trading Signals",
+    "news": "Important News",
+    "reports": "Periodic Reports"
+  },
+  "price_report": {
+    "title": "📊 Cryptocurrency Price Report",
+    "updated": "Updated at",
+    "source": "Source",
+    "disclaimer": "The information above is for educational purposes only and not investment advice."
+  },
+  "technical_analysis": {
+    "title": "🔍 Technical Analysis",
+    "timeframe": "Timeframe",
+    "indicators": "Indicators",
+    "trend": "Trend",
+    "support": "Support",
+    "resistance": "Resistance",
+    "signal": "Signal",
+    "strength": "Signal Strength",
+    "risk": "Risk",
+    "target": "Price Target",
+    "stop_loss": "Stop Loss",
+    "recommendation": "Recommendation",
+    "disclaimer": "This analysis is for educational purposes only and not investment advice."
+  },
+  "signals_report": {
+    "title": "🎯 Trading Signals",
+    "generated": "Generated at",
+    "no_signals": "No signals available at the moment.",
+    "disclaimer": "The signals above are for educational purposes only and not investment advice."
+  },
+  "news_report": {
+    "title": "📰 Latest Cryptocurrency News",
+    "read_more": "Read more",
+    "source": "Source",
+    "published": "Published at",
+    "no_news": "No new articles found."
+  },
+  "price_alerts": {
+    "title": "⚠️ Price Alerts",
+    "create": "Create new alert",
+    "created": "Price alert created.",
+    "removed": "Price alert removed.",
+    "triggered": "Price alert triggered!",
+    "no_alerts": "No price alerts set.",
+    "above": "above",
+    "below": "below",
+    "reached": "reached the price of:"
+  },
+  "system_report": {
+    "title": "🖥️ System Status Report",
+    "uptime": "Uptime",
+    "memory_usage": "Memory Usage",
+    "cpu_usage": "CPU Usage",
+    "active_alerts": "Active Alerts",
+    "last_update": "Last Update",
+    "api_status": "API Status",
+    "database_status": "Database Status",
+    "connected": "Connected",
+    "disconnected": "Disconnected"
+  },
+  "errors": {
+    "general": "An error occurred. Please try again later.",
+    "not_found": "Requested information not found.",
+    "invalid_command": "Invalid command.",
+    "api_error": "Error accessing the API.",
+    "timeout": "Request timed out.",
+    "parse_error": "Error parsing data.",
+    "insufficient_data": "Insufficient data for analysis."
+  }
+}
