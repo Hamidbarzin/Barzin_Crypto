@@ -2,7 +2,47 @@
 
 {% block title %}پنل مدیریت تلگرام{% endblock %}
 
+{% block head %}
+{{ super() }}
+<style>
+    /* استایل برای toast های سفارشی */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+    
+    .toast {
+        min-width: 300px;
+        background-color: #28a745;
+        color: white;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.3s ease-in-out;
+    }
+    
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .toast i {
+        margin-right: 10px;
+        font-size: 1.2em;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
+<!-- کانتینر toast ها -->
+<div class="toast-container" id="toast-container"></div>
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-12">
@@ -11,8 +51,8 @@
                     <h5 class="mb-0">پنل مدیریت تلگرام Crypto Barzin <span id="service-status"></span></h5>
                 </div>
                 <div class="card-body">
-                    <!-- پیام موفقیت -->
-                    <div id="success-message" class="alert alert-success mb-4 d-none">
+                    <!-- پیام موفقیت با کد آبی رنگ برای بهتر دیده شدن -->
+                    <div id="success-message" class="alert alert-info mb-4 d-none">
                         <i class="fas fa-check-circle me-2"></i>
                         <strong>تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.</strong>
                     </div>
@@ -181,6 +221,48 @@
 
 {% block scripts %}
 <script>
+    // تابع نمایش پیام موفقیت با toast
+    function showToast(message, type = 'success') {
+        // ساخت المان toast
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        
+        // تنظیم رنگ بر اساس نوع
+        if (type === 'success') {
+            toast.style.backgroundColor = '#28a745';
+        } else if (type === 'error') {
+            toast.style.backgroundColor = '#dc3545';
+        } else if (type === 'info') {
+            toast.style.backgroundColor = '#17a2b8';
+        }
+        
+        // افزودن آیکون
+        let icon = 'check-circle';
+        if (type === 'error') {
+            icon = 'exclamation-circle';
+        } else if (type === 'info') {
+            icon = 'info-circle';
+        }
+        
+        toast.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+        
+        // اضافه کردن به کانتینر
+        const container = document.getElementById('toast-container');
+        container.appendChild(toast);
+        
+        // نمایش با انیمیشن
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        // حذف بعد از 5 ثانیه
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                container.removeChild(toast);
+            }, 300);
+        }, 5000);
+    }
     // نمایش نتیجه عملیات
     function showResult(message, success = true) {
         const resultContainer = document.getElementById('result-container');
@@ -289,23 +371,8 @@
     document.getElementById('btn-save-settings').addEventListener('click', async function() {
         this.disabled = true;
         
-        // نمایش پیام موفقیت در دو محل
-        // 1. در کنار دکمه ذخیره
-        const settingsResult = document.getElementById('settings-result');
-        settingsResult.classList.remove('d-none');
-        
-        // 2. در بالای صفحه
-        const successMessage = document.getElementById('success-message');
-        successMessage.classList.remove('d-none');
-        
-        // اسکرول به بالا برای دیدن پیام موفقیت
-        window.scrollTo({top: 0, behavior: 'smooth'});
-        
-        // پنهان کردن پیام‌ها بعد از 5 ثانیه
-        setTimeout(() => {
-            settingsResult.classList.add('d-none');
-            successMessage.classList.add('d-none');
-        }, 5000);
+        // نمایش پیام موفقیت با استفاده از آلرت جاوااسکریپت بجای المان‌های HTML
+        // این روش ساده‌تر و مطمئن‌تر است
         
         // دریافت مقادیر فرم
         const messageSendingEnabled = document.getElementById('message-sending-enabled').checked;
@@ -336,8 +403,10 @@
             const response = await fetch('/api/telegram/settings', options);
             const result = await response.json();
             
-            // در صورت وجود خطا نمایش داده شود
-            if (result && !result.success) {
+            // نمایش پیام موفقیت با toast سفارشی بهتر از آلرت
+            if (result && result.success) {
+                showToast('تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.', 'success');
+            } else {
                 showResult(result.message || 'خطا در ذخیره تنظیمات', false);
             }
         } catch (error) {
