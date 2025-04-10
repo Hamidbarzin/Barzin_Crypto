@@ -2346,6 +2346,7 @@ def telegram_control_panel():
 
 
 @app.route('/telegram-success')
+@login_required
 def telegram_success_message():
     """صفحه پیام موفقیت برای ذخیره تنظیمات تلگرام"""
     inject_now()
@@ -2353,6 +2354,7 @@ def telegram_success_message():
 
 
 @app.route('/telegram-settings-saved')
+@login_required
 def telegram_settings_saved():
     """صفحه نمایش موفقیت در ذخیره تنظیمات تلگرام (صفحه جدید)"""
     inject_now()
@@ -2360,6 +2362,7 @@ def telegram_settings_saved():
 
 
 @app.route('/telegram-save-settings', methods=['POST'])
+@login_required
 def telegram_save_settings():
     """ذخیره تنظیمات تلگرام با استفاده از فرم HTML"""
     try:
@@ -2432,6 +2435,7 @@ def telegram_save_settings():
         return redirect('/telegram_control_panel?error=1')
 
 @app.route('/telegram-reliability')
+@login_required
 def telegram_reliability_dashboard():
     """صفحه داشبورد قابلیت اطمینان تلگرام"""
     return render_template('telegram_reliability.html')
