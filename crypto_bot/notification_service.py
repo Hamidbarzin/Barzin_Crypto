@@ -1,8 +1,8 @@
 """
-سرویس اعلان و هشدار برای فرصت‌های خرید و فروش و نوسانات بازار - مسیردهی به تلگرام
+Notification and Alert Service for Buy/Sell Opportunities and Market Volatility - Routing to Telegram
 
-این فایل به عنوان یک لایه میانی عمل می‌کند که تمام اعلان‌ها را به سمت سرویس تلگرام هدایت می‌کند.
-همه متدهای قبلی برای حفظ سازگاری حفظ شده‌اند، اما اکنون به جای ارسال پیامک، از تلگرام استفاده می‌کنند.
+This file acts as a middleware layer that routes all notifications to the Telegram service.
+All previous methods are maintained for compatibility, but now use Telegram instead of SMS.
 """
 
 import os
@@ -11,44 +11,44 @@ from datetime import datetime
 from flask import session
 from crypto_bot.telegram_service import send_telegram_message, send_buy_sell_notification as telegram_send_buy_sell, send_volatility_alert as telegram_send_volatility, send_market_trend_alert as telegram_send_market_trend, send_test_notification as telegram_send_test, get_current_persian_time
 
-# تنظیم لاگر
+# Configure logger
 logger = logging.getLogger(__name__)
 
 def send_sms_notification(to_phone_number, message):
     """
-    هدایت پیام به تلگرام به جای پیامک
+    Route message to Telegram instead of SMS
     
     Args:
-        to_phone_number (str): شماره موبایل گیرنده (دیگر استفاده نمی‌شود)
-        message (str): متن پیام
+        to_phone_number (str): Recipient phone number (no longer used)
+        message (str): Message text
         
     Returns:
-        bool: آیا ارسال موفقیت‌آمیز بود
+        bool: Whether the message was sent successfully
     """
-    logger.info("هدایت پیام به سمت تلگرام...")
+    logger.info("Routing message to Telegram...")
     
-    # دریافت چت آیدی تلگرام از SESSION
+    # Get Telegram chat ID from SESSION
     chat_id = session.get('telegram_chat_id', None)
     
     if not chat_id:
-        logger.error("چت آیدی تلگرام یافت نشد")
+        logger.error("Telegram chat ID not found")
         return False
         
     return send_telegram_message(chat_id, message)
 
 def send_buy_sell_notification(to_phone_number, symbol, action, price, reason):
     """
-    ارسال اعلان خرید یا فروش
+    Send buy or sell notification
     
     Args:
-        to_phone_number (str): شماره موبایل گیرنده
-        symbol (str): نماد ارز
-        action (str): 'خرید' یا 'فروش'
-        price (float): قیمت فعلی
-        reason (str): دلیل توصیه
+        to_phone_number (str): Recipient phone number
+        symbol (str): Cryptocurrency symbol
+        action (str): 'buy' or 'sell' (in Persian: 'خرید' or 'فروش')
+        price (float): Current price
+        reason (str): Recommendation reason
         
     Returns:
-        bool: آیا ارسال موفقیت‌آمیز بود
+        bool: Whether the notification was sent successfully
     """
     message = f"🔔 سیگنال {action} برای {symbol}\n"
     message += f"💰 قیمت فعلی: {price}\n"
