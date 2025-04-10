@@ -3047,20 +3047,20 @@ with app.app_context():
         if telegram_scheduler_service.telegram_scheduler.auto_start_on_boot:
             logger.info("Starting Telegram scheduling service with app_context...")
             if telegram_scheduler_service.start_scheduler():
-                logger.info("سرویس زمان‌بندی تلگرام با موفقیت راه‌اندازی شد")
+                logger.info("Telegram scheduling service started successfully")
             else:
-                logger.error("خطا در راه‌اندازی سرویس زمان‌بندی تلگرام")
+                logger.error("Error starting Telegram scheduling service")
         else:
-            logger.info("راه‌اندازی خودکار سرویس زمان‌بندی تلگرام غیرفعال است")
+            logger.info("Automatic start of Telegram scheduling service is disabled")
     except Exception as e:
-        logger.error(f"استثنا در راه‌اندازی سرویس زمان‌بندی تلگرام: {str(e)}")
+        logger.error(f"Exception while starting Telegram scheduling service: {str(e)}")
 
 
 if __name__ == "__main__":
     # راه‌اندازی زمان‌بندی تلگرام قبل از شروع برنامه
     try:
         # بررسی تنظیمات راه‌اندازی خودکار
-        logger.info("در حال بررسی تنظیمات راه‌اندازی خودکار سرویس زمان‌بندی تلگرام...")
+        logger.info("Checking Telegram scheduling service auto-start settings...")
         if telegram_scheduler_service.telegram_scheduler.auto_start_on_boot:
             logger.info("در حال راه‌اندازی سرویس زمان‌بندی تلگرام...")
             if telegram_scheduler_service.start_scheduler():
