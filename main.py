@@ -2661,7 +2661,11 @@ def set_language(language_code):
         flash(f"خطا در تغییر زبان: {str(e)}", 'error')
     
     # برگشت به صفحه قبلی یا صفحه اصلی
-    return redirect(request.referrer or url_for('minimal_dashboard'))
+    referrer = request.referrer
+    if referrer:
+        return redirect(referrer)
+    else:
+        return redirect(url_for('minimal_dashboard'))
 
 
 @app.route('/api/voice-notification/preview', methods=['POST'])
