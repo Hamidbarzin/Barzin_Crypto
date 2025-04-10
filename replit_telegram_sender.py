@@ -62,8 +62,8 @@ except ImportError:
 
 # تنظیم کنید - کلید API تلگرام و شناسه چت
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-# استفاده مستقیم از آیدی شخصی به جای متغیر محیطی
-DEFAULT_CHAT_ID = 722121956  # آیدی شخصی کاربر - بدون نقل قول
+# استفاده مستقیم از آیدی گروه به جای متغیر محیطی
+DEFAULT_CHAT_ID = -1002584373095  # آیدی گروه تلگرام
 
 # تنظیم منطقه زمانی تهران و تورنتو
 tehran_tz = pytz.timezone('Asia/Tehran')
