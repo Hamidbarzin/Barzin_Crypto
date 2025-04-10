@@ -59,17 +59,17 @@ def send_buy_sell_notification(to_phone_number, symbol, action, price, reason):
 
 def send_volatility_alert(to_phone_number, symbol, price, change_percent, timeframe="1h"):
     """
-    ارسال هشدار نوسان قیمت
+    Send price volatility alert
     
     Args:
-        to_phone_number (str): شماره موبایل گیرنده
-        symbol (str): نماد ارز
-        price (float): قیمت فعلی
-        change_percent (float): درصد تغییر
-        timeframe (str): بازه زمانی تغییر
+        to_phone_number (str): Recipient phone number
+        symbol (str): Cryptocurrency symbol
+        price (float): Current price
+        change_percent (float): Percentage change
+        timeframe (str): Time period for the change
         
     Returns:
-        bool: آیا ارسال موفقیت‌آمیز بود
+        bool: Whether the alert was sent successfully
     """
     direction = "افزایش" if change_percent > 0 else "کاهش"
     emoji = "🚀" if change_percent > 0 else "📉"
@@ -83,16 +83,16 @@ def send_volatility_alert(to_phone_number, symbol, price, change_percent, timefr
 
 def send_market_trend_alert(to_phone_number, trend, affected_coins, reason):
     """
-    ارسال هشدار روند کلی بازار
+    Send market trend alert
     
     Args:
-        to_phone_number (str): شماره موبایل گیرنده
-        trend (str): روند بازار ('صعودی'، 'نزولی' یا 'خنثی')
-        affected_coins (list): لیست ارزهای تحت تأثیر
-        reason (str): دلیل روند
+        to_phone_number (str): Recipient phone number
+        trend (str): Market trend ('صعودی' (bullish), 'نزولی' (bearish) or 'خنثی' (neutral))
+        affected_coins (list): List of affected cryptocurrencies
+        reason (str): Reason for the trend
         
     Returns:
-        bool: آیا ارسال موفقیت‌آمیز بود
+        bool: Whether the alert was sent successfully
     """
     emoji = "🚀" if trend == "صعودی" else "📉" if trend == "نزولی" else "⚖️"
     
@@ -107,27 +107,27 @@ def send_market_trend_alert(to_phone_number, trend, affected_coins, reason):
 
 def send_test_notification(to_phone_number=None):
     """
-    ارسال پیام تست برای بررسی عملکرد سیستم اعلان
+    Send test message to check notification system functionality
     
     Args:
-        to_phone_number (str, optional): شماره موبایل گیرنده (استفاده نمی‌شود)
+        to_phone_number (str, optional): Recipient phone number (not used)
         
     Returns:
-        dict: وضعیت ارسال و پیام
+        dict: Send status and message
     """
-    # استفاده از چت آیدی موجود در session یا استفاده از چت آیدی پیش‌فرض
+    # Use chat ID from session or use default chat ID
     chat_id = session.get('telegram_chat_id', None)
     
-    # اگر در session چت آیدی نباشد، از تابع telegram_send_test استفاده می‌کنیم
-    # که می‌تواند از چت آیدی پیش‌فرض استفاده کند
+    # If there's no chat ID in session, use telegram_send_test function
+    # which can use the default chat ID
     return telegram_send_test(chat_id)
 
 def get_current_persian_time():
     """
-    دریافت زمان فعلی به فرمت مناسب فارسی
+    Get current time in appropriate Persian format
     
     Returns:
-        str: زمان فعلی
+        str: Current time
     """
     now = datetime.now()
     return now.strftime("%Y-%m-%d %H:%M:%S")
