@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 338,
-    "successful": 332,
+    "total_sent": 340,
+    "successful": 334,
     "failed": 6,
     "history": [
       {
@@ -1699,6 +1699,16 @@
         "message_type": "technical_analysis_BTC",
         "success": true,
         "timestamp": "2025-04-10T01:23:00.435337-04:00"
+      },
+      {
+        "message_type": "technical_analysis_ETH",
+        "success": true,
+        "timestamp": "2025-04-10T01:27:07.414577-04:00"
+      },
+      {
+        "message_type": "trading_signals",
+        "success": true,
+        "timestamp": "2025-04-10T01:27:07.898267-04:00"
       }
     ]
   },
