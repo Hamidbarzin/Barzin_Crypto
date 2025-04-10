@@ -203,7 +203,7 @@ def send_price_report():
 ━━━━━━━━━━━━━━━━━━
 
 📊 <b>نمودار کندل‌استیک اخیر Bitcoin (BTC/USDT):</b>
-https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1.svg
+<a href="https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1.svg">https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1.svg</a>
 
 📈 <b>وضعیت بازار:</b> {"🟢 صعودی" if sum(c["change"] for c in coins) > 0 else "🔴 نزولی"}
 
@@ -469,7 +469,7 @@ def send_technical_analysis(symbol="BTC/USDT"):
     # اضافه کردن نمودار کندل‌استیک اگر موجود باشد
     if candlestick_url:
         message += f"""<b>📈 نمودار کندل‌استیک هفتگی:</b>
-{candlestick_url}
+<a href="{candlestick_url}">{candlestick_url}</a>
 
 """
 
@@ -558,10 +558,10 @@ def send_trading_signals():
 ━━━━━━━━━━━━━━━━━━
 
 📊 <b>نمودار کندل‌استیک BTC/USDT:</b>
-https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1.svg
+<a href="https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1.svg">https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1.svg</a>
 
 📊 <b>نمودار کندل‌استیک ETH/USDT:</b>
-https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1027.svg
+<a href="https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1027.svg">https://s3.coinmarketcap.com/generated/sparklines/web/7d/2781/1027.svg</a>
 
 <b>🟢 سیگنال‌های خرید:</b>
 """
