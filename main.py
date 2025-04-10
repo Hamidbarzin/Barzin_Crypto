@@ -19,6 +19,7 @@ from crypto_bot.language_manager import (
     get_language_code, get_ui_text, get_language_info, 
     get_all_languages, SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 )
+from crypto_bot.telegram_auth import verify_password, change_password, login_required
 import replit_telegram_sender
 import telegram_scheduler_service
 
