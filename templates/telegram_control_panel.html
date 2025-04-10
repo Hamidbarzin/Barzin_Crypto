@@ -11,6 +11,11 @@
                     <h5 class="mb-0">پنل مدیریت تلگرام Crypto Barzin <span id="service-status"></span></h5>
                 </div>
                 <div class="card-body">
+                    <!-- پیام موفقیت -->
+                    <div id="success-message" class="alert alert-success mb-4 d-none">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.</strong>
+                    </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <div class="card h-100">
@@ -284,14 +289,23 @@
     document.getElementById('btn-save-settings').addEventListener('click', async function() {
         this.disabled = true;
         
-        // نمایش پیام موفقیت بلافاصله بعد از کلیک
+        // نمایش پیام موفقیت در دو محل
+        // 1. در کنار دکمه ذخیره
         const settingsResult = document.getElementById('settings-result');
         settingsResult.classList.remove('d-none');
         
-        // پنهان کردن پیام بعد از 3 ثانیه
+        // 2. در بالای صفحه
+        const successMessage = document.getElementById('success-message');
+        successMessage.classList.remove('d-none');
+        
+        // اسکرول به بالا برای دیدن پیام موفقیت
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        
+        // پنهان کردن پیام‌ها بعد از 5 ثانیه
         setTimeout(() => {
             settingsResult.classList.add('d-none');
-        }, 3000);
+            successMessage.classList.add('d-none');
+        }, 5000);
         
         // دریافت مقادیر فرم
         const messageSendingEnabled = document.getElementById('message-sending-enabled').checked;
