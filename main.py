@@ -2196,7 +2196,16 @@ def telegram_control_panel():
     inject_now()
     # دریافت وضعیت فعلی سرویس زمان‌بندی
     scheduler_status = telegram_scheduler_service.get_scheduler_status()
-    return render_template('telegram_control_panel.html', scheduler_status=scheduler_status)
+    
+    # بررسی وجود پیام موفقیت در جلسه
+    settings_saved = False
+    if session.get('settings_saved'):
+        settings_saved = True
+        session.pop('settings_saved', None)  # حذف پیام پس از استفاده
+    
+    return render_template('telegram_control_panel.html', 
+                           scheduler_status=scheduler_status,
+                           settings_saved=settings_saved)
 
 
 @app.route('/telegram-reliability')
@@ -2345,6 +2354,9 @@ def api_telegram_settings():
         
         # بروزرسانی تنظیمات
         updated_status = telegram_scheduler_service.update_scheduler_settings(data)
+        
+        # ذخیره پیام موفقیت در جلسه
+        session['settings_saved'] = True
         
         return jsonify({
             'success': True,
