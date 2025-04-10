@@ -48,6 +48,11 @@ class TelegramSchedulerService:
         self.trading_signals_interval = 8  # هر 8 بار (4 ساعت)
         self.crypto_news_interval = 16  # هر 16 بار (8 ساعت)
         
+        # تنظیمات قابل تغییر توسط کاربر
+        self.active_hours_start = 8  # ساعت شروع (8 صبح)
+        self.active_hours_end = 22   # ساعت پایان (10 شب)
+        self.message_sending_enabled = True  # آیا ارسال پیام فعال است؟
+        
         # ارزهای مهم برای تحلیل تکنیکال
         self.important_coins = ["BTC/USDT", "ETH/USDT", "BNB/USDT", "SOL/USDT", "XRP/USDT"]
         self.current_coin_index = 0
@@ -102,6 +107,10 @@ class TelegramSchedulerService:
         """
         return {
             "running": self.running,
+            "message_sending_enabled": self.message_sending_enabled,
+            "active_hours_start": self.active_hours_start,
+            "active_hours_end": self.active_hours_end,
+            "interval": self.interval,
             "system_report_counter": self.system_report_counter,
             "technical_analysis_counter": self.technical_analysis_counter,
             "trading_signals_counter": self.trading_signals_counter,

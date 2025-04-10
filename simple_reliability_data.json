@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 280,
-    "successful": 274,
+    "total_sent": 287,
+    "successful": 281,
     "failed": 6,
     "history": [
       {
@@ -1409,12 +1409,47 @@
         "message_type": "price_report",
         "success": true,
         "timestamp": "2025-04-10T00:33:24.777080-04:00"
+      },
+      {
+        "message_type": "technical_analysis_BTC",
+        "success": true,
+        "timestamp": "2025-04-10T00:36:18.633880-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T00:38:37.779158-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T00:38:37.827999-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T00:39:47.966560-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T00:39:47.989932-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T00:39:55.291267-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T00:39:55.330294-04:00"
       }
     ]
   },
   "uptime": {
     "start_time": "2025-04-09T18:29:20.816437-04:00",
-    "last_restart": "2025-04-10T00:32:11.834577-04:00",
-    "restarts": 112
+    "last_restart": "2025-04-10T00:39:54.755627-04:00",
+    "restarts": 115
   }
 }
