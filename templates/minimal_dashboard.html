@@ -140,11 +140,9 @@
                             
                             <!-- Technical Analysis Content -->
                             <div id="technical-content" style="display: none;">
-                                <!-- Chart Placeholder -->
+                                <!-- Chart Container -->
                                 <div class="chart-container mb-4">
-                                    <div class="d-flex justify-content-center align-items-center h-100">
-                                        <p class="text-muted">{{ ui_text('btc_hourly_chart', 'نمودار قیمت BTC/USDT') }}</p>
-                                    </div>
+                                    <canvas id="priceChart"></canvas>
                                 </div>
                                 
                                 <div class="row">
@@ -549,6 +547,137 @@
         // به‌روزرسانی خودکار قیمت‌ها هر ۳۰ ثانیه
         setInterval(updateSignalPrices, 30000);
         
+        // تابع برای ایجاد نمودار قیمت
+        function createPriceChart(coinSymbol = 'BTC') {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            
+            // داده‌های نمونه برای نمودار
+            const labels = [];
+            const prices = [];
+            
+            // ایجاد داده‌های تصادفی برای ۳۰ روز گذشته
+            const today = new Date();
+            let basePrice = 0;
+            
+            // تنظیم قیمت پایه بر اساس ارز
+            switch(coinSymbol) {
+                case 'BTC': basePrice = 65000; break;
+                case 'ETH': basePrice = 3400; break;
+                case 'SOL': basePrice = 150; break;
+                case 'XRP': basePrice = 0.5; break;
+                default: basePrice = 65000;
+            }
+            
+            // ایجاد ۳۰ روز داده
+            for (let i = 30; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(today.getDate() - i);
+                labels.push(date.toLocaleDateString('fa-IR'));
+                
+                // ایجاد قیمت با نوسان تصادفی حول قیمت پایه
+                const randomFactor = 0.05; // ۵٪ نوسان
+                const change = (Math.random() - 0.5) * randomFactor * basePrice;
+                basePrice += change;
+                if (basePrice < 0) basePrice = Math.abs(basePrice); // جلوگیری از قیمت منفی
+                
+                prices.push(basePrice);
+            }
+            
+            // تنظیم رنگ‌ها
+            const borderColor = coinSymbol === 'BTC' ? '#F7931A' : 
+                               coinSymbol === 'ETH' ? '#627EEA' : 
+                               coinSymbol === 'SOL' ? '#00FFB3' : '#0066FF';
+                               
+            const backgroundColor = coinSymbol === 'BTC' ? 'rgba(247, 147, 26, 0.1)' : 
+                                  coinSymbol === 'ETH' ? 'rgba(98, 126, 234, 0.1)' : 
+                                  coinSymbol === 'SOL' ? 'rgba(0, 255, 179, 0.1)' : 'rgba(0, 102, 255, 0.1)';
+            
+            // ایجاد نمودار
+            if (window.priceChart) {
+                window.priceChart.destroy();
+            }
+            
+            window.priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `${coinSymbol}/USDT Price`,
+                        data: prices,
+                        borderColor: borderColor,
+                        backgroundColor: backgroundColor,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            titleFont: {
+                                family: 'Vazirmatn'
+                            },
+                            bodyFont: {
+                                family: 'Vazirmatn'
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-US', { 
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2 
+                                        }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('en-US', { 
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0
+                                    }).format(value);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            return window.priceChart;
+        }
+    
+        // ایجاد نمودار قیمت اولیه (بیت‌کوین)
+        setTimeout(() => {
+            createPriceChart('BTC');
+        }, 1500);
+    
         // تنظیم رویدادهای کلیک روی تب‌های ارزی در تحلیل تکنیکال
         document.querySelectorAll('.btn-group[role="group"] button').forEach(button => {
             button.addEventListener('click', function() {
@@ -566,12 +695,10 @@
                 
                 // تغییر محتوای نمودار و عنوان بر اساس ارز انتخاب شده
                 const coinText = this.textContent.trim();
-                const chartText = document.querySelector('.chart-container p');
                 const titleElement = document.querySelector('#technical-pane .card-header h5');
                 
-                if (chartText) {
-                    chartText.textContent = `نمودار قیمت ${coinText}/USDT`;
-                }
+                // به‌روزرسانی نمودار قیمت
+                createPriceChart(coinText);
                 
                 if (titleElement) {
                     let coinName = 'بیت‌کوین';
