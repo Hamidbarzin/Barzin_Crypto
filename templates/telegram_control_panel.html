@@ -295,11 +295,28 @@
             interval: interval
         };
         
-        // ارسال درخواست به API
-        const result = await callApi('/api/telegram/settings', 'POST', settings);
-        
-        if (result && result.success) {
-            showResult('تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.', true);
+        try {
+            // ارسال درخواست به API بدون نمایش خودکار پیام
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(settings)
+            };
+            
+            const response = await fetch('/api/telegram/settings', options);
+            const result = await response.json();
+            
+            // نمایش پیام موفقیت به صورت دستی
+            if (result && result.success) {
+                showResult('تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.', true);
+            } else {
+                showResult(result.message || 'خطا در ذخیره تنظیمات', false);
+            }
+        } catch (error) {
+            console.error('خطا در ارسال درخواست:', error);
+            showResult(`خطا در ذخیره تنظیمات: ${error.message}`, false);
         }
         
         // بروزرسانی وضعیت
