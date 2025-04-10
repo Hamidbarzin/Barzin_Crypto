@@ -41,8 +41,14 @@ def get_language_code(lang_name):
         'persian': 'fa',
         'فارسی': 'fa',
         'french': 'fr',
+        'français': 'fr',
         'فرانسوی': 'fr'
     }
+    
+    # اگر lang_name دقیقاً برابر با یکی از کدهای زبان باشد، همان را برگردان
+    if lang_name.lower() in [code.lower() for code in SUPPORTED_LANGUAGES]:
+        return lang_name.lower()
+        
     return lang_map.get(lang_name.lower(), DEFAULT_LANGUAGE)
 
 def get_ui_text(key, default="", language=None):
