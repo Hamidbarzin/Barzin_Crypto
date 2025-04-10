@@ -410,24 +410,24 @@ def get_bot_info(max_retries=2, retry_delay=1):
         except Exception as e:
             last_error = e
             retries += 1
-            logger.warning(f"خطا در دریافت اطلاعات بات (تلاش {retries}/{max_retries}): {str(e)}")
+            logger.warning(f"Error getting bot information (attempt {retries}/{max_retries}): {str(e)}")
             
             if retries <= max_retries:
-                logger.info(f"تلاش مجدد پس از {retry_delay} ثانیه...")
+                logger.info(f"Retrying after {retry_delay} seconds...")
                 import time
-                time.sleep(retry_delay)  # تاخیر قبل از تلاش مجدد
+                time.sleep(retry_delay)  # Delay before retrying
     
-    # اگر به اینجا برسیم، یعنی همه تلاش‌ها ناموفق بوده‌اند
-    error_msg = str(last_error) if last_error else "دلیل نامشخص"
-    logger.error(f"خطا در دریافت اطلاعات بات پس از {max_retries} تلاش: {error_msg}")
+    # If we reach here, all attempts have failed
+    error_msg = str(last_error) if last_error else "unknown reason"
+    logger.error(f"Error getting bot information after {max_retries} attempts: {error_msg}")
     
-    # ارائه اطلاعات پیش‌فرض در صورت عدم دسترسی به API تلگرام
-    token_valid = bool(token and len(token) > 20)  # بررسی سریع معتبر بودن توکن
+    # Provide default information when Telegram API is not accessible
+    token_valid = bool(token and len(token) > 20)  # Quick validation of token
     return {
         "available": False,
         "token_seems_valid": token_valid,
-        "message": f"خطای ارتباط با API تلگرام: {error_msg}",
-        "username": "GrowthFinderBot",  # اطلاعات ثابت در صورت عدم دسترسی به API
+        "message": f"Error connecting to Telegram API: {error_msg}",
+        "username": "GrowthFinderBot",  # Default information when API is not accessible
         "link": "https://t.me/GrowthFinderBot",
         "name": "CryptoSage Bot",
         "id": 0
@@ -529,29 +529,29 @@ def get_chat_debug_info(chat_id=None, max_retries=2, retry_delay=1):
             else:
                 last_error = result["error"]
                 retries += 1
-                logger.warning(f"خطا در دریافت اطلاعات چت (تلاش {retries}/{max_retries}): {last_error}")
+                logger.warning(f"Error getting chat information (attempt {retries}/{max_retries}): {last_error}")
                 
                 if retries <= max_retries:
-                    logger.info(f"تلاش مجدد پس از {retry_delay} ثانیه...")
+                    logger.info(f"Retrying after {retry_delay} seconds...")
                     import time
-                    time.sleep(retry_delay)  # تاخیر قبل از تلاش مجدد
+                    time.sleep(retry_delay)  # Delay before retrying
                 else:
-                    debug_info["error"] = f"خطا در دریافت اطلاعات چت پس از چند تلاش: {last_error}"
+                    debug_info["error"] = f"Error getting chat information after multiple attempts: {last_error}"
         except Exception as e:
             last_error = str(e)
             retries += 1
-            logger.warning(f"خطا در اجرای دیباگ چت (تلاش {retries}/{max_retries}): {last_error}")
+            logger.warning(f"Error running chat debug (attempt {retries}/{max_retries}): {last_error}")
             
             if retries <= max_retries:
-                logger.info(f"تلاش مجدد پس از {retry_delay} ثانیه...")
+                logger.info(f"Retrying after {retry_delay} seconds...")
                 import time
-                time.sleep(retry_delay)  # تاخیر قبل از تلاش مجدد
+                time.sleep(retry_delay)  # Delay before retrying
             else:
-                debug_info["error"] = f"خطا در اجرای دیباگ چت: {last_error}"
+                debug_info["error"] = f"Error running chat debug: {last_error}"
                 
-    # اگر به اینجا برسیم، یعنی همه تلاش‌ها ناموفق بوده‌اند
-    error_msg = str(last_error) if last_error else "دلیل نامشخص"
-    logger.error(f"خطا در دریافت اطلاعات چت پس از {max_retries} تلاش: {error_msg}")
+    # If we reach here, all attempts have failed
+    error_msg = str(last_error) if last_error else "unknown reason"
+    logger.error(f"Error getting chat information after {max_retries} attempts: {error_msg}")
     debug_info["error"] = error_msg
     return debug_info
 
@@ -572,30 +572,30 @@ def send_telegram_photo(chat_id, photo_path, caption=None, parse_mode='HTML', ma
         bool: آیا ارسال موفقیت‌آمیز بود
     """
     if not TELEGRAM_AVAILABLE or _telegram is None:
-        logger.error("کتابخانه تلگرام نصب نشده است")
+        logger.error("Telegram library is not installed")
         return False
         
-    # بررسی مجدد توکن تلگرام از متغیرهای محیطی
+    # Check Telegram token from environment variables
     token = os.environ.get("TELEGRAM_BOT_TOKEN") or TELEGRAM_BOT_TOKEN
     if not token:
-        logger.error("توکن بات تلگرام تنظیم نشده است")
+        logger.error("Telegram bot token is not set")
         return False
         
-    # اطمینان از اینکه chat_id به فرمت عددی است
+    # Ensure chat_id is in numeric format
     try:
         if isinstance(chat_id, str) and chat_id.isdigit():
             chat_id = int(chat_id)
     except Exception as e:
-        logger.warning(f"خطا در تبدیل چت آیدی به عدد: {str(e)}")
-        # ادامه کار بدون تبدیل
+        logger.warning(f"Error converting chat ID to number: {str(e)}")
+        # Continue without conversion
         
-    # بررسی وجود فایل
+    # Check if the file exists
     photo_file = pathlib.Path(photo_path)
     if not photo_file.exists():
-        logger.error(f"فایل تصویر در مسیر {photo_path} یافت نشد.")
+        logger.error(f"Image file not found at path {photo_path}.")
         return False
         
-    # تبدیل ParseMode به نوع مناسب
+    # Convert ParseMode to appropriate type
     if parse_mode == 'HTML':
         parse_mode_enum = ParseMode.HTML
     elif parse_mode == 'Markdown':
@@ -603,16 +603,16 @@ def send_telegram_photo(chat_id, photo_path, caption=None, parse_mode='HTML', ma
     else:
         parse_mode_enum = parse_mode
     
-    # اضافه کردن اطلاعات دیباگ
-    logger.info(f"تلاش برای ارسال تصویر به چت آیدی: {chat_id} از مسیر {photo_path}")
+    # Add debug information
+    logger.info(f"Attempting to send image to chat ID: {chat_id} from path {photo_path}")
     
-    # ایجاد یک لوپ آسنکرون برای اجرای کد آسنکرون
+    # Create an async loop for executing async code
     async def send_photo_async():
-        # ایجاد بات داخل تابع آسنکرون
+        # Create bot inside async function
         bot = _telegram.Bot(token=token)
-        # باز کردن فایل عکس
+        # Open the image file
         with open(photo_path, 'rb') as photo:
-            # ارسال عکس
+            # Send image
             await bot.send_photo(
                 chat_id=chat_id,
                 photo=photo,
@@ -620,7 +620,7 @@ def send_telegram_photo(chat_id, photo_path, caption=None, parse_mode='HTML', ma
                 parse_mode=parse_mode_enum if caption else None
             )
     
-    # تلاش مجدد با تاخیر
+    # Retry with delay
     retries = 0
     last_error = None
     
