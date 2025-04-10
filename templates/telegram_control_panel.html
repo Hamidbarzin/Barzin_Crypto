@@ -292,7 +292,11 @@
         };
         
         // ارسال درخواست به API
-        await callApi('/api/telegram/settings', 'POST', settings);
+        const result = await callApi('/api/telegram/settings', 'POST', settings);
+        
+        if (result && result.success) {
+            showResult('تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.', true);
+        }
         
         // بروزرسانی وضعیت
         refreshStatus();

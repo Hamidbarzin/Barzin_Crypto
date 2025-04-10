@@ -2348,7 +2348,7 @@ def api_telegram_settings():
         
         return jsonify({
             'success': True,
-            'message': 'تنظیمات با موفقیت بروزرسانی شد',
+            'message': 'تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.',
             'status': updated_status
         })
     except Exception as e:
