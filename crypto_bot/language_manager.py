@@ -136,6 +136,12 @@ UI_TRANSLATIONS = {
         'show_signals_directly': 'نمایش مستقیم سیگنال‌ها',
         'show_technical_directly': 'نمایش مستقیم تحلیل تکنیکال',
         
+        # توضیحات سیگنال‌ها
+        'eth_sell_signal': 'اتریوم در نزدیکی مقاومت کلیدی قرار گرفته و شاخص‌های تکنیکال نشان‌دهنده اشباع خرید هستند. RSI بالای ۷۰ قرار دارد و الگوی واگرایی منفی با MACD مشاهده می‌شود. احتمال اصلاح قیمت وجود دارد.',
+        'sol_buy_signal': 'سولانا در حال شکستن یک الگوی مقاومتی کلیدی است و با حجم معاملات بالا در حال حرکت است. میانگین‌های متحرک حمایت قوی را نشان می‌دهند و پتانسیل رشد قابل توجهی وجود دارد.',
+        'bnb_wait_signal': 'بایننس کوین در یک محدوده قیمتی باریک در حال معامله است. در صورت شکست سطح مقاومت ۵۸۰ دلار، سیگنال خرید فعال می‌شود. پیشنهاد می‌شود تا زمان شکست این سطح، معامله‌ای انجام نشود.',
+        'signal_validity': 'ایجاد شده: امروز {time} | اعتبار: {hours} ساعت',
+        
         # عمومی
         'loading': 'در حال بارگذاری...',
         'loading_technical_analysis': 'در حال بارگذاری تحلیل تکنیکال...',
@@ -258,6 +264,12 @@ UI_TRANSLATIONS = {
         'set_alert': 'Set Alert',
         'show_signals_directly': 'Show Signals Directly',
         'show_technical_directly': 'Show Technical Analysis Directly',
+        
+        # Signal descriptions
+        'eth_sell_signal': 'Ethereum is near a key resistance level and technical indicators show overbought conditions. RSI is above 70 and a negative divergence pattern with MACD is observed. A price correction is likely.',
+        'sol_buy_signal': 'Solana is breaking through a key resistance pattern with high trading volume. Moving averages show strong support and there is significant growth potential.',
+        'bnb_wait_signal': 'Binance Coin is trading in a narrow price range. If it breaks the $580 resistance level, a buy signal will be activated. It is recommended not to trade until this level is broken.',
+        'signal_validity': 'Created: Today {time} | Valid for: {hours} hours',
         
         # General
         'loading': 'Loading...',
