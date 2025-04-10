@@ -1,8 +1,8 @@
 {
   "messages": {
-    "total_sent": 255,
+    "total_sent": 260,
     "successful": 254,
-    "failed": 1,
+    "failed": 6,
     "history": [
       {
         "message_type": "test_message",
@@ -1279,12 +1279,42 @@
         "message_type": "test_message",
         "success": true,
         "timestamp": "2025-04-10T00:23:43.334288-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": false,
+        "timestamp": "2025-04-10T00:26:04.129108-04:00",
+        "error": "خطا در ارسال پیام: 400 - {\"ok\":false,\"error_code\":400,\"description\":\"Bad Request: chat not found\"}"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-04-10T00:26:04.136060-04:00",
+        "error": "خطا در ارسال پیام: 400 - {\"ok\":false,\"error_code\":400,\"description\":\"Bad Request: chat not found\"}"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-04-10T00:26:23.858423-04:00",
+        "error": "خطا در ارسال پیام: 400 - {\"ok\":false,\"error_code\":400,\"description\":\"Bad Request: chat not found\"}"
+      },
+      {
+        "message_type": "price_report",
+        "success": false,
+        "timestamp": "2025-04-10T00:26:48.882876-04:00",
+        "error": "خطا در ارسال پیام: 400 - {\"ok\":false,\"error_code\":400,\"description\":\"Bad Request: chat not found\"}"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-04-10T00:26:48.926270-04:00",
+        "error": "خطا در ارسال پیام: 400 - {\"ok\":false,\"error_code\":400,\"description\":\"Bad Request: chat not found\"}"
       }
     ]
   },
   "uptime": {
     "start_time": "2025-04-09T18:29:20.816437-04:00",
-    "last_restart": "2025-04-10T00:23:42.705190-04:00",
-    "restarts": 98
+    "last_restart": "2025-04-10T00:26:43.150189-04:00",
+    "restarts": 102
   }
 }

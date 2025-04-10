@@ -180,7 +180,7 @@ def check_price_alerts() -> List[Dict[str, Any]]:
                 # ارسال هشدار تلگرام
                 alert_message = generate_alert_message(alert_info)
                 try:
-                    replit_telegram_sender.send_message(alert_message)
+                    replit_telegram_sender.send_message(alert_message, parse_mode="HTML")
                     logger.info(f"هشدار قیمت برای {symbol} ارسال شد: {alert_type} {target_price}")
                 except Exception as e:
                     logger.error(f"خطا در ارسال هشدار قیمت به تلگرام: {str(e)}")
