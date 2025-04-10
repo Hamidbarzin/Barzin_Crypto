@@ -1,1 +1,84 @@
-{}
+{
+  "app": {
+    "title": "Crypto Barzin",
+    "description": "Analyse des cryptomonnaies et signaux de trading",
+    "footerText": "Conçu et développé par: Hamid Barzin",
+    "copyright": "© 2025"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "cryptoList": "Cryptomonnaies",
+    "signals": "Signaux",
+    "telegram": "Telegram",
+    "settings": "Paramètres",
+    "priceAlerts": "Alertes de prix",
+    "news": "Actualités",
+    "ai": "IA"
+  },
+  "actions": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "search": "Rechercher",
+    "refresh": "Actualiser",
+    "apply": "Appliquer",
+    "send": "Envoyer",
+    "loading": "Chargement...",
+    "share": "Partager",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "view": "Voir",
+    "create": "Créer"
+  },
+  "languages": {
+    "title": "Langue",
+    "en": "Anglais",
+    "fa": "Persan",
+    "fr": "Français",
+    "selectLanguage": "Choisir la langue"
+  },
+  "status": {
+    "success": "Opération réussie",
+    "error": "Erreur lors de l'opération",
+    "warning": "Avertissement",
+    "info": "Information",
+    "loading": "Chargement...",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "active": "Actif",
+    "inactive": "Inactif"
+  },
+  "time": {
+    "now": "Maintenant",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "tomorrow": "Demain",
+    "minutes": "minutes",
+    "hours": "heures",
+    "days": "jours",
+    "weeks": "semaines",
+    "months": "mois",
+    "years": "années",
+    "ago": "il y a",
+    "later": "plus tard"
+  },
+  "common": {
+    "yes": "Oui",
+    "no": "Non",
+    "on": "Activé",
+    "off": "Désactivé",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "all": "Tous",
+    "none": "Aucun",
+    "more": "Plus",
+    "less": "Moins",
+    "details": "Détails",
+    "summary": "Résumé",
+    "filter": "Filtrer"
+  },
+  "language_changed": "Langue changée en Français.",
+  "language_change_error": "Code de langue invalide."
+}

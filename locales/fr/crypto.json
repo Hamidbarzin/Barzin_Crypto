@@ -1,1 +1,58 @@
-{}
+{
+  "price_list": "Liste des prix",
+  "price_alert": "Alerte de prix",
+  "technical_analysis": "Analyse technique",
+  "market_sentiment": "Sentiment du marché",
+  "trading_opportunities": "Opportunités de trading",
+  "fear_greed_index": "Indice de peur et d'avidité",
+  "market_dominance": "Dominance du marché",
+  "price": "Prix",
+  "change": "Variation",
+  "market_cap": "Capitalisation",
+  "volume": "Volume",
+  "supply": "Offre",
+  "rank": "Rang",
+  "ath": "Plus haut historique",
+  "atl": "Plus bas historique",
+  "add_alert": "Ajouter une alerte",
+  "remove_alert": "Supprimer l'alerte",
+  "set_alert_when": "Définir une alerte quand",
+  "reaches": "atteint",
+  "above": "au-dessus de",
+  "below": "en dessous de",
+  "indicators": {
+    "rsi": "RSI (Indice de force relative)",
+    "macd": "MACD (Convergence/Divergence de moyenne mobile)",
+    "ma": "MA (Moyenne mobile)",
+    "ema": "EMA (Moyenne mobile exponentielle)",
+    "bollinger": "Bandes de Bollinger",
+    "stochastic": "Oscillateur stochastique",
+    "adx": "ADX (Indice de mouvement directionnel moyen)",
+    "cci": "CCI (Indice des canaux de matières premières)",
+    "obv": "OBV (Balance du volume)",
+    "ichimoku": "Nuage d'Ichimoku"
+  },
+  "timeframes": {
+    "1h": "1 heure",
+    "4h": "4 heures",
+    "1d": "1 jour",
+    "1w": "1 semaine",
+    "1m": "1 mois"
+  },
+  "sentiment": {
+    "bullish": "Haussier",
+    "bearish": "Baissier",
+    "neutral": "Neutre",
+    "very_bullish": "Très haussier",
+    "very_bearish": "Très baissier",
+    "extremely_bullish": "Extrêmement haussier",
+    "extremely_bearish": "Extrêmement baissier"
+  },
+  "opportunity": {
+    "strong_buy": "Achat fort",
+    "buy": "Achat",
+    "hold": "Conserver",
+    "sell": "Vente",
+    "strong_sell": "Vente forte"
+  }
+}
