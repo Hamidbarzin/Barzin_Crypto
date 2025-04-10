@@ -248,36 +248,36 @@
                     <h5 class="mb-0">{{ ui_text('system_controls', 'کنترل سیستم') }}</h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">مدیریت سرویس‌های ربات و راه‌اندازی گزارش‌دهی خودکار</p>
+                    <p class="text-muted">{{ ui_text('system_controls_desc', 'مدیریت سرویس‌های ربات و راه‌اندازی گزارش‌دهی خودکار') }}</p>
                     
                     <div class="form-check form-switch mb-3">
                         <input class="form-check-input" type="checkbox" id="system_monitor_enabled" name="system_monitor_enabled" checked>
-                        <label class="form-check-label" for="system_monitor_enabled">سیستم مانیتورینگ روشن/خاموش</label>
-                        <p class="text-muted small mt-1">ارسال گزارش به تلگرام هنگام روشن یا خاموش شدن سیستم</p>
+                        <label class="form-check-label" for="system_monitor_enabled">{{ ui_text('system_monitoring', 'سیستم مانیتورینگ روشن/خاموش') }}</label>
+                        <p class="text-muted small mt-1">{{ ui_text('system_monitoring_desc', 'ارسال گزارش به تلگرام هنگام روشن یا خاموش شدن سیستم') }}</p>
                     </div>
                     
                     <div class="d-grid gap-2">
                         <button type="button" id="start-scheduler-button" class="btn btn-success mb-2">
-                            <i class="fas fa-play me-2"></i> راه‌اندازی زمان‌بندی خودکار
+                            <i class="fas fa-play me-2"></i> {{ ui_text('start_auto_scheduler', 'راه‌اندازی زمان‌بندی خودکار') }}
                         </button>
                         <button type="button" id="stop-scheduler-button" class="btn btn-danger mb-2">
-                            <i class="fas fa-stop me-2"></i> توقف زمان‌بندی خودکار
+                            <i class="fas fa-stop me-2"></i> {{ ui_text('stop_auto_scheduler', 'توقف زمان‌بندی خودکار') }}
                         </button>
                         <a href="/update_notification_settings" class="btn btn-outline-info mb-2" target="_blank">
-                            <i class="fas fa-external-link-alt me-2"></i> تست API در مرورگر
+                            <i class="fas fa-external-link-alt me-2"></i> {{ ui_text('test_api_browser', 'تست API در مرورگر') }}
                         </a>
                         <a href="/voice-notification" class="btn btn-outline-secondary mb-2">
-                            <i class="fas fa-volume-up me-2"></i> اعلان‌های صوتی چندزبانه
+                            <i class="fas fa-volume-up me-2"></i> {{ ui_text('multilingual_voice_notifications', 'اعلان‌های صوتی چندزبانه') }}
                         </a>
                         <hr>
                         <button type="button" id="test-telegram-button" class="btn btn-outline-primary mb-2">
-                            <i class="fab fa-telegram me-2"></i> تست تلگرام
+                            <i class="fab fa-telegram me-2"></i> {{ ui_text('test_telegram', 'تست تلگرام') }}
                         </button>
                         <button type="button" id="test-email-button" class="btn btn-outline-secondary mb-2">
-                            <i class="fas fa-envelope me-2"></i> تست ایمیل
+                            <i class="fas fa-envelope me-2"></i> {{ ui_text('test_email', 'تست ایمیل') }}
                         </button>
                         <button type="button" id="test-sms-button" class="btn btn-outline-secondary">
-                            <i class="fas fa-sms me-2"></i> تست پیامک
+                            <i class="fas fa-sms me-2"></i> {{ ui_text('test_sms', 'تست پیامک') }}
                         </button>
                     </div>
                 </div>
@@ -290,14 +290,14 @@
                 </div>
                 <div class="card-body">
                     <ol class="ps-3">
-                        <li class="mb-2">به ربات <a href="https://t.me/{{ bot_username }}" target="_blank">@{{ bot_username }}</a> پیام دهید</li>
-                        <li class="mb-2">دستور <code>/start</code> را ارسال کنید</li>
-                        <li class="mb-2">دستور <code>/id</code> را برای دریافت چت آیدی ارسال کنید</li>
-                        <li>چت آیدی دریافتی را در فیلد مربوطه در قسمت تنظیمات تلگرام وارد کنید</li>
+                        <li class="mb-2">{{ ui_text('telegram_bot_step1', 'به ربات') }} <a href="https://t.me/{{ bot_username }}" target="_blank">@{{ bot_username }}</a> {{ ui_text('telegram_bot_step1_cont', 'پیام دهید') }}</li>
+                        <li class="mb-2">{{ ui_text('telegram_bot_step2', 'دستور') }} <code>/start</code> {{ ui_text('telegram_bot_step2_cont', 'را ارسال کنید') }}</li>
+                        <li class="mb-2">{{ ui_text('telegram_bot_step3', 'دستور') }} <code>/id</code> {{ ui_text('telegram_bot_step3_cont', 'را برای دریافت چت آیدی ارسال کنید') }}</li>
+                        <li>{{ ui_text('telegram_bot_step4', 'چت آیدی دریافتی را در فیلد مربوطه در قسمت تنظیمات تلگرام وارد کنید') }}</li>
                     </ol>
                     <div class="alert alert-info mt-3">
                         <i class="fas fa-info-circle me-2"></i>
-                        چت آیدی یک عدد منحصربفرد برای هر کاربر در تلگرام است. ربات با استفاده از این شناسه، پیام‌های اختصاصی را برای شما ارسال می‌کند.
+                        {{ ui_text('telegram_chat_id_info', 'چت آیدی یک عدد منحصربفرد برای هر کاربر در تلگرام است. ربات با استفاده از این شناسه، پیام‌های اختصاصی را برای شما ارسال می‌کند.') }}
                     </div>
                 </div>
             </div>
@@ -310,20 +310,20 @@
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
-                            وضعیت ربات
-                            <span class="badge bg-success rounded-pill">فعال</span>
+                            {{ ui_text('bot_status', 'وضعیت ربات') }}
+                            <span class="badge bg-success rounded-pill">{{ ui_text('active', 'فعال') }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
-                            آخرین بروزرسانی
+                            {{ ui_text('last_update', 'آخرین بروزرسانی') }}
                             <span>{{ now.strftime('%H:%M:%S') }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
-                            وضعیت API بازار
-                            <span class="badge bg-success rounded-pill">متصل</span>
+                            {{ ui_text('market_api_status', 'وضعیت API بازار') }}
+                            <span class="badge bg-success rounded-pill">{{ ui_text('connected', 'متصل') }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
-                            حالت ربات
-                            <span class="badge bg-primary rounded-pill">هوشمند</span>
+                            {{ ui_text('bot_mode', 'حالت ربات') }}
+                            <span class="badge bg-primary rounded-pill">{{ ui_text('smart', 'هوشمند') }}</span>
                         </li>
                     </ul>
                 </div>
