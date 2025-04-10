@@ -36,6 +36,22 @@ def inject_now():
     all_languages = get_all_languages()
     current_language_info = get_language_info(current_language_code)
     
+    logger.debug(f"Inject_now: current language code = {current_language_code}")
+    logger.debug(f"Inject_now: current language info = {current_language_info}")
+    
+    # اطمینان از وجود کلید code
+    if 'code' not in current_language_info:
+        logger.warning(f"Language info for {current_language_code} does not contain 'code' key")
+        # اگر کلید کد وجود ندارد، آن را اضافه کنیم
+        current_language_info['code'] = current_language_code
+    
+    # بررسی صحت همه زبان‌ها
+    for lang in all_languages:
+        if 'code' not in lang:
+            logger.warning(f"Language {lang.get('name', 'unknown')} does not have 'code' key")
+            # اضافه کردن کلید کد به زبان
+            lang['code'] = lang.get('name', 'en').lower()[:2]
+    
     return {
         'now': datetime.now(),
         'developer_name': 'حمید برزین',
@@ -2629,15 +2645,17 @@ def set_language(language_code):
         
         if actual_language_code in SUPPORTED_LANGUAGES:
             session['language'] = actual_language_code
+            session.modified = True  # اطمینان از ذخیره تغییرات session
             language_info = get_language_info(actual_language_code)
             language_name = language_info['native_name']
             success_message = get_ui_text('language_changed', f'زبان با موفقیت به {language_name} تغییر کرد.', actual_language_code)
             flash(success_message, 'success')
+            logger.info(f"Language set to {language_code} (actual: {actual_language_code}), previous was {current_language}")
+            logger.info(f"Session language is now: {session.get('language')}")
         else:
             error_message = get_ui_text('language_change_error', 'کد زبان نامعتبر است.', current_language)
             flash(error_message, 'error')
-        
-        logger.info(f"Language set to {language_code} (actual: {actual_language_code}), previous was {current_language}")
+            logger.error(f"Invalid language code: {language_code} (actual: {actual_language_code})")
     except Exception as e:
         logger.error(f"Error setting language to {language_code}: {e}")
         flash(f"خطا در تغییر زبان: {str(e)}", 'error')
