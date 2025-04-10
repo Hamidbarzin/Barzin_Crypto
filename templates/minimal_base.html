@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ربات هوشمند ارز دیجیتال{% endblock %}</title>
+    <title>{% block title %}Crypto Intelligence Bot{% endblock %}</title>
     
     <!-- Meta tags for PWA -->
-    <meta name="description" content="ربات هوشمند تحلیل ارزهای دیجیتال با قابلیت ارسال سیگنال‌های معاملاتی">
+    <meta name="description" content="Smart cryptocurrency analysis bot with trading signal capabilities">
     <meta name="theme-color" content="#1C1C28">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -228,8 +228,8 @@
     <nav class="navbar navbar-expand-lg top-navbar mb-4 sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="/">
-                <img src="/static/logo.svg" alt="برزین کریپتو" height="40" class="me-2">
-                <span>برزین کریپتو</span>
+                <img src="/static/logo.svg" alt="Barzin Crypto" height="40" class="me-2">
+                <span>Barzin Crypto</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -238,37 +238,37 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/minimal_dashboard' or request.path == '/' %}active{% endif %}" href="/minimal_dashboard">
-                            <i class="fas fa-chart-line me-1"></i> {{ ui_text('dashboard', 'داشبورد') }}
+                            <i class="fas fa-chart-line me-1"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/cryptocurrencies' or request.path == '/crypto' %}active{% endif %}" href="/cryptocurrencies">
-                            <i class="fas fa-coins me-1"></i> {{ ui_text('cryptocurrencies', 'ارزهای دیجیتال') }}
+                            <i class="fas fa-coins me-1"></i> Cryptocurrencies
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/price_alerts' or request.path == '/alerts' %}active{% endif %}" href="/price_alerts">
-                            <i class="fas fa-bell me-1"></i> {{ ui_text('price_alerts', 'هشدارهای قیمت') }}
+                            <i class="fas fa-bell me-1"></i> Price Alerts
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/crypto_news' or request.path == '/news' %}active{% endif %}" href="/crypto_news">
-                            <i class="fas fa-newspaper me-1"></i> {{ ui_text('news', 'اخبار') }}
+                            <i class="fas fa-newspaper me-1"></i> News
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/telegram_control_panel' or request.path == '/telegram-control-panel' %}active{% endif %}" href="/telegram-control-panel">
-                            <i class="fas fa-paper-plane me-1"></i> {{ ui_text('telegram_control', 'کنترل تلگرام') }}
+                            <i class="fas fa-paper-plane me-1"></i> Telegram Control
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/voice-notification' %}active{% endif %}" href="/voice-notification">
-                            <i class="fas fa-volume-up me-1"></i> {{ ui_text('voice_notification', 'اعلان‌های صوتی') }}
+                            <i class="fas fa-volume-up me-1"></i> Voice Notifications
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/minimal_settings' %}active{% endif %}" href="/minimal_settings">
-                            <i class="fas fa-cog me-1"></i> {{ ui_text('settings', 'تنظیمات') }}
+                            <i class="fas fa-cog me-1"></i> Settings
                         </a>
                     </li>
 
@@ -289,37 +289,37 @@
                 <div class="col">
                     <a href="/minimal_dashboard" class="mobile-nav-item {% if request.path == '/minimal_dashboard' or request.path == '/' %}active{% endif %}">
                         <i class="fas fa-chart-line"></i>
-                        <span>{{ ui_text('dashboard', 'داشبورد') }}</span>
+                        <span>Dashboard</span>
                     </a>
                 </div>
                 <div class="col">
                     <a href="/cryptocurrencies" class="mobile-nav-item {% if request.path == '/cryptocurrencies' or request.path == '/crypto' %}active{% endif %}">
                         <i class="fas fa-coins"></i>
-                        <span>{{ ui_text('mobile_cryptocurrencies', 'ارزها') }}</span>
+                        <span>Crypto</span>
                     </a>
                 </div>
                 <div class="col">
                     <a href="/price_alerts" class="mobile-nav-item {% if request.path == '/price_alerts' or request.path == '/alerts' %}active{% endif %}">
                         <i class="fas fa-bell"></i>
-                        <span>{{ ui_text('mobile_alerts', 'هشدارها') }}</span>
+                        <span>Alerts</span>
                     </a>
                 </div>
                 <div class="col">
                     <a href="/crypto_news" class="mobile-nav-item {% if request.path == '/crypto_news' or request.path == '/news' %}active{% endif %}">
                         <i class="fas fa-newspaper"></i>
-                        <span>{{ ui_text('mobile_news', 'اخبار') }}</span>
+                        <span>News</span>
                     </a>
                 </div>
                 <div class="col">
                     <a href="/telegram-control-panel" class="mobile-nav-item {% if request.path == '/telegram-control-panel' %}active{% endif %}">
                         <i class="fas fa-paper-plane"></i>
-                        <span>{{ ui_text('mobile_telegram', 'تلگرام') }}</span>
+                        <span>Telegram</span>
                     </a>
                 </div>
                 <div class="col">
                     <a href="/minimal_settings" class="mobile-nav-item {% if request.path == '/minimal_settings' %}active{% endif %}">
                         <i class="fas fa-cog"></i>
-                        <span>{{ ui_text('settings', 'تنظیمات') }}</span>
+                        <span>Settings</span>
                     </a>
                 </div>
             </div>
@@ -337,7 +337,7 @@
         <div class="row">
             <div class="col-12 text-center">
                 <p class="text-muted small">
-                    {{ ui_text('developer_footer', 'طراح و توسعه دهنده: حمید برزین') }} | {{ developer_year }} &copy;
+                    Developer: Hamid Barzin | 2024 &copy;
                 </p>
             </div>
         </div>
@@ -415,28 +415,28 @@
                         } else {
                             // Display error message in price elements
                             if (priceElement) {
-                                priceElement.textContent = 'خطای API';
+                                priceElement.textContent = 'API Error';
                                 priceElement.classList.add('text-danger');
                             }
                             
                             if (changeElement) {
-                                changeElement.innerHTML = '<span class="text-danger">عدم اتصال</span>';
+                                changeElement.innerHTML = '<span class="text-danger">No Connection</span>';
                             }
                             
-                            console.error('API Error:', data.message || 'خطای نامشخص');
+                            console.error('API Error:', data.message || 'Unknown error');
                         }
                     })
                     .catch(error => {
                         // Display error message in price elements
                         const priceElement = document.getElementById(`${domSymbol}-price`);
                         if (priceElement) {
-                            priceElement.textContent = 'خطای شبکه';
+                            priceElement.textContent = 'Network Error';
                             priceElement.classList.add('text-danger');
                         }
                         
                         const changeElement = document.getElementById(`${domSymbol}-change`);
                         if (changeElement) {
-                            changeElement.innerHTML = '<span class="text-danger">عدم اتصال</span>';
+                            changeElement.innerHTML = '<span class="text-danger">No Connection</span>';
                         }
                         
                         console.error('Error updating prices:', error);
