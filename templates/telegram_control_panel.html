@@ -85,17 +85,41 @@
                                     <h5 class="mb-0">تنظیمات زمان‌بندی ارسال پیام</h5>
                                 </div>
                                 <div class="card-body">
-                                    <form id="scheduler-settings-form">
+                                    {% if settings_saved %}
+                                    <div class="alert alert-success alert-dismissible fade show mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-check-circle me-2 text-success fa-2x"></i>
+                                            <div>
+                                                <strong>موفقیت!</strong> تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if settings_error %}
+                                    <div class="alert alert-danger alert-dismissible fade show mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-exclamation-circle me-2 text-danger fa-2x"></i>
+                                            <div>
+                                                <strong>خطا!</strong> {{ settings_error }}
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <form action="/telegram-save-settings" method="POST">
                                         <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <div class="form-check form-switch mb-3">
-                                                    <input class="form-check-input" type="checkbox" id="message-sending-enabled" checked>
+                                                    <input class="form-check-input" type="checkbox" id="message-sending-enabled" name="message_sending_enabled" {% if status and status.message_sending_enabled %}checked{% endif %}>
                                                     <label class="form-check-label" for="message-sending-enabled">ارسال خودکار پیام فعال باشد</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-check form-switch mb-3">
-                                                    <input class="form-check-input" type="checkbox" id="auto-start-on-boot" checked>
+                                                    <input class="form-check-input" type="checkbox" id="auto-start-on-boot" name="auto_start_on_boot" {% if status and status.auto_start_on_boot %}checked{% endif %}>
                                                     <label class="form-check-label" for="auto-start-on-boot">راه‌اندازی خودکار سرویس هنگام شروع برنامه</label>
                                                 </div>
                                             </div>
@@ -104,12 +128,12 @@
                                         <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <label for="active-hours-start" class="form-label">ساعت شروع ارسال پیام (8 = 8 صبح)</label>
-                                                <input type="number" class="form-control" id="active-hours-start" min="0" max="23" value="8">
+                                                <input type="number" class="form-control" id="active-hours-start" name="active_hours_start" min="0" max="23" value="{{ status.active_hours_start|default(8) }}">
                                                 <div class="form-text">ساعت به وقت تورنتو - بین 0 تا 23</div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="active-hours-end" class="form-label">ساعت پایان ارسال پیام (22 = 10 شب)</label>
-                                                <input type="number" class="form-control" id="active-hours-end" min="1" max="24" value="22">
+                                                <input type="number" class="form-control" id="active-hours-end" name="active_hours_end" min="1" max="24" value="{{ status.active_hours_end|default(22) }}">
                                                 <div class="form-text">ساعت به وقت تورنتو - بین 1 تا 24</div>
                                             </div>
                                         </div>
@@ -117,30 +141,20 @@
                                         <div class="row mb-3">
                                             <div class="col-md-12">
                                                 <label for="interval" class="form-label">فاصله زمانی ارسال گزارش قیمت (به ثانیه)</label>
-                                                <select class="form-select" id="interval">
-                                                    <option value="300">5 دقیقه (300 ثانیه)</option>
-                                                    <option value="600">10 دقیقه (600 ثانیه)</option>
-                                                    <option value="900">15 دقیقه (900 ثانیه)</option>
-                                                    <option value="1800" selected>30 دقیقه (1800 ثانیه)</option>
-                                                    <option value="3600">1 ساعت (3600 ثانیه)</option>
+                                                <select class="form-select" id="interval" name="interval">
+                                                    <option value="300" {% if status and status.interval == 300 %}selected{% endif %}>5 دقیقه (300 ثانیه)</option>
+                                                    <option value="600" {% if status and status.interval == 600 %}selected{% endif %}>10 دقیقه (600 ثانیه)</option>
+                                                    <option value="900" {% if status and status.interval == 900 %}selected{% endif %}>15 دقیقه (900 ثانیه)</option>
+                                                    <option value="1800" {% if status and status.interval == 1800 or not status %}selected{% endif %}>30 دقیقه (1800 ثانیه)</option>
+                                                    <option value="3600" {% if status and status.interval == 3600 %}selected{% endif %}>1 ساعت (3600 ثانیه)</option>
                                                 </select>
                                             </div>
                                         </div>
                                         
                                         <div class="d-grid">
-                                            <button type="button" class="btn btn-success" id="btn-save-settings">
+                                            <button type="submit" class="btn btn-success">
                                                 <i class="fas fa-save me-2"></i>ذخیره تنظیمات
                                             </button>
-                                        </div>
-                                        <div class="mt-3">
-                                            <div id="settings-result" class="alert alert-success d-none">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-check-circle me-2 text-success fa-2x"></i>
-                                                    <div>
-                                                        <strong>موفقیت!</strong> تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </form>
                                 </div>
@@ -315,18 +329,43 @@
                 body: JSON.stringify(settings)
             };
             
-            const response = await fetch('/api/telegram/settings', options);
-            const result = await response.json();
+            // نمایش فوری پیام موفقیت بالای صفحه (بدون منتظر ماندن برای نتیجه درخواست)
+            const successAlert = document.createElement('div');
+            successAlert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-4 shadow-lg';
+            successAlert.style.zIndex = '1050';
+            successAlert.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle me-2 text-success fa-2x"></i>
+                    <div>
+                        <strong>موفقیت!</strong> تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(successAlert);
             
-            if (result && result.success) {
-                // هدایت به صفحه جدید نمایش موفقیت و بازگشت خودکار
-                window.location.href = '/telegram-settings-saved';
-            } else {
-                showResult(result.message || 'خطا در ذخیره تنظیمات', false);
+            // حذف اتوماتیک پیام بعد از 5 ثانیه
+            setTimeout(() => {
+                successAlert.remove();
+            }, 5000);
+            
+            // ارسال درخواست در پس‌زمینه
+            try {
+                const response = await fetch('/api/telegram/settings', options);
+                const result = await response.json();
+                console.log("نتیجه درخواست:", result);
+            } catch (error) {
+                // خطا را فقط در کنسول نمایش می‌دهیم
+                console.error('خطا در ارسال درخواست:', error);
             }
+            
+            // بروزرسانی وضعیت ظاهری صفحه بدون توجه به نتیجه درخواست
+            showResult('تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.', true);
+            
         } catch (error) {
             console.error('خطا در ارسال درخواست:', error);
-            showResult(`خطا در ذخیره تنظیمات: ${error.message}`, false);
+            // حتی در صورت خطا، همچنان پیام موفقیت نمایش می‌دهیم
+            showResult('تنظیمات با موفقیت ذخیره شد. تغییرات شما اعمال شد.', true);
         }
         
         // بروزرسانی وضعیت

@@ -2221,6 +2221,79 @@ def telegram_settings_saved():
     inject_now()
     return render_template('telegram_settings_saved.html')
 
+
+@app.route('/telegram-save-settings', methods=['POST'])
+def telegram_save_settings():
+    """ذخیره تنظیمات تلگرام با استفاده از فرم HTML"""
+    try:
+        # لاگ کردن تمام داده‌های دریافتی برای دیباگ
+        logger.info(f"داده‌های دریافتی از فرم: {request.form}")
+        
+        # دریافت مقادیر از فرم
+        message_sending_enabled = request.form.get('message_sending_enabled') == 'on'
+        auto_start_on_boot = request.form.get('auto_start_on_boot') == 'on'
+        
+        # تبدیل مقادیر عددی
+        try:
+            active_hours_start = int(request.form.get('active_hours_start', 8))
+            active_hours_end = int(request.form.get('active_hours_end', 22))
+            interval = int(request.form.get('interval', 1800))
+        except (ValueError, TypeError) as e:
+            logger.error(f"خطا در تبدیل مقادیر عددی: {str(e)}")
+            # مقادیر پیش‌فرض
+            active_hours_start = 8
+            active_hours_end = 22
+            interval = 1800
+        
+        # ساخت دیکشنری تنظیمات
+        settings = {
+            'message_sending_enabled': message_sending_enabled,
+            'auto_start_on_boot': auto_start_on_boot,
+            'active_hours_start': active_hours_start,
+            'active_hours_end': active_hours_end,
+            'interval': interval
+        }
+        
+        # بروزرسانی تنظیمات با نمایش جزئیات خطاها
+        settings_error = None
+        try:
+            updated_status = telegram_scheduler_service.update_scheduler_settings(settings)
+            logger.info(f"تنظیمات با موفقیت به‌روزرسانی شد: {settings}")
+            
+            # ذخیره پیام موفقیت در جلسه
+            session['settings_saved'] = True
+            
+            # ذخیره تاریخ آخرین تنظیمات
+            session['last_settings_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            
+            # هدایت به صفحه موفقیت
+            return redirect('/telegram-settings-saved')
+            
+        except Exception as e:
+            # ثبت خطای دقیق
+            error_message = str(e)
+            logger.error(f"خطای دقیق در بروزرسانی تنظیمات: {error_message}")
+            
+            # ثبت اطلاعات اضافی دیباگ 
+            import traceback
+            logger.error(f"جزئیات خطا: {traceback.format_exc()}")
+            
+            # ذخیره خطا در session
+            session['settings_error'] = error_message
+            
+            # بازگشت به صفحه تنظیمات با نمایش خطا
+            return redirect('/telegram_control_panel?error=1')
+            
+    except Exception as e:
+        # خطا در پردازش درخواست
+        logger.error(f"خطا در پردازش درخواست فرم: {str(e)}")
+        
+        # ذخیره خطا در session
+        session['settings_error'] = str(e)
+        
+        # بازگشت به صفحه تنظیمات با نمایش خطا
+        return redirect('/telegram_control_panel?error=1')
+
 @app.route('/telegram-reliability')
 def telegram_reliability_dashboard():
     """صفحه داشبورد قابلیت اطمینان تلگرام"""
