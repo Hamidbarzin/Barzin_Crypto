@@ -16,16 +16,19 @@ const updatingCoins = new Set();
 
 // تابع اصلی به‌روزرسانی ارزهای دیجیتال ویژه
 function updateSpecialCoins() {
-    console.log("Updating special coins (meme coins & AI coins)");
+    console.log("Updating special coins (meme coins, AI coins & low-cost coins)");
     
     // یکی‌کردن همه سکه‌ها و به‌روزرسانی آنها با تاخیر متفاوت
     const allCoins = [...memeCoins, ...aiCoins, ...lowCostCoins];
+    
+    console.log("Coins to update:", allCoins);
     
     // به‌روزرسانی هر سکه با تاخیر متفاوت برای جلوگیری از درخواست‌های همزمان زیاد
     allCoins.forEach((coin, index) => {
         setTimeout(() => {
             if (!updatingCoins.has(coin)) {
                 updatingCoins.add(coin);
+                console.log(`Updating ${coin} price...`);
                 updateCoinPrice(coin);
                 setTimeout(() => {
                     updatingCoins.delete(coin);
@@ -142,15 +145,46 @@ function updateSignalPrices() {
 
 // راه‌اندازی به‌روزرسانی قیمت‌ها در هنگام بارگذاری صفحه
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded - initializing cryptocurrency updates");
+    
     // به‌روزرسانی اولیه
     updateMainCoins();
+    console.log("Main coins update initialized");
+    
+    // به‌روزرسانی فوری ارزهای ویژه
+    updateSpecialCoins();
+    console.log("Special coins update initialized");
+    
+    // چک کردن المان‌های قیمت
+    setTimeout(checkPriceElements, 2000);
     
     // به‌روزرسانی خودکار ارزهای اصلی هر 30 ثانیه
     setInterval(updateMainCoins, 30000);
     
-    // به‌روزرسانی اولیه ارزهای ویژه با تأخیر 3 ثانیه
-    setTimeout(updateSpecialCoins, 3000);
-    
     // به‌روزرسانی خودکار ارزهای ویژه هر 45 ثانیه
     setInterval(updateSpecialCoins, 45000);
 });
+
+// بررسی موجود بودن المان‌های قیمت در DOM
+function checkPriceElements() {
+    const allCoins = ['BTC', 'ETH', 'SOL', 'XRP', ...memeCoins, ...aiCoins, ...lowCostCoins];
+    
+    console.log("Checking price elements for these coins:", allCoins);
+    
+    allCoins.forEach(coin => {
+        const priceEl = document.getElementById(`${coin}-USDT-price`);
+        const changeEl = document.getElementById(`${coin}-USDT-change`);
+        
+        if (priceEl) {
+            console.log(`✓ Price element for ${coin} found`);
+            // به روزرسانی مستقیم
+            updateCoinPrice(coin);
+        } else {
+            console.error(`✗ Price element for ${coin} NOT found!`);
+        }
+        
+        if (!changeEl) {
+            console.error(`✗ Change element for ${coin} NOT found!`);
+        }
+    });
+}
