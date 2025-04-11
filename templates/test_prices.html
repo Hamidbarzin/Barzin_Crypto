@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نمایش آزمایشی قیمت‌های ارزهای دیجیتال</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            padding-top: 20px;
+        }
+        .crypto-card {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            margin-bottom: 15px;
+        }
+        .card-header {
+            background-color: #2d2d2d;
+            border-bottom: 1px solid #333;
+        }
+        .positive-change {
+            color: #4caf50;
+        }
+        .negative-change {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4 text-center">تست نمایش قیمت‌های ارزهای دیجیتال</h1>
+        
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card crypto-card">
+                    <div class="card-header">
+                        <h5>بیت‌کوین (BTC)</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>قیمت: <span id="btc-price">در حال بارگیری...</span> USDT</p>
+                        <p>تغییر 24 ساعته: <span id="btc-change">در حال بارگیری...</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card crypto-card">
+                    <div class="card-header">
+                        <h5>دوج‌کوین (DOGE)</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>قیمت: <span id="doge-price">در حال بارگیری...</span> USDT</p>
+                        <p>تغییر 24 ساعته: <span id="doge-change">در حال بارگیری...</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card crypto-card">
+                    <div class="card-header">
+                        <h5>رندر (RNDR)</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>قیمت: <span id="rndr-price">در حال بارگیری...</span> USDT</p>
+                        <p>تغییر 24 ساعته: <span id="rndr-change">در حال بارگیری...</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card crypto-card">
+                    <div class="card-header">
+                        <h5>لاگ‌های سیستم</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre id="log-container" style="height: 200px; overflow-y: auto; background-color: #2d2d2d; color: #e0e0e0; padding: 10px;"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <button id="refresh-btn" class="btn btn-primary">به‌روزرسانی قیمت‌ها</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // تابع برای افزودن لاگ به کانتینر لاگ
+        function log(message) {
+            const logContainer = document.getElementById('log-container');
+            const timestamp = new Date().toLocaleTimeString();
+            logContainer.innerHTML += `[${timestamp}] ${message}\n`;
+            logContainer.scrollTop = logContainer.scrollHeight;
+            console.log(message);
+        }
+        
+        // تابع قالب‌بندی قیمت بر اساس بزرگی اعداد
+        function formatPrice(price) {
+            price = parseFloat(price);
+            if (price >= 1000) {
+                return price.toLocaleString('en-US', {maximumFractionDigits: 0});
+            } else if (price >= 1) {
+                return price.toLocaleString('en-US', {maximumFractionDigits: 2});
+            } else if (price >= 0.01) {
+                return price.toLocaleString('en-US', {maximumFractionDigits: 4});
+            } else {
+                return price.toLocaleString('en-US', {maximumFractionDigits: 8});
+            }
+        }
+        
+        // تابع قالب‌بندی درصد تغییرات
+        function formatChange(change) {
+            change = parseFloat(change);
+            const sign = change >= 0 ? '+' : '';
+            const element = `<span class="${change >= 0 ? 'positive-change' : 'negative-change'}">${sign}${change.toFixed(2)}%</span>`;
+            return element;
+        }
+        
+        // تابع به‌روزرسانی قیمت یک ارز
+        function updateCoinPrice(coin) {
+            log(`درخواست قیمت برای ${coin}...`);
+            
+            fetch(`/api/price/${coin.toLowerCase()}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    log(`پاسخ API برای ${coin}: ${JSON.stringify(data)}`);
+                    
+                    if (data.success && data.data && data.data.price) {
+                        const price = parseFloat(data.data.price);
+                        const change = parseFloat(data.data.change_24h || 0);
+                        
+                        const priceElement = document.getElementById(`${coin.toLowerCase()}-price`);
+                        if (priceElement) {
+                            priceElement.textContent = formatPrice(price);
+                            log(`قیمت ${coin} به‌روزرسانی شد: ${price}`);
+                        }
+                        
+                        const changeElement = document.getElementById(`${coin.toLowerCase()}-change`);
+                        if (changeElement) {
+                            changeElement.innerHTML = formatChange(change);
+                            log(`تغییر ${coin} به‌روزرسانی شد: ${change}%`);
+                        }
+                    } else {
+                        log(`خطا در پاسخ API برای ${coin}: ${JSON.stringify(data)}`);
+                    }
+                })
+                .catch(error => {
+                    log(`خطا در به‌روزرسانی ${coin}: ${error.message}`);
+                });
+        }
+        
+        // تابع به‌روزرسانی همه قیمت‌ها
+        function updateAllPrices() {
+            log('به‌روزرسانی همه قیمت‌ها...');
+            updateCoinPrice('BTC');
+            setTimeout(() => updateCoinPrice('DOGE'), 500);
+            setTimeout(() => updateCoinPrice('RNDR'), 1000);
+        }
+        
+        // اجرای به‌روزرسانی اولیه در هنگام بارگذاری صفحه
+        document.addEventListener('DOMContentLoaded', function() {
+            log('صفحه بارگذاری شد. در حال به‌روزرسانی قیمت‌ها...');
+            updateAllPrices();
+            
+            // اضافه کردن event listener به دکمه به‌روزرسانی
+            document.getElementById('refresh-btn').addEventListener('click', function() {
+                log('دکمه به‌روزرسانی کلیک شد');
+                updateAllPrices();
+            });
+        });
+    </script>
+</body>
+</html>

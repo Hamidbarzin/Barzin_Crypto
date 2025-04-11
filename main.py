@@ -2161,6 +2161,11 @@ def minimal_dashboard():
         # Fallback to ultra simple template
         return f"<html><body><h1>Dashboard Error</h1><p>{str(e)}</p><p>Current language: {current_language}</p></body></html>"
 
+@app.route('/test_prices')
+def test_prices():
+    """صفحه تست قیمت‌های ارزهای دیجیتال"""
+    return render_template('test_prices.html')
+
 @app.route('/minimal_settings')
 def minimal_settings():
     """صفحه تنظیمات با طراحی مینیمال"""
