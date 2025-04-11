@@ -397,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <div class="icon-circle me-2">
                                                 <i class="fab fa-bitcoin text-warning"></i>
                                             </div>
-                                            <h5 class="mb-0">{{ ui_text('bitcoin', 'بیت‌کوین') }} (BTC/USDT)</h5>
+                                            <h5 class="mb-0">{{ ui_text('bitcoin', 'Bitcoin') }} (BTC/USDT)</h5>
                                         </div>
                                         <span class="badge bg-success">{{ ui_text('buy', 'خرید') }}</span>
                                     </div>
@@ -444,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <div class="icon-circle me-2">
                                                 <i class="fab fa-ethereum text-primary"></i>
                                             </div>
-                                            <h5 class="mb-0">{{ ui_text('ethereum', 'اتریوم') }} (ETH/USDT)</h5>
+                                            <h5 class="mb-0">{{ ui_text('ethereum', 'Ethereum') }} (ETH/USDT)</h5>
                                         </div>
                                         <span class="badge bg-danger">{{ ui_text('sell', 'فروش') }}</span>
                                     </div>
@@ -491,7 +491,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <div class="icon-circle me-2">
                                                 <i class="fas fa-sun text-info"></i>
                                             </div>
-                                            <h5 class="mb-0">{{ ui_text('solana', 'سولانا') }} (SOL/USDT)</h5>
+                                            <h5 class="mb-0">{{ ui_text('solana', 'Solana') }} (SOL/USDT)</h5>
                                         </div>
                                         <span class="badge bg-success">{{ ui_text('buy', 'خرید') }}</span>
                                     </div>
@@ -538,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <div class="icon-circle me-2">
                                                 <i class="fas fa-coins text-warning"></i>
                                             </div>
-                                            <h5 class="mb-0">{{ ui_text('binance_coin', 'بایننس کوین') }} (BNB/USDT)</h5>
+                                            <h5 class="mb-0">{{ ui_text('binance_coin', 'Binance Coin') }} (BNB/USDT)</h5>
                                         </div>
                                         <span class="badge bg-warning">{{ ui_text('wait', 'انتظار') }}</span>
                                     </div>
@@ -673,11 +673,11 @@ document.addEventListener('DOMContentLoaded', function() {
         testButtons.className = 'row mt-3 mb-3';
         testButtons.innerHTML = `
             <div class="col-12 d-flex justify-content-center gap-2">
-                <button class="btn btn-sm btn-danger" onclick="showSignalsDirectly()">
-                    {{ ui_text("show_signals_directly", "نمایش مستقیم سیگنال‌ها") }}
+                <button class="btn btn-sm btn-primary" onclick="showSignalsDirectly()">
+                    <i class="fas fa-signal me-1"></i> {{ ui_text("show_signals_directly", "Show Trading Signals") }}
                 </button>
                 <button class="btn btn-sm btn-warning" onclick="showTechnicalDirectly()">
-                    {{ ui_text("show_technical_directly", "نمایش مستقیم تحلیل تکنیکال") }}
+                    <i class="fas fa-chart-line me-1"></i> {{ ui_text("show_technical_directly", "Show Technical Analysis") }}
                 </button>
             </div>
         `;
