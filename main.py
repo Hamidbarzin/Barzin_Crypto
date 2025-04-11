@@ -2746,7 +2746,6 @@ def telegram_reliability_dashboard():
 
 @app.route('/price_alerts')
 @app.route('/alerts')
-@login_required
 def price_alerts_page():
     """Price Alert Management Page"""
     return render_template('price_alerts.html')
@@ -3209,7 +3208,6 @@ def api_telegram_send_news():
 
 
 @app.route('/voice-notification')
-@login_required
 def voice_notification_page():
     """Voice Notification Page - Multilingual Voice Alerts"""
     inject_now()
