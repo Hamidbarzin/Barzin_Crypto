@@ -612,11 +612,30 @@
             const symbol = `${coin}-${base}`;
             const altSymbol = `${coin}/${base}`;
             
+            // For special coins (meme coins and AI coins), add fallback price display
+            // if the API doesn't respond in time
+            const priceElement = document.getElementById(`${symbol}-price`);
+            const changeElement = document.getElementById(`${symbol}-change`);
+            
+            if (priceElement) {
+                priceElement.textContent = '...';
+            }
+            
+            if (changeElement) {
+                changeElement.textContent = '...';
+            }
+            
             // Use a shorter timeout for API requests
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const timeoutId = setTimeout(() => {
+                controller.abort();
+                // Show loading indicator for aborted requests
+                if (priceElement) {
+                    priceElement.innerHTML = '<i class="fas fa-sync fa-spin"></i>';
+                }
+            }, 6000);
             
-            // Try CryptoCompare API first for special coins
+            // Try API with the coin name only for faster response
             fetch('/api/price/' + coin.toLowerCase(), {
                 signal: controller.signal
             })
