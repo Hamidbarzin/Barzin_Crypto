@@ -1474,7 +1474,7 @@ def test_telegram_fixed():
         else:
             return jsonify({'success': False, 'message': 'Error sending Telegram message. Both methods failed.'})
     except Exception as e:
-        logger.error(f"خطا در ارسال پیام تلگرام تست: {str(e)}")
+        logger.error(f"Error sending Telegram test message: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
 
 @app.route('/api/telegram-bot-info')
@@ -1487,7 +1487,7 @@ def telegram_bot_info():
         logger.info(f"اطلاعات بات تلگرام: {bot_info}")
         return jsonify({'success': True, 'data': bot_info})
     except Exception as e:
-        logger.error(f"خطا در دریافت اطلاعات بات تلگرام: {str(e)}")
+        logger.error(f"Error getting Telegram bot info: {str(e)}")
         return jsonify({
             'success': False, 
             'message': f'خطا: {str(e)}',
@@ -1510,7 +1510,7 @@ def telegram_chat_debug():
         debug_info = get_chat_debug_info(chat_id)
         return jsonify({'success': True, 'data': debug_info})
     except Exception as e:
-        logger.error(f"خطا در دیباگ چت تلگرام: {str(e)}")
+        logger.error(f"Error debugging Telegram chat: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
 
 @app.route('/api/opportunities')
@@ -1525,7 +1525,7 @@ def get_buy_sell_opportunities():
         opportunities = detect_buy_sell_opportunities(watched_currencies, sensitivity)
         return jsonify({'success': True, 'data': opportunities})
     except Exception as e:
-        logger.error(f"خطا در دریافت فرصت‌های خرید و فروش: {str(e)}")
+        logger.error(f"Error getting buy/sell opportunities: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
 
 @app.route('/api/volatility')
@@ -1541,7 +1541,7 @@ def get_market_volatility():
         volatility = detect_market_volatility(watched_currencies, timeframe, threshold)
         return jsonify({'success': True, 'data': volatility})
     except Exception as e:
-        logger.error(f"خطا در دریافت نوسانات بازار: {str(e)}")
+        logger.error(f"Error getting market volatility: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
 
 @app.route('/api/market-trend')
@@ -1553,7 +1553,7 @@ def get_market_trend():
         trend = analyze_market_trend()
         return jsonify({'success': True, 'data': trend})
     except Exception as e:
-        logger.error(f"خطا در دریافت روند بازار: {str(e)}")
+        logger.error(f"Error getting market trend: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
 
 @app.route('/api/price/<symbol>')
