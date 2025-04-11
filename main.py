@@ -1626,9 +1626,9 @@ def get_price(symbol=None):
             symbol = f"{coin}/{base_currency}"
             
         # For meme coins, AI coins and low-cost coins, use CryptoCompare API directly
-        meme_coins = ['DOGE', 'SHIB', 'PEPE', 'FLOKI', 'WIF', 'BONK', 'MEME', 'TURBO', 'BRETT', 'MOG', 'CAT', 'MYRO']
-        ai_coins = ['RNDR', 'FET', 'WLD', 'OCEAN', 'AGIX', 'GEEQ']
-        low_cost_coins = ['VET', 'XDC', 'HBAR', 'XLM', 'CAKE', 'JASMY', 'STMX', 'SC', 'CELR', 'CTSI']
+        meme_coins = ['DOGE', 'SHIB', 'PEPE', 'FLOKI', 'WIF', 'BONK', 'MEME', 'TURBO', 'BRETT', 'MOG', 'CAT', 'MYRO', 'POPCAT', 'TOSHI', 'SLERF', 'TOGE', 'GROK']
+        ai_coins = ['RNDR', 'FET', 'WLD', 'OCEAN', 'AGIX', 'GEEQ', 'OLAS', 'GRT', 'NMR', 'PYTH', 'NEAR', 'ALI', 'RAD']
+        low_cost_coins = ['VET', 'XDC', 'HBAR', 'XLM', 'CAKE', 'JASMY', 'STMX', 'SC', 'CELR', 'CTSI', 'ACH', 'HOOK', 'LOOM', 'SFP', 'TRU', 'BAL']
         
         special_coins = meme_coins + ai_coins + low_cost_coins
         
