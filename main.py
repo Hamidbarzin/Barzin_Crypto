@@ -1272,7 +1272,7 @@ def test_email():
         elif result:
             return jsonify({'success': True, 'message': 'ایمیل تست با موفقیت ارسال شد'})
         else:
-            return jsonify({'success': False, 'message': 'خطا در ارسال ایمیل تست. لطفاً تنظیمات را بررسی کنید.'})
+            return jsonify({'success': False, 'message': 'Error sending test email. Please check your settings.'})
     except Exception as e:
         logger.error(f"خطا در ارسال ایمیل تست: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
@@ -1296,7 +1296,7 @@ def test_notification():
         elif result:
             return jsonify({'success': True, 'message': 'پیامک تست با موفقیت ارسال شد'})
         else:
-            return jsonify({'success': False, 'message': 'خطا در ارسال پیامک. لطفاً تنظیمات Twilio را بررسی کنید'})
+            return jsonify({'success': False, 'message': 'Error sending SMS. Please check your Twilio settings'})
     except Exception as e:
         logger.error(f"خطا در ارسال پیامک تست: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
@@ -1323,7 +1323,7 @@ def direct_test_telegram():
         if result:
             return jsonify({'success': True, 'message': 'پیام تلگرام با موفقیت ارسال شد'})
         else:
-            return jsonify({'success': False, 'message': 'خطا در ارسال پیام تلگرام'})
+            return jsonify({'success': False, 'message': 'Error sending Telegram message'})
     except Exception as e:
         logger.error(f"خطا در ارسال مستقیم پیام تلگرام: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
@@ -1472,7 +1472,7 @@ def test_telegram_fixed():
         elif result2:
             return jsonify({'success': True, 'message': 'پیام تلگرام با موفقیت ارسال شد (روش قدیمی)'})
         else:
-            return jsonify({'success': False, 'message': 'خطا در ارسال پیام تلگرام. هر دو روش ناموفق بودند.'})
+            return jsonify({'success': False, 'message': 'Error sending Telegram message. Both methods failed.'})
     except Exception as e:
         logger.error(f"خطا در ارسال پیام تلگرام تست: {str(e)}")
         return jsonify({'success': False, 'message': f'خطا: {str(e)}'})
@@ -1747,7 +1747,7 @@ def get_technical(symbol, timeframe):
             # ارسال داده‌های پیش‌فرض همراه با خطا
             return jsonify({
                 'success': False, 
-                'message': f"خطا در تحلیل فنی: {data['error']}", 
+                'message': f"Error in technical analysis: {data['error']}", 
                 'data': get_default_technical_data(clean_symbol, timeframe)
             })
             
