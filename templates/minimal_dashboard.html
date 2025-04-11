@@ -850,13 +850,9 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(function() {
             console.log("Running debug script...");
             
-            // بررسی المان‌های قیمت ارزهای رمزنگاری
+            // بررسی المان‌های قیمت ارزهای رمزنگاری - حذف ارزهای هوش مصنوعی
             const elements = [
-                'BTC-USDT-price', 'ETH-USDT-price', 'SOL-USDT-price', 'XRP-USDT-price',
-                'DOGE-USDT-price', 'SHIB-USDT-price', 'PEPE-USDT-price', 'FLOKI-USDT-price',
-                'WIF-USDT-price', 'MEME-USDT-price',
-                'RNDR-USDT-price', 'FET-USDT-price', 'OCEAN-USDT-price', 'AGIX-USDT-price',
-                'VET-USDT-price', 'XDC-USDT-price', 'HBAR-USDT-price', 'XLM-USDT-price', 'JASMY-USDT-price'
+                'BTC-USDT-price', 'ETH-USDT-price', 'SOL-USDT-price', 'XRP-USDT-price'
             ];
             
             // بررسی وجود و محتوای هر المان
@@ -925,12 +921,8 @@ document.addEventListener('DOMContentLoaded', function() {
             {symbol: 'WIF', id: 'dogwifhat'}, 
             {symbol: 'MEME', id: 'meme-token'}
         ];
-        const aiCoins = [
-            {symbol: 'RNDR', id: 'render-token'}, 
-            {symbol: 'FET', id: 'fetch-ai'}, 
-            {symbol: 'OCEAN', id: 'ocean-protocol'}, 
-            {symbol: 'AGIX', id: 'singularitynet'}
-        ];
+        // ارزهای هوش مصنوعی حذف شده‌اند
+        const aiCoins = [];
         const lowCostCoins = [
             {symbol: 'VET', id: 'vechain'}, 
             {symbol: 'XDC', id: 'xdc-network'}, 
