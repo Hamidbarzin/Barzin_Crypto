@@ -115,6 +115,52 @@
             -webkit-backdrop-filter: blur(10px);
         }
         
+        .navbar-toggler {
+            color: rgba(0, 0, 0, 0.8);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-toggler:hover {
+            color: rgba(0, 0, 0, 1);
+            transform: scale(1.1);
+        }
+        
+        .navbar-toggler i {
+            font-size: 1.5rem;
+        }
+        
+        .navbar-collapse {
+            background-color: rgba(240, 185, 11, 0.95);
+            border-radius: 0 0 1rem 1rem;
+            padding: 0.5rem;
+            margin-top: 0.25rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        @media (max-width: 991.98px) {
+            .navbar-collapse {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+            }
+            
+            .navbar-nav {
+                padding: 0.5rem;
+            }
+            
+            .nav-item {
+                padding: 0.25rem 0;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            
+            .nav-item:last-child {
+                border-bottom: none;
+            }
+        }
+        
         .mobile-nav {
             position: fixed;
             bottom: 0;
@@ -253,15 +299,15 @@
     </style>
 </head>
 <body class="bg-gradient-dark">
-    <!-- Top Navbar (Desktop) -->
+    <!-- Top Navbar -->
     <nav class="navbar navbar-expand-lg top-navbar mb-4 sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="/">
                 <img src="/static/logo.svg" alt="Barzin Crypto" height="40" class="me-2">
                 <span>Barzin Crypto</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
@@ -300,7 +346,6 @@
                             <i class="fas fa-cog me-1"></i> Settings
                         </a>
                     </li>
-
                 </ul>
             </div>
         </div>
@@ -571,6 +616,27 @@
                         });
                     });
                 }
+            }
+        });
+    </script>
+    
+    <!-- Navbar Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the navbar toggler and the collapse element
+            const navbarToggler = document.querySelector('.navbar-toggler');
+            const navbarCollapse = document.querySelector('.collapse.navbar-collapse');
+            
+            // Initialize it as a Bootstrap collapse
+            if (navbarToggler && navbarCollapse) {
+                const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
+                    toggle: false
+                });
+                
+                // Add click event to toggle the collapse
+                navbarToggler.addEventListener('click', function() {
+                    bsCollapse.toggle();
+                });
             }
         });
     </script>
