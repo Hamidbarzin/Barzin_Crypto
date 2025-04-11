@@ -1,0 +1,11 @@
+Original Persian phrases to be translated to English:
+
+1. farsi_signal = 'خرید' -> farsi_signal = 'Buy'
+2. farsi_signal = 'خرید قوی' -> farsi_signal = 'Strong Buy'
+3. farsi_signal = 'فروش' -> farsi_signal = 'Sell'
+4. farsi_signal = 'خنثی' -> farsi_signal = 'Neutral'
+5. farsi_recommendation = "پیشنهاد معامله نوسانی (صعودی)" -> farsi_recommendation = "Consider swing trade (bullish)"
+6. farsi_recommendation = "نقطه ورود مناسب برای معامله نوسانی صعودی" -> farsi_recommendation = "Good entry point for bullish swing trade"
+7. farsi_recommendation = "پیشنهاد معامله نوسانی (نزولی)" -> farsi_recommendation = "Consider swing trade (bearish)"
+8. farsi_recommendation = "منتظر سیگنال‌های واضح‌تر باشید" -> farsi_recommendation = "Wait for clearer signals"
+9. signal = 'خنثی' -> signal = 'Neutral'
