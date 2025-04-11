@@ -400,7 +400,9 @@
         </div>
     </div>
 
-    <!-- Bootstrap Bundle with Popper -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Chart.js -->
@@ -622,22 +624,30 @@
     
     <!-- Navbar Toggle Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get the navbar toggler and the collapse element
-            const navbarToggler = document.querySelector('.navbar-toggler');
-            const navbarCollapse = document.querySelector('.collapse.navbar-collapse');
+        $(document).ready(function() {
+            // jQuery for bootstrap navbar toggle
+            $('.navbar-toggler').click(function() {
+                $('#navbarNav').toggleClass('show');
+            });
             
-            // Initialize it as a Bootstrap collapse
-            if (navbarToggler && navbarCollapse) {
-                const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
-                    toggle: false
-                });
-                
-                // Add click event to toggle the collapse
-                navbarToggler.addEventListener('click', function() {
-                    bsCollapse.toggle();
-                });
-            }
+            // Close the menu when clicking outside of it
+            $(document).click(function(event) {
+                var clickover = $(event.target);
+                var opened = $('#navbarNav').hasClass('show');
+                if (opened && !clickover.hasClass('navbar-toggler') && !clickover.parents().hasClass('navbar-collapse')) {
+                    $('.navbar-toggler').click();
+                }
+            });
+            
+            // Close menu when clicked on a nav-link
+            $('.nav-item').click(function() {
+                var opened = $('#navbarNav').hasClass('show');
+                if (opened) {
+                    $('.navbar-toggler').click();
+                }
+            });
+            
+            console.log('jQuery navbar toggle is initialized');
         });
     </script>
     
