@@ -91,98 +91,104 @@ document.addEventListener('DOMContentLoaded', function() {
 {% block content %}
 
 <div id="dashboard-content">
-    <div class="row mb-4">
+    <div class="row mb-5">
+        <div class="col-12 text-center py-5">
+            <h1 class="mb-3 display-4 fw-bold">
+                {{ ui_text('get_verified', 'شروع کنید') }} <span class="text-muted">و</span><br>
+                {{ ui_text('start_crypto', 'سفر ارز دیجیتال خود را آغاز کنید') }}
+            </h1>
+            <div class="mt-4 mb-5">
+                <button class="btn btn-warning btn-lg px-4 py-2 fw-bold me-2">{{ ui_text('verify_now', 'تأیید هویت') }}</button>
+                <button class="btn btn-outline-light btn-lg px-4 py-2">{{ ui_text('watch_tutorial', 'مشاهده آموزش') }}</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-3">
         <div class="col-12">
-            <h1 class="mb-3">{{ ui_text('dashboard', 'داشبورد') }}</h1>
-            <p class="text-muted">{{ ui_text('market_overview', 'آخرین تحلیل‌ها، سیگنال‌ها و قیمت‌های بازار ارز دیجیتال') }}</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">{{ ui_text('popular', 'محبوب') }}</h4>
+                <a href="/cryptocurrencies" class="text-decoration-none text-muted">{{ ui_text('see_listing', 'مشاهده لیست') }}</a>
+            </div>
         </div>
     </div>
 
-    <!-- Crypto Price Cards -->
-    <div class="row mb-4" id="price-section">
-        <!-- Main Coins -->
-        <div class="col-md-3 mb-3">
-            <div class="card crypto-card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-circle me-3">
-                                <i class="fab fa-bitcoin text-warning fs-4"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title mb-0">{{ ui_text('bitcoin', 'بیت‌کوین') }}</h5>
-                                <p class="text-muted mb-0">BTC/USDT</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-end">
-                        <h3 class="mb-0" id="BTC-USDT-price">--</h3>
-                        <h5 class="mb-0" id="BTC-USDT-change">--</h5>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card crypto-card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-circle me-3">
-                                <i class="fab fa-ethereum text-primary fs-4"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title mb-0">{{ ui_text('ethereum', 'اتریوم') }}</h5>
-                                <p class="text-muted mb-0">ETH/USDT</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-end">
-                        <h3 class="mb-0" id="ETH-USDT-price">--</h3>
-                        <h5 class="mb-0" id="ETH-USDT-change">--</h5>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card crypto-card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-circle me-3">
-                                <i class="fas fa-sun text-success fs-4"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title mb-0">{{ ui_text('coins.sol', 'سولانا') }}</h5>
-                                <p class="text-muted mb-0">SOL/USDT</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-end">
-                        <h3 class="mb-0" id="SOL-USDT-price">--</h3>
-                        <h5 class="mb-0" id="SOL-USDT-change">--</h5>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card crypto-card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-circle me-3">
-                                <i class="fas fa-chart-line text-info fs-4"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title mb-0">{{ ui_text('ripple', 'ریپل') }}</h5>
-                                <p class="text-muted mb-0">XRP/USDT</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-end">
-                        <h3 class="mb-0" id="XRP-USDT-price">--</h3>
-                        <h5 class="mb-0" id="XRP-USDT-change">--</h5>
-                    </div>
-                </div>
+    <!-- Crypto Price Cards (Binance Style) -->
+    <div class="row mb-5" id="price-section">
+        <!-- Main Coins - Table Format like Binance -->
+        <div class="col-lg-12">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ ui_text('name', 'نام') }}</th>
+                            <th scope="col">{{ ui_text('last_price', 'آخرین قیمت') }}</th>
+                            <th scope="col">{{ ui_text('24h_change', 'تغییر ۲۴ ساعته') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-circle me-2">
+                                        <i class="fab fa-bitcoin text-warning"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ ui_text('bitcoin', 'بیت‌کوین') }}</h6>
+                                        <small class="text-muted">BTC/USDT</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><h6 class="mb-0" id="BTC-USDT-price">--</h6></td>
+                            <td><h6 class="mb-0" id="BTC-USDT-change">--</h6></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-circle me-2">
+                                        <i class="fab fa-ethereum text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ ui_text('ethereum', 'اتریوم') }}</h6>
+                                        <small class="text-muted">ETH/USDT</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><h6 class="mb-0" id="ETH-USDT-price">--</h6></td>
+                            <td><h6 class="mb-0" id="ETH-USDT-change">--</h6></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-circle me-2">
+                                        <i class="fas fa-sun text-success"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ ui_text('coins.sol', 'سولانا') }}</h6>
+                                        <small class="text-muted">SOL/USDT</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><h6 class="mb-0" id="SOL-USDT-price">--</h6></td>
+                            <td><h6 class="mb-0" id="SOL-USDT-change">--</h6></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-circle me-2">
+                                        <i class="fas fa-chart-line text-info"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ ui_text('ripple', 'ریپل') }}</h6>
+                                        <small class="text-muted">XRP/USDT</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><h6 class="mb-0" id="XRP-USDT-price">--</h6></td>
+                            <td><h6 class="mb-0" id="XRP-USDT-change">--</h6></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -193,17 +199,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     <!-- Section for Low-Cost Growth Coins removed at user's request -->
 
-    <!-- Simple Section Switcher instead of tabs -->
-    <div class="row mb-4">
+    <!-- Binance Style Section Switcher -->
+    <div class="row mb-5">
         <div class="col-12">
-            <div class="d-flex justify-content-center gap-2">
-                <button class="btn btn-primary active" id="technical-btn" onclick="switchSection('technical')">
+            <div class="d-flex border-bottom border-secondary mb-3">
+                <button class="btn btn-link text-decoration-none px-3 py-2 active text-warning border-bottom border-warning" id="technical-btn" onclick="switchSection('technical')">
                     <i class="fas fa-chart-bar me-1"></i> {{ ui_text('technical_analysis', 'تحلیل تکنیکال') }}
                 </button>
-                <button class="btn btn-outline-primary" id="signals-btn" onclick="switchSection('signals')">
+                <button class="btn btn-link text-decoration-none px-3 py-2 text-muted" id="signals-btn" onclick="switchSection('signals')">
                     <i class="fas fa-signal me-1"></i> {{ ui_text('trading_signals', 'سیگنال‌های معاملاتی') }}
                 </button>
-                <button class="btn btn-outline-primary" id="news-btn" onclick="switchSection('news')">
+                <button class="btn btn-link text-decoration-none px-3 py-2 text-muted" id="news-btn" onclick="switchSection('news')">
                     <i class="fas fa-newspaper me-1"></i> {{ ui_text('news', 'اخبار') }}
                 </button>
             </div>
@@ -238,6 +244,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // AI coins functions removed as requested
+        
+        // Binance Style Tab Switching
+        function switchSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.style.display = 'none';
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.btn-link').forEach(btn => {
+                btn.classList.remove('active', 'text-warning', 'border-bottom', 'border-warning');
+                btn.classList.add('text-muted');
+            });
+            
+            // Show selected section
+            const selectedPane = document.getElementById(sectionName + '-pane');
+            if (selectedPane) {
+                selectedPane.style.display = 'block';
+            }
+            
+            // Set active class to selected button
+            const selectedBtn = document.getElementById(sectionName + '-btn');
+            if (selectedBtn) {
+                selectedBtn.classList.remove('text-muted');
+                selectedBtn.classList.add('active', 'text-warning', 'border-bottom', 'border-warning');
+            }
+        }
     </script>
     
     <!-- Section Content Container -->
@@ -245,13 +278,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 <!-- Technical Analysis Tab -->
                 <div class="tab-pane active" id="technical-pane" role="tabpanel" aria-labelledby="technical-tab">
                     <div class="card crypto-card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
+                        <div class="card-header d-flex justify-content-between align-items-center border-0 bg-transparent">
                             <h5 class="mb-0">{{ ui_text('technical_analysis_bitcoin', 'تحلیل تکنیکال بیت‌کوین (تایم‌فریم ساعتی)') }}</h5>
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-secondary active">BTC</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary">ETH</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary">SOL</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary">XRP</button>
+                            <div class="binance-tabs">
+                                <a href="#" class="binance-tab-item active">BTC</a>
+                                <a href="#" class="binance-tab-item">ETH</a>
+                                <a href="#" class="binance-tab-item">SOL</a>
+                                <a href="#" class="binance-tab-item">XRP</a>
                             </div>
                         </div>
                         <div class="card-body">

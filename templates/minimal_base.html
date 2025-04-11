@@ -107,40 +107,101 @@
         
         /* Crypto Cards */
         .crypto-card {
-            border-radius: 8px;
+            border-radius: 4px;
             transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: none;
             background-color: #1E2026;
             min-height: 120px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            box-shadow: none;
         }
         
         .crypto-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-            border-color: rgba(240, 185, 11, 0.3);
+            transform: none;
+            box-shadow: none;
+            border-color: transparent;
         }
         
         .crypto-card .card-body {
-            padding: 1.5rem;
+            padding: 1rem;
         }
         
         .crypto-card h5 {
-            font-size: 1.25rem;
-            font-weight: bold;
+            font-size: 1.1rem;
+            font-weight: 500;
         }
         
         .crypto-card h6 {
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
         
         .crypto-card h3 {
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 1.3rem;
+            font-weight: 500;
         }
         
         .crypto-card .card-body.p-2 {
             padding: 0.75rem !important;
+        }
+        
+        /* Binance Style Table */
+        .table-dark {
+            background-color: transparent;
+            border-color: #1E2026;
+        }
+        
+        .table-dark thead th {
+            background-color: #0B0E11;
+            border-bottom: 1px solid #1E2026;
+            color: #848E9C;
+            font-weight: 400;
+            font-size: 0.85rem;
+            padding: 0.75rem 1rem;
+        }
+        
+        .table-dark tbody td {
+            border-bottom: 1px solid #1E2026;
+            padding: 0.75rem 1rem;
+            vertical-align: middle;
+            background-color: #0B0E11;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: #14151A !important;
+        }
+        
+        /* Binance Style Tabs */
+        .binance-tabs {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .binance-tab-item {
+            padding: 0.5rem 0.75rem;
+            color: #848E9C;
+            text-decoration: none;
+            font-size: 0.9rem;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .binance-tab-item:hover {
+            color: #F0B90B;
+        }
+        
+        .binance-tab-item.active {
+            color: #F0B90B;
+            font-weight: 500;
+        }
+        
+        .binance-tab-item.active:after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #F0B90B;
+            border-radius: 2px 2px 0 0;
         }
         
         .positive-change {
