@@ -23,18 +23,91 @@ function updateSpecialCoins() {
     
     console.log("Coins to update:", allCoins);
     
+    // تست مستقیم برای رفع اشکال
+    fetch('/api/price/doge')
+        .then(response => response.json())
+        .then(data => {
+            console.log("TEST DOGE RESPONSE:", data);
+            if (data.success && data.data && data.data.price) {
+                const priceElement = document.getElementById('DOGE-USDT-price');
+                if (priceElement) {
+                    priceElement.textContent = formatPrice(data.data.price);
+                    console.log("DOGE price updated to", data.data.price);
+                } else {
+                    console.error("DOGE price element not found");
+                }
+            }
+        })
+        .catch(error => console.error("Error fetching DOGE:", error));
+    
+    // تست با ارز RNDR
+    fetch('/api/price/rndr')
+        .then(response => response.json())
+        .then(data => {
+            console.log("TEST RNDR RESPONSE:", data);
+            if (data.success && data.data && data.data.price) {
+                const priceElement = document.getElementById('RNDR-USDT-price');
+                if (priceElement) {
+                    priceElement.textContent = formatPrice(data.data.price);
+                    console.log("RNDR price updated to", data.data.price);
+                } else {
+                    console.error("RNDR price element not found");
+                }
+            }
+        })
+        .catch(error => console.error("Error fetching RNDR:", error));
+    
     // به‌روزرسانی هر سکه با تاخیر متفاوت برای جلوگیری از درخواست‌های همزمان زیاد
     allCoins.forEach((coin, index) => {
         setTimeout(() => {
             if (!updatingCoins.has(coin)) {
                 updatingCoins.add(coin);
                 console.log(`Updating ${coin} price...`);
-                updateCoinPrice(coin);
-                setTimeout(() => {
-                    updatingCoins.delete(coin);
-                }, 5000); // پاک کردن از لیست در حال به‌روزرسانی‌ها بعد از 5 ثانیه
+                
+                // مستقیم فراخوانی API برای هر سکه
+                fetch(`/api/price/${coin.toLowerCase()}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(`API response for ${coin}:`, data);
+                        if (data.success && data.data && data.data.price) {
+                            const price = parseFloat(data.data.price);
+                            const change = parseFloat(data.data.change_24h || 0);
+                            
+                            // آپدیت قیمت با استفاده از ID استاندارد
+                            const priceElement = document.getElementById(`${coin}-USDT-price`);
+                            if (priceElement) {
+                                priceElement.textContent = formatPrice(price);
+                                console.log(`Successfully updated ${coin} price to ${price}`);
+                            } else {
+                                console.error(`Price element for ${coin} not found!`);
+                            }
+                            
+                            // آپدیت درصد تغییرات با استفاده از ID استاندارد
+                            const changeElement = document.getElementById(`${coin}-USDT-change`);
+                            if (changeElement) {
+                                changeElement.textContent = formatChange(change);
+                                if (change >= 0) {
+                                    changeElement.classList.add('positive-change');
+                                    changeElement.classList.remove('negative-change');
+                                } else {
+                                    changeElement.classList.add('negative-change');
+                                    changeElement.classList.remove('positive-change');
+                                }
+                            } else {
+                                console.error(`Change element for ${coin} not found!`);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error updating ${coin}:`, error);
+                    })
+                    .finally(() => {
+                        setTimeout(() => {
+                            updatingCoins.delete(coin);
+                        }, 5000); // پاک کردن از لیست در حال به‌روزرسانی‌ها بعد از 5 ثانیه
+                    });
             }
-        }, index * 800); // تاخیر 800 میلی‌ثانیه بین هر سکه
+        }, index * 500); // تاخیر 500 میلی‌ثانیه بین هر سکه
     });
 }
 
