@@ -3208,8 +3208,9 @@ def api_telegram_send_news():
 
 
 @app.route('/voice-notification')
+@login_required
 def voice_notification_page():
-    """صفحه اعلان‌های صوتی چندزبانه"""
+    """Voice Notification Page - Multilingual Voice Alerts"""
     inject_now()
     return render_template('voice_notification.html')
     
@@ -3252,51 +3253,51 @@ def set_language(language_code):
 @app.route('/api/voice-notification/preview', methods=['POST'])
 def api_voice_notification_preview():
     """
-    پیش‌نمایش اعلان صوتی
+    Preview voice notification
     """
     try:
-        # دریافت پارامترهای ورودی
+        # Get input parameters
         params = request.json
         
-        # ایجاد پیش‌نمایش
+        # Create preview
         result = voice_notification_service.preview_notification(params)
         
         return jsonify(result)
     except Exception as e:
-        logger.error(f"خطا در پیش‌نمایش اعلان صوتی: {str(e)}")
+        logger.error(f"Error in voice notification preview: {str(e)}")
         return jsonify({
             "success": False,
-            "error": f"خطا در پیش‌نمایش اعلان صوتی: {str(e)}"
+            "error": f"Error in voice notification preview: {str(e)}"
         }), 500
 
 
 @app.route('/api/voice-notification/save', methods=['POST'])
 def api_voice_notification_save():
     """
-    ذخیره تنظیمات اعلان صوتی
+    Save voice notification settings
     """
     try:
-        # دریافت پارامترهای ورودی
+        # Get input parameters
         params = request.json
         
-        # ذخیره تنظیمات
+        # Save settings
         success = voice_notification_service.save_user_settings(params)
         
         if success:
             return jsonify({
                 "success": True,
-                "message": "تنظیمات با موفقیت ذخیره شد"
+                "message": "Settings saved successfully"
             })
         else:
             return jsonify({
                 "success": False,
-                "error": "خطا در ذخیره تنظیمات"
+                "error": "Error saving settings"
             }), 500
     except Exception as e:
-        logger.error(f"خطا در ذخیره تنظیمات اعلان صوتی: {str(e)}")
+        logger.error(f"Error saving voice notification settings: {str(e)}")
         return jsonify({
             "success": False,
-            "error": f"خطا در ذخیره تنظیمات اعلان صوتی: {str(e)}"
+            "error": f"Error saving voice notification settings: {str(e)}"
         }), 500
 
 
