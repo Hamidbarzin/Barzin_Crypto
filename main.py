@@ -476,22 +476,22 @@ def index():
         sign = "+" if change > 0 else ""
         return f"{sign}{change:.2f}%"
     
-    # Crypto currency names in Persian
+    # Crypto currency names in English
     crypto_names = {
-        'BTC': 'بیت‌کوین (BTC)',
-        'ETH': 'اتریوم (ETH)',
-        'BNB': 'بایننس کوین (BNB)',
-        'XRP': 'ریپل (XRP)',
-        'SOL': 'سولانا (SOL)',
-        'ADA': 'کاردانو (ADA)',
-        'DOGE': 'دوج‌کوین (DOGE)',
-        'SHIB': 'شیبا اینو (SHIB)',
-        'TRX': 'ترون (TRX)',
-        'DOT': 'پولکادات (DOT)',
-        'AVAX': 'آوالانچ (AVAX)',
-        'MATIC': 'پلیگان (MATIC)',
-        'UNI': 'یونی‌سواپ (UNI)',
-        'LINK': 'چین‌لینک (LINK)'
+        'BTC': 'Bitcoin (BTC)',
+        'ETH': 'Ethereum (ETH)',
+        'BNB': 'Binance Coin (BNB)',
+        'XRP': 'Ripple (XRP)',
+        'SOL': 'Solana (SOL)',
+        'ADA': 'Cardano (ADA)',
+        'DOGE': 'Dogecoin (DOGE)',
+        'SHIB': 'Shiba Inu (SHIB)',
+        'TRX': 'Tron (TRX)',
+        'DOT': 'Polkadot (DOT)',
+        'AVAX': 'Avalanche (AVAX)',
+        'MATIC': 'Polygon (MATIC)',
+        'UNI': 'Uniswap (UNI)',
+        'LINK': 'Chainlink (LINK)'
     }
     
     # رندر کردن قالب با داده‌های پایه
@@ -763,7 +763,7 @@ def cryptocurrencies():
     layer_coins = [
         {
             'id': 22, 
-            'name': 'پلیگان', 
+            'name': 'Polygon', 
             'symbol': 'MATIC/USDT', 
             'icon': 'fas fa-project-diagram text-purple',
             'price': '0.625',
