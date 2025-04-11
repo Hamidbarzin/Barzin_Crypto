@@ -65,10 +65,10 @@
         .nav-link {
             color: #848E9C !important;
             font-weight: 400;
-            padding: 0.6rem 0.8rem !important;
+            padding: 0.6rem 1rem !important;
             transition: all 0.2s;
             position: relative;
-            margin: 0 0.15rem;
+            margin: 0 0.5rem;
             font-size: 14px;
             border: none;
             background: none;
@@ -439,8 +439,8 @@
     </style>
 </head>
 <body class="bg-gradient-dark">
-    <!-- Top Navbar (Bootstrap 5 Standard Navbar) -->
-    <nav class="navbar navbar-expand-lg top-navbar mb-4 sticky-top">
+    <!-- Top Navbar (Simple Fixed Navbar) -->
+    <nav class="navbar top-navbar mb-4 sticky-top">
         <div class="container">
             <!-- Brand/logo moved to left side -->
             <a class="navbar-brand d-flex align-items-center" href="/">
@@ -448,14 +448,9 @@
                 <span>Barzin Crypto</span>
             </a>
             
-            <!-- Toggle button for mobile -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <i class="fas fa-bars"></i>
-            </button>
-            
-            <!-- Collapsible menu -->
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav ms-auto">
+            <!-- Fixed menu (always visible) -->
+            <div class="d-none d-lg-flex">
+                <ul class="navbar-nav ms-auto d-flex flex-row">
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/minimal_dashboard' or request.path == '/' %}active{% endif %}" href="/minimal_dashboard">
                             Dashboard

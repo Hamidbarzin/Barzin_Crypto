@@ -1,87 +1,22 @@
-// اسکریپت ساده‌تر منوی کشویی بوت‌استرپ
+// اسکریپت ساده برای منوی ثابت
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Navbar JavaScript initializing');
     
-    // Check if Bootstrap is initialized
+    // در این نسخه جدید، دیگر به منوی کشویی نیازی نیست
+    // فقط برای تطبیق با استایل‌های مختلف بوت‌استرپ، بررسی می‌کنیم که آیا بوت‌استرپ لود شده است
     if (typeof bootstrap !== 'undefined') {
         console.log('Bootstrap JS is detected');
-        
-        // مقداردهی اولیه همه منوهای کشویی
-        var navbarToggler = document.querySelector('.navbar-toggler');
-        var navbarCollapse = document.getElementById('navbarNavDropdown');
-        
-        if (navbarToggler && navbarCollapse) {
-            // روش اول: استفاده از کلاس‌های Bootstrap
-            try {
-                console.log('Trying Bootstrap initialization');
-                var bsCollapse = new bootstrap.Collapse(navbarCollapse, {
-                    toggle: false
-                });
-                
-                navbarToggler.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    bsCollapse.toggle();
-                    console.log('Toggled using Bootstrap');
-                });
-                
-                console.log('Bootstrap initialization successful');
-            } catch (e) {
-                // روش دوم: تغییر دستی کلاس‌ها
-                console.log('Using manual toggle as fallback');
-                navbarToggler.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    navbarCollapse.classList.toggle('show');
-                    console.log('Toggled manually (classList)');
-                });
-            }
-            
-            // بستن منو هنگام کلیک روی لینک‌ها
-            document.querySelectorAll('.nav-link').forEach(function(link) {
-                link.addEventListener('click', function() {
-                    if (window.innerWidth < 992) {
-                        try {
-                            bsCollapse.hide();
-                        } catch (e) {
-                            navbarCollapse.classList.remove('show');
-                        }
-                    }
-                });
-            });
-            
-            // بستن منو هنگام کلیک خارج از منو
-            document.addEventListener('click', function(e) {
-                if (window.innerWidth < 992 && 
-                    !e.target.closest('.navbar-collapse') && 
-                    !e.target.closest('.navbar-toggler') && 
-                    navbarCollapse.classList.contains('show')) {
-                    try {
-                        bsCollapse.hide();
-                    } catch (e) {
-                        navbarCollapse.classList.remove('show');
-                    }
-                }
-            });
-        } else {
-            console.warn('Navbar elements not found!');
-            if (!navbarToggler) console.warn('Missing: .navbar-toggler');
-            if (!navbarCollapse) console.warn('Missing: #navbarNavDropdown');
-        }
+        console.log('Using fixed menu design - no dropdown needed');
     } else {
-        console.error('Bootstrap JS not loaded!');
-        // پلن B: تغییر دستی کلاس‌ها در صورت نبود بوت‌استرپ
-        var navbarToggler = document.querySelector('.navbar-toggler');
-        var navbarCollapse = document.getElementById('navbarNavDropdown');
-        
-        if (navbarToggler && navbarCollapse) {
-            navbarToggler.addEventListener('click', function(e) {
-                e.preventDefault();
-                navbarCollapse.classList.toggle('show');
-                console.log('Toggled manually in fallback mode');
-            });
-        }
+        console.log('Bootstrap JS not loaded, but not needed for the fixed menu');
     }
+    
+    // اضافه کردن افکت‌های هاور برای لینک‌های منو
+    document.querySelectorAll('.nav-link').forEach(function(link) {
+        link.addEventListener('mouseenter', function() {
+            this.style.transition = 'color 0.3s ease';
+        });
+    });
     
     console.log('Navbar JavaScript initialized');
 });
