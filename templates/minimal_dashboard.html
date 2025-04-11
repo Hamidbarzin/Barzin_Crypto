@@ -893,8 +893,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`Found ${allElements.length} elements with -USDT-price pattern:`);
             allElements.forEach(el => {
                 console.log(`  ID: ${el.id}, Content: "${el.textContent}"`);
-                // تغییر رنگ پس‌زمینه برای راحتی دیدن
-                el.style.backgroundColor = "#f0f0ff";
+                // پس‌زمینه‌ها را تنظیم نمی‌کنیم تا از حالت اصلی تم استفاده شود
             });
         }, 1000);
     })();
