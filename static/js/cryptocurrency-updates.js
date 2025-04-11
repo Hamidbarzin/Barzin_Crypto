@@ -1,0 +1,156 @@
+/**
+ * ماژول به‌روزرسانی قیمت ارزهای دیجیتال
+ * 
+ * این فایل برای به‌روزرسانی خودکار قیمت‌های ارزهای دیجیتال در سایت استفاده می‌شود.
+ * با استفاده از تکنیک‌های بهینه‌سازی مانند صف درخواست‌ها و تأخیر زمانی بین آن‌ها،
+ * از محدودیت‌های API اجتناب می‌کند.
+ */
+
+// آرایه‌های سکه‌ها برای به‌روزرسانی خودکار
+const memeCoins = ['DOGE', 'SHIB', 'PEPE', 'FLOKI', 'WIF', 'MEME'];
+const aiCoins = ['RNDR', 'FET', 'OCEAN', 'AGIX'];
+const lowCostCoins = ['VET', 'XDC', 'HBAR', 'XLM', 'JASMY'];
+
+// برای مدیریت سکه‌هایی که در حال به‌روزرسانی هستند
+const updatingCoins = new Set();
+
+// تابع اصلی به‌روزرسانی ارزهای دیجیتال ویژه
+function updateSpecialCoins() {
+    console.log("Updating special coins (meme coins & AI coins)");
+    
+    // یکی‌کردن همه سکه‌ها و به‌روزرسانی آنها با تاخیر متفاوت
+    const allCoins = [...memeCoins, ...aiCoins, ...lowCostCoins];
+    
+    // به‌روزرسانی هر سکه با تاخیر متفاوت برای جلوگیری از درخواست‌های همزمان زیاد
+    allCoins.forEach((coin, index) => {
+        setTimeout(() => {
+            if (!updatingCoins.has(coin)) {
+                updatingCoins.add(coin);
+                updateCoinPrice(coin);
+                setTimeout(() => {
+                    updatingCoins.delete(coin);
+                }, 5000); // پاک کردن از لیست در حال به‌روزرسانی‌ها بعد از 5 ثانیه
+            }
+        }, index * 800); // تاخیر 800 میلی‌ثانیه بین هر سکه
+    });
+}
+
+// تابع به‌روزرسانی قیمت یک سکه مشخص
+function updateCoinPrice(coin) {
+    fetch(`/api/price/${coin.toLowerCase()}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response && response.success && response.data) {
+                const data = response.data;
+                if (data && data.price) {
+                    const price = parseFloat(data.price);
+                    const change = parseFloat(data.change_24h || 0);
+                    
+                    const coinSymbol = coin.toUpperCase();
+                    
+                    // آپدیت قیمت با استفاده از ID استاندارد
+                    const priceElement = document.getElementById(`${coinSymbol}-USDT-price`);
+                    if (priceElement) {
+                        priceElement.textContent = formatPrice(price);
+                        console.log(`Successfully updated ${coin} price to ${price}`);
+                    }
+                    
+                    // آپدیت درصد تغییرات با استفاده از ID استاندارد
+                    const changeElement = document.getElementById(`${coinSymbol}-USDT-change`);
+                    if (changeElement) {
+                        changeElement.textContent = formatChange(change);
+                        if (change >= 0) {
+                            changeElement.classList.add('positive-change');
+                            changeElement.classList.remove('negative-change');
+                        } else {
+                            changeElement.classList.add('negative-change');
+                            changeElement.classList.remove('positive-change');
+                        }
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error(`Error updating ${coin}:`, error);
+        });
+}
+
+// تابع قالب‌بندی قیمت بر اساس بزرگی اعداد
+function formatPrice(price) {
+    // Format based on price magnitude
+    if (price >= 1000) {
+        return price.toLocaleString('en-US', {maximumFractionDigits: 0});
+    } else if (price >= 1) {
+        return price.toLocaleString('en-US', {maximumFractionDigits: 2});
+    } else if (price >= 0.01) {
+        return price.toLocaleString('en-US', {maximumFractionDigits: 4});
+    } else {
+        return price.toLocaleString('en-US', {maximumFractionDigits: 8});
+    }
+}
+
+// تابع قالب‌بندی درصد تغییرات
+function formatChange(change) {
+    const sign = change >= 0 ? '+' : '';
+    return `${sign}${change.toFixed(2)}%`;
+}
+
+// تابع به‌روزرسانی قیمت‌های ارزهای اصلی
+function updateMainCoins() {
+    console.log("Updating prices for:", ["BTC/USDT", "ETH/USDT", "SOL/USDT", "XRP/USDT"]);
+    
+    // Update prices at intervals to avoid overwhelming the API
+    setTimeout(() => { updateCoinPrice('BTC'); }, 100);
+    setTimeout(() => { updateCoinPrice('ETH'); }, 900);
+    setTimeout(() => { updateCoinPrice('SOL'); }, 1700);
+    setTimeout(() => { updateCoinPrice('XRP'); }, 2500);
+}
+
+// تابع به‌روزرسانی قیمت در سیگنال‌ها
+function updateSignalPrices() {
+    try {
+        console.log('Updating signal prices');
+        
+        // دریافت قیمت بیت‌کوین با استفاده از ID استاندارد جدید
+        const btcPrice = document.getElementById('BTC-USDT-price')?.textContent;
+        if (btcPrice && btcPrice !== '--') {
+            const btcSignalPrice = document.getElementById('btc-signal-price');
+            if (btcSignalPrice) {
+                console.log('Updating BTC price to:', btcPrice);
+                btcSignalPrice.textContent = btcPrice + ' USDT';
+            }
+        }
+        
+        // دریافت قیمت اتریوم با استفاده از ID استاندارد جدید
+        const ethPrice = document.getElementById('ETH-USDT-price')?.textContent;
+        if (ethPrice && ethPrice !== '--') {
+            const ethSignalPrice = document.getElementById('eth-signal-price');
+            if (ethSignalPrice) {
+                console.log('Updating ETH price to:', ethPrice);
+                ethSignalPrice.textContent = ethPrice + ' USDT';
+            }
+        }
+    } catch (error) {
+        console.error('Error updating signal prices:', error);
+    }
+}
+
+// راه‌اندازی به‌روزرسانی قیمت‌ها در هنگام بارگذاری صفحه
+document.addEventListener('DOMContentLoaded', function() {
+    // به‌روزرسانی اولیه
+    updateMainCoins();
+    
+    // به‌روزرسانی خودکار ارزهای اصلی هر 30 ثانیه
+    setInterval(updateMainCoins, 30000);
+    
+    // به‌روزرسانی اولیه ارزهای ویژه با تأخیر 3 ثانیه
+    setTimeout(updateSpecialCoins, 3000);
+    
+    // به‌روزرسانی خودکار ارزهای ویژه هر 45 ثانیه
+    setInterval(updateSpecialCoins, 45000);
+});

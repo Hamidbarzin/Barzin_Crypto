@@ -2,6 +2,11 @@
 
 {% block title %}{{ ui_text('dashboard', 'داشبورد') }} | {{ ui_text('title', 'برزین کریپتو') }}{% endblock %}
 
+{% block head %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/cryptocurrency-updates.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 
 <div id="dashboard-content">
@@ -442,7 +447,8 @@
             
     <!-- JavaScript for updating prices for new coins -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // پیوند به فایل به‌روزرسانی قیمت‌ها قبلاً افزوده شده و دیگر نیازی به این بخش کد نیست
+        /*document.addEventListener('DOMContentLoaded', function() {
             // Add event listeners for all new coin price updates - Meme coins
             // We'll use our new updateSpecialCoins function instead of these individual calls
             
