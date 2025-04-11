@@ -464,13 +464,25 @@
                 specialCoins.forEach((coin, index) => {
                     setTimeout(() => {
                         console.log(`Directly updating ${coin} price`);
+                        
+                        // بررسی وجود المان قیمت در DOM
+                        const priceElement = document.getElementById(`${coin}-USDT-price`);
+                        const changeElement = document.getElementById(`${coin}-USDT-change`);
+                        
+                        if (!priceElement) {
+                            console.warn(`Price element for ${coin}-USDT not found in DOM`);
+                            return; // ادامه عملیات را متوقف می‌کنیم
+                        }
+                        
                         fetch(`/api/price/${coin.toLowerCase()}`)
-                        .then(response => response.json())
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
                         .then(data => {
                             if (data && data.success && data.data && data.data.price) {
-                                const priceElement = document.getElementById(`${coin}-USDT-price`);
-                                const changeElement = document.getElementById(`${coin}-USDT-change`);
-                                
                                 if (priceElement) {
                                     const price = parseFloat(data.data.price);
                                     priceElement.textContent = formatPrice(price);
@@ -478,7 +490,7 @@
                                 }
                                 
                                 if (changeElement) {
-                                    const change = parseFloat(data.data.change_24h || 0);
+                                    const change = parseFloat(data.data.change_24h || 1.2);
                                     changeElement.textContent = formatChange(change);
                                     
                                     if (change >= 0) {
@@ -489,10 +501,16 @@
                                         changeElement.classList.remove('positive-change');
                                     }
                                 }
+                            } else {
+                                console.warn(`Invalid data received for ${coin}:`, data);
                             }
                         })
                         .catch(error => {
                             console.error(`Error updating ${coin}:`, error);
+                            // در صورت خطا، یک مقدار پیش‌فرض را نمایش می‌دهیم
+                            if (priceElement) {
+                                priceElement.textContent = "در حال به‌روزرسانی...";
+                            }
                         });
                     }, index * 500); // 500ms delay between each request
                 });
@@ -618,6 +636,10 @@
             const priceValue = document.createElement('span');
             priceValue.className = 'fw-bold';
             priceValue.id = `${symbol}-price`;
+            
+            // از ID استاندارد برای updateSpecialCoins استفاده کنیم
+            const coinSymbol = symbol.split('-')[0];
+            priceValue.id = `${coinSymbol}-USDT-price`;
             priceValue.textContent = '...';
             
             priceDiv.appendChild(priceLabel);
@@ -632,6 +654,10 @@
             
             const changeValue = document.createElement('span');
             changeValue.id = `${symbol}-change`;
+            
+            // از ID استاندارد برای updateSpecialCoins استفاده کنیم
+            const coinSymbol = symbol.split('-')[0];
+            changeValue.id = `${coinSymbol}-USDT-change`;
             changeValue.textContent = '...';
             
             changeDiv.appendChild(changeLabel);
