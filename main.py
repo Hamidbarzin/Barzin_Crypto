@@ -1224,6 +1224,78 @@ def test_telegram():
     # استفاده از چت آیدی پیش‌فرض از متغیر محیطی
     chat_id = os.environ.get('DEFAULT_CHAT_ID', '722627622')
     logger.info(f"چت آیدی پیش‌فرض: {chat_id}")
+
+@app.route('/send_price_report')
+def send_price_report():
+    """صفحه ارسال گزارش قیمت ارزهای دیجیتال به تلگرام"""
+    success = send_telegram_price_report()
+    if success:
+        flash('گزارش قیمت با موفقیت به تلگرام ارسال شد.', 'success')
+    else:
+        flash('خطا در ارسال گزارش قیمت به تلگرام.', 'danger')
+    return redirect(url_for('telegram_control_panel'))
+
+@app.route('/send_system_report')
+def send_system_report():
+    """صفحه ارسال گزارش سیستم به تلگرام"""
+    success = send_telegram_system_report()
+    if success:
+        flash('گزارش سیستم با موفقیت به تلگرام ارسال شد.', 'success')
+    else:
+        flash('خطا در ارسال گزارش سیستم به تلگرام.', 'danger')
+    return redirect(url_for('telegram_control_panel'))
+
+@app.route('/send_trading_signals')
+def send_trading_signals_route():
+    """صفحه ارسال سیگنال‌های معاملاتی به تلگرام"""
+    success = send_telegram_trading_signals()
+    if success:
+        flash('سیگنال‌های معاملاتی با موفقیت به تلگرام ارسال شد.', 'success')
+    else:
+        flash('خطا در ارسال سیگنال‌های معاملاتی به تلگرام.', 'danger')
+    return redirect(url_for('telegram_control_panel'))
+
+@app.route('/send_technical_analysis')
+def send_technical_analysis_route():
+    """صفحه ارسال تحلیل تکنیکال به تلگرام"""
+    symbol = request.args.get('symbol', 'BTC/USDT')
+    success = send_telegram_technical_analysis(symbol)
+    if success:
+        flash(f'تحلیل تکنیکال برای {symbol} با موفقیت به تلگرام ارسال شد.', 'success')
+    else:
+        flash(f'خطا در ارسال تحلیل تکنیکال برای {symbol} به تلگرام.', 'danger')
+    return redirect(url_for('telegram_control_panel'))
+
+@app.route('/send_crypto_news')
+def send_crypto_news_route():
+    """صفحه ارسال اخبار ارزهای دیجیتال به تلگرام"""
+    try:
+        from crypto_bot.crypto_news import send_crypto_news_to_telegram
+        success = send_crypto_news_to_telegram()
+        if success:
+            flash('اخبار ارزهای دیجیتال با موفقیت به تلگرام ارسال شد.', 'success')
+        else:
+            flash('خطا در ارسال اخبار ارزهای دیجیتال به تلگرام.', 'danger')
+    except Exception as e:
+        logger.error(f"خطا در ارسال اخبار: {str(e)}")
+        flash(f'خطا در ارسال اخبار: {str(e)}', 'danger')
+    return redirect(url_for('telegram_control_panel'))
+    
+@app.route('/api/telegram-test')
+def test_telegram_fixed():
+    """ارسال پیام تلگرام تست برای بررسی عملکرد اعلان‌ها (نسخه ساده شده)"""
+    try:
+        result = replit_telegram_sender.send_test_message()
+        return jsonify({
+            'success': True, 
+            'message': 'پیام تست به تلگرام با موفقیت ارسال شد.'
+        })
+    except Exception as e:
+        logger.error(f"خطا در ارسال پیام تست به تلگرام: {str(e)}")
+        return jsonify({
+            'success': False, 
+            'message': f'خطا: {str(e)}'
+        })
     
     # اگر اطلاعات در قالب JSON ارسال شده
     if request.is_json:
