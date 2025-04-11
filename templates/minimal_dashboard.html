@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="tab-pane active" id="technical-pane" role="tabpanel" aria-labelledby="technical-tab">
                     <div class="card crypto-card">
                         <div class="card-header d-flex justify-content-between align-items-center border-0 bg-transparent">
-                            <h5 class="mb-0">{{ ui_text('technical_analysis_bitcoin', 'Bitcoin Technical Analysis (1h Timeframe)') }}</h5>
+                            <h5 class="mb-0">{{ ui_text('technical_analysis_bitcoin', 'Bitcoin Technical Analysis (Hourly Timeframe)') }}</h5>
                             <div class="binance-tabs">
                                 <a href="#" class="binance-tab-item active">BTC</a>
                                 <a href="#" class="binance-tab-item">ETH</a>
@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         </div>
                                     </div>
                                     <p class="signal-description">
-                                        بیت‌کوین اخیراً یک الگوی مثلث صعودی را تکمیل کرده و به نظر می‌رسد آماده ادامه روند صعودی است. شاخص RSI در ناحیه خنثی قرار دارد و MACD سیگنال خرید را نشان می‌دهد.
+                                        {{ ui_text('btc_buy_signal', 'Bitcoin has recently completed a bullish triangle pattern and appears ready to continue its upward trend. The RSI indicator is in the neutral zone and MACD shows a buy signal.') }}
                                     </p>
                                     <div class="text-center mt-3">
                                         <button class="btn btn-sm btn-outline-warning me-2">{{ ui_text("share", "اشتراک‌گذاری") }} <i class="fas fa-share-alt ms-1"></i></button>
@@ -469,7 +469,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         </div>
                                     </div>
                                     <p class="signal-description">
-                                        {{ ui_text('eth_sell_signal', 'اتریوم در نزدیکی مقاومت کلیدی قرار گرفته و شاخص‌های تکنیکال نشان‌دهنده اشباع خرید هستند. RSI بالای ۷۰ قرار دارد و الگوی واگرایی منفی با MACD مشاهده می‌شود. احتمال اصلاح قیمت وجود دارد.') }}
+                                        {{ ui_text('eth_sell_signal', 'Ethereum is positioned near a key resistance level and technical indicators show overbought conditions. RSI is above 70 and a negative divergence pattern is observed with MACD. A price correction is likely.') }}
                                     </p>
                                     <div class="text-center mt-3">
                                         <button class="btn btn-sm btn-outline-warning me-2">{{ ui_text("share", "اشتراک‌گذاری") }} <i class="fas fa-share-alt ms-1"></i></button>
@@ -516,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         </div>
                                     </div>
                                     <p class="signal-description">
-                                        {{ ui_text('sol_buy_signal', 'سولانا در حال شکستن یک الگوی مقاومتی کلیدی است و با حجم معاملات بالا در حال حرکت است. میانگین‌های متحرک حمایت قوی را نشان می‌دهند و پتانسیل رشد قابل توجهی وجود دارد.') }}
+                                        {{ ui_text('sol_buy_signal', 'Solana is breaking a key resistance pattern and moving with high trading volume. Moving averages show strong support with significant growth potential.') }}
                                     </p>
                                     <div class="text-center mt-3">
                                         <button class="btn btn-sm btn-outline-warning me-2">{{ ui_text("share", "اشتراک‌گذاری") }} <i class="fas fa-share-alt ms-1"></i></button>
@@ -563,7 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         </div>
                                     </div>
                                     <p class="signal-description">
-                                        {{ ui_text('bnb_wait_signal', 'بایننس کوین در یک محدوده قیمتی باریک در حال معامله است. در صورت شکست سطح مقاومت ۵۸۰ دلار، سیگنال خرید فعال می‌شود. پیشنهاد می‌شود تا زمان شکست این سطح، معامله‌ای انجام نشود.') }}
+                                        {{ ui_text('bnb_wait_signal', 'Binance Coin is trading in a narrow price range. If the resistance level at $580 breaks, a buy signal will be activated. It is recommended not to trade until this level breaks.') }}
                                     </p>
                                     <div class="text-center mt-3">
                                         <button class="btn btn-sm btn-outline-warning me-2">{{ ui_text("share", "اشتراک‌گذاری") }} <i class="fas fa-share-alt ms-1"></i></button>
@@ -863,12 +863,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 createPriceChart(coinText);
                 
                 if (titleElement) {
-                    let coinName = 'بیت‌کوین';
-                    if (coinText === 'ETH') coinName = 'اتریوم';
-                    if (coinText === 'SOL') coinName = 'سولانا';
-                    if (coinText === 'XRP') coinName = 'ریپل';
+                    let coinName = 'Bitcoin';
+                    if (coinText === 'ETH') coinName = 'Ethereum';
+                    if (coinText === 'SOL') coinName = 'Solana';
+                    if (coinText === 'XRP') coinName = 'Ripple';
                     
-                    titleElement.textContent = `تحلیل تکنیکال ${coinName} (تایم‌فریم ساعتی)`;
+                    titleElement.textContent = `${coinName} Technical Analysis (Hourly Timeframe)`;
                 }
             });
         });
