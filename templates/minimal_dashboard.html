@@ -635,7 +635,6 @@
             
             const priceValue = document.createElement('span');
             priceValue.className = 'fw-bold';
-            priceValue.id = `${symbol}-price`;
             
             // از ID استاندارد برای updateSpecialCoins استفاده کنیم
             const coinSymbol = symbol.split('-')[0];
@@ -653,10 +652,8 @@
             changeLabel.textContent = 'تغییر ۲۴ ساعته:';
             
             const changeValue = document.createElement('span');
-            changeValue.id = `${symbol}-change`;
             
             // از ID استاندارد برای updateSpecialCoins استفاده کنیم
-            const coinSymbol = symbol.split('-')[0];
             changeValue.id = `${coinSymbol}-USDT-change`;
             changeValue.textContent = '...';
             
@@ -707,14 +704,15 @@
                             const price = parseFloat(data.price);
                             const change = parseFloat(data.change_24h || 0);
                             
-                            // Update price
-                            const priceElement = document.getElementById(`${symbol}-price`);
+                            // Update price - using new standardized ID format
+                            const coinSymbol = coin.toUpperCase();
+                            const priceElement = document.getElementById(`${coinSymbol}-USDT-price`);
                             if (priceElement) {
                                 priceElement.textContent = formatPrice(price);
                             }
                             
-                            // Update change percentage
-                            const changeElement = document.getElementById(`${symbol}-change`);
+                            // Update change percentage - using new standardized ID format
+                            const changeElement = document.getElementById(`${coinSymbol}-USDT-change`);
                             if (changeElement) {
                                 changeElement.textContent = formatChange(change);
                                 if (change >= 0) {
@@ -748,15 +746,16 @@
                                     const price = parseFloat(data.price);
                                     const change = parseFloat(data.change_24h || 0);
                                     
-                                    // Update price
-                                    const priceElement = document.getElementById(`${symbol}-price`);
+                                    // Update price - using new standardized ID format
+                                    const coinSymbol = coin.toUpperCase();
+                                    const priceElement = document.getElementById(`${coinSymbol}-USDT-price`);
                                     if (priceElement) {
                                         console.log(`Backup succeeded for ${coin}: ${price}`);
                                         priceElement.textContent = formatPrice(price);
                                     }
                                     
-                                    // Update change percentage
-                                    const changeElement = document.getElementById(`${symbol}-change`);
+                                    // Update change percentage - using new standardized ID format
+                                    const changeElement = document.getElementById(`${coinSymbol}-USDT-change`);
                                     if (changeElement) {
                                         changeElement.textContent = formatChange(change);
                                         if (change >= 0) {
@@ -771,10 +770,11 @@
                             }
                         })
                         .catch(() => {
-                            // If backup also failed, show error
-                            const priceElement = document.getElementById(`${symbol}-price`);
+                            // If backup also failed, show error - using new standardized ID format 
+                            const coinSymbol = coin.toUpperCase();
+                            const priceElement = document.getElementById(`${coinSymbol}-USDT-price`);
                             if (priceElement) {
-                                priceElement.textContent = 'خطا';
+                                priceElement.textContent = 'در حال به‌روزرسانی...';
                             }
                         });
                     }, 500);
