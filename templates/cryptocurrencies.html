@@ -25,8 +25,6 @@
                         <button type="button" class="btn btn-sm btn-warning active" data-crypto-category="all">همه ارزها</button>
                         <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="major">ارزهای مهم بازار</button>
                         <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="promising">ارزهای هوش مصنوعی</button>
-                        <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="meme">ارزهای میم محبوب</button>
-                        <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="low_cost">ارزهای کم‌هزینه</button>
                         <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="new">ارزهای لایر 1 و 2</button>
                     </div>
                 </div>
@@ -48,14 +46,10 @@
                             <tbody>
                                 <!-- لیست ارزهای دیجیتال با استفاده از داده‌های دینامیک -->
                                 {% for coin in cryptocurrencies %}
-                                {% if coin.id <= 8 %}
+                                {% if coin.id <= 7 %}
                                 <tr class="crypto-row major">
-                                {% elif coin.id <= 11 %}
+                                {% elif coin.id <= 13 %}
                                 <tr class="crypto-row promising">
-                                {% elif coin.id <= 17 %}
-                                <tr class="crypto-row meme">
-                                {% elif coin.id <= 21 %}
-                                <tr class="crypto-row low_cost">
                                 {% else %}
                                 <tr class="crypto-row new">
                                 {% endif %}
