@@ -516,7 +516,7 @@ def cryptocurrencies():
     important_coins = [
         {
             'id': 1, 
-            'name': 'بیت‌کوین', 
+            'name': 'Bitcoin', 
             'symbol': 'BTC/USDT', 
             'icon': 'fab fa-bitcoin text-warning',
             'price': '67,500.25',
@@ -527,7 +527,7 @@ def cryptocurrencies():
         },
         {
             'id': 2, 
-            'name': 'اتریوم', 
+            'name': 'Ethereum', 
             'symbol': 'ETH/USDT', 
             'icon': 'fab fa-ethereum text-primary',
             'price': '3,450.75',
@@ -538,7 +538,7 @@ def cryptocurrencies():
         },
         {
             'id': 3, 
-            'name': 'تتر', 
+            'name': 'Tether', 
             'symbol': 'USDT/USD', 
             'icon': 'fas fa-dollar-sign text-success',
             'price': '1.000',
@@ -549,7 +549,7 @@ def cryptocurrencies():
         },
         {
             'id': 4, 
-            'name': 'سولانا', 
+            'name': 'Solana', 
             'symbol': 'SOL/USDT', 
             'icon': 'fas fa-sun text-info',
             'price': '142.60',
@@ -560,7 +560,7 @@ def cryptocurrencies():
         },
         {
             'id': 5, 
-            'name': 'بایننس کوین', 
+            'name': 'Binance Coin', 
             'symbol': 'BNB/USDT', 
             'icon': 'fas fa-coins text-warning',
             'price': '571.25',
@@ -571,7 +571,7 @@ def cryptocurrencies():
         },
         {
             'id': 6, 
-            'name': 'ریپل', 
+            'name': 'Ripple', 
             'symbol': 'XRP/USDT', 
             'icon': 'fas fa-stream text-info',
             'price': '0.622',
@@ -582,7 +582,7 @@ def cryptocurrencies():
         },
         {
             'id': 7, 
-            'name': 'چین‌لینک', 
+            'name': 'Chainlink', 
             'symbol': 'LINK/USDT', 
             'icon': 'fas fa-link text-info',
             'price': '14.25',
@@ -593,7 +593,7 @@ def cryptocurrencies():
         },
         {
             'id': 8, 
-            'name': 'آواکس', 
+            'name': 'Avalanche', 
             'symbol': 'AVAX/USDT', 
             'icon': 'fas fa-mountain text-danger',
             'price': '35.42',
@@ -608,7 +608,7 @@ def cryptocurrencies():
     ai_coins = [
         {
             'id': 9, 
-            'name': 'رندر', 
+            'name': 'Render', 
             'symbol': 'RNDR/USDT', 
             'icon': 'fas fa-cubes text-danger',
             'price': '7.25',
@@ -619,7 +619,7 @@ def cryptocurrencies():
         },
         {
             'id': 10, 
-            'name': 'فچر', 
+            'name': 'Fetch', 
             'symbol': 'FET/USDT', 
             'icon': 'fas fa-robot text-primary',
             'price': '1.52',
@@ -630,7 +630,7 @@ def cryptocurrencies():
         },
         {
             'id': 11, 
-            'name': 'ورلدکوین', 
+            'name': 'Worldcoin', 
             'symbol': 'WLD/USDT', 
             'icon': 'fas fa-globe-europe text-info',
             'price': '5.82',
@@ -645,7 +645,7 @@ def cryptocurrencies():
     meme_coins = [
         {
             'id': 12, 
-            'name': 'دوج‌کوین', 
+            'name': 'Dogecoin', 
             'symbol': 'DOGE/USDT', 
             'icon': 'fas fa-dog text-warning',
             'price': '0.1568',

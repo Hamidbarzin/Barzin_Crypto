@@ -16,3 +16,20 @@
 
 # Status Translations
 نامشخص=Unknown
+
+# Cryptocurrency Names
+بیت‌کوین=Bitcoin
+اتریوم=Ethereum
+تتر=Tether
+سولانا=Solana
+بایننس کوین=Binance Coin
+ریپل=Ripple
+چین‌لینک=Chainlink
+آواکس=Avalanche
+رندر=Render
+فچر=Fetch
+ورلدکوین=Worldcoin
+پولکادات=Polkadot
+کاردانو=Cardano
+پولیگان=Polygon
+دوج‌کوین=Dogecoin
