@@ -211,6 +211,7 @@
     // تابع عمومی برای ارسال درخواست API
     async function callApi(endpoint, method = 'GET', data = null, showMessages = true) {
         try {
+            console.log(`Calling endpoint: ${endpoint} with method: ${method}`);
             const options = {
                 method: method,
                 headers: {
@@ -223,7 +224,9 @@
             }
             
             const response = await fetch(endpoint, options);
+            console.log(`Response status: ${response.status}`);
             const result = await response.json();
+            console.log('API response:', result);
             
             if (showMessages) {
                 if (result.success) {
