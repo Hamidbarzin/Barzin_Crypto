@@ -255,22 +255,88 @@
     
     // ارسال گزارش سیستم
     document.getElementById('btn-system-report').addEventListener('click', async function() {
+        console.log('System report button clicked');
         this.disabled = true;
-        await callApi('/api/telegram/system_report');
+        try {
+            const button = this;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>در حال ارسال...';
+            
+            // استفاده مستقیم از fetch به جای callApi
+            const response = await fetch('/api/telegram/system_report');
+            console.log('System report raw response:', response);
+            
+            if (response.ok) {
+                const result = await response.json();
+                console.log('System report API call completed:', result);
+                showResult(result.message || 'گزارش سیستم با موفقیت ارسال شد', true);
+            } else {
+                console.error('System report API call failed with status:', response.status);
+                showResult('خطا در ارسال گزارش سیستم', false);
+            }
+            
+            button.innerHTML = '<i class="fas fa-server me-2"></i>ارسال گزارش سیستم';
+        } catch (error) {
+            console.error('Error in system report:', error);
+            showResult(`خطا در ارسال درخواست: ${error.message}`, false);
+        }
         this.disabled = false;
     });
     
     // ارسال پیام تست
     document.getElementById('btn-test-message').addEventListener('click', async function() {
+        console.log('Test message button clicked');
         this.disabled = true;
-        await callApi('/api/telegram/test');
+        try {
+            const button = this;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>در حال ارسال...';
+            
+            // استفاده مستقیم از fetch به جای callApi
+            const response = await fetch('/api/telegram/test');
+            console.log('Test message raw response:', response);
+            
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Test message API call completed:', result);
+                showResult(result.message || 'پیام تست با موفقیت ارسال شد', true);
+            } else {
+                console.error('Test message API call failed with status:', response.status);
+                showResult('خطا در ارسال پیام تست', false);
+            }
+            
+            button.innerHTML = '<i class="fas fa-vial me-2"></i>ارسال پیام تست';
+        } catch (error) {
+            console.error('Error in test message:', error);
+            showResult(`خطا در ارسال درخواست: ${error.message}`, false);
+        }
         this.disabled = false;
     });
     
     // ارسال سیگنال‌های معاملاتی
     document.getElementById('btn-trading-signals').addEventListener('click', async function() {
+        console.log('Trading signals button clicked');
         this.disabled = true;
-        await callApi('/api/telegram/trading_signals');
+        try {
+            const button = this;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>در حال ارسال...';
+            
+            // استفاده مستقیم از fetch به جای callApi
+            const response = await fetch('/api/telegram/trading_signals');
+            console.log('Trading signals raw response:', response);
+            
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Trading signals API call completed:', result);
+                showResult(result.message || 'سیگنال‌های معاملاتی با موفقیت ارسال شد', true);
+            } else {
+                console.error('Trading signals API call failed with status:', response.status);
+                showResult('خطا در ارسال سیگنال‌های معاملاتی', false);
+            }
+            
+            button.innerHTML = '<i class="fas fa-signal me-2"></i>ارسال سیگنال‌های معاملاتی';
+        } catch (error) {
+            console.error('Error in trading signals:', error);
+            showResult(`خطا در ارسال درخواست: ${error.message}`, false);
+        }
         this.disabled = false;
     });
     
