@@ -782,6 +782,63 @@
             const sign = change >= 0 ? '+' : '';
             return `${sign}${change.toFixed(2)}%`;
         }
+        
+        // تابع ساده برای به‌روزرسانی قیمت ارزهای میم و ارزهای هوش مصنوعی
+        function updateSpecialCoinsOnLoad() {
+            console.log("Directly updating special coins from HTML...");
+            
+            // لیست ارزهای میم و هوش مصنوعی
+            const specialCoins = [
+                'DOGE', 'SHIB', 'PEPE', 'FLOKI', 'WIF', 'MEME', 
+                'RNDR', 'FET', 'OCEAN', 'AGIX',
+                'VET', 'XDC', 'HBAR', 'XLM', 'JASMY'
+            ];
+            
+            specialCoins.forEach((coin, index) => {
+                setTimeout(() => {
+                    console.log(`Directly fetching ${coin} price...`);
+                    
+                    fetch(`/api/price/${coin.toLowerCase()}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(`Direct API response for ${coin}:`, data);
+                            
+                            if (data.success && data.data && data.data.price) {
+                                const price = parseFloat(data.data.price);
+                                const change = parseFloat(data.data.change_24h || 0);
+                                
+                                const priceElement = document.getElementById(`${coin}-USDT-price`);
+                                if (priceElement) {
+                                    priceElement.textContent = formatPrice(price);
+                                    console.log(`Successfully updated ${coin} price element to ${price}`);
+                                } else {
+                                    console.error(`Price element for ${coin} not found!`, `Looked for ID: ${coin}-USDT-price`);
+                                }
+                                
+                                const changeElement = document.getElementById(`${coin}-USDT-change`);
+                                if (changeElement) {
+                                    changeElement.textContent = formatChange(change);
+                                    changeElement.className = change >= 0 ? 'positive-change' : 'negative-change';
+                                } else {
+                                    console.error(`Change element for ${coin} not found!`, `Looked for ID: ${coin}-USDT-change`);
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error(`Error updating ${coin}:`, error);
+                        });
+                }, index * 500); // هر 500 میلی‌ثانیه یک درخواست ارسال می‌کنیم
+            });
+        }
+        
+        // اجرای تابع بعد از بارگذاری کامل صفحه
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM fully loaded in HTML - Running direct update");
+            setTimeout(updateSpecialCoinsOnLoad, 1000);
+            
+            // تکرار به‌روزرسانی هر 60 ثانیه
+            setInterval(updateSpecialCoinsOnLoad, 60000);
+        });
     </script>
     
     <!-- Section Content Container -->
