@@ -414,26 +414,26 @@ def index():
                 <tr class="signal-buy">
                     <td>BTC/USDT</td>
                     <td>82,500</td>
-                    <td>خرید</td>
-                    <td>پیشنهاد معامله نوسانی (صعودی)</td>
+                    <td>Buy</td>
+                    <td>Consider swing trade (bullish)</td>
                 </tr>
                 <tr class="signal-buy">
                     <td>ETH/USDT</td>
                     <td>3,200</td>
-                    <td>خرید قوی</td>
-                    <td>نقطه ورود مناسب برای معامله نوسانی صعودی</td>
+                    <td>Strong Buy</td>
+                    <td>Good entry point for bullish swing trade</td>
                 </tr>
                 <tr class="signal-buy">
                     <td>SOL/USDT</td>
                     <td>145</td>
-                    <td>خرید</td>
-                    <td>روند صعودی قوی</td>
+                    <td>Buy</td>
+                    <td>Strong upward trend</td>
                 </tr>
                 <tr class="signal-sell">
                     <td>XRP/USDT</td>
                     <td>0.52</td>
-                    <td>فروش</td>
-                    <td>احتمال اصلاح قیمت</td>
+                    <td>Sell</td>
+                    <td>Possible price correction</td>
                 </tr>
             {% endfor %}
         </table>
@@ -522,7 +522,7 @@ def cryptocurrencies():
             'price': '67,500.25',
             'change': '+2.4%',
             'volume': '52.3B',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -533,7 +533,7 @@ def cryptocurrencies():
             'price': '3,450.75',
             'change': '+1.8%',
             'volume': '24.7B',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -544,7 +544,7 @@ def cryptocurrencies():
             'price': '1.000',
             'change': '+0.01%',
             'volume': '85.6B',
-            'signal': 'نگهداری',
+            'signal': 'Hold',
             'signal_class': 'warning'
         },
         {
@@ -555,7 +555,7 @@ def cryptocurrencies():
             'price': '142.60',
             'change': '+4.2%',
             'volume': '6.1B',
-            'signal': 'خرید قوی',
+            'signal': 'Strong Buy',
             'signal_class': 'success'
         },
         {
@@ -566,7 +566,7 @@ def cryptocurrencies():
             'price': '571.25',
             'change': '+1.5%',
             'volume': '3.5B',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -577,7 +577,7 @@ def cryptocurrencies():
             'price': '0.622',
             'change': '+2.9%',
             'volume': '2.8B',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -588,7 +588,7 @@ def cryptocurrencies():
             'price': '14.25',
             'change': '+3.8%',
             'volume': '945M',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -599,7 +599,7 @@ def cryptocurrencies():
             'price': '35.42',
             'change': '+5.2%',
             'volume': '1.2B',
-            'signal': 'خرید قوی',
+            'signal': 'Strong Buy',
             'signal_class': 'success'
         },
     ]
@@ -614,7 +614,7 @@ def cryptocurrencies():
             'price': '7.25',
             'change': '+8.4%',
             'volume': '420M',
-            'signal': 'خرید قوی',
+            'signal': 'Strong Buy',
             'signal_class': 'success'
         },
         {
@@ -625,7 +625,7 @@ def cryptocurrencies():
             'price': '1.52',
             'change': '+6.7%',
             'volume': '310M',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -636,7 +636,7 @@ def cryptocurrencies():
             'price': '5.82',
             'change': '+9.3%',
             'volume': '265M',
-            'signal': 'خرید قوی',
+            'signal': 'Strong Buy',
             'signal_class': 'success'
         }
     ]
@@ -651,7 +651,7 @@ def cryptocurrencies():
             'price': '0.1568',
             'change': '+1.5%',
             'volume': '950M',
-            'signal': 'نگهداری',
+            'signal': 'Hold',
             'signal_class': 'warning'
         },
         {
@@ -662,7 +662,7 @@ def cryptocurrencies():
             'price': '0.00001191',
             'change': '+1.2%',
             'volume': '850M',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -673,7 +673,7 @@ def cryptocurrencies():
             'price': '0.00000678',
             'change': '+2.5%',
             'volume': '520M',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -684,7 +684,7 @@ def cryptocurrencies():
             'price': '0.00005347',
             'change': '+3.2%',
             'volume': '320M',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -695,7 +695,7 @@ def cryptocurrencies():
             'price': '0.3736',
             'change': '+4.8%',
             'volume': '280M',
-            'signal': 'خرید قوی',
+            'signal': 'Strong Buy',
             'signal_class': 'success'
         },
         {
@@ -706,7 +706,7 @@ def cryptocurrencies():
             'price': '0.001586',
             'change': '+2.1%',
             'volume': '180M',
-            'signal': 'نگهداری',
+            'signal': 'Hold',
             'signal_class': 'warning'
         }
     ]
@@ -721,7 +721,7 @@ def cryptocurrencies():
             'price': '0.02162',
             'change': '+1.2%',
             'volume': '120M',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -732,7 +732,7 @@ def cryptocurrencies():
             'price': '0.06532',
             'change': '+2.4%',
             'volume': '85M',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -743,7 +743,7 @@ def cryptocurrencies():
             'price': '0.1717',
             'change': '+3.5%',
             'volume': '110M',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -754,7 +754,7 @@ def cryptocurrencies():
             'price': '0.2333',
             'change': '+1.8%',
             'volume': '95M',
-            'signal': 'نگهداری',
+            'signal': 'Hold',
             'signal_class': 'warning'
         }
     ]
@@ -769,7 +769,7 @@ def cryptocurrencies():
             'price': '0.625',
             'change': '+3.8%',
             'volume': '520M',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -780,7 +780,7 @@ def cryptocurrencies():
             'price': '1.35',
             'change': '+6.2%',
             'volume': '610M',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         },
         {
@@ -791,7 +791,7 @@ def cryptocurrencies():
             'price': '2.95',
             'change': '+4.7%',
             'volume': '480M',
-            'signal': 'خرید',
+            'signal': 'Buy',
             'signal_class': 'success'
         }
     ]
@@ -1038,7 +1038,7 @@ def dashboard_classic():
             'source': 'دنیای رمزارز',
             'url': '#',
             'date': datetime.now().strftime('%Y-%m-%d'),
-            'sentiment': {'score': 0.2, 'label': 'خنثی'},
+            'sentiment': {'score': 0.2, 'label': 'Neutral'},
             'is_sample_data': True
         },
         {
@@ -1797,7 +1797,7 @@ def get_default_technical_data(symbol, timeframe):
         'ma20': current_price * 0.98,
         'ma50': current_price * 0.95,
         'ma200': current_price * 0.9,
-        'signal': 'خنثی',
+        'signal': 'Neutral',
         'signal_strength': 0
     }
 

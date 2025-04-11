@@ -2,28 +2,29 @@
 import re
 
 def replace_persian_terms(file_path):
+    # Load translations from file
+    translations = {}
+    with open('english_translations.txt', 'r', encoding='utf-8') as trans_file:
+        for line in trans_file:
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            if '=' in line:
+                persian, english = line.split('=', 1)
+                translations[persian] = english
+
+    # Read the file content
     with open(file_path, 'r', encoding='utf-8') as file:
         content = file.read()
     
-    # Define replacements
-    replacements = [
-        # Signal indicators
-        ("farsi_signal = 'خرید'", "farsi_signal = 'Buy'"),
-        ("farsi_signal = 'خرید قوی'", "farsi_signal = 'Strong Buy'"),
-        ("farsi_signal = 'فروش'", "farsi_signal = 'Sell'"),
-        ("farsi_signal = 'خنثی'", "farsi_signal = 'Neutral'"),
+    # Apply translations
+    for persian, english in translations.items():
+        content = content.replace(f"'{persian}'", f"'{english}'")
+        content = content.replace(f"\"{persian}\"", f"\"{english}\"")
         
-        # Recommendations
-        ('farsi_recommendation = "پیشنهاد معامله نوسانی (صعودی)"', 'farsi_recommendation = "Consider swing trade (bullish)"'),
-        ('farsi_recommendation = "نقطه ورود مناسب برای معامله نوسانی صعودی"', 'farsi_recommendation = "Good entry point for bullish swing trade"'),
-        ('farsi_recommendation = "پیشنهاد معامله نوسانی (نزولی)"', 'farsi_recommendation = "Consider swing trade (bearish)"'),
-        ('farsi_recommendation = "منتظر سیگنال‌های واضح‌تر باشید"', 'farsi_recommendation = "Wait for clearer signals"')
-    ]
-    
-    # Apply replacements
-    for old, new in replacements:
-        content = content.replace(old, new)
-    
+        # For signal values in dictionary entries
+        content = content.replace(f"'signal': '{persian}'", f"'signal': '{english}'")
+        
     # Write the modified content back to the file
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write(content)
