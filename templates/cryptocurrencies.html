@@ -1,6 +1,6 @@
 {% extends "minimal_base.html" %}
 
-{% block title %}ارزهای دیجیتال | برزین کریپتو{% endblock %}
+{% block title %}Cryptocurrencies | Crypto Barzin{% endblock %}
 
 {% block content %}
 <!-- Header with creator information -->
@@ -8,9 +8,9 @@
 <div class="row mb-3">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
-            <h1 class="mb-0">ارزهای دیجیتال</h1>
+            <h1 class="mb-0">Cryptocurrencies</h1>
         </div>
-        <p class="text-muted mt-2">لیست کامل ارزهای دیجیتال تحت نظارت و تحلیل</p>
+        <p class="text-muted mt-2">Complete list of monitored and analyzed cryptocurrencies</p>
     </div>
 </div>
 <div id="dashboard-content">
@@ -20,12 +20,12 @@
         <div class="col-12">
             <div class="card crypto-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">دسته‌بندی ارزها</h5>
+                    <h5 class="mb-0">Cryptocurrency Categories</h5>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-sm btn-warning active" data-crypto-category="all">همه ارزها</button>
-                        <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="major">ارزهای مهم بازار</button>
-                        <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="promising">ارزهای هوش مصنوعی</button>
-                        <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="new">ارزهای لایر 1 و 2</button>
+                        <button type="button" class="btn btn-sm btn-warning active" data-crypto-category="all">All Coins</button>
+                        <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="major">Major Coins</button>
+                        <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="promising">AI Coins</button>
+                        <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="new">Layer 1 & 2</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -34,17 +34,17 @@
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">ارز</th>
-                                    <th scope="col">نماد</th>
-                                    <th scope="col">قیمت (USDT)</th>
-                                    <th scope="col">تغییر (24h)</th>
-                                    <th scope="col">حجم (24h)</th>
-                                    <th scope="col">سیگنال</th>
-                                    <th scope="col">تحلیل</th>
+                                    <th scope="col">Coin</th>
+                                    <th scope="col">Symbol</th>
+                                    <th scope="col">Price (USDT)</th>
+                                    <th scope="col">Change (24h)</th>
+                                    <th scope="col">Volume (24h)</th>
+                                    <th scope="col">Signal</th>
+                                    <th scope="col">Analysis</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- لیست ارزهای دیجیتال با استفاده از داده‌های دینامیک -->
+                                <!-- List of cryptocurrencies using dynamic data -->
                                 {% for coin in cryptocurrencies %}
                                 {% if coin.id <= 7 %}
                                 <tr class="crypto-row major">
@@ -67,7 +67,7 @@
                                     <td id="{{ coin.symbol.replace('/', '-') }}-change" class="{% if coin.change.startswith('+') %}text-success{% else %}text-danger{% endif %}">{{ coin.change }}</td>
                                     <td>{{ coin.volume }}</td>
                                     <td><span class="badge bg-{{ coin.signal_class }}">{{ coin.signal }}</span></td>
-                                    <td><a href="#" class="btn btn-sm btn-outline-primary analysis-button">تحلیل فنی</a></td>
+                                    <td><a href="#" class="btn btn-sm btn-outline-primary analysis-button">Technical Analysis</a></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -83,46 +83,46 @@
         <div class="col-12">
             <div class="card crypto-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">تحلیل تکنیکال <span id="selected-crypto-name">بیت‌کوین</span></h5>
+                    <h5 class="mb-0">Technical Analysis <span id="selected-crypto-name">Bitcoin</span></h5>
                     <div class="border rounded p-1 bg-dark">
-                        <button onclick="document.getElementById('technical-analysis-content').style.display='block'; document.getElementById('news-analysis-content').style.display='none';" class="btn btn-sm btn-outline-primary mx-1">تحلیل فنی</button>
-                        <button onclick="document.getElementById('technical-analysis-content').style.display='none'; document.getElementById('news-analysis-content').style.display='block';" class="btn btn-sm btn-primary mx-1">اخبار و تحلیل‌ها</button>
+                        <button onclick="document.getElementById('technical-analysis-content').style.display='block'; document.getElementById('news-analysis-content').style.display='none';" class="btn btn-sm btn-outline-primary mx-1">Technical Analysis</button>
+                        <button onclick="document.getElementById('technical-analysis-content').style.display='none'; document.getElementById('news-analysis-content').style.display='block';" class="btn btn-sm btn-primary mx-1">News & Analysis</button>
                     </div>
                 </div>
                 <div class="card-body">
-                    <!-- بخش تحلیل تکنیکال -->
+                    <!-- Technical Analysis Section -->
                     <div id="technical-analysis-content">
-                        <!-- نمایش وضعیت بارگذاری -->
+                        <!-- Loading status -->
                         <div id="technical-loading" style="display: none;">
                             <div class="text-center my-5">
                                 <div class="spinner-border text-warning" role="status">
-                                    <span class="visually-hidden">در حال بارگذاری...</span>
+                                    <span class="visually-hidden">Loading...</span>
                                 </div>
-                                <p class="mt-2 text-muted">در حال دریافت تحلیل فنی <span id="selected-crypto-symbol2">BTC/USDT</span>...</p>
+                                <p class="mt-2 text-muted">Loading technical analysis for <span id="selected-crypto-symbol2">BTC/USDT</span>...</p>
                             </div>
                         </div>
                         
-                        <!-- محتوای تحلیل فنی -->
+                        <!-- Technical Analysis Content -->
                         <div id="technical-content">
                             <div class="row">
                                 <div class="col-md-8">
                                     <!-- Chart Placeholder -->
                                     <div class="chart-container" style="height: 300px; background: #1c1c28; border-radius: 8px;">
                                         <div class="d-flex justify-content-center align-items-center h-100">
-                                            <p class="text-muted">نمودار قیمت <span id="selected-crypto-symbol">BTC/USDT</span> به زودی بارگذاری خواهد شد</p>
+                                            <p class="text-muted">Price chart for <span id="selected-crypto-symbol">BTC/USDT</span> will load soon</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="indicator-box mb-3">
-                                        <div class="indicator-label">RSI (شاخص قدرت نسبی)</div>
+                                        <div class="indicator-label">RSI (Relative Strength Index)</div>
                                         <div class="progress" style="height: 8px;">
                                             <div class="progress-bar bg-success" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
                                         </div>
                                         <div class="d-flex justify-content-between">
-                                            <small class="text-muted">اشباع فروش</small>
-                                            <small class="text-muted">خنثی</small>
-                                            <small class="text-muted">اشباع خرید</small>
+                                            <small class="text-muted">Oversold</small>
+                                            <small class="text-muted">Neutral</small>
+                                            <small class="text-muted">Overbought</small>
                                         </div>
                                         <div class="indicator-value">65</div>
                                     </div>
@@ -130,19 +130,19 @@
                                 <div class="indicator-box mb-3">
                                     <div class="indicator-label">MACD</div>
                                     <div class="d-flex justify-content-between">
-                                        <div>سیگنال: <span class="text-info">12.2</span></div>
-                                        <div>خط MACD: <span class="text-warning">15.8</span></div>
+                                        <div>Signal: <span class="text-info">12.2</span></div>
+                                        <div>MACD Line: <span class="text-warning">15.8</span></div>
                                     </div>
                                     <div class="indicator-description">
                                         <span class="text-success">
                                             <i class="fas fa-arrow-up me-1"></i>
-                                            روند صعودی (سیگنال خرید)
+                                            Bullish trend (Buy signal)
                                         </span>
                                     </div>
                                 </div>
                                 
                                 <div class="indicator-box">
-                                    <div class="indicator-label">میانگین‌های متحرک</div>
+                                    <div class="indicator-label">Moving Averages</div>
                                     <div class="d-flex justify-content-between mt-2">
                                         <div>MA20: <span class="text-info">63,200</span></div>
                                         <div>MA50: <span class="text-warning">61,500</span></div>
@@ -150,7 +150,7 @@
                                     <div class="indicator-description">
                                         <span class="text-success">
                                             <i class="fas fa-check-circle me-1"></i>
-                                            قیمت بالای میانگین‌های متحرک (روند صعودی)
+                                            Price above moving averages (Bullish trend)
                                         </span>
                                     </div>
                                 </div>
@@ -158,82 +158,82 @@
                         </div>
                     </div>
                     
-                    <!-- بخش اخبار و تحلیل‌ها -->
+                    <!-- News and Analysis Section -->
                     <div id="news-analysis-content" style="display: block;">
-                        <h6 class="border-bottom pb-2 mb-3">آخرین اخبار مرتبط با <span id="selected-crypto-name2">بیت‌کوین</span></h6>
+                        <h6 class="border-bottom pb-2 mb-3">Latest news about <span id="selected-crypto-name2">Bitcoin</span></h6>
                         <div class="news-container">
                             <div class="news-item mb-3 p-3 border-start border-4 border-primary">
-                                <h6 class="news-title mb-2">بیت‌کوین به بالاترین قیمت تاریخ خود رسید</h6>
-                                <p class="news-excerpt text-muted mb-1">ارز دیجیتال بیت‌کوین با عبور از مرز ۷۰ هزار دلار به بالاترین قیمت تاریخ خود دست یافت. این اتفاق در پی افزایش تقاضا از سوی صندوق‌های ETF رخ داده است.</p>
+                                <h6 class="news-title mb-2">Bitcoin Reaches All-Time High Price</h6>
+                                <p class="news-excerpt text-muted mb-1">Bitcoin has reached its all-time high price by surpassing $70,000. This event follows increased demand from ETF funds and institutional investors.</p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <small class="news-source">منبع: خبرگزاری ارز دیجیتال</small>
-                                    <small class="news-date">۸ آوریل ۲۰۲۵</small>
+                                    <small class="news-source">Source: Cryptocurrency News Agency</small>
+                                    <small class="news-date">April 8, 2025</small>
                                 </div>
                                 <div class="news-sentiment mt-2">
-                                    <span class="badge bg-success">احساس بازار: مثبت</span>
+                                    <span class="badge bg-success">Market sentiment: Positive</span>
                                 </div>
                             </div>
                             
                             <div class="news-item mb-3 p-3 border-start border-4 border-warning">
-                                <h6 class="news-title mb-2">تحلیل‌گران: احتمال اصلاح کوتاه‌مدت در قیمت بیت‌کوین</h6>
-                                <p class="news-excerpt text-muted mb-1">برخی تحلیل‌گران معتقدند پس از رشد اخیر، بیت‌کوین ممکن است یک اصلاح قیمت موقت را تجربه کند. شاخص‌های تکنیکال نشان می‌دهند بازار در وضعیت اشباع خرید قرار دارد.</p>
+                                <h6 class="news-title mb-2">Analysts: Potential Short-Term Correction in Bitcoin Price</h6>
+                                <p class="news-excerpt text-muted mb-1">Some analysts believe that after the recent growth, Bitcoin may experience a temporary price correction. Technical indicators show the market is in an overbought condition.</p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <small class="news-source">منبع: تحلیل‌گران بازار</small>
-                                    <small class="news-date">۷ آوریل ۲۰۲۵</small>
+                                    <small class="news-source">Source: Market Analysts</small>
+                                    <small class="news-date">April 7, 2025</small>
                                 </div>
                                 <div class="news-sentiment mt-2">
-                                    <span class="badge bg-warning">احساس بازار: خنثی</span>
+                                    <span class="badge bg-warning">Market sentiment: Neutral</span>
                                 </div>
                             </div>
                             
                             <div class="news-item mb-3 p-3 border-start border-4 border-info">
-                                <h6 class="news-title mb-2">استراتژی معامله هدفمند: زمان مناسب برای ورود به بازار</h6>
-                                <p class="news-excerpt text-muted mb-1">با توجه به تثبیت قیمت بیت‌کوین در بالای سطح ۶۵ هزار دلار، بسیاری از معامله‌گران این محدوده را برای ورود به بازار مناسب می‌دانند. استراتژی خرید تدریجی می‌تواند ریسک را کاهش دهد.</p>
+                                <h6 class="news-title mb-2">Targeted Trading Strategy: Right Time to Enter the Market</h6>
+                                <p class="news-excerpt text-muted mb-1">With Bitcoin's price stabilizing above $65,000, many traders consider this range suitable for market entry. A gradual buying strategy can reduce risk.</p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <small class="news-source">منبع: دنیای رمزارز</small>
-                                    <small class="news-date">۶ آوریل ۲۰۲۵</small>
+                                    <small class="news-source">Source: Crypto World</small>
+                                    <small class="news-date">April 6, 2025</small>
                                 </div>
                                 <div class="news-sentiment mt-2">
-                                    <span class="badge bg-info">احساس بازار: محتاطانه مثبت</span>
+                                    <span class="badge bg-info">Market sentiment: Cautiously positive</span>
                                 </div>
                             </div>
                         </div>
                         
                         <a href="#" class="btn btn-outline-secondary btn-sm mt-2 w-100" id="load-more-news" onclick="loadMoreNews(); return false;">
-                            <i class="fas fa-sync me-1"></i> بارگذاری اخبار بیشتر
+                            <i class="fas fa-sync me-1"></i> Load More News
                         </a>
                         
 <script>
-// تابع بارگذاری اخبار بیشتر
+// Function to load more news
 function loadMoreNews() {
     const loadMoreButton = document.getElementById('load-more-news');
     const newsContainer = document.querySelector('.news-container');
     
     if (loadMoreButton && newsContainer) {
-        // نمایش حالت بارگذاری
-        loadMoreButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> در حال بارگذاری...';
+        // Show loading state
+        loadMoreButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Loading...';
         
-        // شبیه‌سازی تأخیر در بارگذاری (در نسخه واقعی با درخواست API جایگزین می‌شود)
+        // Simulate loading delay (in the actual version this would be replaced by an API request)
         setTimeout(() => {
-            // افزودن خبر جدید
+            // Add new news item
             const newNewsItem = document.createElement('div');
             newNewsItem.className = 'news-item mb-3 p-3 border-start border-4 border-success';
             newNewsItem.innerHTML = `
-                <h6 class="news-title mb-2">گزارش: سرمایه‌گذاری نهادی در رمزارزها افزایش یافته است</h6>
-                <p class="news-excerpt text-muted mb-1">گزارش‌ها حاکی از آن است که سرمایه‌گذاری نهادی در بازار رمزارزها، خصوصاً بیت‌کوین و اتریوم به شدت افزایش یافته است. این روند می‌تواند نشانه‌ای از پذیرش گسترده‌تر ارزهای دیجیتال باشد.</p>
+                <h6 class="news-title mb-2">Report: Institutional Investment in Cryptocurrencies is Increasing</h6>
+                <p class="news-excerpt text-muted mb-1">Reports indicate that institutional investment in the cryptocurrency market, especially Bitcoin and Ethereum, has increased dramatically. This trend could be a sign of broader adoption of digital currencies.</p>
                 <div class="d-flex justify-content-between align-items-center">
-                    <small class="news-source">منبع: تحلیل مالی کریپتو</small>
-                    <small class="news-date">۵ آوریل ۲۰۲۵</small>
+                    <small class="news-source">Source: Crypto Financial Analysis</small>
+                    <small class="news-date">April 5, 2025</small>
                 </div>
                 <div class="news-sentiment mt-2">
-                    <span class="badge bg-success">احساس بازار: بسیار مثبت</span>
+                    <span class="badge bg-success">Market sentiment: Very positive</span>
                 </div>
             `;
             
             newsContainer.appendChild(newNewsItem);
             
-            // بازگرداندن دکمه به حالت اصلی
-            loadMoreButton.innerHTML = '<i class="fas fa-sync me-1"></i> بارگذاری اخبار بیشتر';
+            // Restore button to original state
+            loadMoreButton.innerHTML = '<i class="fas fa-sync me-1"></i> Load More News';
         }, 1000);
     }
 }
@@ -249,29 +249,29 @@ function loadMoreNews() {
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // تابع قالب‌بندی قیمت
+    // Price formatting function
     function formatPrice(price) {
         if (price === null || price === undefined || isNaN(price)) {
             return '--';
         }
         
-        // اگر قیمت بزرگ است (بدون اعشار)
+        // If price is large (no decimal)
         if (price >= 1000) {
             return price.toLocaleString('en-US', {maximumFractionDigits: 0});
         }
         
-        // اگر قیمت کوچک است (اعشار بیشتر لازم است)
+        // If price is small (more decimal places needed)
         if (price < 0.01) {
             return price.toLocaleString('en-US', {minimumFractionDigits: 6, maximumFractionDigits: 6});
         }
         
-        // حالت پیش‌فرض: 2 رقم اعشار
+        // Default: 2 decimal places
         return price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
     
-    // تابع برای دریافت تحلیل فنی از API
+    // Function to get technical analysis from API
     function loadTechnicalData(symbol) {
-        // نمایش وضعیت بارگذاری
+        // Show loading status
         const loadingEl = document.getElementById('technical-loading');
         const contentEl = document.getElementById('technical-content');
         
@@ -280,14 +280,14 @@ document.addEventListener('DOMContentLoaded', function() {
             contentEl.style.display = 'none';
         }
         
-        // درخواست به API
+        // API request
         fetch(`/api/technical/${symbol}/1d`)
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.data) {
                     const analysis = data.data;
                     
-                    // به‌روزرسانی RSI
+                    // Update RSI
                     if (analysis.rsi !== undefined) {
                         const rsiEl = document.querySelector('.indicator-box:nth-child(1) .indicator-value');
                         const rsiProgressEl = document.querySelector('.indicator-box:nth-child(1) .progress-bar');
@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (rsiProgressEl) {
                             rsiProgressEl.style.width = `${analysis.rsi}%`;
                             
-                            // تغییر رنگ بر اساس مقدار
+                            // Change color based on value
                             rsiProgressEl.classList.remove('bg-success', 'bg-danger', 'bg-warning');
                             if (analysis.rsi < 30) {
                                 rsiProgressEl.classList.add('bg-danger');
