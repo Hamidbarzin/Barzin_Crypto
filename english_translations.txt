@@ -63,6 +63,28 @@
 گزارش وضعیت سیستم=System Status Report
 پیام تست=Test Message
 تست تلگرام=Test Telegram
+تست ایمیل=Test Email
+تست پیامک=Test SMS
+راه‌اندازی زمان‌بندی خودکار=Start Auto Scheduler
+توقف زمان‌بندی خودکار=Stop Auto Scheduler
+تست API در مرورگر=Test API in Browser
+اعلان‌های صوتی چندزبانه=Multilingual Voice Notifications
+فعال=Active
+متصل=Connected
+هوشمند=Smart
+وضعیت ربات=Bot Status
+آخرین بروزرسانی=Last Update
+وضعیت API بازار=Market API Status
+حالت ربات=Bot Mode
+وضعیت سیستم=System Status
+راهنمای تنظیم ربات تلگرام=Telegram Bot Setup Guide
+به ربات=Message the bot
+پیام دهید=
+دستور=command
+را ارسال کنید=send
+را برای دریافت چت آیدی ارسال کنید=to get your Chat ID
+چت آیدی دریافتی را در فیلد مربوطه در قسمت تنظیمات تلگرام وارد کنید=Enter the received Chat ID in the Telegram settings field
+چت آیدی یک عدد منحصربفرد برای هر کاربر در تلگرام است. ربات با استفاده از این شناسه، پیام‌های اختصاصی را برای شما ارسال می‌کند.=Chat ID is a unique number for each Telegram user. The bot uses this ID to send you personalized messages.
 
 # Recommendation Translations
 پیشنهاد معامله نوسانی (صعودی)=Consider swing trade (bullish)
