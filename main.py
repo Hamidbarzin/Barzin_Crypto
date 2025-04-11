@@ -1437,8 +1437,19 @@ def get_market_trend():
         return jsonify({'success': False, 'message': str(e)})
 
 @app.route('/api/price/<symbol>')
-def get_price(symbol):
+@app.route('/get_price')
+def get_price(symbol=None):
     try:
+        # If symbol is None, try to get it from request parameters
+        if symbol is None:
+            symbol = request.args.get('symbol')
+            
+        if not symbol:
+            return jsonify({
+                'success': False, 
+                'error': 'Symbol is required'
+            }), 400
+        
         # Normalize symbol format - both BTC/USDT and BTC-USDT should work
         # Try with the symbol as provided first
         symbols_to_try = [symbol]

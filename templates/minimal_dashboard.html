@@ -469,31 +469,45 @@
             const symbol = `${coin}-${base}`;
             const altSymbol = `${coin}/${base}`;
             
-            fetch('/get_price?symbol=' + altSymbol)
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.price) {
-                        const price = parseFloat(data.price);
-                        const change = parseFloat(data.change_24h || 0);
-                        
-                        // Update price
-                        const priceElement = document.getElementById(`${symbol}-price`);
-                        if (priceElement) {
-                            priceElement.textContent = formatPrice(price);
-                        }
-                        
-                        // Update change percentage
-                        const changeElement = document.getElementById(`${symbol}-change`);
-                        if (changeElement) {
-                            changeElement.textContent = formatChange(change);
-                            if (change >= 0) {
-                                changeElement.classList.add('positive-change');
-                                changeElement.classList.remove('negative-change');
-                            } else {
-                                changeElement.classList.add('negative-change');
-                                changeElement.classList.remove('positive-change');
+            // اسلش در URL نیاز به کدگذاری دارد
+            const encodedSymbol = encodeURIComponent(altSymbol);
+            fetch('/api/price/' + coin.toLowerCase())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(response => {
+                    if (response && response.success && response.data) {
+                        const data = response.data;
+                        if (data && data.price) {
+                            const price = parseFloat(data.price);
+                            const change = parseFloat(data.change_24h || 0);
+                            
+                            // Update price
+                            const priceElement = document.getElementById(`${symbol}-price`);
+                            if (priceElement) {
+                                priceElement.textContent = formatPrice(price);
                             }
+                            
+                            // Update change percentage
+                            const changeElement = document.getElementById(`${symbol}-change`);
+                            if (changeElement) {
+                                changeElement.textContent = formatChange(change);
+                                if (change >= 0) {
+                                    changeElement.classList.add('positive-change');
+                                    changeElement.classList.remove('negative-change');
+                                } else {
+                                    changeElement.classList.add('negative-change');
+                                    changeElement.classList.remove('positive-change');
+                                }
+                            }
+                        } else {
+                            console.log(`No price data available for ${coin}`);
                         }
+                    } else {
+                        console.log(`No valid response for ${coin}`);
                     }
                 })
                 .catch(error => console.log(`Error fetching price for ${coin}: ${error}`));
