@@ -667,21 +667,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // افزودن دکمه‌های آزمایشی برای مشاهده مستقیم بخش سیگنال‌ها
-        const container = document.querySelector('.container');
-        const testButtons = document.createElement('div');
-        testButtons.className = 'row mt-3 mb-3';
-        testButtons.innerHTML = `
-            <div class="col-12 d-flex justify-content-center gap-2">
-                <button class="btn btn-sm btn-primary" onclick="showSignalsDirectly()">
-                    <i class="fas fa-signal me-1"></i> {{ ui_text("show_signals_directly", "Show Trading Signals") }}
-                </button>
-                <button class="btn btn-sm btn-warning" onclick="showTechnicalDirectly()">
-                    <i class="fas fa-chart-line me-1"></i> {{ ui_text("show_technical_directly", "Show Technical Analysis") }}
-                </button>
-            </div>
-        `;
-        container.prepend(testButtons);
+        // دکمه‌های اضافی مشاهده مستقیم بخش سیگنال‌ها که در گوشه‌ی سمت چپ هدر بودند حذف شدند
         
         // افزودن توابع دسترسی سریع
         window.showSignalsDirectly = function() {
