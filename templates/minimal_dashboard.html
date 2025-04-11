@@ -445,271 +445,328 @@
         </div>
     </div>
             
-    <!-- JavaScript for cryptocurrency sections setup -->
+    <!-- مدیریت نمایش بخش‌های ارزهای دیجیتال - بخش‌ها به شکل استاتیک تعریف شده‌اند -->
+    <div id="meme_coins" class="coin-section mb-4">
+        <h2 class="section-heading mb-3">ارزهای میم محبوب</h2>
+        <div class="row">
+            <!-- DOGE -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">Dogecoin</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="DOGE-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="DOGE-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SHIB -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">Shiba Inu</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="SHIB-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="SHIB-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PEPE -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">Pepe</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="PEPE-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="PEPE-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FLOKI -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">Floki</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="FLOKI-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="FLOKI-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- WIF -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">Dogwifhat</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="WIF-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="WIF-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- MEME -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">Meme</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="MEME-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="MEME-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- بخش ارزهای هوش مصنوعی -->
+    <div id="ai_coins" class="coin-section mb-4">
+        <h2 class="section-heading mb-3">ارزهای هوش مصنوعی</h2>
+        <div class="row">
+            <!-- RNDR -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">Render</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="RNDR-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="RNDR-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FET -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">Fetch.ai</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="FET-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="FET-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- OCEAN -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">Ocean Protocol</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="OCEAN-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="OCEAN-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AGIX -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">SingularityNET</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="AGIX-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="AGIX-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- بخش ارزهای ارزان با پتانسیل رشد -->
+    <div id="lowcost_coins" class="coin-section mb-4">
+        <h2 class="section-heading mb-3">ارزهای ارزان با پتانسیل رشد</h2>
+        <div class="row">
+            <!-- VET -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">VeChain</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="VET-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="VET-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- XDC -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">XDC Network</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="XDC-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="XDC-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- HBAR -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">Hedera</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="HBAR-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="HBAR-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- XLM -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">Stellar</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="XLM-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="XLM-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- JASMY -->
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card crypto-card h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="crypto-icon me-2"><i class="fab fa-ethereum"></i></div>
+                        <h5 class="mb-0">Jasmy</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">قیمت:</span>
+                            <span class="fw-bold" id="JASMY-USDT-price">...</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">تغییر ۲۴ ساعته:</span>
+                            <span id="JASMY-USDT-change">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- تابع قالب‌بندی قیمت و تغییرات -->
     <script>
-        // تمام توابع مربوط به به‌روزرسانی قیمت به فایل خارجی cryptocurrency-updates.js منتقل شده‌اند
-        document.addEventListener('DOMContentLoaded', function() {
-        
-        // Add cryptocurrency cards to the dashboard
-        function setupCryptoSections() {
-            // Get main container
-            const mainContainer = document.querySelector('.main-content');
-            if (!mainContainer) return;
-            
-            // Create meme coins section
-            const memeCoinsSection = createCryptoSection('meme_coins', 'ارزهای میم محبوب', [
-                { symbol: 'DOGE-USDT', name: 'Dogecoin', logo: 'doge.svg' },
-                { symbol: 'SHIB-USDT', name: 'Shiba Inu', logo: 'shib.svg' },
-                { symbol: 'PEPE-USDT', name: 'Pepe', logo: 'pepe.svg' },
-                { symbol: 'FLOKI-USDT', name: 'Floki', logo: 'floki.svg' },
-                { symbol: 'WIF-USDT', name: 'Dogwifhat', logo: 'wif.svg' },
-                { symbol: 'MEME-USDT', name: 'Meme', logo: 'meme.svg' }
-            ]);
-            
-            // Create AI coins section
-            const aiCoinsSection = createCryptoSection('ai_coins', 'ارزهای هوش مصنوعی', [
-                { symbol: 'RNDR-USDT', name: 'Render', logo: 'rndr.svg' },
-                { symbol: 'FET-USDT', name: 'Fetch.ai', logo: 'fet.svg' },
-                { symbol: 'OCEAN-USDT', name: 'Ocean Protocol', logo: 'ocean.svg' },
-                { symbol: 'AGIX-USDT', name: 'SingularityNET', logo: 'agix.svg' }
-            ]);
-            
-            // Create low-cost growth coins section
-            const lowCostSection = createCryptoSection('lowcost_coins', 'ارزهای ارزان با پتانسیل رشد', [
-                { symbol: 'VET-USDT', name: 'VeChain', logo: 'vet.svg' },
-                { symbol: 'XDC-USDT', name: 'XDC Network', logo: 'xdc.svg' },
-                { symbol: 'HBAR-USDT', name: 'Hedera', logo: 'hbar.svg' },
-                { symbol: 'XLM-USDT', name: 'Stellar', logo: 'xlm.svg' },
-                { symbol: 'JASMY-USDT', name: 'Jasmy', logo: 'jasmy.svg' }
-            ]);
-            
-            // Add sections to main container
-            const priceSection = document.querySelector('.price-section');
-            if (priceSection) {
-                priceSection.parentNode.insertBefore(memeCoinsSection, priceSection.nextSibling);
-                priceSection.parentNode.insertBefore(aiCoinsSection, memeCoinsSection.nextSibling);
-                priceSection.parentNode.insertBefore(lowCostSection, aiCoinsSection.nextSibling);
-            } else {
-                mainContainer.appendChild(memeCoinsSection);
-                mainContainer.appendChild(aiCoinsSection);
-                mainContainer.appendChild(lowCostSection);
-            }
-        }
-        
-        // Create a crypto section with cards
-        function createCryptoSection(sectionId, sectionTitle, coins) {
-            const section = document.createElement('div');
-            section.className = 'coin-section mb-4';
-            section.id = sectionId;
-            
-            // Create section header
-            const header = document.createElement('h2');
-            header.className = 'section-heading mb-3';
-            header.textContent = sectionTitle;
-            section.appendChild(header);
-            
-            // Create row for cards
-            const row = document.createElement('div');
-            row.className = 'row';
-            
-            // Add coin cards
-            coins.forEach(coin => {
-                const card = createCryptoCard(coin.symbol, coin.name, coin.logo);
-                row.appendChild(card);
-            });
-            
-            section.appendChild(row);
-            return section;
-        }
-        
-        // Create a crypto card
-        function createCryptoCard(symbol, name, logo) {
-            const col = document.createElement('div');
-            col.className = 'col-md-4 col-lg-3 mb-3';
-            
-            const card = document.createElement('div');
-            card.className = 'card crypto-card h-100';
-            
-            // Card header with logo and name
-            const cardHeader = document.createElement('div');
-            cardHeader.className = 'card-header d-flex align-items-center';
-            
-            const iconDiv = document.createElement('div');
-            iconDiv.className = 'crypto-icon me-2';
-            
-            const icon = document.createElement('i');
-            icon.className = 'fab fa-ethereum'; // Default icon - we don't have all logos yet
-            iconDiv.appendChild(icon);
-            
-            const nameHeading = document.createElement('h5');
-            nameHeading.className = 'mb-0';
-            nameHeading.textContent = name;
-            
-            cardHeader.appendChild(iconDiv);
-            cardHeader.appendChild(nameHeading);
-            card.appendChild(cardHeader);
-            
-            // Card body with price and change
-            const cardBody = document.createElement('div');
-            cardBody.className = 'card-body';
-            
-            const priceDiv = document.createElement('div');
-            priceDiv.className = 'd-flex justify-content-between mb-2';
-            
-            const priceLabel = document.createElement('span');
-            priceLabel.className = 'text-muted';
-            priceLabel.textContent = 'قیمت:';
-            
-            const priceValue = document.createElement('span');
-            priceValue.className = 'fw-bold';
-            
-            // از ID استاندارد برای updateSpecialCoins استفاده کنیم
-            const coinSymbol = symbol.split('-')[0];
-            priceValue.id = `${coinSymbol}-USDT-price`;
-            priceValue.textContent = '...';
-            
-            priceDiv.appendChild(priceLabel);
-            priceDiv.appendChild(priceValue);
-            
-            const changeDiv = document.createElement('div');
-            changeDiv.className = 'd-flex justify-content-between';
-            
-            const changeLabel = document.createElement('span');
-            changeLabel.className = 'text-muted';
-            changeLabel.textContent = 'تغییر ۲۴ ساعته:';
-            
-            const changeValue = document.createElement('span');
-            
-            // از ID استاندارد برای updateSpecialCoins استفاده کنیم
-            changeValue.id = `${coinSymbol}-USDT-change`;
-            changeValue.textContent = '...';
-            
-            changeDiv.appendChild(changeLabel);
-            changeDiv.appendChild(changeValue);
-            
-            cardBody.appendChild(priceDiv);
-            cardBody.appendChild(changeDiv);
-            card.appendChild(cardBody);
-            
-            col.appendChild(card);
-            return col;
-        }
-        
-        // Direct API request method - simplified for better reliability
-        function queueFetchRequest(coin, base) {
-            const symbol = `${coin}-${base}`;
-            setTimeout(() => {
-                fetchCoinPrice(coin, symbol);
-            }, Math.random() * 1000); // Add random delay between 0-1000ms to avoid overwhelming the server
-        }
-        
-        function fetchCoinPrice(coin, symbol) {
-            const priceElement = document.getElementById(`${symbol}-price`);
-            const changeElement = document.getElementById(`${symbol}-change`);
-            
-            // Update the UI to show loading state
-            if (priceElement) {
-                priceElement.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
-            }
-            
-            if (changeElement) {
-                changeElement.textContent = '...';
-            }
-            
-            // Simple direct API call without any extra headers, options or signal
-            fetch('/api/price/' + coin.toLowerCase())
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(response => {
-                    if (response && response.success && response.data) {
-                        const data = response.data;
-                        if (data && data.price) {
-                            const price = parseFloat(data.price);
-                            const change = parseFloat(data.change_24h || 0);
-                            
-                            // Update price - using new standardized ID format
-                            const coinSymbol = coin.toUpperCase();
-                            const priceElement = document.getElementById(`${coinSymbol}-USDT-price`);
-                            if (priceElement) {
-                                priceElement.textContent = formatPrice(price);
-                            }
-                            
-                            // Update change percentage - using new standardized ID format
-                            const changeElement = document.getElementById(`${coinSymbol}-USDT-change`);
-                            if (changeElement) {
-                                changeElement.textContent = formatChange(change);
-                                if (change >= 0) {
-                                    changeElement.classList.add('positive-change');
-                                    changeElement.classList.remove('negative-change');
-                                } else {
-                                    changeElement.classList.add('negative-change');
-                                    changeElement.classList.remove('positive-change');
-                                }
-                            }
-                        } else {
-                            console.log(`No price data available for ${coin}`);
-                        }
-                    } else {
-                        console.log(`No valid response for ${coin}`);
-                    }
-                })
-                .catch(error => {
-                    console.log(`Error fetching price for ${coin}: ${error}`);
-                    
-                    // Let's try a direct API call as a backup
-                    setTimeout(() => {
-                        fetch(`/api/price/${coin.toLowerCase()}`, {
-                            headers: { 'Cache-Control': 'no-cache' }
-                        })
-                        .then(response => response.json())
-                        .then(response => {
-                            if (response && response.success && response.data) {
-                                const data = response.data;
-                                if (data && data.price) {
-                                    const price = parseFloat(data.price);
-                                    const change = parseFloat(data.change_24h || 0);
-                                    
-                                    // Update price - using new standardized ID format
-                                    const coinSymbol = coin.toUpperCase();
-                                    const priceElement = document.getElementById(`${coinSymbol}-USDT-price`);
-                                    if (priceElement) {
-                                        console.log(`Backup succeeded for ${coin}: ${price}`);
-                                        priceElement.textContent = formatPrice(price);
-                                    }
-                                    
-                                    // Update change percentage - using new standardized ID format
-                                    const changeElement = document.getElementById(`${coinSymbol}-USDT-change`);
-                                    if (changeElement) {
-                                        changeElement.textContent = formatChange(change);
-                                        if (change >= 0) {
-                                            changeElement.classList.add('positive-change');
-                                            changeElement.classList.remove('negative-change');
-                                        } else {
-                                            changeElement.classList.add('negative-change');
-                                            changeElement.classList.remove('positive-change');
-                                        }
-                                    }
-                                }
-                            }
-                        })
-                        .catch(() => {
-                            // If backup also failed, show error - using new standardized ID format 
-                            const coinSymbol = coin.toUpperCase();
-                            const priceElement = document.getElementById(`${coinSymbol}-USDT-price`);
-                            if (priceElement) {
-                                priceElement.textContent = 'در حال به‌روزرسانی...';
-                            }
-                        });
-                    }, 500);
-                });
-        }
-        
         function formatPrice(price) {
-            // Format based on price magnitude
+            // قالب‌بندی بر اساس بزرگی قیمت
             if (price >= 1000) {
                 return price.toLocaleString('en-US', {maximumFractionDigits: 0});
             } else if (price >= 1) {
@@ -725,11 +782,6 @@
             const sign = change >= 0 ? '+' : '';
             return `${sign}${change.toFixed(2)}%`;
         }
-        
-        // نمایش بخش‌های ارزهای دیجیتال هنگام بارگذاری صفحه
-        setupCryptoSections();
-        
-        }); // پایان تابع DOMContentLoaded
     </script>
     
     <!-- Section Content Container -->
