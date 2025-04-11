@@ -6,11 +6,19 @@
 <!-- Header with creator information -->
 
 <div class="row mb-3">
-    <div class="col-12">
+    <div class="col-md-6">
         <div class="d-flex justify-content-between align-items-center">
             <h1 class="mb-0">Markets</h1>
         </div>
         <p class="text-muted mt-2">Complete list of monitored and analyzed cryptocurrency markets</p>
+    </div>
+    <div class="col-md-6">
+        <div class="input-group mt-3">
+            <input type="text" id="crypto-search" class="form-control" placeholder="Search by name or symbol...">
+            <button class="btn btn-warning" type="button" id="search-button">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
     </div>
 </div>
 <div id="dashboard-content">
@@ -634,8 +642,50 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update prices every 5 seconds
     setInterval(updatePrices, 5000);
     
+    // Search functionality
+    function setupSearch() {
+        const searchInput = document.getElementById('crypto-search');
+        const searchButton = document.getElementById('search-button');
+        const cryptoRows = document.querySelectorAll('.crypto-row');
+        
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            
+            // If search term is empty, show all
+            if (searchTerm === '') {
+                cryptoRows.forEach(row => {
+                    row.style.display = '';
+                });
+                return;
+            }
+            
+            // Filter rows
+            cryptoRows.forEach(row => {
+                const coinName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const coinSymbol = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                
+                if (coinName.includes(searchTerm) || coinSymbol.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // Add event listeners
+        searchButton.addEventListener('click', performSearch);
+        
+        // Add keypress event for Enter key
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    }
+    
     // Execute main functions
     setupTabs();
+    setupSearch();
     setTimeout(updatePrices, 1000);
 });
 </script>
