@@ -2982,14 +2982,14 @@ def api_set_price_alert():
 @app.route('/api/price-alerts/remove', methods=['POST'])
 def api_remove_price_alert():
     """
-    حذف هشدار قیمت
+    Remove price alert
     """
     data = request.json
     
     if not data or 'symbol' not in data or 'price' not in data:
         return jsonify({
             "success": False,
-            "message": "پارامترهای ورودی ناقص هستند. symbol و price الزامی هستند."
+            "message": "Incomplete parameters. Symbol and price are required."
         }), 400
     
     symbol = data['symbol']
@@ -2999,7 +2999,7 @@ def api_remove_price_alert():
     except (ValueError, TypeError):
         return jsonify({
             "success": False,
-            "message": "فرمت قیمت نامعتبر است."
+            "message": "Invalid price format."
         }), 400
     
     alert_type = data.get('type', 'above')
@@ -3009,19 +3009,19 @@ def api_remove_price_alert():
     if success:
         return jsonify({
             "success": True,
-            "message": f"هشدار قیمت برای {symbol} با موفقیت حذف شد."
+            "message": f"Price alert for {symbol} successfully removed."
         })
     else:
         return jsonify({
             "success": False,
-            "message": "هشدار قیمت مورد نظر یافت نشد."
+            "message": "Price alert not found."
         }), 404
 
 
 @app.route('/api/price-alerts/check', methods=['GET'])
 def api_check_price_alerts():
     """
-    بررسی هشدارهای قیمت
+    Check price alerts
     """
     triggered = check_price_alerts()
     

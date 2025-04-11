@@ -1,6 +1,6 @@
 {% extends 'minimal_base.html' %}
 
-{% block title %}هشدارهای قیمت - کریپتو برزین{% endblock %}
+{% block title %}Price Alerts - Crypto Barzin{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
@@ -8,39 +8,39 @@
         <div class="col-12">
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-dark text-warning">
-                    <h5 class="mb-0"><i class="fas fa-bell"></i> هشدارهای قیمت</h5>
+                    <h5 class="mb-0"><i class="fas fa-bell"></i> Price Alerts</h5>
                 </div>
                 <div class="card-body">
-                    <p>با تنظیم هشدارهای قیمت، هنگامی که قیمت ارز مورد نظر به محدوده مشخص شده برسد، به شما از طریق تلگرام اطلاع‌رسانی می‌شود.</p>
+                    <p>When you set price alerts, you'll be notified via Telegram when the price of your selected cryptocurrency reaches your specified threshold.</p>
                     
                     <form id="price-alert-form" class="mb-4">
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label for="symbolSelect" class="form-label">ارز دیجیتال</label>
+                                <label for="symbolSelect" class="form-label">Cryptocurrency</label>
                                 <select class="form-select" id="symbolSelect" required>
-                                    <option value="" selected disabled>انتخاب ارز...</option>
-                                    <option value="BTC/USDT">بیت‌کوین (BTC)</option>
-                                    <option value="ETH/USDT">اتریوم (ETH)</option>
-                                    <option value="BNB/USDT">بایننس کوین (BNB)</option>
-                                    <option value="SOL/USDT">سولانا (SOL)</option>
-                                    <option value="XRP/USDT">ریپل (XRP)</option>
-                                    <option value="ADA/USDT">کاردانو (ADA)</option>
-                                    <option value="DOGE/USDT">دوج‌کوین (DOGE)</option>
+                                    <option value="" selected disabled>Select coin...</option>
+                                    <option value="BTC/USDT">Bitcoin (BTC)</option>
+                                    <option value="ETH/USDT">Ethereum (ETH)</option>
+                                    <option value="BNB/USDT">Binance Coin (BNB)</option>
+                                    <option value="SOL/USDT">Solana (SOL)</option>
+                                    <option value="XRP/USDT">Ripple (XRP)</option>
+                                    <option value="ADA/USDT">Cardano (ADA)</option>
+                                    <option value="DOGE/USDT">Dogecoin (DOGE)</option>
                                 </select>
                             </div>
                             <div class="col-md-3 mb-3">
-                                <label for="priceInput" class="form-label">قیمت (USDT)</label>
+                                <label for="priceInput" class="form-label">Price (USDT)</label>
                                 <input type="number" step="0.0001" min="0" class="form-control" id="priceInput" required>
                             </div>
                             <div class="col-md-3 mb-3">
-                                <label for="alertTypeSelect" class="form-label">نوع هشدار</label>
+                                <label for="alertTypeSelect" class="form-label">Alert Type</label>
                                 <select class="form-select" id="alertTypeSelect" required>
-                                    <option value="above">بالاتر از قیمت</option>
-                                    <option value="below">پایین‌تر از قیمت</option>
+                                    <option value="above">Above price</option>
+                                    <option value="below">Below price</option>
                                 </select>
                             </div>
                             <div class="col-md-2 mb-3 d-flex align-items-end">
-                                <button type="submit" class="btn btn-warning w-100">افزودن هشدار</button>
+                                <button type="submit" class="btn btn-warning w-100">Add Alert</button>
                             </div>
                         </div>
                     </form>
@@ -51,16 +51,16 @@
                         <table class="table table-striped table-hover">
                             <thead class="table-dark">
                                 <tr>
-                                    <th scope="col">ارز</th>
-                                    <th scope="col">قیمت هدف (USDT)</th>
-                                    <th scope="col">نوع هشدار</th>
-                                    <th scope="col">وضعیت</th>
-                                    <th scope="col">عملیات</th>
+                                    <th scope="col">Coin</th>
+                                    <th scope="col">Target Price (USDT)</th>
+                                    <th scope="col">Alert Type</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="alertsTableBody">
                                 <tr>
-                                    <td colspan="5" class="text-center">در حال بارگذاری هشدارها...</td>
+                                    <td colspan="5" class="text-center">Loading alerts...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -70,14 +70,14 @@
             
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-dark text-warning">
-                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> راهنمای استفاده</h5>
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Usage Guide</h5>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">برای دریافت هشدار در صورت افزایش قیمت، نوع هشدار را «بالاتر از قیمت» انتخاب کنید.</li>
-                        <li class="list-group-item">برای دریافت هشدار در صورت کاهش قیمت، نوع هشدار را «پایین‌تر از قیمت» انتخاب کنید.</li>
-                        <li class="list-group-item">هر هشدار پس از فعال شدن، تنها زمانی دوباره فعال می‌شود که قیمت به محدوده مناسب بازگردد.</li>
-                        <li class="list-group-item">برای مثال، هشدار «بالاتر از ۶۰,۰۰۰» پس از فعال شدن، تنها وقتی دوباره فعال می‌شود که قیمت به زیر ۵۹,۴۰۰ برسد و سپس دوباره به بالای ۶۰,۰۰۰ برگردد.</li>
+                        <li class="list-group-item">To get notified when price increases, select the "Above price" alert type.</li>
+                        <li class="list-group-item">To get notified when price decreases, select the "Below price" alert type.</li>
+                        <li class="list-group-item">After an alert is triggered, it will only be reactivated when the price returns to an appropriate range.</li>
+                        <li class="list-group-item">For example, after an "Above 60,000" alert is triggered, it will only be reactivated when the price drops below 59,400 and then rises above 60,000 again.</li>
                     </ul>
                 </div>
             </div>
@@ -89,10 +89,10 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // بارگذاری هشدارهای قیمت موجود
+        // Load existing price alerts
         loadPriceAlerts();
         
-        // فرم افزودن هشدار قیمت
+        // Add price alert form handling
         document.getElementById('price-alert-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -101,7 +101,7 @@
             const alertType = document.getElementById('alertTypeSelect').value;
             
             if (!symbol || isNaN(price) || price <= 0) {
-                showAlert('لطفاً همه فیلدها را به درستی پر کنید.', 'danger');
+                showAlert('Please fill in all fields correctly.', 'danger');
                 return;
             }
             
@@ -116,12 +116,12 @@
                 if (data.success) {
                     displayPriceAlerts(data.alerts);
                 } else {
-                    showAlert('خطا در بارگذاری هشدارهای قیمت.', 'danger');
+                    showAlert('Error loading price alerts.', 'danger');
                 }
             })
             .catch(error => {
                 console.error('Error loading price alerts:', error);
-                showAlert('خطا در بارگذاری هشدارهای قیمت: ' + error.message, 'danger');
+                showAlert('Error loading price alerts: ' + error.message, 'danger');
             });
     }
     
@@ -131,7 +131,7 @@
         
         let alertCount = 0;
         
-        // برای هر ارز، هشدارهای آن را نمایش می‌دهیم
+        // Display alerts for each coin
         for (const symbol in alerts) {
             const symbolAlerts = alerts[symbol];
             
@@ -140,40 +140,40 @@
                 
                 const row = document.createElement('tr');
                 
-                // رنگ‌بندی سطر بر اساس نوع هشدار
+                // Row color based on alert status
                 if (alert.triggered) {
                     row.className = 'table-warning';
                 }
                 
-                // ارز
+                // Coin symbol
                 const symbolCell = document.createElement('td');
                 symbolCell.textContent = symbol;
                 row.appendChild(symbolCell);
                 
-                // قیمت هدف
+                // Target price
                 const priceCell = document.createElement('td');
                 priceCell.textContent = formatPrice(alert.price);
                 row.appendChild(priceCell);
                 
-                // نوع هشدار
+                // Alert type
                 const typeCell = document.createElement('td');
                 typeCell.innerHTML = alert.type === 'above' ? 
-                    '<span class="badge bg-success">بالاتر از</span>' : 
-                    '<span class="badge bg-danger">پایین‌تر از</span>';
+                    '<span class="badge bg-success">Above</span>' : 
+                    '<span class="badge bg-danger">Below</span>';
                 row.appendChild(typeCell);
                 
-                // وضعیت
+                // Status
                 const statusCell = document.createElement('td');
                 statusCell.innerHTML = alert.triggered ? 
-                    '<span class="badge bg-warning text-dark">فعال شده</span>' : 
-                    '<span class="badge bg-secondary">منتظر</span>';
+                    '<span class="badge bg-warning text-dark">Triggered</span>' : 
+                    '<span class="badge bg-secondary">Waiting</span>';
                 row.appendChild(statusCell);
                 
-                // عملیات
+                // Actions
                 const actionsCell = document.createElement('td');
                 const deleteButton = document.createElement('button');
                 deleteButton.className = 'btn btn-sm btn-danger';
-                deleteButton.innerHTML = '<i class="fas fa-trash"></i> حذف';
+                deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
                 deleteButton.addEventListener('click', function() {
                     removePriceAlert(symbol, alert.price, alert.type);
                 });
@@ -184,13 +184,13 @@
             }
         }
         
-        // اگر هیچ هشداری نباشد
+        // If no alerts exist
         if (alertCount === 0) {
             const row = document.createElement('tr');
             const cell = document.createElement('td');
             cell.colSpan = 5;
             cell.className = 'text-center';
-            cell.textContent = 'هیچ هشدار قیمتی تنظیم نشده است.';
+            cell.textContent = 'No price alerts have been set.';
             row.appendChild(cell);
             tableBody.appendChild(row);
         }
@@ -214,8 +214,8 @@
             .then(data => {
                 if (data.success) {
                     showAlert(data.message, 'success');
-                    loadPriceAlerts(); // بارگذاری مجدد هشدارها
-                    // پاک کردن فرم
+                    loadPriceAlerts(); // Reload alerts
+                    // Clear form
                     document.getElementById('priceInput').value = '';
                 } else {
                     showAlert(data.message, 'danger');
@@ -223,12 +223,12 @@
             })
             .catch(error => {
                 console.error('Error adding price alert:', error);
-                showAlert('خطا در افزودن هشدار قیمت: ' + error.message, 'danger');
+                showAlert('Error adding price alert: ' + error.message, 'danger');
             });
     }
     
     function removePriceAlert(symbol, price, alertType) {
-        if (!confirm('آیا از حذف این هشدار قیمت اطمینان دارید؟')) {
+        if (!confirm('Are you sure you want to delete this price alert?')) {
             return;
         }
         
@@ -249,14 +249,14 @@
             .then(data => {
                 if (data.success) {
                     showAlert(data.message, 'success');
-                    loadPriceAlerts(); // بارگذاری مجدد هشدارها
+                    loadPriceAlerts(); // Reload alerts
                 } else {
                     showAlert(data.message, 'danger');
                 }
             })
             .catch(error => {
                 console.error('Error removing price alert:', error);
-                showAlert('خطا در حذف هشدار قیمت: ' + error.message, 'danger');
+                showAlert('Error removing price alert: ' + error.message, 'danger');
             });
     }
     
@@ -266,7 +266,7 @@
         alertElement.className = `alert alert-${type}`;
         alertElement.classList.remove('d-none');
         
-        // پنهان کردن پیام پس از 5 ثانیه
+        // Hide message after 5 seconds
         setTimeout(() => {
             alertElement.classList.add('d-none');
         }, 5000);
