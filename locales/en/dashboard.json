@@ -2,6 +2,11 @@
   "dashboard": "Dashboard",
   "title": "Crypto Barzin",
   "market_overview": "Latest analysis, signals, and cryptocurrency market prices",
+  "meme_coins": "Popular Meme Coins",
+  "ai_coins": "AI Focused Coins",
+  "lowcost_coins": "Low-Cost Growth Coins",
+  "new_coins": "Newer Coins with Potential",
+  "growth_coins": "High Potential Coins",
   "price_card": {
     "current_price": "Current Price",
     "24h_change": "24h Change",
