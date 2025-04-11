@@ -1470,15 +1470,29 @@ def get_price(symbol=None):
             base_currency = 'USDT'
             symbol = f"{coin}/{base_currency}"
             
-        # For meme coins and other special cases, try CryptoCompare API directly
+        # For meme coins, AI coins and low-cost coins, use CryptoCompare API directly
+        meme_coins = ['DOGE', 'SHIB', 'PEPE', 'FLOKI', 'WIF', 'BONK', 'MEME', 'TURBO', 'BRETT', 'MOG', 'CAT', 'MYRO']
+        ai_coins = ['RNDR', 'FET', 'WLD', 'OCEAN', 'AGIX', 'GEEQ']
+        low_cost_coins = ['VET', 'XDC', 'HBAR', 'XLM', 'CAKE', 'JASMY', 'STMX', 'SC', 'CELR', 'CTSI']
+        
+        special_coins = meme_coins + ai_coins + low_cost_coins
+        
         try:
-            if coin.upper() in ['DOGE', 'SHIB', 'PEPE', 'FLOKI', 'WIF', 'MEME', 'RNDR', 'FET', 'OCEAN', 'AGIX']:
-                # Special case for common meme coins and AI coins
+            if coin.upper() in special_coins:
+                # Special case for meme coins, AI coins and low-cost coins
                 from crypto_bot.market_api import get_price_from_cryptocompare
+                
+                # Try to get price from CryptoCompare API
                 result = get_price_from_cryptocompare(f"{coin}/USDT")
                 
+                # If we got a valid result, return it
                 if not result.get('error', False) and 'price' in result:
                     logger.info(f"Using CryptoCompare direct API for {coin}")
+                    
+                    # Add default change_24h if missing to avoid frontend errors
+                    if 'change_24h' not in result:
+                        result['change_24h'] = 0
+                        
                     return jsonify({
                         'success': True,
                         'data': result

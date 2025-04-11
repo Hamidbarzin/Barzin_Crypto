@@ -444,25 +444,25 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Add event listeners for all new coin price updates - Meme coins
-            updateCoinPrice('DOGE', 'USDT');
-            updateCoinPrice('SHIB', 'USDT');
-            updateCoinPrice('PEPE', 'USDT');
-            updateCoinPrice('FLOKI', 'USDT');
-            updateCoinPrice('WIF', 'USDT');
-            updateCoinPrice('MEME', 'USDT');
+            queueFetchRequest('DOGE', 'USDT');
+            queueFetchRequest('SHIB', 'USDT');
+            queueFetchRequest('PEPE', 'USDT');
+            queueFetchRequest('FLOKI', 'USDT');
+            queueFetchRequest('WIF', 'USDT');
+            queueFetchRequest('MEME', 'USDT');
             
             // AI coins
-            updateCoinPrice('RNDR', 'USDT');
-            updateCoinPrice('FET', 'USDT');
-            updateCoinPrice('OCEAN', 'USDT');
-            updateCoinPrice('AGIX', 'USDT');
+            queueFetchRequest('RNDR', 'USDT');
+            queueFetchRequest('FET', 'USDT');
+            queueFetchRequest('OCEAN', 'USDT');
+            queueFetchRequest('AGIX', 'USDT');
             
             // Low-cost growth coins
-            updateCoinPrice('VET', 'USDT');
-            updateCoinPrice('XDC', 'USDT');
-            updateCoinPrice('HBAR', 'USDT');
-            updateCoinPrice('XLM', 'USDT');
-            updateCoinPrice('JASMY', 'USDT');
+            queueFetchRequest('VET', 'USDT');
+            queueFetchRequest('XDC', 'USDT');
+            queueFetchRequest('HBAR', 'USDT');
+            queueFetchRequest('XLM', 'USDT');
+            queueFetchRequest('JASMY', 'USDT');
             
             // Display new crypto sections and headings
             setupCryptoSections();
