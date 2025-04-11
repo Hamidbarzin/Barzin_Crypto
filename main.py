@@ -1449,6 +1449,43 @@ def get_price(symbol=None):
                 'success': False, 
                 'error': 'Symbol is required'
             }), 400
+            
+        # طراحی شده برای کار کردن با هر دو حالت - symbol به تنهایی (مثل btc)
+        # یا symbol با base currency (مثل BTC/USDT)
+        base_currency = None
+        coin = symbol
+        
+        # اگر symbol شامل فرمت جفت ارزی است، آن را تفکیک می‌کنیم
+        if '/' in symbol:
+            parts = symbol.split('/')
+            coin = parts[0]
+            base_currency = parts[1]
+        elif '-' in symbol:
+            parts = symbol.split('-')
+            coin = parts[0]
+            base_currency = parts[1]
+            
+        # برای سادگی، در صورت عدم تعیین ارز پایه، USDT را فرض می‌کنیم
+        if not base_currency:
+            base_currency = 'USDT'
+            symbol = f"{coin}/{base_currency}"
+            
+        # For meme coins and other special cases, try CryptoCompare API directly
+        try:
+            if coin.upper() in ['DOGE', 'SHIB', 'PEPE', 'FLOKI', 'WIF', 'MEME', 'RNDR', 'FET', 'OCEAN', 'AGIX']:
+                # Special case for common meme coins and AI coins
+                from crypto_bot.market_api import get_price_from_cryptocompare
+                result = get_price_from_cryptocompare(f"{coin}/USDT")
+                
+                if not result.get('error', False) and 'price' in result:
+                    logger.info(f"Using CryptoCompare direct API for {coin}")
+                    return jsonify({
+                        'success': True,
+                        'data': result
+                    })
+        except Exception as e:
+            logger.warning(f"Failed to get direct price for {coin}: {str(e)}")
+            # Continue with normal flow
         
         # Normalize symbol format - both BTC/USDT and BTC-USDT should work
         # Try with the symbol as provided first

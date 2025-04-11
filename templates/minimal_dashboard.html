@@ -463,16 +463,165 @@
             updateCoinPrice('HBAR', 'USDT');
             updateCoinPrice('XLM', 'USDT');
             updateCoinPrice('JASMY', 'USDT');
+            
+            // Display new crypto sections and headings
+            setupCryptoSections();
         });
+        
+        // Add cryptocurrency cards to the dashboard
+        function setupCryptoSections() {
+            // Get main container
+            const mainContainer = document.querySelector('.main-content');
+            if (!mainContainer) return;
+            
+            // Create meme coins section
+            const memeCoinsSection = createCryptoSection('meme_coins', 'ارزهای میم محبوب', [
+                { symbol: 'DOGE-USDT', name: 'Dogecoin', logo: 'doge.svg' },
+                { symbol: 'SHIB-USDT', name: 'Shiba Inu', logo: 'shib.svg' },
+                { symbol: 'PEPE-USDT', name: 'Pepe', logo: 'pepe.svg' },
+                { symbol: 'FLOKI-USDT', name: 'Floki', logo: 'floki.svg' },
+                { symbol: 'WIF-USDT', name: 'Dogwifhat', logo: 'wif.svg' },
+                { symbol: 'MEME-USDT', name: 'Meme', logo: 'meme.svg' }
+            ]);
+            
+            // Create AI coins section
+            const aiCoinsSection = createCryptoSection('ai_coins', 'ارزهای هوش مصنوعی', [
+                { symbol: 'RNDR-USDT', name: 'Render', logo: 'rndr.svg' },
+                { symbol: 'FET-USDT', name: 'Fetch.ai', logo: 'fet.svg' },
+                { symbol: 'OCEAN-USDT', name: 'Ocean Protocol', logo: 'ocean.svg' },
+                { symbol: 'AGIX-USDT', name: 'SingularityNET', logo: 'agix.svg' }
+            ]);
+            
+            // Create low-cost growth coins section
+            const lowCostSection = createCryptoSection('lowcost_coins', 'ارزهای ارزان با پتانسیل رشد', [
+                { symbol: 'VET-USDT', name: 'VeChain', logo: 'vet.svg' },
+                { symbol: 'XDC-USDT', name: 'XDC Network', logo: 'xdc.svg' },
+                { symbol: 'HBAR-USDT', name: 'Hedera', logo: 'hbar.svg' },
+                { symbol: 'XLM-USDT', name: 'Stellar', logo: 'xlm.svg' },
+                { symbol: 'JASMY-USDT', name: 'Jasmy', logo: 'jasmy.svg' }
+            ]);
+            
+            // Add sections to main container
+            const priceSection = document.querySelector('.price-section');
+            if (priceSection) {
+                priceSection.parentNode.insertBefore(memeCoinsSection, priceSection.nextSibling);
+                priceSection.parentNode.insertBefore(aiCoinsSection, memeCoinsSection.nextSibling);
+                priceSection.parentNode.insertBefore(lowCostSection, aiCoinsSection.nextSibling);
+            } else {
+                mainContainer.appendChild(memeCoinsSection);
+                mainContainer.appendChild(aiCoinsSection);
+                mainContainer.appendChild(lowCostSection);
+            }
+        }
+        
+        // Create a crypto section with cards
+        function createCryptoSection(sectionId, sectionTitle, coins) {
+            const section = document.createElement('div');
+            section.className = 'coin-section mb-4';
+            section.id = sectionId;
+            
+            // Create section header
+            const header = document.createElement('h2');
+            header.className = 'section-heading mb-3';
+            header.textContent = sectionTitle;
+            section.appendChild(header);
+            
+            // Create row for cards
+            const row = document.createElement('div');
+            row.className = 'row';
+            
+            // Add coin cards
+            coins.forEach(coin => {
+                const card = createCryptoCard(coin.symbol, coin.name, coin.logo);
+                row.appendChild(card);
+            });
+            
+            section.appendChild(row);
+            return section;
+        }
+        
+        // Create a crypto card
+        function createCryptoCard(symbol, name, logo) {
+            const col = document.createElement('div');
+            col.className = 'col-md-4 col-lg-3 mb-3';
+            
+            const card = document.createElement('div');
+            card.className = 'card crypto-card h-100';
+            
+            // Card header with logo and name
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'card-header d-flex align-items-center';
+            
+            const iconDiv = document.createElement('div');
+            iconDiv.className = 'crypto-icon me-2';
+            
+            const icon = document.createElement('i');
+            icon.className = 'fab fa-ethereum'; // Default icon - we don't have all logos yet
+            iconDiv.appendChild(icon);
+            
+            const nameHeading = document.createElement('h5');
+            nameHeading.className = 'mb-0';
+            nameHeading.textContent = name;
+            
+            cardHeader.appendChild(iconDiv);
+            cardHeader.appendChild(nameHeading);
+            card.appendChild(cardHeader);
+            
+            // Card body with price and change
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body';
+            
+            const priceDiv = document.createElement('div');
+            priceDiv.className = 'd-flex justify-content-between mb-2';
+            
+            const priceLabel = document.createElement('span');
+            priceLabel.className = 'text-muted';
+            priceLabel.textContent = 'قیمت:';
+            
+            const priceValue = document.createElement('span');
+            priceValue.className = 'fw-bold';
+            priceValue.id = `${symbol}-price`;
+            priceValue.textContent = '...';
+            
+            priceDiv.appendChild(priceLabel);
+            priceDiv.appendChild(priceValue);
+            
+            const changeDiv = document.createElement('div');
+            changeDiv.className = 'd-flex justify-content-between';
+            
+            const changeLabel = document.createElement('span');
+            changeLabel.className = 'text-muted';
+            changeLabel.textContent = 'تغییر ۲۴ ساعته:';
+            
+            const changeValue = document.createElement('span');
+            changeValue.id = `${symbol}-change`;
+            changeValue.textContent = '...';
+            
+            changeDiv.appendChild(changeLabel);
+            changeDiv.appendChild(changeValue);
+            
+            cardBody.appendChild(priceDiv);
+            cardBody.appendChild(changeDiv);
+            card.appendChild(cardBody);
+            
+            col.appendChild(card);
+            return col;
+        }
         
         function updateCoinPrice(coin, base) {
             const symbol = `${coin}-${base}`;
             const altSymbol = `${coin}/${base}`;
             
-            // اسلش در URL نیاز به کدگذاری دارد
-            const encodedSymbol = encodeURIComponent(altSymbol);
-            fetch('/api/price/' + coin.toLowerCase())
+            // Use a shorter timeout for API requests
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            // Try CryptoCompare API first for special coins
+            fetch('/api/price/' + coin.toLowerCase(), {
+                signal: controller.signal
+            })
                 .then(response => {
+                    clearTimeout(timeoutId);
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
