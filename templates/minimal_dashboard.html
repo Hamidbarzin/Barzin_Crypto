@@ -1523,4 +1523,160 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 </script>
+
+<!-- اسکریپت اضافی برای به‌روزرسانی قیمت‌ها -->
+<script>
+    // اجرای این اسکریپت بعد از بارگذاری کامل صفحه
+    window.addEventListener('load', function() {
+        console.log("Window fully loaded - applying direct price updates");
+        
+        // آرایه‌های سکه‌ها
+        const mainCoins = [
+            {symbol: 'BTC', id: 'bitcoin'}, 
+            {symbol: 'ETH', id: 'ethereum'}, 
+            {symbol: 'SOL', id: 'solana'}, 
+            {symbol: 'XRP', id: 'ripple'}
+        ];
+        const memeCoins = [
+            {symbol: 'DOGE', id: 'dogecoin'}, 
+            {symbol: 'SHIB', id: 'shiba-inu'}, 
+            {symbol: 'PEPE', id: 'pepe'}, 
+            {symbol: 'FLOKI', id: 'floki'}, 
+            {symbol: 'WIF', id: 'dogwifhat'}, 
+            {symbol: 'MEME', id: 'meme-token'}
+        ];
+        const aiCoins = [
+            {symbol: 'RNDR', id: 'render-token'}, 
+            {symbol: 'FET', id: 'fetch-ai'}, 
+            {symbol: 'OCEAN', id: 'ocean-protocol'}, 
+            {symbol: 'AGIX', id: 'singularitynet'}
+        ];
+        const lowCostCoins = [
+            {symbol: 'VET', id: 'vechain'}, 
+            {symbol: 'XDC', id: 'xdc-network'}, 
+            {symbol: 'HBAR', id: 'hedera-hashgraph'}, 
+            {symbol: 'XLM', id: 'stellar'}, 
+            {symbol: 'JASMY', id: 'jasmy'}
+        ];
+        
+        // تابع به‌روزرسانی یک سکه
+        function updateCoinPriceDirectly(coinData) {
+            const coinSymbol = coinData.symbol;
+            console.log(`Direct price update for ${coinSymbol}`);
+            
+            // دریافت المان‌های مربوطه
+            const priceElement = document.getElementById(`${coinSymbol}-USDT-price`);
+            const changeElement = document.getElementById(`${coinSymbol}-USDT-change`);
+            
+            if (!priceElement) {
+                console.error(`Price element not found for ${coinSymbol}`);
+                return;
+            }
+            
+            fetch(`/api/price/${coinData.id.toLowerCase()}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(`API response for ${coinSymbol}:`, data);
+                    
+                    if (data.success && data.data && data.data.price) {
+                        // به‌روزرسانی قیمت
+                        const price = parseFloat(data.data.price);
+                        priceElement.textContent = formatDirectPrice(price);
+                        console.log(`Direct price updated for ${coinSymbol}: ${price}`);
+                        
+                        // به‌روزرسانی تغییرات
+                        if (changeElement && data.data.change_24h) {
+                            const change = parseFloat(data.data.change_24h);
+                            const sign = change >= 0 ? '+' : '';
+                            changeElement.textContent = `${sign}${change.toFixed(2)}%`;
+                            
+                            if (change >= 0) {
+                                changeElement.classList.add('positive-change');
+                                changeElement.classList.remove('negative-change');
+                            } else {
+                                changeElement.classList.add('negative-change');
+                                changeElement.classList.remove('positive-change');
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error(`Error updating ${coinSymbol}:`, error);
+                    
+                    // در صورت خطا، استفاده از API مستقیم CryptoCompare
+                    fetch(`/api/price/${coinSymbol.toLowerCase()}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(`Fallback API response for ${coinSymbol}:`, data);
+                            
+                            if (data.success && data.data && data.data.price) {
+                                // به‌روزرسانی قیمت
+                                const price = parseFloat(data.data.price);
+                                priceElement.textContent = formatDirectPrice(price);
+                                console.log(`Fallback price updated for ${coinSymbol}: ${price}`);
+                                
+                                // به‌روزرسانی تغییرات
+                                if (changeElement && data.data.change_24h) {
+                                    const change = parseFloat(data.data.change_24h);
+                                    const sign = change >= 0 ? '+' : '';
+                                    changeElement.textContent = `${sign}${change.toFixed(2)}%`;
+                                    
+                                    if (change >= 0) {
+                                        changeElement.classList.add('positive-change');
+                                        changeElement.classList.remove('negative-change');
+                                    } else {
+                                        changeElement.classList.add('negative-change');
+                                        changeElement.classList.remove('positive-change');
+                                    }
+                                }
+                            }
+                        })
+                        .catch(fallbackError => {
+                            console.error(`Fallback error updating ${coinSymbol}:`, fallbackError);
+                        });
+                });
+        }
+        
+        // تابع قالب‌بندی قیمت
+        function formatDirectPrice(price) {
+            if (price >= 1000) {
+                return price.toLocaleString('en-US', {maximumFractionDigits: 0});
+            } else if (price >= 1) {
+                return price.toLocaleString('en-US', {maximumFractionDigits: 2});
+            } else if (price >= 0.01) {
+                return price.toLocaleString('en-US', {maximumFractionDigits: 4});
+            } else {
+                return price.toLocaleString('en-US', {maximumFractionDigits: 8});
+            }
+        }
+        
+        // به‌روزرسانی همه سکه‌ها با تأخیر
+        function updateAllCoinsWithDelay(coinList) {
+            let delay = 0;
+            const increment = 500; // 500 میلی‌ثانیه تأخیر بین هر سکه
+            
+            coinList.forEach(coin => {
+                setTimeout(() => {
+                    updateCoinPriceDirectly(coin);
+                }, delay);
+                delay += increment;
+            });
+        }
+        
+        // به‌روزرسانی همه دسته‌های سکه‌ها
+        updateAllCoinsWithDelay(mainCoins);
+        updateAllCoinsWithDelay(memeCoins);
+        updateAllCoinsWithDelay(aiCoins);
+        updateAllCoinsWithDelay(lowCostCoins);
+        
+        // به‌روزرسانی دوره‌ای هر 60 ثانیه
+        setInterval(() => {
+            console.log("Periodic update of all coins");
+            updateAllCoinsWithDelay(mainCoins);
+            updateAllCoinsWithDelay(memeCoins);
+            updateAllCoinsWithDelay(aiCoins);
+            updateAllCoinsWithDelay(lowCostCoins);
+        }, 60000);
+    });
+</script>
 {% endblock %}
