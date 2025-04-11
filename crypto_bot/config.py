@@ -36,15 +36,22 @@ DEFAULT_CURRENCIES = [
     
     # ارزهای میم و مورد علاقه بازار (Meme Coins)
     'DOGE/USDT', 'SHIB/USDT', 'PEPE/USDT', 'FLOKI/USDT', 'WIF/USDT', 'BONK/USDT',
+    'MEME/USDT', 'TURBO/USDT', 'BRETT/USDT', 'MOG/USDT', 'CAT/USDT', 'MYRO/USDT',
     
     # ارزهای ارزان با پتانسیل رشد بالا (زیر 1 دلار)
     'VET/USDT', 'XDC/USDT', 'HBAR/USDT', 'XLM/USDT', 'FET/USDT', 'CAKE/USDT',
+    'JASMY/USDT', 'OCEAN/USDT', 'STMX/USDT', 'SC/USDT', 'CELR/USDT', 'CTSI/USDT',
     
     # ارزهای با پتانسیل رشد بالا
     'ARB/USDT', 'IMX/USDT', 'LINK/USDT', 'RNDR/USDT', 'ATOM/USDT',
+    'AAVE/USDT', 'UNI/USDT', 'RUNE/USDT', 'INJ/USDT', 'FTM/USDT',
     
     # ارزهای جدیدتر با پتانسیل رشد
-    'SUI/USDT', 'APT/USDT', 'ICP/USDT', 'SEI/USDT', 'TON/USDT', 'NEAR/USDT'
+    'SUI/USDT', 'APT/USDT', 'ICP/USDT', 'SEI/USDT', 'TON/USDT', 'NEAR/USDT',
+    'STX/USDT', 'EGLD/USDT', 'MINA/USDT', 'KASPA/USDT', 'TIA/USDT',
+    
+    # ارزهای با تمرکز روی هوش مصنوعی
+    'FET/USDT', 'OCEAN/USDT', 'RNDR/USDT', 'AGIX/USDT', 'GEEQ/USDT'
 ]
 
 TIMEFRAMES = {

@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 323,
-    "successful": 323,
+    "total_sent": 332,
+    "successful": 332,
     "failed": 0,
     "history": [
       {
@@ -1618,12 +1618,57 @@
         "message_type": "price_report",
         "success": true,
         "timestamp": "2025-04-10T21:38:54.131039-04:00"
+      },
+      {
+        "message_type": "trading_signals",
+        "success": true,
+        "timestamp": "2025-04-10T21:52:53.975498-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T21:52:59.839424-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T21:53:00.365180-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T21:53:02.636423-04:00"
+      },
+      {
+        "message_type": "trading_signals",
+        "success": true,
+        "timestamp": "2025-04-10T21:53:06.199294-04:00"
+      },
+      {
+        "message_type": "technical_analysis_BTC",
+        "success": true,
+        "timestamp": "2025-04-10T21:53:07.580356-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T21:53:12.307080-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-10T21:53:46.551103-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-10T21:53:46.576343-04:00"
       }
     ]
   },
   "uptime": {
     "start_time": "2025-04-10T16:54:51.535404-04:00",
-    "last_restart": "2025-04-10T21:38:53.592583-04:00",
-    "restarts": 145
+    "last_restart": "2025-04-10T21:53:46.056279-04:00",
+    "restarts": 149
   }
 }
