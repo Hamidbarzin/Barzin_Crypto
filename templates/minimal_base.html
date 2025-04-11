@@ -299,17 +299,22 @@
     </style>
 </head>
 <body class="bg-gradient-dark">
-    <!-- Top Navbar -->
+    <!-- Top Navbar (Bootstrap 5 Navbar) -->
     <nav class="navbar navbar-expand-lg top-navbar mb-4 sticky-top">
         <div class="container">
+            <!-- Brand/logo -->
             <a class="navbar-brand d-flex align-items-center" href="/">
                 <img src="/static/logo.svg" alt="Barzin Crypto" height="40" class="me-2">
                 <span>Barzin Crypto</span>
             </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            
+            <!-- Toggle button for mobile navigation -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+            
+            <!-- Navbar links -->
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/minimal_dashboard' or request.path == '/' %}active{% endif %}" href="/minimal_dashboard">
@@ -622,34 +627,8 @@
         });
     </script>
     
-    <!-- Navbar Toggle Script -->
-    <script>
-        $(document).ready(function() {
-            // jQuery for bootstrap navbar toggle
-            $('.navbar-toggler').click(function() {
-                $('#navbarNav').toggleClass('show');
-            });
-            
-            // Close the menu when clicking outside of it
-            $(document).click(function(event) {
-                var clickover = $(event.target);
-                var opened = $('#navbarNav').hasClass('show');
-                if (opened && !clickover.hasClass('navbar-toggler') && !clickover.parents().hasClass('navbar-collapse')) {
-                    $('.navbar-toggler').click();
-                }
-            });
-            
-            // Close menu when clicked on a nav-link
-            $('.nav-item').click(function() {
-                var opened = $('#navbarNav').hasClass('show');
-                if (opened) {
-                    $('.navbar-toggler').click();
-                }
-            });
-            
-            console.log('jQuery navbar toggle is initialized');
-        });
-    </script>
+    <!-- Navbar JavaScript -->
+    <script src="/static/js/navbar.js"></script>
     
     <!-- PWA Service Worker Registration -->
     <script>
