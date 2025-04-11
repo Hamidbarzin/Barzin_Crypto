@@ -407,8 +407,8 @@ def index():
                 <tr class="signal-{{ 'buy' if 'buy' in data.get('signal', '').lower() else 'sell' if 'sell' in data.get('signal', '').lower() else 'neutral' }}">
                     <td>{{ symbol }}</td>
                     <td>{{ format_price(data.get('price', 0)) }}</td>
-                    <td>{{ data.get('farsi_signal', data.get('signal', 'نامشخص')) }}</td>
-                    <td>{{ data.get('farsi_swing_recommendation', data.get('swing_recommendation', 'نامشخص')) }}</td>
+                    <td>{{ data.get('farsi_signal', data.get('signal', 'Unknown')) }}</td>
+                    <td>{{ data.get('farsi_swing_recommendation', data.get('swing_recommendation', 'Unknown')) }}</td>
                 </tr>
             {% else %}
                 <tr class="signal-buy">
@@ -445,7 +445,7 @@ def index():
     def format_price(price):
         """Format price with commas and appropriate decimal places"""
         if price is None:
-            return "نامشخص"
+            return "Unknown"
             
         if isinstance(price, str):
             try:
@@ -465,7 +465,7 @@ def index():
     def format_change(change):
         """Format change as percentage with sign"""
         if change is None:
-            return "نامشخص"
+            return "Unknown"
             
         if isinstance(change, str):
             try:
@@ -1060,28 +1060,28 @@ def dashboard_classic():
         # Determine signal type based on coin (just for variety in samples)
         if coin.lower() in ['btc', 'eth', 'bnb']:
             signal = 'Buy'
-            farsi_signal = 'خرید'
+            farsi_signal = 'Buy'
             strength = 0.35
             recommendation = "Consider swing trade (long)"
-            farsi_recommendation = "پیشنهاد معامله نوسانی (صعودی)"
+            farsi_recommendation = "Consider swing trade (bullish)"
         elif coin.lower() in ['xrp', 'sol', 'ada']:
             signal = 'Strong Buy'
-            farsi_signal = 'خرید قوی'
+            farsi_signal = 'Strong Buy'
             strength = 0.65
             recommendation = "Good swing entry for long position"
-            farsi_recommendation = "نقطه ورود مناسب برای معامله نوسانی صعودی"
+            farsi_recommendation = "Good entry point for bullish swing trade"
         elif coin.lower() in ['doge', 'shib', 'trx']:
             signal = 'Sell'
-            farsi_signal = 'فروش'
+            farsi_signal = 'Sell'
             strength = -0.35
             recommendation = "Consider swing trade (short)"
-            farsi_recommendation = "پیشنهاد معامله نوسانی (نزولی)"
+            farsi_recommendation = "Consider swing trade (bearish)"
         else:
             signal = 'Neutral'
-            farsi_signal = 'خنثی'
+            farsi_signal = 'Neutral'
             strength = 0.05
             recommendation = "Wait for clearer signals"
-            farsi_recommendation = "منتظر سیگنال‌های واضح‌تر باشید"
+            farsi_recommendation = "Wait for clearer signals"
         
         # Create sample signal data
         signals[symbol] = {
@@ -1834,28 +1834,28 @@ def get_signals():
         # Determine signal type based on coin (just for variety in samples)
         if coin.lower() in ['btc', 'eth', 'bnb']:
             signal = 'Buy'
-            farsi_signal = 'خرید'
+            farsi_signal = 'Buy'
             strength = 0.35
             recommendation = "Consider swing trade (long)"
-            farsi_recommendation = "پیشنهاد معامله نوسانی (صعودی)"
+            farsi_recommendation = "Consider swing trade (bullish)"
         elif coin.lower() in ['xrp', 'sol', 'ada']:
             signal = 'Strong Buy'
-            farsi_signal = 'خرید قوی'
+            farsi_signal = 'Strong Buy'
             strength = 0.65
             recommendation = "Good swing entry for long position"
-            farsi_recommendation = "نقطه ورود مناسب برای معامله نوسانی صعودی"
+            farsi_recommendation = "Good entry point for bullish swing trade"
         elif coin.lower() in ['doge', 'shib', 'trx']:
             signal = 'Sell'
-            farsi_signal = 'فروش'
+            farsi_signal = 'Sell'
             strength = -0.35
             recommendation = "Consider swing trade (short)"
-            farsi_recommendation = "پیشنهاد معامله نوسانی (نزولی)"
+            farsi_recommendation = "Consider swing trade (bearish)"
         else:
             signal = 'Neutral'
-            farsi_signal = 'خنثی'
+            farsi_signal = 'Neutral'
             strength = 0.05
             recommendation = "Wait for clearer signals"
-            farsi_recommendation = "منتظر سیگنال‌های واضح‌تر باشید"
+            farsi_recommendation = "Wait for clearer signals"
         
         # Try to get the real price with a very short timeout
         try:
