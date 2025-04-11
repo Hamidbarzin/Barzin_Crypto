@@ -2746,8 +2746,9 @@ def telegram_reliability_dashboard():
 
 @app.route('/price_alerts')
 @app.route('/alerts')
+@login_required
 def price_alerts_page():
-    """صفحه مدیریت هشدارهای قیمت"""
+    """Price Alert Management Page"""
     return render_template('price_alerts.html')
 
 
@@ -2911,12 +2912,12 @@ def api_telegram_settings():
 @app.route('/api/price-alerts', methods=['GET'])
 def api_get_price_alerts():
     """
-    دریافت لیست هشدارهای قیمت
+    Get list of price alerts
     """
     symbol = request.args.get('symbol')
     alerts = get_price_alerts(symbol)
     
-    # تبدیل داده‌ها به فرمت قابل سریال‌سازی
+    # Convert data to serializable format
     serializable_alerts = {}
     for s, alert_list in alerts.items():
         serializable_alerts[s] = [
@@ -2937,14 +2938,14 @@ def api_get_price_alerts():
 @app.route('/api/price-alerts/set', methods=['POST'])
 def api_set_price_alert():
     """
-    تنظیم هشدار قیمت جدید
+    Set new price alert
     """
     data = request.json
     
     if not data or 'symbol' not in data or 'price' not in data:
         return jsonify({
             "success": False,
-            "message": "پارامترهای ورودی ناقص هستند. symbol و price الزامی هستند."
+            "message": "Incomplete parameters. Symbol and price are required."
         }), 400
     
     symbol = data['symbol']
@@ -2954,14 +2955,14 @@ def api_set_price_alert():
     except (ValueError, TypeError):
         return jsonify({
             "success": False,
-            "message": "فرمت قیمت نامعتبر است."
+            "message": "Invalid price format."
         }), 400
     
     alert_type = data.get('type', 'above')
     if alert_type not in ['above', 'below']:
         return jsonify({
             "success": False, 
-            "message": "نوع هشدار باید 'above' یا 'below' باشد."
+            "message": "Alert type must be 'above' or 'below'."
         }), 400
     
     success = set_price_alert(symbol, price, alert_type)
@@ -2969,12 +2970,12 @@ def api_set_price_alert():
     if success:
         return jsonify({
             "success": True,
-            "message": f"هشدار قیمت برای {symbol} {'بالاتر از' if alert_type == 'above' else 'پایین‌تر از'} {price} با موفقیت تنظیم شد."
+            "message": f"Price alert for {symbol} {'above' if alert_type == 'above' else 'below'} {price} set successfully."
         })
     else:
         return jsonify({
             "success": False,
-            "message": "خطا در تنظیم هشدار قیمت."
+            "message": "Error setting price alert."
         }), 500
 
 
