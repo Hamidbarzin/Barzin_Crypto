@@ -608,17 +608,43 @@
             return col;
         }
         
-        function updateCoinPrice(coin, base) {
-            const symbol = `${coin}-${base}`;
-            const altSymbol = `${coin}/${base}`;
+        // Keep track of delayed fetch calls to avoid overwhelming the server
+        const fetchQueue = [];
+        const maxConcurrentRequests = 3;
+        let activeRequests = 0;
+        
+        function queueFetchRequest(coin, base) {
+            return new Promise((resolve) => {
+                fetchQueue.push(() => {
+                    executeFetch(coin, base).finally(() => {
+                        activeRequests--;
+                        processQueue(); // Process next in queue when this is done
+                        resolve();
+                    });
+                });
+                
+                processQueue();
+            });
+        }
+        
+        function processQueue() {
+            if (fetchQueue.length === 0 || activeRequests >= maxConcurrentRequests) {
+                return;
+            }
             
-            // For special coins (meme coins and AI coins), add fallback price display
-            // if the API doesn't respond in time
+            const nextFetch = fetchQueue.shift();
+            activeRequests++;
+            setTimeout(nextFetch, 100); // Small delay for stability
+        }
+        
+        function executeFetch(coin, base) {
+            const symbol = `${coin}-${base}`;
             const priceElement = document.getElementById(`${symbol}-price`);
             const changeElement = document.getElementById(`${symbol}-change`);
             
+            // Update the UI to show loading state
             if (priceElement) {
-                priceElement.textContent = '...';
+                priceElement.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
             }
             
             if (changeElement) {
@@ -629,14 +655,10 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => {
                 controller.abort();
-                // Show loading indicator for aborted requests
-                if (priceElement) {
-                    priceElement.innerHTML = '<i class="fas fa-sync fa-spin"></i>';
-                }
-            }, 6000);
+            }, 5000);
             
             // Try API with the coin name only for faster response
-            fetch('/api/price/' + coin.toLowerCase(), {
+            return fetch('/api/price/' + coin.toLowerCase(), {
                 signal: controller.signal
             })
                 .then(response => {
