@@ -6,18 +6,19 @@
  * از محدودیت‌های API اجتناب می‌کند.
  */
 
-// آرایه‌های سکه‌ها برای به‌روزرسانی خودکار - ارزهای میم و ارزان حذف شده‌اند
-const aiCoins = ['RNDR', 'FET', 'OCEAN', 'AGIX'];
+// آرایه‌های سکه‌ها برای به‌روزرسانی خودکار - تمام ارزهای غیر اصلی حذف شده‌اند
+// ارزهای هوش مصنوعی، میم و ارزان حذف شده‌اند
+const aiCoins = []; // ارزهای هوش مصنوعی نیز حذف شده‌اند
 
 // برای مدیریت سکه‌هایی که در حال به‌روزرسانی هستند
 const updatingCoins = new Set();
 
-// تابع اصلی به‌روزرسانی ارزهای دیجیتال ویژه
+// تابع اصلی به‌روزرسانی ارزهای دیجیتال ویژه - تمام ارزهای غیر اصلی حذف شده‌اند
 function updateSpecialCoins() {
-    console.log("Updating AI coins only");
+    console.log("Special coins update function - no special coins to update");
     
-    // ارزهای میم و ارزان حذف شده‌اند
-    const allCoins = [...aiCoins];
+    // تمام ارزها به جز ارزهای اصلی حذف شده‌اند
+    const allCoins = [];
     
     console.log("Coins to update:", allCoins);
     
@@ -204,7 +205,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // بررسی موجود بودن المان‌های قیمت در DOM
 function checkPriceElements() {
-    const allCoins = ['BTC', 'ETH', 'SOL', 'XRP', ...aiCoins];
+    // فقط ارزهای اصلی را نگه داشته‌ایم
+    const allCoins = ['BTC', 'ETH', 'SOL', 'XRP'];
     
     console.log("Checking price elements for these coins:", allCoins);
     
