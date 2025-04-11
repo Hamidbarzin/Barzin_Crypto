@@ -656,7 +656,7 @@ def cryptocurrencies():
         },
         {
             'id': 13, 
-            'name': 'شیبا اینو', 
+            'name': 'Shiba Inu', 
             'symbol': 'SHIB/USDT', 
             'icon': 'fas fa-dog text-danger',
             'price': '0.00001191',
@@ -667,7 +667,7 @@ def cryptocurrencies():
         },
         {
             'id': 14, 
-            'name': 'پپه', 
+            'name': 'Pepe', 
             'symbol': 'PEPE/USDT', 
             'icon': 'fas fa-frog text-success',
             'price': '0.00000678',
@@ -678,7 +678,7 @@ def cryptocurrencies():
         },
         {
             'id': 15, 
-            'name': 'فلوکی', 
+            'name': 'Floki', 
             'symbol': 'FLOKI/USDT', 
             'icon': 'fas fa-paw text-warning',
             'price': '0.00005347',
@@ -689,7 +689,7 @@ def cryptocurrencies():
         },
         {
             'id': 16, 
-            'name': 'دوگ ویف هت', 
+            'name': 'Dog Wif Hat', 
             'symbol': 'WIF/USDT', 
             'icon': 'fas fa-hat-cowboy text-primary',
             'price': '0.3736',
@@ -700,7 +700,7 @@ def cryptocurrencies():
         },
         {
             'id': 17, 
-            'name': 'میم کوین', 
+            'name': 'Meme Coin', 
             'symbol': 'MEME/USDT', 
             'icon': 'fas fa-laugh-squint text-warning',
             'price': '0.001586',
@@ -715,7 +715,7 @@ def cryptocurrencies():
     low_cost_coins = [
         {
             'id': 18, 
-            'name': 'وی‌چین', 
+            'name': 'VeChain', 
             'symbol': 'VET/USDT', 
             'icon': 'fas fa-link text-primary',
             'price': '0.02162',
@@ -726,7 +726,7 @@ def cryptocurrencies():
         },
         {
             'id': 19, 
-            'name': 'ایکس‌دی‌سی', 
+            'name': 'XDC', 
             'symbol': 'XDC/USDT', 
             'icon': 'fas fa-cube text-info',
             'price': '0.06532',
@@ -737,7 +737,7 @@ def cryptocurrencies():
         },
         {
             'id': 20, 
-            'name': 'هدرا', 
+            'name': 'Hedera', 
             'symbol': 'HBAR/USDT', 
             'icon': 'fas fa-h-square text-primary',
             'price': '0.1717',
@@ -748,7 +748,7 @@ def cryptocurrencies():
         },
         {
             'id': 21, 
-            'name': 'استلار', 
+            'name': 'Stellar', 
             'symbol': 'XLM/USDT', 
             'icon': 'fas fa-star text-warning',
             'price': '0.2333',
@@ -774,7 +774,7 @@ def cryptocurrencies():
         },
         {
             'id': 23, 
-            'name': 'آربیتروم', 
+            'name': 'Arbitrum', 
             'symbol': 'ARB/USDT', 
             'icon': 'fas fa-chart-line text-primary',
             'price': '1.35',
@@ -785,7 +785,7 @@ def cryptocurrencies():
         },
         {
             'id': 24, 
-            'name': 'اپتیمیسم', 
+            'name': 'Optimism', 
             'symbol': 'OP/USDT', 
             'icon': 'fas fa-rocket text-danger',
             'price': '2.95',

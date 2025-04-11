@@ -33,3 +33,14 @@
 کاردانو=Cardano
 پولیگان=Polygon
 دوج‌کوین=Dogecoin
+شیبا اینو=Shiba Inu
+پپه=Pepe
+فلوکی=Floki
+دوگ ویف هت=Dog Wif Hat
+میم کوین=Meme Coin
+وی‌چین=VeChain
+ایکس‌دی‌سی=XDC
+هدرا=Hedera
+استلار=Stellar
+آربیتروم=Arbitrum
+اپتیمیسم=Optimism
