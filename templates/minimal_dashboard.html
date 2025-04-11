@@ -1524,6 +1524,72 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 </script>
 
+<!-- اسکریپت دیباگ ساده برای نمایش المان‌ها -->
+<script>
+    // تابع دیباگ - فورا اجرا می‌شود
+    (function() {
+        // اجرای با تاخیر برای اطمینان از بارگذاری کامل صفحه
+        setTimeout(function() {
+            console.log("Running debug script...");
+            
+            // بررسی المان‌های قیمت ارزهای رمزنگاری
+            const elements = [
+                'BTC-USDT-price', 'ETH-USDT-price', 'SOL-USDT-price', 'XRP-USDT-price',
+                'DOGE-USDT-price', 'SHIB-USDT-price', 'PEPE-USDT-price', 'FLOKI-USDT-price',
+                'WIF-USDT-price', 'MEME-USDT-price',
+                'RNDR-USDT-price', 'FET-USDT-price', 'OCEAN-USDT-price', 'AGIX-USDT-price',
+                'VET-USDT-price', 'XDC-USDT-price', 'HBAR-USDT-price', 'XLM-USDT-price', 'JASMY-USDT-price'
+            ];
+            
+            // بررسی وجود و محتوای هر المان
+            elements.forEach(id => {
+                const elem = document.getElementById(id);
+                if (elem) {
+                    console.log(`✓ Element ${id} found!`);
+                    console.log(`  Content: "${elem.textContent}"`);
+                    console.log(`  Is visible: ${window.getComputedStyle(elem).display !== 'none'}`);
+                    console.log(`  Class list: ${elem.className}`);
+                    // تست مستقیم تغییر محتوا
+                    if (id === 'DOGE-USDT-price') {
+                        elem.textContent = "DEBUG-TEST";
+                        elem.style.color = "red";
+                        elem.style.fontWeight = "bold";
+                        console.log(`  DEBUG: Set ${id} to "DEBUG-TEST" with red color`);
+                    }
+                } else {
+                    console.error(`✗ Element ${id} NOT found!`);
+                }
+            });
+            
+            // لاگ کردن ساختار DOM برای بخش میم کوین‌ها
+            const memeSection = document.querySelector('h4.text-primary');
+            if (memeSection) {
+                console.log("✓ Found meme coins section:");
+                console.log("  ", memeSection.textContent);
+            } else {
+                console.error("✗ Meme coins section not found!");
+            }
+            
+            // تست تغییر مستقیم با querySelector
+            const dogeElem = document.querySelector('[id="DOGE-USDT-price"]');
+            if (dogeElem) {
+                dogeElem.textContent = "ALTERNATE-TEST";
+                dogeElem.style.backgroundColor = "yellow";
+                console.log("✓ Set DOGE price via querySelector to ALTERNATE-TEST with yellow bg");
+            }
+            
+            // تست برای اطمینان از اینکه ID‌ها درست هستند
+            const allElements = document.querySelectorAll('[id$="-USDT-price"]');
+            console.log(`Found ${allElements.length} elements with -USDT-price pattern:`);
+            allElements.forEach(el => {
+                console.log(`  ID: ${el.id}, Content: "${el.textContent}"`);
+                // تغییر رنگ پس‌زمینه برای راحتی دیدن
+                el.style.backgroundColor = "#f0f0ff";
+            });
+        }, 1000);
+    })();
+</script>
+
 <!-- اسکریپت اضافی برای به‌روزرسانی قیمت‌ها -->
 <script>
     // اجرای این اسکریپت بعد از بارگذاری کامل صفحه
