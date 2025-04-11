@@ -32,7 +32,13 @@ EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 2525))  # SMTP2GO standard port
 DEFAULT_CURRENCIES = [
     # ارزهای اصلی و شناخته شده
     'BTC/USDT', 'ETH/USDT', 'XRP/USDT', 'BNB/USDT', 'ADA/USDT', 
-    'SOL/USDT', 'DOT/USDT', 'MATIC/USDT', 'DOGE/USDT', 'AVAX/USDT',
+    'SOL/USDT', 'DOT/USDT', 'MATIC/USDT', 'AVAX/USDT',
+    
+    # ارزهای میم و مورد علاقه بازار (Meme Coins)
+    'DOGE/USDT', 'SHIB/USDT', 'PEPE/USDT', 'FLOKI/USDT', 'WIF/USDT', 'BONK/USDT',
+    
+    # ارزهای ارزان با پتانسیل رشد بالا (زیر 1 دلار)
+    'VET/USDT', 'XDC/USDT', 'HBAR/USDT', 'XLM/USDT', 'FET/USDT', 'CAKE/USDT',
     
     # ارزهای با پتانسیل رشد بالا
     'ARB/USDT', 'IMX/USDT', 'LINK/USDT', 'RNDR/USDT', 'ATOM/USDT',
