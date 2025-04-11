@@ -708,6 +708,39 @@ def cryptocurrencies():
             'volume': '180M',
             'signal': 'Hold',
             'signal_class': 'warning'
+        },
+        {
+            'id': 18, 
+            'name': 'Bonk', 
+            'symbol': 'BONK/USDT', 
+            'icon': 'fas fa-dog text-warning',
+            'price': '0.00001342',
+            'change': '+3.8%',
+            'volume': '210M',
+            'signal': 'Buy',
+            'signal_class': 'success'
+        },
+        {
+            'id': 19, 
+            'name': 'Turbo', 
+            'symbol': 'TURBO/USDT', 
+            'icon': 'fas fa-bolt text-danger',
+            'price': '0.00005871',
+            'change': '+5.2%',
+            'volume': '150M',
+            'signal': 'Strong Buy',
+            'signal_class': 'success'
+        },
+        {
+            'id': 20, 
+            'name': 'Brett', 
+            'symbol': 'BRETT/USDT', 
+            'icon': 'fas fa-meteor text-primary',
+            'price': '0.00000785',
+            'change': '+2.7%',
+            'volume': '120M',
+            'signal': 'Buy',
+            'signal_class': 'success'
         }
     ]
     
