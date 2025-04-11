@@ -34,21 +34,21 @@
             font-family: 'Vazirmatn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             transition: background-color 0.3s ease;
             padding-bottom: 60px; /* Space for mobile nav */
-            background-color: #131722;
+            background-color: #0B0E11;
         }
         
-        /* TradingView-Like Navbar Styles */
+        /* Binance-Like Navbar Styles */
         .top-navbar {
-            background-color: #1E222D;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+            background-color: #1E2026;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             padding: 0.5rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            height: 60px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            height: 64px;
         }
         
         .navbar-brand {
             font-weight: 600;
-            color: #2962FF;
+            color: #F0B90B;
         }
         
         .navbar-brand img {
@@ -56,17 +56,16 @@
         }
         
         .navbar-brand span {
-            background: linear-gradient(90deg, #2962FF, #5599FF);
+            background: linear-gradient(90deg, #F0B90B, #F8D12F);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: bold;
-            letter-spacing: 0.5px;
         }
         
         .nav-link {
-            color: #D1D4DC !important;
+            color: #eaecef !important;
             font-weight: 500;
-            padding: 0.75rem 0.75rem !important;
+            padding: 0.75rem 1rem !important;
             border-radius: 4px;
             transition: all 0.2s;
             position: relative;
@@ -75,28 +74,29 @@
         }
         
         .nav-link:hover {
-            color: #ffffff !important;
-            background-color: rgba(41, 98, 255, 0.1);
+            color: #F0B90B !important;
+            background-color: rgba(240, 185, 11, 0.1);
         }
         
         .nav-link.active {
-            color: #ffffff !important;
-            background-color: rgba(41, 98, 255, 0.2);
+            color: #F0B90B !important;
+            background-color: rgba(240, 185, 11, 0.15);
         }
         
         .nav-link.active::after {
             content: '';
             position: absolute;
             bottom: 0;
-            left: 0;
-            width: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
             height: 3px;
-            background-color: #2962FF;
+            background-color: #F0B90B;
             border-radius: 3px 3px 0 0;
         }
         
         .nav-link svg {
-            margin-right: 0.25rem;
+            margin-right: 0.5rem;
             vertical-align: middle;
             opacity: 0.85;
         }
@@ -180,21 +180,15 @@
             background-color: rgba(0, 0, 0, 0.25);
         }
         
-        /* Navigation - TradingView Style */
-        .top-navbar {
-            background-color: #1E222D;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        
+        /* Navigation - Binance Style */
         .navbar-toggler {
-            color: rgba(255, 255, 255, 0.8);
+            color: #F0B90B;
             border: none;
             transition: all 0.3s ease;
         }
         
         .navbar-toggler:hover {
-            color: #2962FF;
+            color: #F8D12F;
             transform: scale(1.1);
         }
         
@@ -203,12 +197,12 @@
         }
         
         .navbar-collapse {
-            background-color: #1E222D;
-            border-radius: 0 0 0.75rem 0.75rem;
-            padding: 0.75rem;
+            background-color: #1E2026;
+            border-radius: 0 0 0.5rem 0.5rem;
+            padding: 0.5rem;
             margin-top: 0.25rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-top: none;
         }
         
@@ -240,13 +234,13 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: #151924;
+            background-color: #0B0E11;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             z-index: 1000;
             padding: 0.5rem 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
         }
         
         .mobile-nav-item {
@@ -254,18 +248,18 @@
             flex-direction: column;
             align-items: center;
             text-decoration: none;
-            color: #D1D4DC;
+            color: #eaecef;
             font-size: 0.75rem;
             padding: 0.5rem 0;
             transition: all 0.3s ease;
         }
         
         .mobile-nav-item:hover {
-            color: #FFFFFF;
+            color: #F0B90B;
         }
         
         .mobile-nav-item.active {
-            color: #2962FF;
+            color: #F0B90B;
         }
         
         .mobile-nav-item svg {
@@ -279,7 +273,7 @@
         
         /* Utilities */
         .bg-gradient-dark {
-            background: linear-gradient(120deg, #1C1C28, #2D2D3A);
+            background: #0B0E11;
         }
         
         /* Cryptocurrency Page Styles */
