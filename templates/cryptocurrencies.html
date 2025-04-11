@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                     
-                    // به‌روزرسانی MACD
+                    // Update MACD
                     if (analysis.macd !== undefined && analysis.macd_signal !== undefined) {
                         const macdEl = document.querySelector('.indicator-box:nth-child(2) .text-warning');
                         const signalEl = document.querySelector('.indicator-box:nth-child(2) .text-info');
@@ -327,16 +327,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         if (macdDescEl) {
                             if (analysis.macd > analysis.macd_signal) {
-                                macdDescEl.innerHTML = '<i class="fas fa-arrow-up me-1"></i> روند صعودی (سیگنال خرید)';
+                                macdDescEl.innerHTML = '<i class="fas fa-arrow-up me-1"></i> Bullish trend (Buy signal)';
                                 macdDescEl.className = 'text-success';
                             } else {
-                                macdDescEl.innerHTML = '<i class="fas fa-arrow-down me-1"></i> روند نزولی (سیگنال فروش)';
+                                macdDescEl.innerHTML = '<i class="fas fa-arrow-down me-1"></i> Bearish trend (Sell signal)';
                                 macdDescEl.className = 'text-danger';
                             }
                         }
                     }
                     
-                    // به‌روزرسانی میانگین‌های متحرک
+                    // Update Moving Averages
                     if (analysis.ma20 !== undefined && analysis.ma50 !== undefined) {
                         const ma20El = document.querySelector('.indicator-box:nth-child(3) .text-info');
                         const ma50El = document.querySelector('.indicator-box:nth-child(3) .text-warning');
@@ -352,49 +352,49 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         if (maDescEl && analysis.current_price !== undefined) {
                             if (analysis.current_price > analysis.ma20 && analysis.ma20 > analysis.ma50) {
-                                maDescEl.innerHTML = '<i class="fas fa-check-circle me-1"></i> قیمت بالای میانگین‌های متحرک (روند صعودی)';
+                                maDescEl.innerHTML = '<i class="fas fa-check-circle me-1"></i> Price above moving averages (Bullish trend)';
                                 maDescEl.className = 'text-success';
                             } else if (analysis.current_price < analysis.ma20 && analysis.ma20 < analysis.ma50) {
-                                maDescEl.innerHTML = '<i class="fas fa-times-circle me-1"></i> قیمت زیر میانگین‌های متحرک (روند نزولی)';
+                                maDescEl.innerHTML = '<i class="fas fa-times-circle me-1"></i> Price below moving averages (Bearish trend)';
                                 maDescEl.className = 'text-danger';
                             } else {
-                                maDescEl.innerHTML = '<i class="fas fa-minus-circle me-1"></i> قیمت در محدوده میانگین‌های متحرک (روند خنثی)';
+                                maDescEl.innerHTML = '<i class="fas fa-minus-circle me-1"></i> Price between moving averages (Neutral trend)';
                                 maDescEl.className = 'text-warning';
                             }
                         }
                     }
                     
-                    // نمایش نتیجه و مخفی کردن بارگذاری
+                    // Show results and hide loading state
                     if (loadingEl && contentEl) {
                         loadingEl.style.display = 'none';
                         contentEl.style.display = 'block';
                     }
                 } else {
-                    console.error('Error loading technical data:', data.message || 'خطای نامشخص');
+                    console.error('Error loading technical data:', data.message || 'Unknown error');
                     
-                    // مخفی کردن بارگذاری و نمایش پیغام خطا
+                    // Hide loading and show error message
                     if (loadingEl && contentEl) {
                         loadingEl.style.display = 'none';
                         contentEl.style.display = 'block';
-                        contentEl.innerHTML = '<div class="alert alert-danger">خطا در دریافت اطلاعات تحلیل فنی</div>';
+                        contentEl.innerHTML = '<div class="alert alert-danger">Error loading technical analysis data</div>';
                     }
                 }
             })
             .catch(error => {
                 console.error('Error loading technical data:', error);
                 
-                // مخفی کردن بارگذاری و نمایش پیغام خطا
+                // Hide loading and show error message
                 if (loadingEl && contentEl) {
                     loadingEl.style.display = 'none';
                     contentEl.style.display = 'block';
-                    contentEl.innerHTML = '<div class="alert alert-danger">خطا در ارتباط با سرور</div>';
+                    contentEl.innerHTML = '<div class="alert alert-danger">Error connecting to server</div>';
                 }
             });
     }
     
-    // روش ساده برای فیلتر کردن ارزها
+    // Simple method for filtering cryptocurrencies
     function setupFilterButtons() {
-        // انتخاب دکمه‌ها و سطرهای جدول
+        // Select buttons and table rows
         const allButton = document.querySelector('[data-crypto-category="all"]');
         const majorButton = document.querySelector('[data-crypto-category="major"]');
         const promisingButton = document.querySelector('[data-crypto-category="promising"]');
@@ -405,25 +405,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const promisingRows = document.querySelectorAll('.crypto-row.promising');
         const newRows = document.querySelectorAll('.crypto-row.new');
         
-        console.log('تعداد کل سطرها:', allRows.length);
-        console.log('سطرهای ارزهای اصلی:', majorRows.length);
-        console.log('سطرهای ارزهای با پتانسیل:', promisingRows.length);
-        console.log('سطرهای ارزهای جدید:', newRows.length);
+        console.log('Total rows:', allRows.length);
+        console.log('Major coin rows:', majorRows.length);
+        console.log('Promising coin rows:', promisingRows.length);
+        console.log('New coin rows:', newRows.length);
         
-        // تابع نمایش دادن یا مخفی کردن سطرها
+        // Function to show or hide rows
         function showRows(rowsToShow) {
-            // همه سطرها را مخفی کن
+            // Hide all rows
             allRows.forEach(row => {
                 row.style.display = 'none';
             });
             
-            // فقط سطرهای انتخاب شده را نمایش بده
+            // Show only selected rows
             rowsToShow.forEach(row => {
                 row.style.display = '';
             });
         }
         
-        // تابع به روزرسانی وضعیت دکمه‌ها
+        // Function to update button states
         function updateButtonStates(activeButton) {
             [allButton, majorButton, promisingButton, newButton].forEach(button => {
                 button.classList.remove('active');
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
             activeButton.classList.add('btn-warning');
         }
         
-        // اضافه کردن رویداد کلیک برای هر دکمه
+        // Add click event for each button
         if (allButton) {
             allButton.addEventListener('click', function() {
                 updateButtonStates(this);
@@ -466,18 +466,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // فراخوانی تابع تنظیم دکمه‌های فیلتر
+    // Call the filter buttons setup function
     setupFilterButtons();
     
-    // دکمه‌های تحلیل در جدول ارزها
+    // Analysis buttons in the cryptocurrencies table
     const tableAnalysisButtons = document.querySelectorAll('td .analysis-button');
     
-    // اضافه کردن رویداد کلیک برای نمایش تحلیل فنی
+    // Add click event for showing technical analysis
     tableAnalysisButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
             
-            // دریافت اطلاعات ارز از سطر کلیک شده
+            // Get cryptocurrency info from the clicked row
             const row = this.closest('tr');
             const cryptoNameElement = row.querySelector('.d-flex > div:nth-child(2)');
             const cryptoSymbolElement = row.querySelector('td:nth-child(3)');
@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const cryptoName = cryptoNameElement.textContent;
                 const cryptoSymbol = cryptoSymbolElement.textContent;
                 
-                // به روزرسانی بخش تحلیل
+                // Update analysis section
                 const nameElement = document.getElementById('selected-crypto-name');
                 const symbolElement = document.getElementById('selected-crypto-symbol');
                 const nameElement2 = document.getElementById('selected-crypto-name2');
@@ -499,22 +499,22 @@ document.addEventListener('DOMContentLoaded', function() {
                         nameElement2.textContent = cryptoName;
                     }
                     
-                    // درخواست دریافت تحلیل فنی برای ارز انتخاب شده
+                    // Request technical analysis data for selected cryptocurrency
                     loadTechnicalData(cryptoSymbol);
                 }
                 
-                // نمایش بخش تحلیل فنی (به جای اخبار)
+                // Show technical analysis section (instead of news)
                 document.getElementById('technical-analysis-content').style.display = 'none';
                 document.getElementById('news-analysis-content').style.display = 'block';
                 
-                // اسکرول به بخش تحلیل
+                // Scroll to analysis section
                 const analysisSection = document.querySelector('.card-header');
-                if (analysisSection && analysisSection.textContent.includes('تحلیل تکنیکال')) {
+                if (analysisSection && analysisSection.textContent.includes('Technical Analysis')) {
                     analysisSection.scrollIntoView({
                         behavior: 'smooth'
                     });
                 } else {
-                    // اگر بخش تحلیل پیدا نشد، به انتهای صفحه اسکرول کن
+                    // If analysis section not found, scroll to end of page
                     window.scrollTo({
                         top: document.body.scrollHeight,
                         behavior: 'smooth'
@@ -524,9 +524,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // تنظیم دکمه‌های زبانه برای تحلیل فنی / اخبار
+    // Setup tabs for technical analysis / news
     function setupTabs() {
-        // تابع نمایش تحلیل فنی
+        // Function to show technical analysis
         function showTechnical() {
             const technicalContent = document.getElementById('technical-analysis-content');
             const newsContent = document.getElementById('news-analysis-content');
@@ -543,11 +543,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 newsButton.classList.add('btn-outline-primary');
                 newsButton.classList.remove('btn-primary');
                 
-                console.log('نمایش تحلیل فنی');
+                console.log('Showing technical analysis');
             }
         }
         
-        // تابع نمایش اخبار
+        // Function to show news
         function showNews() {
             const technicalContent = document.getElementById('technical-analysis-content');
             const newsContent = document.getElementById('news-analysis-content');
@@ -564,22 +564,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 newsButton.classList.add('btn-primary');
                 newsButton.classList.remove('btn-outline-primary');
                 
-                // به‌روزرسانی نام رمزارز در بخش اخبار
+                // Update cryptocurrency name in news section
                 const cryptoName = document.getElementById('selected-crypto-name').textContent;
                 const cryptoName2 = document.getElementById('selected-crypto-name2');
                 if (cryptoName2) {
                     cryptoName2.textContent = cryptoName;
                 }
                 
-                console.log('نمایش اخبار و تحلیل‌ها');
+                console.log('Showing news and analysis');
             }
         }
         
-        // تعریف توابع در سطح کلی صفحه
+        // Define functions at global scope
         window.showTechnical = showTechnical;
         window.showNews = showNews;
         
-        // اضافه کردن event listener به دکمه‌ها
+        // Add event listeners to buttons
         const techButton = document.getElementById('show-technical');
         const newsButton = document.getElementById('show-news');
         
@@ -592,12 +592,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // شبیه‌سازی به‌روزرسانی قیمت‌ها (در حالت واقعی با API جایگزین می‌شود)
+    // Update cryptocurrency prices (API-based)
     function updatePrices() {
         const cryptoPriceElements = document.querySelectorAll('[id$="-price"]');
         const cryptoChangeElements = document.querySelectorAll('[id$="-change"]');
         
-        // به‌روزرسانی قیمت‌ها با استفاده از API
+        // Update prices using API
         cryptoPriceElements.forEach(el => {
             const domId = el.id;
             const symbol = domId.replace('-price', '');
@@ -606,16 +606,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success && data.data) {
-                            // به‌روزرسانی قیمت
+                            // Update price
                             el.textContent = formatPrice(data.data.price);
                             
-                            // به‌روزرسانی درصد تغییر (اگر element وجود داشته باشد)
+                            // Update percentage change (if element exists)
                             const changeEl = document.getElementById(`${symbol}-change`);
                             if (changeEl && data.data.change_24h !== undefined) {
                                 const newChange = data.data.change_24h;
                                 changeEl.textContent = (newChange >= 0 ? '+' : '') + newChange.toFixed(2) + '%';
                                 
-                                // به‌روزرسانی رنگ‌ها
+                                // Update colors
                                 if (newChange >= 0) {
                                     changeEl.className = 'text-success';
                                 } else {
@@ -631,10 +631,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // به‌روزرسانی قیمت‌ها هر 5 ثانیه
+    // Update prices every 5 seconds
     setInterval(updatePrices, 5000);
     
-    // اجرای توابع اصلی
+    // Execute main functions
     setupTabs();
     setTimeout(updatePrices, 1000);
 });
