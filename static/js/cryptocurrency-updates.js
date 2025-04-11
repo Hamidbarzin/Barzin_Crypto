@@ -6,56 +6,20 @@
  * از محدودیت‌های API اجتناب می‌کند.
  */
 
-// آرایه‌های سکه‌ها برای به‌روزرسانی خودکار
-const memeCoins = ['DOGE', 'SHIB', 'PEPE', 'FLOKI', 'WIF', 'MEME'];
+// آرایه‌های سکه‌ها برای به‌روزرسانی خودکار - ارزهای میم و ارزان حذف شده‌اند
 const aiCoins = ['RNDR', 'FET', 'OCEAN', 'AGIX'];
-const lowCostCoins = ['VET', 'XDC', 'HBAR', 'XLM', 'JASMY'];
 
 // برای مدیریت سکه‌هایی که در حال به‌روزرسانی هستند
 const updatingCoins = new Set();
 
 // تابع اصلی به‌روزرسانی ارزهای دیجیتال ویژه
 function updateSpecialCoins() {
-    console.log("Updating special coins (meme coins, AI coins & low-cost coins)");
+    console.log("Updating AI coins only");
     
-    // یکی‌کردن همه سکه‌ها و به‌روزرسانی آنها با تاخیر متفاوت
-    const allCoins = [...memeCoins, ...aiCoins, ...lowCostCoins];
+    // ارزهای میم و ارزان حذف شده‌اند
+    const allCoins = [...aiCoins];
     
     console.log("Coins to update:", allCoins);
-    
-    // تست مستقیم برای رفع اشکال
-    fetch('/api/price/doge')
-        .then(response => response.json())
-        .then(data => {
-            console.log("TEST DOGE RESPONSE:", data);
-            if (data.success && data.data && data.data.price) {
-                const priceElement = document.getElementById('DOGE-USDT-price');
-                if (priceElement) {
-                    priceElement.textContent = formatPrice(data.data.price);
-                    console.log("DOGE price updated to", data.data.price);
-                } else {
-                    console.error("DOGE price element not found");
-                }
-            }
-        })
-        .catch(error => console.error("Error fetching DOGE:", error));
-    
-    // تست با ارز RNDR
-    fetch('/api/price/rndr')
-        .then(response => response.json())
-        .then(data => {
-            console.log("TEST RNDR RESPONSE:", data);
-            if (data.success && data.data && data.data.price) {
-                const priceElement = document.getElementById('RNDR-USDT-price');
-                if (priceElement) {
-                    priceElement.textContent = formatPrice(data.data.price);
-                    console.log("RNDR price updated to", data.data.price);
-                } else {
-                    console.error("RNDR price element not found");
-                }
-            }
-        })
-        .catch(error => console.error("Error fetching RNDR:", error));
     
     // به‌روزرسانی هر سکه با تاخیر متفاوت برای جلوگیری از درخواست‌های همزمان زیاد
     allCoins.forEach((coin, index) => {
@@ -240,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // بررسی موجود بودن المان‌های قیمت در DOM
 function checkPriceElements() {
-    const allCoins = ['BTC', 'ETH', 'SOL', 'XRP', ...memeCoins, ...aiCoins, ...lowCostCoins];
+    const allCoins = ['BTC', 'ETH', 'SOL', 'XRP', ...aiCoins];
     
     console.log("Checking price elements for these coins:", allCoins);
     
