@@ -1725,7 +1725,7 @@ def get_price(symbol=None):
         logger.warning(f"No result for {symbol} or alternatives, API request failed")
         return jsonify({
             'success': False, 
-            'message': 'خطا در دریافت اطلاعات قیمت. لطفاً بعداً دوباره امتحان کنید.'
+            'message': 'Error retrieving price data. Please try again later.'
         })
     except Exception as e:
         logger.error(f"Error getting price for {symbol}: {str(e)}")
