@@ -608,37 +608,15 @@
             return col;
         }
         
-        // Keep track of delayed fetch calls to avoid overwhelming the server
-        const fetchQueue = [];
-        const maxConcurrentRequests = 3;
-        let activeRequests = 0;
-        
+        // Direct API request method - simplified for better reliability
         function queueFetchRequest(coin, base) {
-            return new Promise((resolve) => {
-                fetchQueue.push(() => {
-                    executeFetch(coin, base).finally(() => {
-                        activeRequests--;
-                        processQueue(); // Process next in queue when this is done
-                        resolve();
-                    });
-                });
-                
-                processQueue();
-            });
-        }
-        
-        function processQueue() {
-            if (fetchQueue.length === 0 || activeRequests >= maxConcurrentRequests) {
-                return;
-            }
-            
-            const nextFetch = fetchQueue.shift();
-            activeRequests++;
-            setTimeout(nextFetch, 100); // Small delay for stability
-        }
-        
-        function executeFetch(coin, base) {
             const symbol = `${coin}-${base}`;
+            setTimeout(() => {
+                fetchCoinPrice(coin, symbol);
+            }, Math.random() * 1000); // Add random delay between 0-1000ms to avoid overwhelming the server
+        }
+        
+        function fetchCoinPrice(coin, symbol) {
             const priceElement = document.getElementById(`${symbol}-price`);
             const changeElement = document.getElementById(`${symbol}-change`);
             
@@ -651,18 +629,9 @@
                 changeElement.textContent = '...';
             }
             
-            // Use a shorter timeout for API requests
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => {
-                controller.abort();
-            }, 5000);
-            
-            // Try API with the coin name only for faster response
-            return fetch('/api/price/' + coin.toLowerCase(), {
-                signal: controller.signal
-            })
+            // Simple direct API call without any extra headers, options or signal
+            fetch('/api/price/' + coin.toLowerCase())
                 .then(response => {
-                    clearTimeout(timeoutId);
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
