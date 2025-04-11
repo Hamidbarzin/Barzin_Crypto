@@ -1223,23 +1223,23 @@
             try {
                 console.log('Updating signal prices');
                 
-                // دریافت قیمت بیت‌کوین
+                // دریافت قیمت بیت‌کوین با استفاده از ID استاندارد جدید
                 const btcPrice = document.getElementById('BTC-USDT-price')?.textContent;
                 if (btcPrice && btcPrice !== '--') {
                     const btcSignalPrice = document.getElementById('btc-signal-price');
                     if (btcSignalPrice) {
                         console.log('Updating BTC price to:', btcPrice);
-                        btcSignalPrice.textContent = btcPrice;
+                        btcSignalPrice.textContent = btcPrice + ' USDT';
                     }
                 }
                 
-                // دریافت قیمت اتریوم
+                // دریافت قیمت اتریوم با استفاده از ID استاندارد جدید
                 const ethPrice = document.getElementById('ETH-USDT-price')?.textContent;
                 if (ethPrice && ethPrice !== '--') {
                     const ethSignalPrice = document.getElementById('eth-signal-price');
                     if (ethSignalPrice) {
                         console.log('Updating ETH price to:', ethPrice);
-                        ethSignalPrice.textContent = ethPrice;
+                        ethSignalPrice.textContent = ethPrice + ' USDT';
                     }
                 }
             } catch (error) {
