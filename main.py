@@ -834,6 +834,7 @@ def test_menu():
     return redirect(url_for('index'))
 
 @app.route('/app_settings')
+@login_required
 def app_settings():
     """صفحه تنظیمات ساده"""
     return redirect(url_for('dashboard'))
@@ -841,6 +842,7 @@ def app_settings():
 @app.route('/notifications')
 @app.route('/notification_settings')
 @app.route('/notification-settings')
+@login_required
 def notification_settings():
     """صفحه تنظیمات اعلان‌ها"""
     # تنظیمات پیش‌فرض اعلان‌ها
