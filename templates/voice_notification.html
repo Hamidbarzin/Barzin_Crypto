@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اعلان صوتی چندزبانه | Crypto Barzin</title>
+    <title>Multilingual Voice Notifications | Crypto Barzin</title>
     <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
     <style>
         body {
@@ -43,7 +43,7 @@
         .crypto-icon {
             width: 24px;
             height: 24px;
-            margin-right: 5px;
+            margin-left: 5px;
         }
         
         .voice-preview-container {
@@ -69,17 +69,17 @@
             <div class="col-12">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">خانه</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">اعلان صوتی چندزبانه</li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Multilingual Voice Notifications</li>
                     </ol>
                 </nav>
                 
                 <div class="card bg-dark text-light mb-4">
                     <div class="card-header">
-                        <h2 class="mb-0">تست اعلان صوتی چندزبانه</h2>
+                        <h2 class="mb-0">Multilingual Voice Notification Test</h2>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">ایجاد و تست اعلان‌های صوتی به زبان‌های مختلف برای تغییرات قیمت ارزهای دیجیتال.</p>
+                        <p class="card-text">Create and test voice notifications in different languages for cryptocurrency price changes.</p>
                     </div>
                 </div>
             </div>
@@ -89,33 +89,33 @@
             <div class="col-md-8">
                 <div class="card bg-dark text-light notification-box">
                     <div class="card-body">
-                        <h3 class="card-title">تنظیمات اعلان</h3>
+                        <h3 class="card-title">Notification Settings</h3>
                         
                         <form id="voiceForm">
                             <div class="mb-3">
-                                <label for="cryptoSelect" class="form-label">ارز دیجیتال</label>
+                                <label for="cryptoSelect" class="form-label">Cryptocurrency</label>
                                 <select class="form-select" id="cryptoSelect">
-                                    <option value="BTC">بیت‌کوین (BTC)</option>
-                                    <option value="ETH">اتریوم (ETH)</option>
-                                    <option value="SOL">سولانا (SOL)</option>
-                                    <option value="BNB">بایننس کوین (BNB)</option>
-                                    <option value="XRP">ریپل (XRP)</option>
+                                    <option value="BTC">Bitcoin (BTC)</option>
+                                    <option value="ETH">Ethereum (ETH)</option>
+                                    <option value="SOL">Solana (SOL)</option>
+                                    <option value="BNB">Binance Coin (BNB)</option>
+                                    <option value="XRP">Ripple (XRP)</option>
                                 </select>
                             </div>
                             
                             <div class="mb-3">
-                                <label for="eventType" class="form-label">نوع رویداد</label>
+                                <label for="eventType" class="form-label">Event Type</label>
                                 <select class="form-select" id="eventType">
-                                    <option value="price_increase">افزایش قیمت</option>
-                                    <option value="price_decrease">کاهش قیمت</option>
-                                    <option value="target_reached">رسیدن به قیمت هدف</option>
-                                    <option value="stop_loss">رسیدن به حد ضرر</option>
-                                    <option value="high_volatility">نوسان بالا</option>
+                                    <option value="price_increase">Price Increase</option>
+                                    <option value="price_decrease">Price Decrease</option>
+                                    <option value="target_reached">Target Price Reached</option>
+                                    <option value="stop_loss">Stop Loss Triggered</option>
+                                    <option value="high_volatility">High Volatility</option>
                                 </select>
                             </div>
                             
                             <div class="mb-3">
-                                <label for="priceRange" class="form-label">میزان تغییر قیمت (%)</label>
+                                <label for="priceRange" class="form-label">Price Change Percentage (%)</label>
                                 <div class="price-range">
                                     <div id="priceValue">5%</div>
                                     <input type="range" class="form-range" id="priceRange" min="1" max="20" value="5">
@@ -123,40 +123,40 @@
                             </div>
                             
                             <div class="mb-3">
-                                <label class="form-label">زبان اعلان</label>
+                                <label class="form-label">Notification Language</label>
                                 <div class="language-selector">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="language" id="langFrench" value="fr" checked>
                                         <label class="form-check-label" for="langFrench">
-                                            فرانسوی (Français)
+                                            French (Français)
                                         </label>
                                     </div>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="language" id="langEnglish" value="en">
                                         <label class="form-check-label" for="langEnglish">
-                                            انگلیسی
+                                            English
                                         </label>
                                     </div>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="language" id="langArabic" value="ar">
                                         <label class="form-check-label" for="langArabic">
-                                            عربی
+                                            Arabic
                                         </label>
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="mb-3">
-                                <label for="voiceGender" class="form-label">جنسیت صدا</label>
+                                <label for="voiceGender" class="form-label">Voice Gender</label>
                                 <select class="form-select" id="voiceGender">
-                                    <option value="male">مرد</option>
-                                    <option value="female">زن</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
                                 </select>
                             </div>
                             
                             <div class="d-flex justify-content-between">
-                                <button type="button" id="previewBtn" class="btn btn-primary">پیش‌نمایش صدا</button>
-                                <button type="button" id="saveBtn" class="btn btn-success">ذخیره تنظیمات</button>
+                                <button type="button" id="previewBtn" class="btn btn-primary">Preview Voice</button>
+                                <button type="button" id="saveBtn" class="btn btn-success">Save Settings</button>
                             </div>
                         </form>
                     </div>
@@ -166,20 +166,20 @@
             <div class="col-md-4">
                 <div class="card bg-dark text-light">
                     <div class="card-body">
-                        <h3 class="card-title">پیش‌نمایش صدا</h3>
+                        <h3 class="card-title">Voice Preview</h3>
                         <div class="voice-preview-container">
                             <div id="previewText" class="mb-3 text-info">
-                                <p>متن اعلان اینجا نمایش داده می‌شود...</p>
+                                <p>Notification text will appear here...</p>
                             </div>
                             <div id="audioPlayer" class="preview-audio">
                                 <!-- Audio player will be inserted here -->
                             </div>
                             <div class="mt-3 d-flex justify-content-center">
                                 <button id="playBtn" class="btn btn-outline-info btn-voice-preview" disabled>
-                                    <i class="bi bi-play-fill"></i> پخش
+                                    <i class="bi bi-play-fill"></i> Play
                                 </button>
                                 <button id="downloadBtn" class="btn btn-outline-success btn-voice-preview" disabled>
-                                    <i class="bi bi-download"></i> دانلود
+                                    <i class="bi bi-download"></i> Download
                                 </button>
                             </div>
                         </div>
@@ -188,10 +188,10 @@
                 
                 <div class="card bg-dark text-light mt-4">
                     <div class="card-body">
-                        <h3 class="card-title">تاریخچه اعلان‌ها</h3>
+                        <h3 class="card-title">Notification History</h3>
                         <div class="notification-history" id="notificationHistory">
                             <div class="alert alert-dark text-secondary">
-                                تاریخچه‌ای موجود نیست
+                                No history available
                             </div>
                         </div>
                     </div>
@@ -243,12 +243,12 @@
                 .then(data => {
                     if (data.success) {
                         // Update preview text
-                        previewText.innerHTML = `<p><strong>متن اعلان:</strong></p><p>${data.text}</p>`;
+                        previewText.innerHTML = `<p><strong>Notification text:</strong></p><p>${data.text}</p>`;
                         
                         // Update audio player
                         audioPlayer.innerHTML = `<audio id="notificationAudio" controls>
                             <source src="${data.audio_url}" type="audio/mpeg">
-                            مرورگر شما از پخش صدا پشتیبانی نمی‌کند.
+                            Your browser does not support audio playback.
                         </audio>`;
                         
                         // Enable buttons
@@ -258,11 +258,11 @@
                         // Add to history
                         addToHistory(crypto, eventType, language, data.audio_url);
                     } else {
-                        previewText.innerHTML = `<p class="text-danger">خطا: ${data.error}</p>`;
+                        previewText.innerHTML = `<p class="text-danger">Error: ${data.error}</p>`;
                     }
                 })
                 .catch(error => {
-                    previewText.innerHTML = `<p class="text-danger">خطا در ارتباط با سرور: ${error}</p>`;
+                    previewText.innerHTML = `<p class="text-danger">Server connection error: ${error}</p>`;
                 });
             });
             
@@ -313,13 +313,13 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('تنظیمات با موفقیت ذخیره شد.');
+                        alert('Settings saved successfully.');
                     } else {
-                        alert(`خطا: ${data.error}`);
+                        alert(`Error: ${data.error}`);
                     }
                 })
                 .catch(error => {
-                    alert(`خطا در ارتباط با سرور: ${error}`);
+                    alert(`Server connection error: ${error}`);
                 });
             });
             
@@ -335,19 +335,19 @@
                 // Format event type for display
                 let eventTypeText = '';
                 switch(eventType) {
-                    case 'price_increase': eventTypeText = 'افزایش قیمت'; break;
-                    case 'price_decrease': eventTypeText = 'کاهش قیمت'; break;
-                    case 'target_reached': eventTypeText = 'قیمت هدف'; break;
-                    case 'stop_loss': eventTypeText = 'حد ضرر'; break;
-                    case 'high_volatility': eventTypeText = 'نوسان بالا'; break;
+                    case 'price_increase': eventTypeText = 'Price Increase'; break;
+                    case 'price_decrease': eventTypeText = 'Price Decrease'; break;
+                    case 'target_reached': eventTypeText = 'Target Price'; break;
+                    case 'stop_loss': eventTypeText = 'Stop Loss'; break;
+                    case 'high_volatility': eventTypeText = 'High Volatility'; break;
                 }
                 
                 // Format language for display
                 let languageText = '';
                 switch(language) {
-                    case 'fr': languageText = 'فرانسوی'; break;
-                    case 'en': languageText = 'انگلیسی'; break;
-                    case 'ar': languageText = 'عربی'; break;
+                    case 'fr': languageText = 'French'; break;
+                    case 'en': languageText = 'English'; break;
+                    case 'ar': languageText = 'Arabic'; break;
                 }
                 
                 // Create history item
@@ -374,7 +374,7 @@
                     // Update audio player
                     audioPlayer.innerHTML = `<audio id="notificationAudio" controls>
                         <source src="${audioUrl}" type="audio/mpeg">
-                        مرورگر شما از پخش صدا پشتیبانی نمی‌کند.
+                        Your browser does not support audio playback.
                     </audio>`;
                     
                     // Play audio
