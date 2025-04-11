@@ -641,10 +641,128 @@ def cryptocurrencies():
         }
     ]
     
+    # لیست ارزهای میم محبوب
+    meme_coins = [
+        {
+            'id': 12, 
+            'name': 'دوج‌کوین', 
+            'symbol': 'DOGE/USDT', 
+            'icon': 'fas fa-dog text-warning',
+            'price': '0.1568',
+            'change': '+1.5%',
+            'volume': '950M',
+            'signal': 'نگهداری',
+            'signal_class': 'warning'
+        },
+        {
+            'id': 13, 
+            'name': 'شیبا اینو', 
+            'symbol': 'SHIB/USDT', 
+            'icon': 'fas fa-dog text-danger',
+            'price': '0.00001191',
+            'change': '+1.2%',
+            'volume': '850M',
+            'signal': 'خرید',
+            'signal_class': 'success'
+        },
+        {
+            'id': 14, 
+            'name': 'پپه', 
+            'symbol': 'PEPE/USDT', 
+            'icon': 'fas fa-frog text-success',
+            'price': '0.00000678',
+            'change': '+2.5%',
+            'volume': '520M',
+            'signal': 'خرید',
+            'signal_class': 'success'
+        },
+        {
+            'id': 15, 
+            'name': 'فلوکی', 
+            'symbol': 'FLOKI/USDT', 
+            'icon': 'fas fa-paw text-warning',
+            'price': '0.00005347',
+            'change': '+3.2%',
+            'volume': '320M',
+            'signal': 'خرید',
+            'signal_class': 'success'
+        },
+        {
+            'id': 16, 
+            'name': 'دوگ ویف هت', 
+            'symbol': 'WIF/USDT', 
+            'icon': 'fas fa-hat-cowboy text-primary',
+            'price': '0.3736',
+            'change': '+4.8%',
+            'volume': '280M',
+            'signal': 'خرید قوی',
+            'signal_class': 'success'
+        },
+        {
+            'id': 17, 
+            'name': 'میم کوین', 
+            'symbol': 'MEME/USDT', 
+            'icon': 'fas fa-laugh-squint text-warning',
+            'price': '0.001586',
+            'change': '+2.1%',
+            'volume': '180M',
+            'signal': 'نگهداری',
+            'signal_class': 'warning'
+        }
+    ]
+    
+    # لیست ارزهای کم‌هزینه با پتانسیل رشد
+    low_cost_coins = [
+        {
+            'id': 18, 
+            'name': 'وی‌چین', 
+            'symbol': 'VET/USDT', 
+            'icon': 'fas fa-link text-primary',
+            'price': '0.02162',
+            'change': '+1.2%',
+            'volume': '120M',
+            'signal': 'خرید',
+            'signal_class': 'success'
+        },
+        {
+            'id': 19, 
+            'name': 'ایکس‌دی‌سی', 
+            'symbol': 'XDC/USDT', 
+            'icon': 'fas fa-cube text-info',
+            'price': '0.06532',
+            'change': '+2.4%',
+            'volume': '85M',
+            'signal': 'خرید',
+            'signal_class': 'success'
+        },
+        {
+            'id': 20, 
+            'name': 'هدرا', 
+            'symbol': 'HBAR/USDT', 
+            'icon': 'fas fa-h-square text-primary',
+            'price': '0.1717',
+            'change': '+3.5%',
+            'volume': '110M',
+            'signal': 'خرید',
+            'signal_class': 'success'
+        },
+        {
+            'id': 21, 
+            'name': 'استلار', 
+            'symbol': 'XLM/USDT', 
+            'icon': 'fas fa-star text-warning',
+            'price': '0.2333',
+            'change': '+1.8%',
+            'volume': '95M',
+            'signal': 'نگهداری',
+            'signal_class': 'warning'
+        }
+    ]
+    
     # لیست ارزهای مهم لایر 1 و 2
     layer_coins = [
         {
-            'id': 12, 
+            'id': 22, 
             'name': 'پلیگان', 
             'symbol': 'MATIC/USDT', 
             'icon': 'fas fa-project-diagram text-purple',
@@ -655,7 +773,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 13, 
+            'id': 23, 
             'name': 'آربیتروم', 
             'symbol': 'ARB/USDT', 
             'icon': 'fas fa-chart-line text-primary',
@@ -666,7 +784,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 14, 
+            'id': 24, 
             'name': 'اپتیمیسم', 
             'symbol': 'OP/USDT', 
             'icon': 'fas fa-rocket text-danger',
@@ -679,12 +797,14 @@ def cryptocurrencies():
     ]
     
     # ترکیب همه ارزها
-    all_cryptocurrencies = important_coins + ai_coins + layer_coins
+    all_cryptocurrencies = important_coins + ai_coins + meme_coins + low_cost_coins + layer_coins
     
     return render_template('cryptocurrencies.html', 
                           cryptocurrencies=all_cryptocurrencies,
                           major_coins=important_coins,
                           promising_coins=ai_coins,
+                          meme_coins=meme_coins,
+                          low_cost_coins=low_cost_coins,
                           new_coins=layer_coins,
                           developer_name="حمید برزین")
 
