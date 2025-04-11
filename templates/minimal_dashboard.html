@@ -1131,60 +1131,7 @@
 {% block extra_scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // تابع به‌روزرسانی ارزهای ویژه (میم کوین‌ها و ارزهای هوش مصنوعی)
-        function updateSpecialCoins() {
-            console.log('Updating special coins (meme coins & AI coins)');
-            const specialCoins = [
-                // میم کوین‌ها
-                'DOGE', 'SHIB', 'PEPE', 'FLOKI', 'WIF', 'MEME',
-                // ارزهای هوش مصنوعی
-                'RNDR', 'FET', 'OCEAN', 'AGIX',
-                // ارزهای کم‌ارزش با پتانسیل رشد
-                'VET', 'XDC', 'HBAR', 'XLM', 'JASMY'
-            ];
-            
-            specialCoins.forEach((coin, index) => {
-                setTimeout(() => {
-                    console.log(`Directly updating ${coin} price`);
-                    fetch(`/api/price/${coin.toLowerCase()}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data && data.success && data.data && data.data.price) {
-                            const priceElement = document.getElementById(`${coin}-USDT-price`);
-                            const changeElement = document.getElementById(`${coin}-USDT-change`);
-                            
-                            if (priceElement) {
-                                const price = parseFloat(data.data.price);
-                                priceElement.textContent = formatPrice(price);
-                                console.log(`Successfully updated ${coin} price to ${price}`);
-                            }
-                            
-                            if (changeElement) {
-                                const change = parseFloat(data.data.change_24h || 0);
-                                changeElement.textContent = formatChange(change);
-                                
-                                if (change >= 0) {
-                                    changeElement.classList.add('positive-change');
-                                    changeElement.classList.remove('negative-change');
-                                } else {
-                                    changeElement.classList.add('negative-change');
-                                    changeElement.classList.remove('positive-change');
-                                }
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error(`Error updating ${coin}:`, error);
-                    });
-                }, index * 500); // 500ms delay between each request
-            });
-        }
-        
-        // به‌روزرسانی ارزهای ویژه هنگام بارگذاری صفحه
-        setTimeout(updateSpecialCoins, 2000);
-        
-        // به‌روزرسانی ارزهای ویژه هر 30 ثانیه
-        setInterval(updateSpecialCoins, 30000);
+        // توجه: عملیات به‌روزرسانی قیمت ارزها به فایل مستقل cryptocurrency-updates.js منتقل شده است
     
         // تابع تغییر بخش
         window.switchSection = function(sectionName) {
