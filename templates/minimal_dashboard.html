@@ -1550,12 +1550,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log(`  Is visible: ${window.getComputedStyle(elem).display !== 'none'}`);
                     console.log(`  Class list: ${elem.className}`);
                     // تست مستقیم تغییر محتوا
-                    if (id === 'DOGE-USDT-price') {
-                        elem.textContent = "DEBUG-TEST";
-                        elem.style.color = "red";
-                        elem.style.fontWeight = "bold";
-                        console.log(`  DEBUG: Set ${id} to "DEBUG-TEST" with red color`);
-                    }
+                    // کد تست حذف شد - مقدار‌های واقعی از API ها استفاده می‌شوند
+                    console.log(`  ${id} ready for update from API`);
+                    
                 } else {
                     console.error(`✗ Element ${id} NOT found!`);
                 }
