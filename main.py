@@ -1228,7 +1228,7 @@ def test_telegram():
 @app.route('/send_price_report')
 def send_price_report():
     """صفحه ارسال گزارش قیمت ارزهای دیجیتال به تلگرام"""
-    success = send_telegram_price_report()
+    success = replit_telegram_sender.send_price_report()
     if success:
         flash('گزارش قیمت با موفقیت به تلگرام ارسال شد.', 'success')
     else:
@@ -1238,7 +1238,7 @@ def send_price_report():
 @app.route('/send_system_report')
 def send_system_report():
     """صفحه ارسال گزارش سیستم به تلگرام"""
-    success = send_telegram_system_report()
+    success = replit_telegram_sender.send_system_report()
     if success:
         flash('گزارش سیستم با موفقیت به تلگرام ارسال شد.', 'success')
     else:
@@ -1248,7 +1248,7 @@ def send_system_report():
 @app.route('/send_trading_signals')
 def send_trading_signals_route():
     """صفحه ارسال سیگنال‌های معاملاتی به تلگرام"""
-    success = send_telegram_trading_signals()
+    success = replit_telegram_sender.send_trading_signals()
     if success:
         flash('سیگنال‌های معاملاتی با موفقیت به تلگرام ارسال شد.', 'success')
     else:
@@ -1259,7 +1259,7 @@ def send_trading_signals_route():
 def send_technical_analysis_route():
     """صفحه ارسال تحلیل تکنیکال به تلگرام"""
     symbol = request.args.get('symbol', 'BTC/USDT')
-    success = send_telegram_technical_analysis(symbol)
+    success = replit_telegram_sender.send_technical_analysis(symbol)
     if success:
         flash(f'تحلیل تکنیکال برای {symbol} با موفقیت به تلگرام ارسال شد.', 'success')
     else:
