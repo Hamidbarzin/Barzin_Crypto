@@ -39,10 +39,10 @@
         
         /* Binance-Like Navbar Styles */
         .top-navbar {
-            background-color: #1E2026;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            background-color: #0B0E11;
+            box-shadow: none;
             padding: 0.5rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             height: 64px;
         }
         
@@ -63,24 +63,26 @@
         }
         
         .nav-link {
-            color: #eaecef !important;
-            font-weight: 500;
-            padding: 0.75rem 1rem !important;
-            border-radius: 4px;
+            color: #848E9C !important;
+            font-weight: 400;
+            padding: 0.6rem 0.8rem !important;
             transition: all 0.2s;
             position: relative;
             margin: 0 0.15rem;
             font-size: 14px;
+            border: none;
+            background: none;
         }
         
         .nav-link:hover {
             color: #F0B90B !important;
-            background-color: rgba(240, 185, 11, 0.1);
+            background: none;
         }
         
         .nav-link.active {
             color: #F0B90B !important;
-            background-color: rgba(240, 185, 11, 0.15);
+            background: none;
+            font-weight: 500;
         }
         
         .nav-link.active::after {
@@ -89,10 +91,10 @@
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 50%;
-            height: 3px;
+            width: 20px;
+            height: 2px;
             background-color: #F0B90B;
-            border-radius: 3px 3px 0 0;
+            border-radius: 1px 1px 0 0;
         }
         
         .nav-link svg {
@@ -456,62 +458,36 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/minimal_dashboard' or request.path == '/' %}active{% endif %}" href="/minimal_dashboard">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-speedometer2 me-1" viewBox="0 0 16 16">
-                                <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4M3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707M2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10m9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5m.754-4.246a.39.39 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.39.39 0 0 0-.029-.518z"/>
-                                <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.99 7.99 0 0 1 0 10m8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3"/>
-                            </svg>
                             Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/cryptocurrencies' or request.path == '/crypto' %}active{% endif %}" href="/cryptocurrencies">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-currency-bitcoin me-1" viewBox="0 0 16 16">
-                                <path d="M5.5 13v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.084c1.992 0 3.416-1.033 3.416-2.82 0-1.502-1.007-2.323-2.186-2.44v-.088c.97-.242 1.683-.974 1.683-2.19C11.997 3.93 10.847 3 9.092 3H9V1.75a.25.25 0 0 0-.25-.25h-1a.25.25 0 0 0-.25.25V3h-.5V1.75a.25.25 0 0 0-.25-.25h-1a.25.25 0 0 0-.25.25V3h-1.5a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-.5a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h1.5v1.25c0 .138.112.25.25.25zM4.25 4.5h4.5a1.5 1.5 0 0 1 1.5 1.5 1.5 1.5 0 0 1-1.5 1.5h-4.5zm0 4h4.5a1.5 1.5 0 0 1 1.5 1.5 1.5 1.5 0 0 1-1.5 1.5h-4.5z"/>
-                            </svg>
                             Cryptocurrencies
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/price_alerts' or request.path == '/alerts' %}active{% endif %}" href="/price_alerts">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-bell me-1" viewBox="0 0 16 16">
-                                <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"/>
-                            </svg>
                             Price Alerts
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/crypto_news' or request.path == '/news' %}active{% endif %}" href="/crypto_news">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-newspaper me-1" viewBox="0 0 16 16">
-                                <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5zM12 14c.37 0 .654-.211.853-.441.092-.106.147-.279.147-.531V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v11c0 .278.223.5.497.5z"/>
-                                <path d="M2 3h10v2H2zm0 3h4v3H2zm0 4h4v1H2zm0 2h4v1H2zm5-6h2v1H7zm3 0h2v1h-2zM7 8h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2z"/>
-                            </svg>
                             News
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/telegram_control_panel' or request.path == '/telegram-control-panel' %}active{% endif %}" href="/telegram-control-panel">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-telegram me-1" viewBox="0 0 16 16">
-                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.287 5.906q-1.168.486-4.666 2.01-.567.225-.595.442c-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294q.39.01.868-.32 3.177-2.09 3.395-2.246c.05-.036.12-.019.12.056 0 .039-.033.078-.147.163q-.9.661-2.624 2.747c-.23.212-.199.531.09.75q.47.36.894.698.417.323.814.63c.265.205.538.416.808.63q.32.245.54.43c.297.25.78.23 1.055-.024q1.032-.946 1.982-1.844.953-.898 1.977-1.822.494-.44.494-.988T14.5 8.142q-2.61-1.2-5.138-2.283c-.72-.307-1.467-.392-2.22-.162-.635.193-1.14.56-1.47 1.033-.32.458-.457.975-.38 1.55q.12.92.1 2.73t-.09 2.73q-.11.92-.089 1.55.78.58.38 1.035.329.474.964.667.629.19 1.348-.069.72-.258 1.438-.563z"/>
-                            </svg>
                             Telegram Control
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/voice-notification' %}active{% endif %}" href="/voice-notification">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-volume-up me-1" viewBox="0 0 16 16">
-                                <path d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303z"/>
-                                <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89z"/>
-                                <path d="M10.025 8a4.5 4.5 0 0 1-1.318 3.182L8 10.475A3.5 3.5 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.5 4.5 0 0 1 10.025 8M7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11"/>
-                            </svg>
                             Voice Notifications
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/minimal_settings' %}active{% endif %}" href="/minimal_settings">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-gear me-1" viewBox="0 0 16 16">
-                                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                            </svg>
                             Settings
                         </a>
                     </li>
