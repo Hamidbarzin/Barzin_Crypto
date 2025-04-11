@@ -1352,7 +1352,7 @@ def send_price_report():
     if success:
         flash('گزارش قیمت با موفقیت به تلگرام ارسال شد.', 'success')
     else:
-        flash('خطا در ارسال گزارش قیمت به تلگرام.', 'danger')
+        flash('Error sending price report to Telegram.', 'danger')
     return redirect(url_for('telegram_control_panel'))
 
 @app.route('/send_system_report')
@@ -1362,7 +1362,7 @@ def send_system_report():
     if success:
         flash('گزارش سیستم با موفقیت به تلگرام ارسال شد.', 'success')
     else:
-        flash('خطا در ارسال گزارش سیستم به تلگرام.', 'danger')
+        flash('Error sending system report to Telegram.', 'danger')
     return redirect(url_for('telegram_control_panel'))
 
 @app.route('/send_trading_signals')
@@ -1372,7 +1372,7 @@ def send_trading_signals_route():
     if success:
         flash('سیگنال‌های معاملاتی با موفقیت به تلگرام ارسال شد.', 'success')
     else:
-        flash('خطا در ارسال سیگنال‌های معاملاتی به تلگرام.', 'danger')
+        flash('Error sending trading signals to Telegram.', 'danger')
     return redirect(url_for('telegram_control_panel'))
 
 @app.route('/send_technical_analysis')
@@ -1383,7 +1383,7 @@ def send_technical_analysis_route():
     if success:
         flash(f'تحلیل تکنیکال برای {symbol} با موفقیت به تلگرام ارسال شد.', 'success')
     else:
-        flash(f'خطا در ارسال تحلیل تکنیکال برای {symbol} به تلگرام.', 'danger')
+        flash(f'Error sending technical analysis for {symbol} to Telegram.', 'danger')
     return redirect(url_for('telegram_control_panel'))
 
 @app.route('/send_crypto_news')
@@ -1395,10 +1395,10 @@ def send_crypto_news_route():
         if success:
             flash('اخبار ارزهای دیجیتال با موفقیت به تلگرام ارسال شد.', 'success')
         else:
-            flash('خطا در ارسال اخبار ارزهای دیجیتال به تلگرام.', 'danger')
+            flash('Error sending cryptocurrency news to Telegram.', 'danger')
     except Exception as e:
-        logger.error(f"خطا در ارسال اخبار: {str(e)}")
-        flash(f'خطا در ارسال اخبار: {str(e)}', 'danger')
+        logger.error(f"Error sending news: {str(e)}")
+        flash(f'Error sending news: {str(e)}', 'danger')
     return redirect(url_for('telegram_control_panel'))
     
 @app.route('/api/telegram-test')
