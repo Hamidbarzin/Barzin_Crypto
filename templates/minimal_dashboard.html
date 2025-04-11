@@ -700,7 +700,53 @@
                         console.log(`No valid response for ${coin}`);
                     }
                 })
-                .catch(error => console.log(`Error fetching price for ${coin}: ${error}`));
+                .catch(error => {
+                    console.log(`Error fetching price for ${coin}: ${error}`);
+                    
+                    // Let's try a direct API call as a backup
+                    setTimeout(() => {
+                        fetch(`/api/price/${coin.toLowerCase()}`, {
+                            headers: { 'Cache-Control': 'no-cache' }
+                        })
+                        .then(response => response.json())
+                        .then(response => {
+                            if (response && response.success && response.data) {
+                                const data = response.data;
+                                if (data && data.price) {
+                                    const price = parseFloat(data.price);
+                                    const change = parseFloat(data.change_24h || 0);
+                                    
+                                    // Update price
+                                    const priceElement = document.getElementById(`${symbol}-price`);
+                                    if (priceElement) {
+                                        console.log(`Backup succeeded for ${coin}: ${price}`);
+                                        priceElement.textContent = formatPrice(price);
+                                    }
+                                    
+                                    // Update change percentage
+                                    const changeElement = document.getElementById(`${symbol}-change`);
+                                    if (changeElement) {
+                                        changeElement.textContent = formatChange(change);
+                                        if (change >= 0) {
+                                            changeElement.classList.add('positive-change');
+                                            changeElement.classList.remove('negative-change');
+                                        } else {
+                                            changeElement.classList.add('negative-change');
+                                            changeElement.classList.remove('positive-change');
+                                        }
+                                    }
+                                }
+                            }
+                        })
+                        .catch(() => {
+                            // If backup also failed, show error
+                            const priceElement = document.getElementById(`${symbol}-price`);
+                            if (priceElement) {
+                                priceElement.textContent = 'خطا';
+                            }
+                        });
+                    }, 500);
+                });
         }
         
         function formatPrice(price) {
