@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 639,
-    "successful": 639,
+    "total_sent": 641,
+    "successful": 641,
     "failed": 0,
     "history": [
       {
@@ -3198,12 +3198,22 @@
         "message_type": "test_message",
         "success": true,
         "timestamp": "2025-04-11T09:02:01.993123-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-11T19:46:43.239191-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-11T19:46:43.260107-04:00"
       }
     ]
   },
   "uptime": {
     "start_time": "2025-04-10T16:54:51.535404-04:00",
-    "last_restart": "2025-04-11T09:02:01.459152-04:00",
-    "restarts": 306
+    "last_restart": "2025-04-11T19:46:42.725461-04:00",
+    "restarts": 307
   }
 }
