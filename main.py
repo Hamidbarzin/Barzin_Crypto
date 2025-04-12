@@ -807,7 +807,7 @@ def cryptocurrencies():
     # لیست ارزهای مهم لایر 1 و 2
     layer_coins = [
         {
-            'id': 22, 
+            'id': 26, 
             'name': 'Polygon', 
             'symbol': 'MATIC/USDT', 
             'icon': 'fas fa-project-diagram text-purple',
@@ -818,7 +818,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 23, 
+            'id': 27, 
             'name': 'Arbitrum', 
             'symbol': 'ARB/USDT', 
             'icon': 'fas fa-chart-line text-primary',
@@ -829,7 +829,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 24, 
+            'id': 28, 
             'name': 'Optimism', 
             'symbol': 'OP/USDT', 
             'icon': 'fas fa-rocket text-danger',
