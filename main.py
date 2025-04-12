@@ -3202,8 +3202,8 @@ def api_telegram_send_news():
     ارسال اخبار ارزهای دیجیتال به تلگرام
     """
     try:
-        news_message = get_crypto_news_formatted_for_telegram()
-        result = replit_telegram_sender.send_message(news_message, parse_mode="Markdown")
+        # استفاده از فانکشن جدید send_crypto_news که خودش اخبار را می‌گیرد و ارسال می‌کند
+        result = replit_telegram_sender.send_crypto_news()
         
         if result:
             return jsonify({

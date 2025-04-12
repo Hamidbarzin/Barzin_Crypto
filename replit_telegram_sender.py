@@ -605,24 +605,86 @@ def send_crypto_news():
         bool: موفقیت یا شکست ارسال اخبار
     """
     try:
-        from crypto_bot.crypto_news import get_crypto_news_formatted_for_telegram
+        # استفاده از ماژول جدید news_scanner برای دریافت و خلاصه‌سازی اخبار
+        from crypto_bot.news_scanner import get_combined_news
         
-        news_text = get_crypto_news_formatted_for_telegram()
+        # اخبار برتر ارزهای دیجیتال
+        news = get_combined_news(max_items=7)
         
-        # If no news was found, send error message
-        if not news_text or len(news_text) < 10:
-            logger.error("Received crypto news is empty or incomplete")
-            news_text = "⚠️ Sorry, an error occurred while retrieving cryptocurrency news."
+        # ساخت پیام اخبار
+        if not news:
+            message = "⚠️ اخبار ارزهای دیجیتال در دسترس نیست."
+            return send_message(message, message_type="crypto_news")
         
-        return send_message(news_text, parse_mode="Markdown", message_type="crypto_news")
-    except ImportError:
-        logger.error("Error accessing the crypto news module")
-        error_message = "❌ Error accessing the crypto news module"
+        telegram_message = "*📰 اخبار مهم ارزهای دیجیتال*\n\n"
+        
+        # اضافه کردن وضعیت کلی بازار
+        telegram_message += "*💹 وضعیت بازار:*\n"
+        
+        # دریافت قیمت فعلی بیت‌کوین و اتریوم برای نمایش در گزارش
+        from crypto_bot.market_data import get_crypto_price
+        btc_data = get_crypto_price("BTC/USDT")
+        eth_data = get_crypto_price("ETH/USDT")
+        
+        if btc_data and "price" in btc_data:
+            btc_price = btc_data["price"]
+            btc_change = btc_data.get("change_24h", 0)
+            btc_emoji = "🟢" if btc_change >= 0 else "🔴"
+            telegram_message += f"• بیت‌کوین: ${btc_price:,.0f} ({btc_emoji} {btc_change:.2f}%)\n"
+        
+        if eth_data and "price" in eth_data:
+            eth_price = eth_data["price"]
+            eth_change = eth_data.get("change_24h", 0)
+            eth_emoji = "🟢" if eth_change >= 0 else "🔴"
+            telegram_message += f"• اتریوم: ${eth_price:,.0f} ({eth_emoji} {eth_change:.2f}%)\n"
+            
+        telegram_message += "\n*📊 عناوین مهم خبری:*\n"
+        
+        # تعیین امتیاز اهمیت برای اخبار بر اساس کلمات کلیدی
+        important_keywords = [
+            "bitcoin", "ethereum", "bearish", "bullish", "rally", "crash", 
+            "record", "all-time high", "regulation", "halving", "crisis",
+            "innovation", "adoption", "mainstream", "institutional", "mass adoption"
+        ]
+        
+        for item in news:
+            title = item.get('title', '')
+            url = item.get('url', '#')
+            source = item.get('source', '')
+            
+            # محاسبه امتیاز اهمیت خبر
+            importance_score = 0
+            lower_title = title.lower()
+            
+            for keyword in important_keywords:
+                if keyword in lower_title:
+                    importance_score += 2
+            
+            if importance_score > 0:
+                # اخبار مهم را با علامت مشخص کنیم
+                telegram_message += f"• 🔍 [{title}]({url})\n"
+            else:
+                telegram_message += f"• [{title}]({url})\n"
+                
+            telegram_message += f"  منبع: {source}\n\n"
+        
+        telegram_message += "\n🤖 *کریپتو برزین* | *اخبار و تحلیل‌های بیشتر*"
+        
+        # ارسال پیام به تلگرام
+        return send_message(telegram_message, parse_mode="Markdown", message_type="crypto_news")
+        
+    except ImportError as e:
+        logger.error(f"Error accessing the news scanner module: {str(e)}")
+        error_message = "❌ خطا در دسترسی به ماژول اسکنر اخبار. لطفاً بعداً تلاش کنید."
         return send_message(error_message, message_type="crypto_news")
     except Exception as e:
         logger.error(f"Error sending cryptocurrency news: {str(e)}")
-        error_message = f"❌ Error sending cryptocurrency news: {str(e)}"
-        return send_message(error_message, message_type="crypto_news")
+        # در صورت خطا، یک پیام ساده‌تر ارسال می‌کنیم
+        try:
+            error_message = "*📰 اخبار ارزهای دیجیتال*\n\n⚠️ در حال حاضر به دلیل مشکل فنی، امکان دریافت اخبار وجود ندارد.\n\nلطفاً بعداً دوباره تلاش کنید."
+            return send_message(error_message, parse_mode="Markdown", message_type="crypto_news")
+        except:
+            return False
 
 
 # Test message sending
