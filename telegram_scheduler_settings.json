@@ -1,0 +1,7 @@
+{
+    "message_sending_enabled": true,
+    "auto_start_on_boot": true,
+    "active_hours_start": 8,
+    "active_hours_end": 22,
+    "interval": 3600
+}
