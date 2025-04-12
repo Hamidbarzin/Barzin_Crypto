@@ -27,22 +27,36 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card crypto-card">
-                <div class="card-header bg-dark">
-                    <div class="row align-items-center">
-                        <div class="col-md-4 mb-2 mb-md-0">
-                            <h5 class="mb-0 text-white">Cryptocurrency Categories</h5>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="btn-group w-100">
-                                <button class="btn btn-sm btn-primary filter-btn active" onclick="filterCoins('all')">All Coins</button>
-                                <button class="btn btn-sm btn-outline-light filter-btn" onclick="filterCoins('major')">Major</button>
-                                <button class="btn btn-sm btn-outline-light filter-btn" onclick="filterCoins('stable')">Stable</button>
-                                <button class="btn btn-sm btn-outline-light filter-btn" onclick="filterCoins('promising')">AI</button>
-                                <button class="btn btn-sm btn-outline-light filter-btn" onclick="filterCoins('meme')">Meme</button>
-                                <button class="btn btn-sm btn-outline-light filter-btn" onclick="filterCoins('low-cost')">Low Cost</button>
+                <div class="card-header">
+                    <h5 class="mb-3">Cryptocurrency Categories</h5>
+                    <form id="filter-form">
+                        <div class="mb-2">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="coinType" id="allCoins" value="all" checked>
+                                <label class="form-check-label" for="allCoins">All Coins</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="coinType" id="majorCoins" value="major">
+                                <label class="form-check-label" for="majorCoins">Major Coins</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="coinType" id="stableCoins" value="stable">
+                                <label class="form-check-label" for="stableCoins">Stablecoins</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="coinType" id="aiCoins" value="promising">
+                                <label class="form-check-label" for="aiCoins">AI Coins</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="coinType" id="memeCoins" value="meme">
+                                <label class="form-check-label" for="memeCoins">Meme Coins</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="coinType" id="lowCostCoins" value="low-cost">
+                                <label class="form-check-label" for="lowCostCoins">Low Cost</label>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -270,41 +284,34 @@ function loadMoreNews() {
 
 {% block extra_js %}
 <script>
-// Simple function to filter coins by category
-function filterCoins(category) {
-    // Update button styles
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('active', 'btn-primary');
-        btn.classList.add('btn-outline-light');
-    });
-    
-    // Highlight the selected button
-    const selectedBtn = document.querySelector(`.filter-btn[onclick="filterCoins('${category}')"]`);
-    if (selectedBtn) {
-        selectedBtn.classList.remove('btn-outline-light');
-        selectedBtn.classList.add('active', 'btn-primary');
-    }
-    
-    // Filter the coins
-    if (category === 'all') {
-        // Show all rows
-        document.querySelectorAll('.crypto-row').forEach(row => {
-            row.style.display = '';
-        });
-    } else {
-        // Hide all rows first
-        document.querySelectorAll('.crypto-row').forEach(row => {
-            row.style.display = 'none';
-        });
-        
-        // Show only matching rows
-        document.querySelectorAll(`.crypto-row.${category}`).forEach(row => {
-            row.style.display = '';
-        });
-    }
-}
+// This will be replaced with a simpler event listener on document ready
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners to the radio buttons for filtering coins
+    document.querySelectorAll('input[name="coinType"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const category = this.value;
+            console.log(`Filtering by category: ${category}`);
+            
+            // Filter the coins
+            if (category === 'all') {
+                // Show all rows
+                document.querySelectorAll('.crypto-row').forEach(row => {
+                    row.style.display = '';
+                });
+            } else {
+                // Hide all rows first
+                document.querySelectorAll('.crypto-row').forEach(row => {
+                    row.style.display = 'none';
+                });
+                
+                // Show only matching rows
+                document.querySelectorAll(`.crypto-row.${category}`).forEach(row => {
+                    row.style.display = '';
+                });
+            }
+        });
+    });
     
     // Price formatting function
     function formatPrice(price) {
