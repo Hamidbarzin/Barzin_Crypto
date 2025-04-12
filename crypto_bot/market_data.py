@@ -54,12 +54,13 @@ COINGECKO_MAPPINGS = {
     "UNI-USDT": "uniswap"
 }
 
-def get_crypto_price(symbol: str) -> Optional[Dict[str, Any]]:
+def get_crypto_price(symbol: str, timeout: Optional[int] = None) -> Optional[Dict[str, Any]]:
     """
     دریافت قیمت ارز دیجیتال
     
     Args:
         symbol (str): نماد ارز دیجیتال (مثال: BTC/USDT)
+        timeout (Optional[int]): مهلت زمانی (به ثانیه) برای درخواست‌های API
         
     Returns:
         Optional[Dict[str, Any]]: داده‌های قیمت یا None در صورت خطا
@@ -95,12 +96,13 @@ def get_crypto_price(symbol: str) -> Optional[Dict[str, Any]]:
         logger.error(f"Error in get_crypto_price for {symbol}: {str(e)}")
         return None
 
-def get_multiple_prices(symbols: List[str]) -> Dict[str, Dict[str, Any]]:
+def get_multiple_prices(symbols: List[str], timeout: Optional[int] = None) -> Dict[str, Dict[str, Any]]:
     """
     دریافت قیمت چندین ارز دیجیتال
     
     Args:
         symbols (List[str]): لیست نمادهای ارز دیجیتال
+        timeout (Optional[int]): مهلت زمانی (به ثانیه) برای درخواست‌های API
         
     Returns:
         Dict[str, Dict[str, Any]]: دیکشنری از داده‌های قیمت
@@ -108,13 +110,13 @@ def get_multiple_prices(symbols: List[str]) -> Dict[str, Dict[str, Any]]:
     result = {}
     
     for symbol in symbols:
-        price_data = get_crypto_price(symbol)
+        price_data = get_crypto_price(symbol, timeout=timeout)
         if price_data:
             result[symbol] = price_data
     
     return result
 
-def get_current_prices(symbols_list=None, include_favorites=True):
+def get_current_prices(symbols_list=None, include_favorites=True, timeout=None):
     """
     دریافت قیمت‌های فعلی ارزهای دیجیتال
     
@@ -122,6 +124,7 @@ def get_current_prices(symbols_list=None, include_favorites=True):
         symbols_list (List[str], optional): لیست نمادهای ارز دیجیتال. 
                                         اگر None باشد، از لیست پیش‌فرض استفاده می‌شود.
         include_favorites (bool, optional): آیا ارزهای مورد علاقه در نتایج گنجانده شوند
+        timeout (int, optional): مهلت زمانی (به ثانیه) برای درخواست‌های API
         
     Returns:
         Dict[str, Dict[str, Any]]: دیکشنری از داده‌های قیمت
@@ -144,7 +147,7 @@ def get_current_prices(symbols_list=None, include_favorites=True):
         symbols = default_symbols if not include_favorites else favorite_symbols
     
     # دریافت قیمت‌ها
-    return get_multiple_prices(symbols)
+    return get_multiple_prices(symbols, timeout=timeout)
 
 def _get_cached_price(symbol: str) -> Optional[Dict[str, Any]]:
     """
