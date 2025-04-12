@@ -28,89 +28,89 @@ try:
     logger.info("Python-telegram-bot library loaded successfully.")
 except ImportError as e:
     logger.warning(f"Python-telegram-bot library not installed ({str(e)}). Telegram features will be disabled.")
-    logger.warning("کتابخانه python-telegram-bot نصب نشده است. قابلیت‌های تلگرام غیرفعال خواهند بود.")
+    logger.warning("Python-telegram-bot library is not installed. Telegram features will be disabled.")
 
-# دریافت توکن بات Telegram از متغیرهای محیطی
+# Get Telegram bot token from environment variables
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 if TELEGRAM_BOT_TOKEN:
-    logger.info("توکن تلگرام در متغیرهای محیطی یافت شد.")
+    logger.info("Telegram token found in environment variables.")
 else:
-    logger.warning("توکن تلگرام در متغیرهای محیطی تنظیم نشده است.")
+    logger.warning("Telegram token not set in environment variables.")
 
-# دیکشنری برای نگهداری آیدی چت کاربران
-# در نسخه‌های آینده، این دیکشنری باید از دیتابیس خوانده شود
-# اضافه کردن چت آیدی خودتان اینجا
+# Dictionary for storing user chat IDs
+# In future versions, this dictionary should be read from the database
+# Add your chat ID here
 CHAT_IDS = {
-    'default': 722627622  # چت آیدی کاربر - به صورت عدد صحیح
+    'default': 722627622  # User chat ID - as an integer
 }
 
 
 def initialize_bot():
     """
-    مقداردهی اولیه بات تلگرام
+    Initialize the Telegram bot
 
     Returns:
-        telegram.Bot: آبجکت بات تلگرام یا None در صورت خطا
+        telegram.Bot: Telegram bot object or None in case of error
     """
     if not TELEGRAM_AVAILABLE or _telegram is None:
-        logger.error("کتابخانه تلگرام نصب نشده است")
+        logger.error("Telegram library is not installed")
         return None
         
     if not TELEGRAM_BOT_TOKEN:
-        logger.error("توکن بات تلگرام تنظیم نشده است")
+        logger.error("Telegram bot token is not set")
         return None
 
     try:
         bot = _telegram.Bot(token=TELEGRAM_BOT_TOKEN)
-        logger.info(f"بات تلگرام با نام {bot.get_me().first_name} با موفقیت راه‌اندازی شد")
+        logger.info(f"Telegram bot with name {bot.get_me().first_name} initialized successfully")
         return bot
     except Exception as e:
-        logger.error(f"خطا در راه‌اندازی بات تلگرام: {str(e)}")
+        logger.error(f"Error initializing Telegram bot: {str(e)}")
         return None
 
 
 def send_telegram_message(chat_id, message, parse_mode=None, max_retries=3, retry_delay=1):
     """
-    ارسال پیام متنی به کاربر از طریق تلگرام
+    Send a text message to a user via Telegram
 
     Args:
-        chat_id (int or str): شناسه چت کاربر
-        message (str): متن پیام
-        parse_mode (str): نوع پارس پیام ('HTML' یا 'Markdown') یا None برای بدون پارس
-        max_retries (int): حداکثر تعداد تلاش‌های مجدد در صورت خطا
-        retry_delay (int): تاخیر به ثانیه بین تلاش‌های مجدد
+        chat_id (int or str): User's chat ID
+        message (str): Message text
+        parse_mode (str): Parse mode ('HTML' or 'Markdown') or None for no parsing
+        max_retries (int): Maximum number of retry attempts in case of error
+        retry_delay (int): Delay in seconds between retry attempts
 
     Returns:
-        bool: آیا ارسال موفقیت‌آمیز بود
+        bool: Whether the message was sent successfully
     """
-    # استفاده از چت آیدی پیش‌فرض اگر مقدار ورودی مشخص نشده باشد
+    # Use default chat ID if input value is not specified
     if not chat_id:
         default_chat_id = os.environ.get('DEFAULT_CHAT_ID', CHAT_IDS.get('default'))
         if default_chat_id:
             chat_id = default_chat_id
-            logger.info(f"استفاده از چت آیدی پیش‌فرض: {chat_id}")
+            logger.info(f"Using default chat ID: {chat_id}")
         else:
-            logger.error("Chat ID مشخص نشده و چت آیدی پیش‌فرض نیز یافت نشد.")
+            logger.error("Chat ID not specified and default chat ID not found.")
             return False
     if not TELEGRAM_AVAILABLE or _telegram is None:
-        logger.error("کتابخانه تلگرام نصب نشده است")
+        logger.error("Telegram library is not installed")
         return False
         
-    # بررسی مجدد توکن تلگرام از متغیرهای محیطی
+    # Check Telegram token from environment variables again
     token = os.environ.get("TELEGRAM_BOT_TOKEN") or TELEGRAM_BOT_TOKEN
     if not token:
-        logger.error("توکن بات تلگرام تنظیم نشده است")
+        logger.error("Telegram bot token is not set")
         return False
         
-    # اطمینان از اینکه chat_id به فرمت عددی است
+    # Ensure chat_id is in numeric format
     try:
         if isinstance(chat_id, str) and chat_id.isdigit():
             chat_id = int(chat_id)
     except Exception as e:
-        logger.warning(f"خطا در تبدیل چت آیدی به عدد: {str(e)}")
-        # ادامه کار بدون تبدیل
+        logger.warning(f"Error converting chat ID to number: {str(e)}")
+        # Continue without conversion
 
-    # تبدیل ParseMode به نوع مناسب
+    # Convert ParseMode to the appropriate type
     if parse_mode == 'HTML':
         parse_mode_enum = 'HTML'
     elif parse_mode == 'Markdown':
@@ -118,138 +118,138 @@ def send_telegram_message(chat_id, message, parse_mode=None, max_retries=3, retr
     else:
         parse_mode_enum = parse_mode
     
-    # اضافه کردن اطلاعات دیباگ
-    logger.info(f"تلاش برای ارسال پیام به چت آیدی: {chat_id} (نوع: {type(chat_id).__name__})")
+    # Add debug information
+    logger.info(f"Attempting to send message to chat ID: {chat_id} (type: {type(chat_id).__name__})")
     
-    # ایجاد یک لوپ آسنکرون برای اجرای کد آسنکرون
+    # Create an async loop to run async code
     async def send_message_async():
-        # ایجاد بات داخل تابع آسنکرون
+        # Create bot inside async function
         bot = _telegram.Bot(token=token)
-        # ارسال پیام
+        # Send message
         await bot.send_message(chat_id=chat_id, text=message, parse_mode=parse_mode_enum)
     
-    # تلاش مجدد با تاخیر
+    # Retry with delay
     retries = 0
     last_error = None
     
     while retries <= max_retries:
         try:
-            # بررسی وجود لوپ رویداد و اجرای تابع آسنکرون
+            # Check for event loop and run async function
             try:
-                # اگر لوپ رویداد در حال اجرا باشد
+                # If event loop is running
                 loop = asyncio.get_event_loop()
                 if loop.is_running():
-                    # ایجاد تسک جدید در لوپ موجود
+                    # Create a new task in the existing loop
                     future = asyncio.run_coroutine_threadsafe(send_message_async(), loop)
-                    # منتظر اتمام تسک می‌مانیم
-                    future.result(timeout=10)  # تایم‌اوت 10 ثانیه
+                    # Wait for task to complete
+                    future.result(timeout=10)  # 10 second timeout
                 else:
-                    # اجرا در لوپ فعلی
+                    # Run in current loop
                     loop.run_until_complete(send_message_async())
             except RuntimeError:
-                # اگر لوپ رویداد وجود نداشته باشد، یک لوپ جدید ایجاد می‌کنیم
+                # If event loop doesn't exist, create a new one
                 asyncio.run(send_message_async())
             
-            logger.info(f"پیام با موفقیت به چت {chat_id} ارسال شد")
+            logger.info(f"Message successfully sent to chat {chat_id}")
             return True
             
         except Exception as e:
             last_error = e
             retries += 1
-            logger.warning(f"خطا در ارسال پیام تلگرام (تلاش {retries}/{max_retries}): {str(e)}")
+            logger.warning(f"Error sending Telegram message (attempt {retries}/{max_retries}): {str(e)}")
             
             if retries <= max_retries:
-                logger.info(f"تلاش مجدد پس از {retry_delay} ثانیه...")
+                logger.info(f"Retrying after {retry_delay} seconds...")
                 import time
-                time.sleep(retry_delay)  # تاخیر قبل از تلاش مجدد
+                time.sleep(retry_delay)  # Delay before retrying
             else:
-                logger.error(f"همه تلاش‌ها برای ارسال پیام به {chat_id} با شکست مواجه شد")
+                logger.error(f"All attempts to send message to {chat_id} failed")
                 return False
     
-    # اگر به اینجا برسیم، یعنی همه تلاش‌ها ناموفق بوده‌اند
-    logger.error(f"خطا در ارسال پیام تلگرام پس از {max_retries} تلاش: {str(last_error)}")
+    # If we get here, all attempts have failed
+    logger.error(f"Error sending Telegram message after {max_retries} attempts: {str(last_error)}")
     return False
 
 
 def register_user(chat_id, user_info=None):
     """
-    ثبت کاربر جدید برای دریافت اعلان‌ها
+    Register a new user to receive notifications
 
     Args:
-        chat_id (int or str): شناسه چت کاربر
-        user_info (dict, optional): اطلاعات اضافی کاربر
+        chat_id (int or str): User's chat ID
+        user_info (dict, optional): Additional user information
 
     Returns:
-        bool: آیا ثبت موفقیت‌آمیز بود
+        bool: Whether registration was successful
     """
     try:
-        # تبدیل chat_id به عدد صحیح
+        # Convert chat_id to integer
         if isinstance(chat_id, str) and chat_id.isdigit():
             chat_id = int(chat_id)
             
-        # استفاده از کلید 'default' برای ذخیره چت آیدی پیش‌فرض
+        # Use 'default' key for storing default chat ID
         if chat_id == CHAT_IDS.get('default'):
             key = 'default'
         else:
-            key = f"user_{chat_id}"  # استفاده از پیشوند برای کلیدهای دیگر
+            key = f"user_{chat_id}"  # Use prefix for other keys
             
-        # ذخیره اطلاعات کاربر
+        # Store user information
         if user_info is None:
             user_info = {"registered_at": get_current_persian_time()}
             
-        # ثبت کاربر در دیکشنری
+        # Register user in dictionary
         CHAT_IDS[key] = chat_id
-        logger.info(f"کاربر با شناسه چت {chat_id} با موفقیت ثبت شد")
+        logger.info(f"User with chat ID {chat_id} registered successfully")
         return True
     except Exception as e:
-        logger.error(f"خطا در ثبت کاربر: {str(e)}")
+        logger.error(f"Error registering user: {str(e)}")
         return False
 
 
 def send_buy_sell_notification(chat_id, symbol, action, price, reason):
     """
-    ارسال اعلان خرید یا فروش از طریق تلگرام
+    Send buy or sell notification via Telegram
 
     Args:
-        chat_id (int or str): شناسه چت کاربر
-        symbol (str): نماد ارز
-        action (str): 'Buy' یا 'Sell'
-        price (float): قیمت فعلی
-        reason (str): دلیل توصیه
+        chat_id (int or str): User's chat ID
+        symbol (str): Cryptocurrency symbol
+        action (str): 'Buy' or 'Sell'
+        price (float): Current price
+        reason (str): Recommendation reason
 
     Returns:
-        bool: آیا ارسال موفقیت‌آمیز بود
+        bool: Whether the message was sent successfully
     """
     emoji = "🟢" if action == "Buy" else "🔴"
-    message = f"{emoji} <b>سیگنال {action} برای {symbol}</b>\n\n"
-    message += f"💰 <b>قیمت فعلی:</b> {price}\n\n"
-    message += f"📊 <b>دلیل:</b>\n{reason}\n\n"
-    message += f"⏰ <b>زمان:</b> {get_current_persian_time()}"
+    message = f"{emoji} <b>{action} Signal for {symbol}</b>\n\n"
+    message += f"💰 <b>Current Price:</b> {price}\n\n"
+    message += f"📊 <b>Reason:</b>\n{reason}\n\n"
+    message += f"⏰ <b>Time:</b> {get_current_persian_time()}"
 
     return send_telegram_message(chat_id, message)
 
 
 def send_volatility_alert(chat_id, symbol, price, change_percent, timeframe="1h"):
     """
-    ارسال هشدار نوسان قیمت از طریق تلگرام
+    Send price volatility alert via Telegram
 
     Args:
-        chat_id (int or str): شناسه چت کاربر
-        symbol (str): نماد ارز
-        price (float): قیمت فعلی
-        change_percent (float): درصد تغییر
-        timeframe (str): بازه زمانی تغییر
+        chat_id (int or str): User's chat ID
+        symbol (str): Cryptocurrency symbol
+        price (float): Current price
+        change_percent (float): Percentage change
+        timeframe (str): Time period of change
 
     Returns:
-        bool: آیا ارسال موفقیت‌آمیز بود
+        bool: Whether the message was sent successfully
     """
-    direction = "افزایش" if change_percent > 0 else "کاهش"
+    direction = "Increase" if change_percent > 0 else "Decrease"
     emoji = "🚀" if change_percent > 0 else "📉"
 
-    message = f"{emoji} <b>هشدار نوسان قیمت {symbol}</b>\n\n"
-    message += f"💰 <b>قیمت فعلی:</b> {price}\n\n"
-    message += f"📊 <b>{direction}:</b> {abs(change_percent):.2f}% در {timeframe}\n\n"
-    message += f"⏰ <b>زمان:</b> {get_current_persian_time()}"
+    message = f"{emoji} <b>Price Volatility Alert for {symbol}</b>\n\n"
+    message += f"💰 <b>Current Price:</b> {price}\n\n"
+    message += f"📊 <b>{direction}:</b> {abs(change_percent):.2f}% in {timeframe}\n\n"
+    message += f"⏰ <b>Time:</b> {get_current_persian_time()}"
 
     return send_telegram_message(chat_id, message)
 
@@ -281,68 +281,68 @@ def send_market_trend_alert(chat_id, trend, affected_coins, reason):
 
 def send_test_notification(chat_id=None):
     """
-    ارسال پیام تست برای بررسی عملکرد سیستم اعلان تلگرام
+    Send a test message to check the Telegram notification system functionality
 
     Args:
-        chat_id (int or str, optional): شناسه چت کاربر، اگر None باشد از چت آیدی پیش‌فرض استفاده می‌شود
+        chat_id (int or str, optional): User's chat ID, if None the default chat ID will be used
 
     Returns:
-        dict: وضعیت ارسال و پیام
+        dict: Message sending status and message
     """
     if chat_id is None:
         chat_id = os.environ.get('DEFAULT_CHAT_ID', CHAT_IDS.get('default'))
         if not chat_id:
             return {
                 "success": False,
-                "message": "Chat ID پیش‌فرض تنظیم نشده است"
+                "message": "Default chat ID is not set"
             }
     
-    # اطمینان از اینکه chat_id به فرمت عددی است
+    # Ensure chat_id is in numeric format
     try:
         if isinstance(chat_id, str) and chat_id.isdigit():
             chat_id = int(chat_id)
     except Exception as e:
-        logger.warning(f"خطا در تبدیل چت آیدی به عدد: {str(e)}")
+        logger.warning(f"Error converting chat ID to number: {str(e)}")
         return {
             "success": False,
-            "message": f"فرمت چت آیدی نادرست است. لطفاً یک عدد وارد کنید. خطا: {str(e)}"
+            "message": f"Invalid chat ID format. Please enter a number. Error: {str(e)}"
         }
             
-    message = "🤖 <b>پیام تست از ربات معامله ارز دیجیتال</b>\n\n"
-    message += "سیستم اعلان‌های تلگرام فعال است.\n\n"
-    message += f"⏰ <b>زمان:</b> {get_current_persian_time()}"
+    message = "🤖 <b>Test message from Crypto Trading Bot</b>\n\n"
+    message += "Telegram notification system is active.\n\n"
+    message += f"⏰ <b>Time:</b> {get_current_persian_time()}"
 
-    # اضافه کردن اطلاعات دیباگ
-    logger.info(f"ارسال پیام تست به چت آیدی: {chat_id} (نوع: {type(chat_id).__name__})")
+    # Add debug information
+    logger.info(f"Sending test message to chat ID: {chat_id} (type: {type(chat_id).__name__})")
 
     try:
         result = send_telegram_message(chat_id, message)
         if result:
             return {
                 "success": True,
-                "message": "Test Message با موفقیت ارسال شد."
+                "message": "Test message sent successfully."
             }
         else:
-            # بررسی علت احتمالی خطا
+            # Check possible cause of error
             return {
                 "success": False,
-                "message": ("خطا در ارسال پیام تست. احتمالاً شما هنوز با ربات گفتگو را شروع نکرده‌اید. "
-                           "لطفاً ابتدا به @GrowthFinderBot در تلگرام رفته و دکمه Start را بزنید، "
-                           "سپس چت آیدی خود را با ربات @userinfobot بررسی کنید.")
+                "message": ("Error sending test message. You probably haven't started a conversation with the bot yet. "
+                           "Please first go to @GrowthFinderBot in Telegram and press the Start button, "
+                           "then check your chat ID with @userinfobot.")
             }
     except Exception as e:
         error_msg = str(e)
         if "Chat not found" in error_msg:
             return {
                 "success": False,
-                "message": ("کاربر با چت آیدی وارد شده پیدا نشد. لطفاً مطمئن شوید که: "
-                           "1) چت آیدی صحیح است "
-                           "2) گفتگو با ربات @GrowthFinderBot را در تلگرام شروع کرده‌اید")
+                "message": ("User with the entered chat ID not found. Please make sure that: "
+                           "1) The chat ID is correct "
+                           "2) You have started a conversation with @GrowthFinderBot in Telegram")
             }
         else:
             return {
                 "success": False,
-                "message": f"خطا در ارسال پیام تست: {error_msg}"
+                "message": f"Error sending test message: {error_msg}"
             }
 
 
