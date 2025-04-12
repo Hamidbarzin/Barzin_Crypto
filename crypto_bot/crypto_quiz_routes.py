@@ -165,11 +165,21 @@ def register_routes(app):
         quiz_questions = session.get('quiz_questions', [])
         current_index = session.get('current_question', 0)
         
+        # دریافت سوال فعلی
+        if current_index > 0 and current_index <= len(quiz_questions):
+            question_id = quiz_questions[current_index - 1]
+            question = CryptoQuiz.query.get(question_id)
+        else:
+            # اگر شماره سوال اشتباه باشد، به صفحه خانه برگرد
+            flash('Question not found', 'error')
+            return redirect(url_for('crypto_quiz_home'))
+        
         # بررسی اینکه آیا این آخرین سوال بود
         is_last_question = current_index >= len(quiz_questions)
         
         return render_template('crypto_quiz_answer_result.html',
                               result=result,
+                              question=question,
                               quiz_score=session.get('quiz_score', 0),
                               quiz_correct=session.get('quiz_correct', 0),
                               total_questions=len(quiz_questions),
