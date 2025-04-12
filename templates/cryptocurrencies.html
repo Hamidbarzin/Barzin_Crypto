@@ -397,81 +397,28 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
-    // Simple method for filtering cryptocurrencies
+    // Simple method for showing all cryptocurrencies
     function setupFilterButtons() {
-        // Select buttons and table rows
-        const allButton = document.querySelector('[data-crypto-category="all"]');
-        const majorButton = document.querySelector('[data-crypto-category="major"]');
+        // Simply show all rows since we only have AI coins now
         const promisingButton = document.querySelector('[data-crypto-category="promising"]');
-        const newButton = document.querySelector('[data-crypto-category="new"]');
-        
         const allRows = document.querySelectorAll('.crypto-row');
-        const majorRows = document.querySelectorAll('.crypto-row.major');
-        const promisingRows = document.querySelectorAll('.crypto-row.promising');
-        const newRows = document.querySelectorAll('.crypto-row.new');
         
         console.log('Total rows:', allRows.length);
-        console.log('Major coin rows:', majorRows.length);
-        console.log('Promising coin rows:', promisingRows.length);
-        console.log('New coin rows:', newRows.length);
         
-        // Function to show or hide rows
-        function showRows(rowsToShow) {
-            // Hide all rows
-            allRows.forEach(row => {
-                row.style.display = 'none';
-            });
-            
-            // Show only selected rows
-            rowsToShow.forEach(row => {
-                row.style.display = '';
-            });
-        }
+        // Show all rows by default
+        allRows.forEach(row => {
+            row.style.display = '';
+        });
         
-        // Function to update button states
-        function updateButtonStates(activeButton) {
-            [allButton, majorButton, promisingButton, newButton].forEach(button => {
-                button.classList.remove('active');
-                button.classList.remove('btn-warning');
-                button.classList.add('btn-outline-warning');
-            });
-            
-            activeButton.classList.add('active');
-            activeButton.classList.remove('btn-outline-warning');
-            activeButton.classList.add('btn-warning');
-        }
-        
-        // Add click event for each button
-        if (allButton) {
-            allButton.addEventListener('click', function() {
-                updateButtonStates(this);
-                showRows(allRows);
-            });
-        }
-        
-        if (majorButton) {
-            majorButton.addEventListener('click', function() {
-                updateButtonStates(this);
-                showRows(majorRows);
-            });
-        }
-        
+        // Make the promising button active by default
         if (promisingButton) {
-            promisingButton.addEventListener('click', function() {
-                updateButtonStates(this);
-                showRows(promisingRows);
-            });
-        }
-        
-        if (newButton) {
-            newButton.addEventListener('click', function() {
-                updateButtonStates(this);
-                showRows(newRows);
-            });
+            promisingButton.classList.add('active');
+            promisingButton.classList.remove('btn-outline-warning');
+            promisingButton.classList.add('btn-warning');
         }
     }
     
-    // Call the filter buttons setup function
+    // Call the setup function
     setupFilterButtons();
     
     // Analysis buttons in the cryptocurrencies table
