@@ -11,10 +11,22 @@ import random
 import re
 import time
 from datetime import datetime, timedelta
+from typing import List, Dict, Any, Optional
 
 import requests
 import trafilatura
 from bs4 import BeautifulSoup
+
+# اضافه کردن ماژول جدید API اخبار
+try:
+    from crypto_bot.crypto_news_api import (
+        get_crypto_news_from_api,
+        get_canadian_crypto_news_from_api,
+        get_news_by_category_from_api
+    )
+    HAS_NEWS_API = True
+except ImportError:
+    HAS_NEWS_API = False
 
 # تنظیم لاگر
 logging.basicConfig(level=logging.INFO)
@@ -58,13 +70,14 @@ NEWS_SOURCES = [
 CACHE_FILE = "data/news_cache.json"
 CACHE_EXPIRY = 60 * 60  # 1 ساعت به ثانیه
 
-def get_combined_news(max_items=10, use_cache=True):
+def get_combined_news(max_items=10, use_cache=True, ignore_cache_expiry=False):
     """
     دریافت اخبار ترکیبی از تمامی منابع
 
     Args:
         max_items (int): حداکثر تعداد اخبار برای هر منبع
         use_cache (bool): استفاده از کش
+        ignore_cache_expiry (bool): نادیده گرفتن زمان انقضای کش در صورت خطا
 
     Returns:
         list: لیست اخبار ترکیبی
@@ -73,14 +86,29 @@ def get_combined_news(max_items=10, use_cache=True):
         # بررسی داده‌های کش شده
         if use_cache and os.path.exists(CACHE_FILE):
             cache_age = time.time() - os.path.getmtime(CACHE_FILE)
-            if cache_age < CACHE_EXPIRY:
-                with open(CACHE_FILE, 'r', encoding='utf-8') as f:
-                    cached_news = json.load(f)
-                    logger.info(f"Loaded {len(cached_news)} news items from cache")
-                    return cached_news
+            
+            # استفاده از کش معتبر یا نادیده گرفتن انقضا اگر درخواست شده باشد
+            if cache_age < CACHE_EXPIRY or ignore_cache_expiry:
+                try:
+                    with open(CACHE_FILE, 'r', encoding='utf-8') as f:
+                        cached_news = json.load(f)
+                        cache_status = "valid" if cache_age < CACHE_EXPIRY else "expired"
+                        logger.info(f"Loaded {len(cached_news)} news items from {cache_status} cache (age: {int(cache_age/60)} min)")
+                        
+                        # اضافه کردن نشانگر برای اخبار منقضی شده
+                        if cache_age >= CACHE_EXPIRY:
+                            for news in cached_news:
+                                if "is_stale" not in news:
+                                    news["is_stale"] = True
+                                    
+                        return cached_news
+                except (json.JSONDecodeError, IOError) as e:
+                    logger.error(f"Error reading cache file: {str(e)}")
+                    # ادامه به جمع‌آوری اخبار جدید در صورت خطا در خواندن کش
 
         # جمع‌آوری اخبار از همه منابع
         combined_news = []
+        error_count = 0
         
         for source in NEWS_SOURCES:
             try:
@@ -93,24 +121,42 @@ def get_combined_news(max_items=10, use_cache=True):
                 combined_news.extend(news_items)
                 logger.info(f"Fetched {len(news_items)} news items from {source['name']}")
             except Exception as e:
+                error_count += 1
                 logger.error(f"Error fetching news from {source['name']}: {str(e)}")
         
-        # مرتب‌سازی براساس زمان (جدیدترین اخبار اول)
-        combined_news.sort(key=lambda x: x.get("published_at", ""), reverse=True)
-        
-        # محدود کردن به تعداد مشخص
-        combined_news = combined_news[:max_items]
-        
-        # ذخیره در کش
-        os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
-        with open(CACHE_FILE, 'w', encoding='utf-8') as f:
-            json.dump(combined_news, f, ensure_ascii=False, indent=2)
+        # اگر هیچ خبری جمع‌آوری نشد و خطاها وجود داشت، از کش منقضی استفاده کن
+        if not combined_news and error_count > 0 and os.path.exists(CACHE_FILE) and not ignore_cache_expiry:
+            logger.warning("No news fetched and errors occurred. Trying to use expired cache.")
+            return get_combined_news(max_items, use_cache=True, ignore_cache_expiry=True)
+            
+        # اگر اخبار جمع‌آوری شد، آنها را مرتب‌سازی و ذخیره کن
+        if combined_news:
+            # مرتب‌سازی براساس زمان (جدیدترین اخبار اول)
+            combined_news.sort(key=lambda x: x.get("published_at", ""), reverse=True)
+            
+            # محدود کردن به تعداد مشخص
+            combined_news = combined_news[:max_items]
+            
+            # ذخیره در کش (فقط اگر اخبار جدید داریم)
+            try:
+                os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
+                with open(CACHE_FILE, 'w', encoding='utf-8') as f:
+                    json.dump(combined_news, f, ensure_ascii=False, indent=2)
+                logger.info(f"Cached {len(combined_news)} news items")
+            except Exception as cache_err:
+                logger.error(f"Error caching news data: {str(cache_err)}")
         
         return combined_news
     
     except Exception as e:
         logger.error(f"Error in get_combined_news: {str(e)}")
-        # در صورت خطا، داده تستی برای جلوگیری از خالی‌ماندن صفحه
+        
+        # در صورت خطا، تلاش برای استفاده از کش قدیمی
+        if not ignore_cache_expiry and os.path.exists(CACHE_FILE):
+            logger.warning("Error occurred. Trying to use any available cache regardless of age.")
+            return get_combined_news(max_items, use_cache=True, ignore_cache_expiry=True)
+            
+        # اگر هیچ کشی در دسترس نبود یا خطا در خواندن کش وجود داشت، آرایه خالی برگردان
         return []
 
 def fetch_rss_news(source, max_items=5):
@@ -254,20 +300,35 @@ def fetch_web_news(source, max_items=5):
         logger.error(f"Error in fetch_web_news for {source['name']}: {str(e)}")
         return []
 
-def get_canadian_crypto_news(max_items=5, use_cache=True):
+def get_canadian_crypto_news(max_items=5, use_cache=True, ignore_cache_expiry=False):
     """
     دریافت اخبار ارزهای دیجیتال مربوط به کانادا
 
     Args:
         max_items (int): حداکثر تعداد اخبار
         use_cache (bool): استفاده از کش
+        ignore_cache_expiry (bool): نادیده گرفتن زمان انقضای کش در صورت خطا
 
     Returns:
         list: لیست اخبار کانادایی
     """
     try:
-        # دریافت اخبار ترکیبی
-        combined_news = get_combined_news(max_items * 3, use_cache)
+        # ابتدا سعی کنید با استفاده از API خبری جدید، اخبار کانادایی را دریافت کنید
+        if HAS_NEWS_API:
+            try:
+                logger.info("Getting Canadian crypto news from the new API")
+                api_news = get_canadian_crypto_news_from_api(max_items, use_cache=use_cache, ignore_cache_expiry=ignore_cache_expiry)
+                if api_news:
+                    logger.info(f"Received {len(api_news)} Canadian crypto news items from API")
+                    return api_news
+                else:
+                    logger.warning("No Canadian crypto news received from API, falling back to web scraping")
+            except Exception as api_err:
+                logger.error(f"Error getting Canadian news from API: {str(api_err)}")
+                # ادامه به روش قدیمی در صورت خطا
+        
+        # دریافت اخبار ترکیبی از منابع عادی
+        combined_news = get_combined_news(max_items * 3, use_cache, ignore_cache_expiry)
         
         # فیلتر کردن اخبار مربوط به کانادا
         canadian_keywords = ["canada", "canadian", "toronto", "ontario", "quebec", "vancouver", 
@@ -285,6 +346,19 @@ def get_canadian_crypto_news(max_items=5, use_cache=True):
                     canadian_news.append(news)
                     break
         
+        # بررسی تعداد اخبار کانادایی
+        if not canadian_news:
+            logger.warning("No Canadian crypto news found. Adding fallback news with Canadian context.")
+            # اضافه کردن برچسب کانادا به برخی اخبار عمومی به عنوان راه حل جایگزین
+            general_count = min(max_items, len(combined_news))
+            for i in range(general_count):
+                if i < len(combined_news):
+                    news_item = combined_news[i].copy()
+                    if "title" in news_item:
+                        if not news_item.get("is_stale", False):
+                            news_item["context"] = "Canada"
+                        canadian_news.append(news_item)
+        
         # اگر اخبار کانادایی کمتر از حد انتظار یافت شد، از اخبار عمومی استفاده کن
         if len(canadian_news) < max_items:
             remaining = max_items - len(canadian_news)
@@ -295,9 +369,13 @@ def get_canadian_crypto_news(max_items=5, use_cache=True):
     
     except Exception as e:
         logger.error(f"Error in get_canadian_crypto_news: {str(e)}")
+        # در صورت خطا، تلاش برای بدست آوردن اخبار با استفاده از کش منقضی شده
+        if not ignore_cache_expiry:
+            logger.warning("Trying to get Canadian news using expired cache")
+            return get_canadian_crypto_news(max_items, True, True)
         return []
 
-def get_news_by_category(category, max_items=5, use_cache=True):
+def get_news_by_category(category, max_items=5, use_cache=True, ignore_cache_expiry=False):
     """
     دریافت اخبار بر اساس دسته‌بندی
 
@@ -305,13 +383,30 @@ def get_news_by_category(category, max_items=5, use_cache=True):
         category (str): دسته‌بندی اخبار
         max_items (int): حداکثر تعداد اخبار
         use_cache (bool): استفاده از کش
+        ignore_cache_expiry (bool): نادیده گرفتن زمان انقضای کش در صورت خطا
 
     Returns:
         list: لیست اخبار
     """
     try:
+        # ابتدا سعی کنید با استفاده از API خبری جدید، اخبار دسته‌بندی شده را دریافت کنید
+        if HAS_NEWS_API:
+            try:
+                logger.info(f"Getting {category} crypto news from the new API")
+                api_news = get_news_by_category_from_api(category, max_items, 
+                                                       use_cache=use_cache, 
+                                                       ignore_cache_expiry=ignore_cache_expiry)
+                if api_news:
+                    logger.info(f"Received {len(api_news)} {category} crypto news items from API")
+                    return api_news
+                else:
+                    logger.warning(f"No {category} crypto news received from API, falling back to web scraping")
+            except Exception as api_err:
+                logger.error(f"Error getting {category} news from API: {str(api_err)}")
+                # ادامه به روش قدیمی در صورت خطا
+        
         # دریافت اخبار ترکیبی
-        combined_news = get_combined_news(max_items * 3, use_cache)
+        combined_news = get_combined_news(max_items * 3, use_cache, ignore_cache_expiry)
         
         # تعریف کلیدواژه‌های هر دسته
         categories = {
@@ -351,6 +446,10 @@ def get_news_by_category(category, max_items=5, use_cache=True):
     
     except Exception as e:
         logger.error(f"Error in get_news_by_category: {str(e)}")
+        # در صورت خطا، تلاش برای بدست آوردن اخبار با استفاده از کش منقضی شده
+        if not ignore_cache_expiry:
+            logger.warning(f"Trying to get {category} news using expired cache")
+            return get_news_by_category(category, max_items, True, True)
         return []
 
 def get_news_summary(url):
@@ -364,29 +463,52 @@ def get_news_summary(url):
         dict: خلاصه خبر
     """
     try:
-        # دریافت متن کامل خبر
-        downloaded = trafilatura.fetch_url(url)
-        text = trafilatura.extract(downloaded)
+        # دریافت متن کامل خبر با تایم‌اوت و مدیریت خطا
+        try:
+            downloaded = trafilatura.fetch_url(url, timeout=15)  # افزایش تایم‌اوت
+            if not downloaded:
+                logger.warning(f"Failed to download content from {url}")
+                return {"summary": "Could not download the article content."}
+                
+            text = trafilatura.extract(downloaded)
+        except Exception as fetch_error:
+            logger.error(f"Error fetching article from {url}: {str(fetch_error)}")
+            return {"summary": "Error downloading the article content."}
         
         if not text or len(text) < 50:
-            return {"summary": "No content could be extracted from this article."}
+            logger.warning(f"Insufficient text extracted from {url}")
+            return {"summary": "No meaningful content could be extracted from this article."}
         
         # برش متن طولانی
         max_length = 5000
         if len(text) > max_length:
+            logger.info(f"Truncating long article text from {url} ({len(text)} chars)")
             text = text[:max_length] + "..."
         
         # تولید خلاصه با روش ساده
-        sentences = re.split(r'(?<=[.!?])\s+', text)
-        summary_sentences = sentences[:3]  # استفاده از ۳ جمله اول به عنوان خلاصه
-        summary = ' '.join(summary_sentences)
+        try:
+            sentences = re.split(r'(?<=[.!?])\s+', text)
+            # استفاده از بین ۳ تا ۵ جمله اول به عنوان خلاصه، بسته به طول جمله‌ها
+            if not sentences:
+                return {"summary": "The article could not be split into sentences."}
+                
+            # انتخاب تعداد جمله‌ها: کمتر اگر جمله‌ها طولانی هستند
+            avg_sentence_length = sum(len(s) for s in sentences[:5]) / min(5, len(sentences))
+            num_sentences = 5 if avg_sentence_length < 100 else (4 if avg_sentence_length < 150 else 3)
+            
+            summary_sentences = sentences[:int(num_sentences)]  
+            summary = ' '.join(summary_sentences)
+        except Exception as summary_error:
+            logger.error(f"Error creating summary from {url}: {str(summary_error)}")
+            # استفاده از روش ساده‌تر در صورت خطا
+            summary = text[:250] + "..."
         
         # برش خلاصه بلند
         if len(summary) > 250:
             summary = summary[:247] + "..."
             
-        return {"summary": summary}
+        return {"summary": summary, "full_text_length": len(text)}
     
     except Exception as e:
         logger.error(f"Error getting news summary: {str(e)}")
-        return {"summary": "Error retrieving article content."}
+        return {"summary": "Error processing article content."}
