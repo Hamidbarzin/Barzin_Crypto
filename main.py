@@ -1643,6 +1643,8 @@ def get_market_trend():
         logger.error(f"Error getting market trend: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
 
+
+
 # تابع جدید با سیستم حافظه نهان
 from crypto_bot.cached_api import get_cached_price, get_special_coin_price
 
@@ -1722,14 +1724,33 @@ def get_price(symbol=None):
         logger.error(f"Error getting price for {symbol}: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
 
+@app.route('/api/technical')
 @app.route('/api/technical/<symbol>/<timeframe>')
-def get_technical(symbol, timeframe):
+def get_technical(symbol=None, timeframe=None):
     try:
+        # اگر پارامترها از URL نیامده اند، از query parameters دریافت کنیم
+        if symbol is None:
+            symbol = request.args.get('symbol', 'BTC/USDT')
+        
+        if timeframe is None:
+            timeframe = request.args.get('timeframe', '1d')
+        
+        # تضمین اینکه symbol و timeframe مقدار دارند
+        if not symbol:
+            symbol = 'BTC/USDT'
+        
+        if not timeframe:
+            timeframe = '1d'
+        
         # پاکسازی نماد قبل از ارسال به تابع تحلیل فنی
-        clean_symbol = symbol.replace('-', '/') if '-' in symbol else symbol
+        clean_symbol = symbol
+        if '-' in symbol:
+            clean_symbol = symbol.replace('-', '/')
+        
         logger.info(f"Getting technical data for symbol: {clean_symbol}, timeframe: {timeframe}")
         
         # دریافت تحلیل فنی
+        from crypto_bot.technical_analysis import get_technical_analysis
         data = get_technical_analysis(clean_symbol, timeframe)
         
         # بررسی صحت داده‌های برگشتی
