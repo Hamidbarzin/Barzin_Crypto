@@ -29,11 +29,19 @@
             <div class="card crypto-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Market Categories</h5>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-sm btn-secondary" data-crypto-category="major">Major</button>
-                        <button type="button" class="btn btn-sm btn-success" data-crypto-category="stable">Stablecoins</button>
-                        <button type="button" class="btn btn-sm btn-warning active" data-crypto-category="promising">AI Coins</button>
-                        <button type="button" class="btn btn-sm btn-info" data-crypto-category="low-cost">Low Cost</button>
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Category
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+                            <li><a class="dropdown-item" href="#" data-crypto-category="major">Major Coins</a></li>
+                            <li><a class="dropdown-item" href="#" data-crypto-category="stable">Stablecoins</a></li>
+                            <li><a class="dropdown-item" href="#" data-crypto-category="promising">AI Coins</a></li>
+                            <li><a class="dropdown-item" href="#" data-crypto-category="meme">Meme Coins</a></li>
+                            <li><a class="dropdown-item" href="#" data-crypto-category="low-cost">Low Cost</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" data-crypto-category="all">All Coins</a></li>
+                        </ul>
                     </div>
                 </div>
                 <div class="card-body">
@@ -263,19 +271,36 @@ function loadMoreNews() {
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize category buttons
-    document.querySelectorAll('[data-crypto-category]').forEach(button => {
-        button.addEventListener('click', function() {
-            // Remove active class from all buttons
-            document.querySelectorAll('[data-crypto-category]').forEach(btn => {
-                btn.classList.remove('active');
+    // Initialize category dropdown items
+    document.querySelectorAll('.dropdown-item[data-crypto-category]').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all dropdown items
+            document.querySelectorAll('.dropdown-item[data-crypto-category]').forEach(dropItem => {
+                dropItem.classList.remove('active');
             });
             
-            // Add active class to clicked button
+            // Add active class to clicked item
             this.classList.add('active');
+            
+            // Update dropdown button text
+            const categoryDropdown = document.getElementById('categoryDropdown');
+            if (categoryDropdown) {
+                categoryDropdown.textContent = this.textContent;
+            }
             
             // Get the category
             const category = this.getAttribute('data-crypto-category');
+            
+            // Handle the special "All Coins" category
+            if (category === 'all') {
+                // Show all rows
+                document.querySelectorAll('.crypto-row').forEach(row => {
+                    row.style.display = 'table-row';
+                });
+                return;
+            }
             
             // Hide all rows
             document.querySelectorAll('.crypto-row').forEach(row => {
@@ -432,29 +457,31 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
-    // Simple method for showing all cryptocurrencies
-    function setupFilterButtons() {
-        // Simply show all rows since we only have AI coins now
-        const promisingButton = document.querySelector('[data-crypto-category="promising"]');
+    // Setup to show all cryptocurrencies by default
+    function setupInitialView() {
+        // Show all rows by default
         const allRows = document.querySelectorAll('.crypto-row');
-        
         console.log('Total rows:', allRows.length);
         
-        // Show all rows by default
         allRows.forEach(row => {
-            row.style.display = '';
+            row.style.display = 'table-row';
         });
         
-        // Make the promising button active by default
-        if (promisingButton) {
-            promisingButton.classList.add('active');
-            promisingButton.classList.remove('btn-outline-warning');
-            promisingButton.classList.add('btn-warning');
+        // Set initial dropdown text
+        const categoryDropdown = document.getElementById('categoryDropdown');
+        if (categoryDropdown) {
+            categoryDropdown.textContent = 'All Coins';
+        }
+        
+        // Make the "All Coins" item active by default
+        const allCoinsItem = document.querySelector('.dropdown-item[data-crypto-category="all"]');
+        if (allCoinsItem) {
+            allCoinsItem.classList.add('active');
         }
     }
     
     // Call the setup function
-    setupFilterButtons();
+    setupInitialView();
     
     // Analysis buttons in the cryptocurrencies table
     const tableAnalysisButtons = document.querySelectorAll('td .analysis-button');
