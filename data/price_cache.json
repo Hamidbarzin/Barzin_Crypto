@@ -101,23 +101,23 @@
   },
   "SOLANA/USDT": {
     "data": {
-      "price": 130.7,
-      "change_24h": 8.85845,
-      "market_cap": 67519811689,
-      "volume_24h": 4424393529,
+      "price": 130.12,
+      "change_24h": 8.13982,
+      "market_cap": 67429743209,
+      "volume_24h": 4512285292,
       "source": "CoinGecko"
     },
-    "cached_at": 1744476346.6610303
+    "cached_at": 1744476567.9475548
   },
   "RIPPLE/USDT": {
     "data": {
       "price": 2.15,
-      "change_24h": 6.9884,
-      "market_cap": 125406904719,
-      "volume_24h": 3445932373,
+      "change_24h": 6.68863,
+      "market_cap": 125324363546,
+      "volume_24h": 3612998895,
       "source": "CoinGecko"
     },
-    "cached_at": 1744476347.3277438
+    "cached_at": 1744476568.9595563
   },
   "BNB/USDT": {
     "data": {
