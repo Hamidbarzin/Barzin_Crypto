@@ -33,11 +33,14 @@ def get_crypto_analysis(crypto_name, question_type="general"):
         # بررسی نوع سوال
         prompt = create_analysis_prompt(crypto_name, question_type)
         
-        # استفاده از OpenAI برای تحلیل
-        response = openai.chat.completions.create(
-            model="gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+        # استفاده از OpenAI برای تحلیل - همسازگار با نسخه قدیمی‌تر API
+        system_message = "You are a cryptocurrency analysis expert. Provide detailed and accurate information about cryptocurrencies based on technical analysis, fundamental analysis, and market trends."
+        
+        # استفاده از نسخه قدیمی‌تر OpenAI API
+        response = openai.ChatCompletion.create(
+            model="gpt-4",  # استفاده از مدل پایدارتر
             messages=[
-                {"role": "system", "content": "You are a cryptocurrency analysis expert. Provide detailed and accurate information about cryptocurrencies based on technical analysis, fundamental analysis, and market trends."},
+                {"role": "system", "content": system_message},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=1000
@@ -151,8 +154,9 @@ def get_crypto_news(crypto_name, limit=5):
         # استفاده از OpenAI برای ایجاد خلاصه‌ای از اخبار اخیر
         prompt = f"What are the most important recent news (last 2-4 weeks) about {crypto_name} cryptocurrency? Please list {limit} news items with dates and a brief description of each."
         
-        response = openai.chat.completions.create(
-            model="gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+        # استفاده از نسخه قدیمی‌تر OpenAI API
+        response = openai.ChatCompletion.create(
+            model="gpt-4",  # استفاده از مدل پایدارتر
             messages=[
                 {"role": "system", "content": "You are a cryptocurrency news analyst. Provide the most relevant and recent news about cryptocurrencies."},
                 {"role": "user", "content": prompt}
