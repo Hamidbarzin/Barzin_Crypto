@@ -431,9 +431,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Update Moving Averages
                     if (analysis.ma20 !== undefined && analysis.ma50 !== undefined) {
-                        const ma20El = document.querySelector('.indicator-box:nth-child(3) .text-info');
-                        const ma50El = document.querySelector('.indicator-box:nth-child(3) .text-warning');
-                        const maDescEl = document.querySelector('.indicator-box:nth-child(3) .indicator-description span');
+                        console.log("MA values:", analysis.ma20, analysis.ma50);
+                        const ma20El = document.querySelector('#technical-content .indicator-box:nth-child(3) .text-info');
+                        const ma50El = document.querySelector('#technical-content .indicator-box:nth-child(3) .text-warning');
+                        const maDescEl = document.querySelector('#technical-content .indicator-box:nth-child(3) .indicator-description span');
+                        console.log("MA elements found:", ma20El, ma50El, maDescEl);
                         
                         if (ma20El) {
                             ma20El.textContent = formatPrice(analysis.ma20);
