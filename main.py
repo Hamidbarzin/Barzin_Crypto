@@ -1851,7 +1851,7 @@ def get_technical(symbol=None, timeframe=None):
             'data': get_default_technical_data(symbol, timeframe)
         })
         
-@app.route('/technical_analysis/<path:symbol>')
+@app.route('/technical_analysis/<path:symbol>', methods=['GET'])
 # اجازه دسترسی همه کاربران به صفحه تحلیل تکنیکال
 # @login_required
 def technical_analysis_page(symbol):
