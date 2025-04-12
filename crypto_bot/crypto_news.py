@@ -1,8 +1,8 @@
 """
-ماژول دریافت و پردازش اخبار ارزهای دیجیتال
+Cryptocurrency News Retrieval and Processing Module
 
-این ماژول برای دریافت اخبار مهم ارزهای دیجیتال از منابع معتبر استفاده می‌شود
-و قابلیت دسته‌بندی، ترجمه و تحلیل احساسات اخبار را نیز فراهم می‌کند.
+This module is used to retrieve important cryptocurrency news from reliable sources
+and provides functionality for categorizing, translating, and sentiment analysis of news.
 """
 
 import os
@@ -17,12 +17,12 @@ import trafilatura
 from openai import OpenAI
 from typing import List, Dict, Any, Optional
 
-# ماژول اخبار CMC Markets Canada
+# CMC Markets Canada news module
 try:
     from crypto_bot.cmc_canada_news import get_cmc_canada_news, get_cmc_canada_crypto_analysis, get_combined_cmc_canada_content
 except ImportError:
     logger = logging.getLogger(__name__)
-    logger.warning("ماژول CMC Markets Canada اخبار یافت نشد. این منبع اخبار در دسترس نخواهد بود.")
+    logger.warning("CMC Markets Canada news module not found. This news source will not be available.")
     
     def get_cmc_canada_news(max_items=5, use_cache=True):
         return []
@@ -33,10 +33,10 @@ except ImportError:
     def get_combined_cmc_canada_content(max_news=5, max_analysis=3, use_cache=True):
         return []
 
-# تنظیم لاگر
+# Setup logger
 logger = logging.getLogger(__name__)
 
-# تنظیمات API
+# API settings
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 CRYPTOCOMPARE_API_KEY = os.environ.get("CRYPTOCOMPARE_API_KEY")
 

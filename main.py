@@ -2703,7 +2703,7 @@ def price_alerts_page():
 @app.route('/crypto_news')
 @app.route('/news')
 def crypto_news_page():
-    """صفحه اخبار ارزهای دیجیتال"""
+    """Cryptocurrency News Page"""
     return render_template('crypto_news.html')
 
 
@@ -2984,7 +2984,7 @@ def api_check_price_alerts():
 @app.route('/api/crypto-news', methods=['GET'])
 def api_get_crypto_news():
     """
-    دریافت اخبار ارزهای دیجیتال
+    Get cryptocurrency news
     """
     try:
         limit = request.args.get('limit', default=10, type=int)
@@ -2998,17 +2998,17 @@ def api_get_crypto_news():
             "news": news
         })
     except Exception as e:
-        logger.error(f"خطا در دریافت اخبار: {str(e)}")
+        logger.error(f"Error retrieving news: {str(e)}")
         return jsonify({
             "success": False,
-            "message": f"خطا در دریافت اخبار: {str(e)}"
+            "message": f"Error retrieving news: {str(e)}"
         }), 500
 
 
 @app.route('/api/cmc-canada-news', methods=['GET'])
 def api_get_cmc_canada_news():
     """
-    دریافت اخبار و تحلیل‌های CMC Markets Canada
+    Get news and analysis from CMC Markets Canada
     """
     try:
         from crypto_bot.cmc_canada_news import get_combined_cmc_canada_content
@@ -3025,23 +3025,23 @@ def api_get_cmc_canada_news():
             "count": len(news)
         })
     except ImportError as e:
-        logger.error(f"خطا: ماژول CMC Markets Canada در دسترس نیست: {str(e)}")
+        logger.error(f"Error: CMC Markets Canada module not available: {str(e)}")
         return jsonify({
             "success": False,
-            "message": "ماژول CMC Markets Canada در دسترس نیست"
+            "message": "CMC Markets Canada module not available"
         }), 404
     except Exception as e:
-        logger.error(f"خطا در دریافت اخبار CMC Markets Canada: {str(e)}")
+        logger.error(f"Error retrieving CMC Markets Canada news: {str(e)}")
         return jsonify({
             "success": False,
-            "message": f"خطا در دریافت اخبار CMC Markets Canada: {str(e)}"
+            "message": f"Error retrieving CMC Markets Canada news: {str(e)}"
         }), 500
 
 
 @app.route('/api/market-insights', methods=['GET'])
 def api_get_market_insights():
     """
-    دریافت تحلیل‌ها و بینش‌های بازار ارزهای دیجیتال
+    Get market insights and analysis for cryptocurrencies
     """
     try:
         insights = get_market_insights()
@@ -3051,10 +3051,10 @@ def api_get_market_insights():
             "data": insights
         })
     except Exception as e:
-        logger.error(f"خطا در دریافت بینش‌های بازار: {str(e)}")
+        logger.error(f"Error retrieving market insights: {str(e)}")
         return jsonify({
             "success": False,
-            "message": f"خطا در دریافت بینش‌های بازار: {str(e)}"
+            "message": f"Error retrieving market insights: {str(e)}"
         }), 500
 
 
