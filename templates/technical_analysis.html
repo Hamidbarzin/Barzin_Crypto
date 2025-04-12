@@ -1,54 +1,62 @@
 {% extends "minimal_base.html" %}
 
-{% block title %}Technical Analysis - {{ symbol }}{% endblock %}
+{% block title %}{{ ui_text('technical_analysis', 'تحلیل تکنیکال') }} - {{ symbol }}{% endblock %}
 
 {% block content %}
-<!-- Page header -->
-<div class="row mb-3">
-    <div class="col-md-8">
-        <div class="d-flex align-items-center">
-            <i class="fab fa-bitcoin text-warning me-2" style="font-size: 24px;"></i>
-            <div>
-                <h1 class="mb-0">{{ name }} <span class="badge bg-warning text-dark">{{ symbol }}</span></h1>
-                <p class="text-muted mb-0">Technical Analysis • Last updated: {{ timestamp }}</p>
-            </div>
+<!-- Page header - Yellow banner at top -->
+<div class="alert alert-warning py-2 mb-3 d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-gem me-2"></i>
+        <span>{{ ui_text('only_for_premium', 'فقط مخصوص اعضای پریمیوم') }}</span>
+    </div>
+    <a href="#" class="btn btn-sm btn-dark">{{ ui_text('upgrade', 'ارتقا') }}</a>
+</div>
+
+<!-- Main header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
+    <div class="d-flex align-items-center">
+        <img src="/static/icons/crypto-btc.svg" alt="BTC" class="me-2" width="32" height="32">
+        <div>
+            <h4 class="mb-0">{{ ui_text('technical_analysis', 'تحلیل تکنیکال') }} - {{ symbol }}</h4>
+            <div class="text-muted small">{{ ui_text('updated_at', 'آخرین بروزرسانی') }}: {{ timestamp }}</div>
         </div>
     </div>
-    <div class="col-md-4 text-end">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href="/minimal" class="text-decoration-none">Home</a></li>
-                <li class="breadcrumb-item"><a href="/cryptocurrencies" class="text-decoration-none">Markets</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Analysis</li>
-            </ol>
-        </nav>
+    
+    <div class="d-flex mt-2 mt-md-0">
+        <a href="/cryptocurrencies" class="btn btn-sm btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left me-1"></i> {{ ui_text('back_to_markets', 'بازگشت به بازارها') }}
+        </a>
+        <a href="#" class="btn btn-sm btn-primary">
+            <i class="fas fa-refresh me-1"></i> {{ ui_text('refresh', 'بروزرسانی') }}
+        </a>
     </div>
 </div>
 
-<!-- Main content section -->
-<div class="row mb-4">
-    <div class="col-12">
-        <!-- Navigation links -->
-        <div class="d-flex mb-3">
-            <a href="/cryptocurrencies" class="me-3 text-decoration-none">
-                <i class="fas fa-list-ul me-1"></i> All Markets
-            </a>
-            <a href="/technical_analysis/{{ symbol }}" class="me-3 text-decoration-none text-warning">
-                <i class="fas fa-chart-line me-1"></i> Technical Analysis
-            </a>
-            <a href="/minimal" class="me-3 text-decoration-none">
-                <i class="fas fa-home me-1"></i> Dashboard
-            </a>
-        </div>
-    </div>
+<!-- Navigation links -->
+<div class="d-flex mb-3 border-bottom pb-2">
+    <a href="/technical_analysis/{{ symbol }}" class="me-3 text-decoration-none fw-bold">
+        <i class="fas fa-chart-line me-1"></i> {{ ui_text('technical_analysis', 'تحلیل تکنیکال') }}
+    </a>
+    <a href="#signals" class="me-3 text-decoration-none text-muted">
+        <i class="fas fa-signal me-1"></i> {{ ui_text('signals', 'سیگنال‌ها') }}
+    </a>
+    <a href="#news" class="me-3 text-decoration-none text-muted">
+        <i class="fas fa-newspaper me-1"></i> {{ ui_text('news', 'اخبار') }}
+    </a>
 </div>
 
     <div class="row mb-4">
         <div class="col-md-8">
             <!-- Chart Placeholder -->
             <div class="card mb-4">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Price Chart</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary">1H</button>
+                        <button class="btn btn-sm btn-outline-secondary">4H</button>
+                        <button class="btn btn-sm btn-outline-primary">1D</button>
+                        <button class="btn btn-sm btn-outline-secondary">1W</button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="chart-container" style="height: 300px; background: #1c1c28; border-radius: 8px;">
@@ -65,12 +73,29 @@
                 <div class="card-header">
                     <h5 class="mb-0">Current Price</h5>
                 </div>
-                <div class="card-body">
-                    <h2>${{ price }}</h2>
-                    <span class="{% if change_24h >= 0 %}text-success{% else %}text-danger{% endif %}">
-                        <i class="fas {% if change_24h >= 0 %}fa-caret-up{% else %}fa-caret-down{% endif %}"></i>
-                        {{ change_24h|abs|round(2) }}% (24h)
-                    </span>
+                <div class="card-body text-center">
+                    <h1>${{ price }}</h1>
+                    <div class="mb-2">
+                        <span class="{% if change_24h >= 0 %}text-success{% else %}text-danger{% endif %} fs-5">
+                            <i class="fas {% if change_24h >= 0 %}fa-caret-up{% else %}fa-caret-down{% endif %}"></i>
+                            {{ change_24h|abs|round(2) }}% (24h)
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted small mt-3">
+                        <div>
+                            <div>{{ ui_text('24h_high', '24h High') }}</div>
+                            <div class="text-success">${{ price|float * 1.02 }}</div>
+                        </div>
+                        <div>
+                            <div>{{ ui_text('24h_low', '24h Low') }}</div>
+                            <div class="text-danger">${{ price|float * 0.98 }}</div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-warning w-100">
+                            <i class="fas fa-bell me-1"></i> {{ ui_text('set_alert', 'Set Price Alert') }}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
