@@ -10,7 +10,11 @@ import json
 import random
 from datetime import datetime
 import os
-from models import db, CryptoQuiz, UserQuizAttempt, UserQuizScore, User
+from crypto_bot.database import get_db, get_models
+
+# دریافت شی پایگاه داده و مدل‌ها
+db = get_db()
+User, CryptoQuiz, UserQuizAttempt, UserQuizScore = get_models()
 
 # تنظیم لاگ
 logger = logging.getLogger(__name__)
