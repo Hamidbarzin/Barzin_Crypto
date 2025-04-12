@@ -644,43 +644,84 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Search functionality
     function setupSearch() {
+        console.log("Setting up search functionality...");
         const searchInput = document.getElementById('crypto-search');
         const searchButton = document.getElementById('search-button');
         const cryptoRows = document.querySelectorAll('.crypto-row');
         
+        console.log("Search input:", searchInput);
+        console.log("Search button:", searchButton);
+        console.log("Number of crypto rows:", cryptoRows.length);
+        
         function performSearch() {
+            console.log("Performing search...");
             const searchTerm = searchInput.value.toLowerCase().trim();
+            console.log("Search term:", searchTerm);
             
             // If search term is empty, show all
             if (searchTerm === '') {
+                console.log("Search term is empty, showing all rows");
                 cryptoRows.forEach(row => {
                     row.style.display = '';
                 });
                 return;
             }
             
+            let matchCount = 0;
+            
             // Filter rows
             cryptoRows.forEach(row => {
-                const coinName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                const coinSymbol = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-                
-                if (coinName.includes(searchTerm) || coinSymbol.includes(searchTerm)) {
+                try {
+                    // More robust selection with error handling
+                    let coinName = "";
+                    let coinSymbol = "";
+                    
+                    const nameCell = row.querySelector('td:nth-child(2)');
+                    const symbolCell = row.querySelector('td:nth-child(3)');
+                    
+                    if (nameCell) coinName = nameCell.textContent.toLowerCase();
+                    if (symbolCell) coinSymbol = symbolCell.textContent.toLowerCase();
+                    
+                    console.log(`Row data: Name=${coinName}, Symbol=${coinSymbol}`);
+                    
+                    if (coinName.includes(searchTerm) || coinSymbol.includes(searchTerm)) {
+                        row.style.display = '';
+                        matchCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                } catch (err) {
+                    console.error("Error processing row:", err);
+                    // If we encounter an error, show the row anyway
                     row.style.display = '';
-                } else {
-                    row.style.display = 'none';
                 }
             });
+            
+            console.log(`Search complete. Found ${matchCount} matches.`);
         }
         
         // Add event listeners
-        searchButton.addEventListener('click', performSearch);
+        if (searchButton) {
+            console.log("Adding click event listener to search button");
+            searchButton.addEventListener('click', performSearch);
+        }
         
         // Add keypress event for Enter key
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
+        if (searchInput) {
+            console.log("Adding keypress event listener to search input");
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    console.log("Enter key pressed, performing search");
+                    performSearch();
+                }
+            });
+            
+            // Also add input event for real-time filtering
+            searchInput.addEventListener('input', function() {
+                console.log("Input changed, performing search");
                 performSearch();
-            }
-        });
+            });
+        }
     }
     
     // Execute main functions
