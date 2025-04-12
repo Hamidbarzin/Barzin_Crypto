@@ -795,15 +795,15 @@ def get_crypto_news_formatted_for_telegram() -> str:
 
 
 if __name__ == "__main__":
-    # تست ماژول
-    print("دریافت اخبار ارزهای دیجیتال...")
+    # Module test
+    print("Getting cryptocurrency news...")
     news = get_crypto_news(limit=5, translate=True)
     for item in news:
-        print(f"عنوان: {item.get('title')}")
-        print(f"ترجمه: {item.get('title_fa', '')}")
-        print(f"منبع: {item.get('source')}")
-        print(f"تاریخ: {item.get('published_date', '')}")
-        print(f"لینک: {item.get('url')}")
+        print(f"Title: {item.get('title')}")
+        print(f"Translation: {item.get('title_fa', '')}")
+        print(f"Source: {item.get('source')}")
+        print(f"Date: {item.get('published_date', '')}")
+        print(f"Link: {item.get('url')}")
         print("-" * 50)
     
     print("\nتحلیل احساسات بازار:")
