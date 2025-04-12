@@ -4,8 +4,29 @@
 
 {% block content %}
 <div class="container my-4">
+    <!-- Hero section with dark background -->
     <div class="row mb-4">
-        <div class="col">
+        <div class="col-12">
+            <div class="card bg-dark text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="text-warning">
+                            <i class="fas fa-chart-line me-2"></i>
+                            {{ name }} <span class="badge bg-light text-dark">{{ symbol }}</span>
+                        </h2>
+                        <div>
+                            <span class="badge bg-light text-dark">Technical Analysis</span>
+                        </div>
+                    </div>
+                    <p class="text-light mb-0">Last updated: {{ timestamp }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation breadcrumb below the hero section -->
+    <div class="row mb-4">
+        <div class="col-12">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/minimal">Home</a></li>
@@ -13,16 +34,6 @@
                     <li class="breadcrumb-item active" aria-current="page">Technical Analysis - {{ symbol }}</li>
                 </ol>
             </nav>
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="mb-0">
-                    <img src="/static/images/crypto-barzin-logo-small.png" alt="Crypto Barzin" class="me-2" style="height: 36px;">
-                    <span class="text-primary">{{ name }}</span> <span class="badge bg-dark">{{ symbol }}</span>
-                </h2>
-                <div>
-                    <span class="badge bg-info text-white rounded-pill">Technical Analysis</span>
-                </div>
-            </div>
-            <p class="text-muted">Last updated: {{ timestamp }}</p>
         </div>
     </div>
 
