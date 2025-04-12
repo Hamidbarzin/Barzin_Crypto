@@ -1,8 +1,8 @@
 """
-ماژول دریافت اخبار و تحلیل‌های بازار از CMC Markets Canada
+Canadian Crypto Market News and Analysis Module
 
-این ماژول داده‌های اخبار را از CMC Markets Canada دریافت و
-پردازش می‌کند تا برای کاربران ایرانی قابل استفاده باشد.
+This module retrieves and processes news data from Canadian crypto markets
+including CMC Markets Canada and other Canadian crypto news sources.
 """
 import time
 import logging
@@ -14,13 +14,25 @@ from crypto_bot.cache_manager import news_cache
 # تنظیم لاگر
 logger = logging.getLogger(__name__)
 
-# آدرس‌های مهم CMC Markets Canada
+# Important URLs for Canadian crypto sources
 CMC_CANADA_BASE_URL = "https://www.cmcmarkets.com/en-ca/"
 CMC_CANADA_NEWS_URL = f"{CMC_CANADA_BASE_URL}news-and-analysis"
 CMC_CANADA_CRYPTO_URL = f"{CMC_CANADA_BASE_URL}cryptocurrency-trading"
 CMC_CANADA_MARKET_ANALYSIS_URL = f"{CMC_CANADA_BASE_URL}financial-trading/market-reports-and-analysis"
 
-# زمان نگهداری کش اخبار (2 ساعت)
+# NDAX Canadian Crypto Exchange
+NDAX_BASE_URL = "https://ndax.io/"
+NDAX_BLOG_URL = "https://ndax.io/blog/"
+
+# Bitbuy Canadian Exchange
+BITBUY_BASE_URL = "https://bitbuy.ca/"
+BITBUY_BLOG_URL = "https://bitbuy.ca/en/resources/blog/"
+
+# Newton Canadian Exchange
+NEWTON_BASE_URL = "https://www.newton.co/"
+NEWTON_LEARN_URL = "https://www.newton.co/learn"
+
+# Cache timeout (2 hours)
 NEWS_CACHE_TTL = 2 * 60 * 60
 
 
@@ -273,15 +285,338 @@ def get_combined_cmc_canada_content(max_news=5, max_analysis=3, use_cache=True):
     return combined_items
 
 
-def fetch_full_article_content(url):
+def get_ndax_blog_news(max_items=5, use_cache=True):
     """
-    دریافت متن کامل مقاله از URL
+    Retrieve news from NDAX.io blog
     
     Args:
-        url (str): آدرس کامل مقاله
+        max_items (int): Maximum number of news items to retrieve
+        use_cache (bool): Whether to use cache for news data
         
     Returns:
-        str: متن استخراج شده از مقاله
+        list: List of news items with details
+    """
+    cache_key = f"ndax_blog_news_{max_items}"
+    
+    # Check cache
+    if use_cache:
+        cached_data = news_cache.get(cache_key)
+        if cached_data is not None:
+            logger.info("NDAX blog news retrieved from cache")
+            return cached_data
+    
+    news_items = []
+    
+    try:
+        # Get blog page
+        response = requests.get(NDAX_BLOG_URL, timeout=10)
+        if response.status_code != 200:
+            logger.error(f"Error fetching NDAX blog: {response.status_code}")
+            return news_items
+        
+        # Parse HTML with BeautifulSoup
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Find news items - adjust classes based on actual structure
+        blog_posts = soup.find_all('article') or soup.find_all('div', class_=['post', 'blog-post', 'entry'])
+        
+        for post in blog_posts[:max_items]:
+            try:
+                # Extract title and link
+                title_elem = post.find(['h1', 'h2', 'h3', 'h4']) or post.find(class_=['title', 'entry-title'])
+                link_elem = title_elem.find('a') if title_elem else post.find('a')
+                
+                if not title_elem or not link_elem:
+                    continue
+                
+                title = title_elem.text.strip()
+                link = link_elem['href']
+                
+                # Add domain to link if relative
+                if link.startswith('/'):
+                    link = f"{NDAX_BASE_URL.rstrip('/')}{link}"
+                
+                # Extract date
+                date_elem = post.find('time') or post.find(class_=['date', 'published', 'entry-date'])
+                date = date_elem.text.strip() if date_elem else 'Unknown Date'
+                
+                # Extract summary
+                summary_elem = post.find(['p', 'div'], class_=['summary', 'excerpt', 'entry-summary'])
+                summary = summary_elem.text.strip() if summary_elem else ''
+                
+                # Extract image
+                image_elem = post.find('img')
+                image_url = image_elem['src'] if image_elem and 'src' in image_elem.attrs else ''
+                
+                # Create news item
+                news_item = {
+                    'title': title,
+                    'url': link,
+                    'date': date,
+                    'summary': summary,
+                    'image_url': image_url,
+                    'source': 'NDAX',
+                    'sentiment': {'score': 0, 'label': 'Neutral'},
+                    'tags': ['canada', 'crypto', 'exchange'],
+                    'is_sample_data': False
+                }
+                
+                news_items.append(news_item)
+                
+            except Exception as e:
+                logger.error(f"Error parsing blog post from NDAX: {str(e)}")
+                continue
+    
+    except Exception as e:
+        logger.error(f"Error fetching news from NDAX blog: {str(e)}")
+    
+    # Save to cache
+    if news_items:
+        news_cache.set(cache_key, news_items, NEWS_CACHE_TTL)
+        logger.info(f"Saved {len(news_items)} NDAX blog items to cache")
+    
+    return news_items
+
+
+def get_bitbuy_blog_news(max_items=5, use_cache=True):
+    """
+    Retrieve news from Bitbuy blog
+    
+    Args:
+        max_items (int): Maximum number of news items to retrieve
+        use_cache (bool): Whether to use cache for news data
+        
+    Returns:
+        list: List of news items with details
+    """
+    cache_key = f"bitbuy_blog_news_{max_items}"
+    
+    # Check cache
+    if use_cache:
+        cached_data = news_cache.get(cache_key)
+        if cached_data is not None:
+            logger.info("Bitbuy blog news retrieved from cache")
+            return cached_data
+    
+    news_items = []
+    
+    try:
+        # Get blog page
+        response = requests.get(BITBUY_BLOG_URL, timeout=10)
+        if response.status_code != 200:
+            logger.error(f"Error fetching Bitbuy blog: {response.status_code}")
+            return news_items
+        
+        # Parse HTML with BeautifulSoup
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Find news items - adjust classes based on actual structure
+        blog_posts = soup.find_all('article') or soup.find_all('div', class_=['post', 'blog-post', 'entry'])
+        
+        for post in blog_posts[:max_items]:
+            try:
+                # Extract title and link
+                title_elem = post.find(['h1', 'h2', 'h3', 'h4']) or post.find(class_=['title', 'entry-title'])
+                link_elem = title_elem.find('a') if title_elem else post.find('a')
+                
+                if not title_elem or not link_elem:
+                    continue
+                
+                title = title_elem.text.strip()
+                link = link_elem['href']
+                
+                # Add domain to link if relative
+                if link.startswith('/'):
+                    link = f"{BITBUY_BASE_URL.rstrip('/')}{link}"
+                
+                # Extract date
+                date_elem = post.find('time') or post.find(class_=['date', 'published', 'entry-date'])
+                date = date_elem.text.strip() if date_elem else 'Unknown Date'
+                
+                # Extract summary
+                summary_elem = post.find(['p', 'div'], class_=['summary', 'excerpt', 'entry-summary'])
+                summary = summary_elem.text.strip() if summary_elem else ''
+                
+                # Extract image
+                image_elem = post.find('img')
+                image_url = image_elem['src'] if image_elem and 'src' in image_elem.attrs else ''
+                
+                # Create news item
+                news_item = {
+                    'title': title,
+                    'url': link,
+                    'date': date,
+                    'summary': summary,
+                    'image_url': image_url,
+                    'source': 'Bitbuy',
+                    'sentiment': {'score': 0, 'label': 'Neutral'},
+                    'tags': ['canada', 'crypto', 'exchange'],
+                    'is_sample_data': False
+                }
+                
+                news_items.append(news_item)
+                
+            except Exception as e:
+                logger.error(f"Error parsing blog post from Bitbuy: {str(e)}")
+                continue
+    
+    except Exception as e:
+        logger.error(f"Error fetching news from Bitbuy blog: {str(e)}")
+    
+    # Save to cache
+    if news_items:
+        news_cache.set(cache_key, news_items, NEWS_CACHE_TTL)
+        logger.info(f"Saved {len(news_items)} Bitbuy blog items to cache")
+    
+    return news_items
+
+
+def get_newton_learn_articles(max_items=5, use_cache=True):
+    """
+    Retrieve educational articles from Newton.co Learn section
+    
+    Args:
+        max_items (int): Maximum number of articles to retrieve
+        use_cache (bool): Whether to use cache for article data
+        
+    Returns:
+        list: List of articles with details
+    """
+    cache_key = f"newton_learn_articles_{max_items}"
+    
+    # Check cache
+    if use_cache:
+        cached_data = news_cache.get(cache_key)
+        if cached_data is not None:
+            logger.info("Newton learn articles retrieved from cache")
+            return cached_data
+    
+    articles = []
+    
+    try:
+        # Get learn page
+        response = requests.get(NEWTON_LEARN_URL, timeout=10)
+        if response.status_code != 200:
+            logger.error(f"Error fetching Newton learn articles: {response.status_code}")
+            return articles
+        
+        # Parse HTML with BeautifulSoup
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Find article items - adjust classes based on actual structure
+        article_elems = soup.find_all('article') or soup.find_all(['div', 'section'], class_=['article', 'post', 'learn-item'])
+        
+        for article_elem in article_elems[:max_items]:
+            try:
+                # Extract title and link
+                title_elem = article_elem.find(['h1', 'h2', 'h3', 'h4']) or article_elem.find(class_=['title', 'article-title'])
+                link_elem = title_elem.find('a') if title_elem else article_elem.find('a')
+                
+                if not title_elem or not link_elem:
+                    continue
+                
+                title = title_elem.text.strip()
+                link = link_elem['href']
+                
+                # Add domain to link if relative
+                if link.startswith('/'):
+                    link = f"{NEWTON_BASE_URL.rstrip('/')}{link}"
+                
+                # Extract date if available
+                date_elem = article_elem.find('time') or article_elem.find(class_=['date', 'published'])
+                date = date_elem.text.strip() if date_elem else 'Unknown Date'
+                
+                # Extract summary
+                summary_elem = article_elem.find(['p', 'div'], class_=['summary', 'excerpt', 'description'])
+                summary = summary_elem.text.strip() if summary_elem else ''
+                
+                # Extract image
+                image_elem = article_elem.find('img')
+                image_url = image_elem['src'] if image_elem and 'src' in image_elem.attrs else ''
+                
+                # Create article item
+                article_item = {
+                    'title': title,
+                    'url': link,
+                    'date': date,
+                    'summary': summary,
+                    'image_url': image_url,
+                    'source': 'Newton',
+                    'type': 'educational',
+                    'tags': ['canada', 'crypto', 'educational'],
+                    'is_sample_data': False
+                }
+                
+                articles.append(article_item)
+                
+            except Exception as e:
+                logger.error(f"Error parsing article from Newton: {str(e)}")
+                continue
+    
+    except Exception as e:
+        logger.error(f"Error fetching articles from Newton: {str(e)}")
+    
+    # Save to cache
+    if articles:
+        news_cache.set(cache_key, articles, NEWS_CACHE_TTL)
+        logger.info(f"Saved {len(articles)} Newton learn articles to cache")
+    
+    return articles
+
+
+def get_all_canadian_crypto_news(max_per_source=3, use_cache=True):
+    """
+    Combine news from all Canadian crypto sources
+    
+    Args:
+        max_per_source (int): Maximum number of items to retrieve from each source
+        use_cache (bool): Whether to use cache for news data
+        
+    Returns:
+        list: Combined list of news items from all sources
+    """
+    cache_key = f"all_canadian_crypto_news_{max_per_source}"
+    
+    # Check cache
+    if use_cache:
+        cached_data = news_cache.get(cache_key)
+        if cached_data is not None:
+            logger.info("All Canadian crypto news retrieved from cache")
+            return cached_data
+    
+    # Get news from all sources
+    cmc_news = get_cmc_canada_news(max_items=max_per_source, use_cache=use_cache)
+    ndax_news = get_ndax_blog_news(max_items=max_per_source, use_cache=use_cache)
+    bitbuy_news = get_bitbuy_blog_news(max_items=max_per_source, use_cache=use_cache)
+    newton_articles = get_newton_learn_articles(max_items=max_per_source, use_cache=use_cache)
+    
+    # Combine all news
+    all_news = []
+    all_news.extend(cmc_news)
+    all_news.extend(ndax_news)
+    all_news.extend(bitbuy_news)
+    all_news.extend(newton_articles)
+    
+    # Sort by date if possible (most recent first)
+    # This is challenging due to different date formats, so we will keep the mixed order
+    
+    # Save to cache
+    if all_news:
+        news_cache.set(cache_key, all_news, NEWS_CACHE_TTL)
+        logger.info(f"Saved {len(all_news)} combined Canadian crypto news items to cache")
+    
+    return all_news
+
+
+def fetch_full_article_content(url):
+    """
+    Retrieve full article content from URL
+    
+    Args:
+        url (str): Full article URL
+        
+    Returns:
+        str: Extracted article text
     """
     cache_key = f"article_content_{url}"
     
@@ -316,14 +651,26 @@ def fetch_full_article_content(url):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     
-    # آزمایش دریافت اخبار
+    # Test CMC Markets Canada
     news = get_cmc_canada_news(max_items=3, use_cache=False)
     print(f"Retrieved {len(news)} news items from CMC Markets Canada")
     
-    # آزمایش دریافت تحلیل‌ها
     analysis = get_cmc_canada_crypto_analysis(max_items=2, use_cache=False)
     print(f"Retrieved {len(analysis)} analysis items from CMC Markets Canada")
     
-    # آزمایش ترکیب
     combined = get_combined_cmc_canada_content(max_news=3, max_analysis=2, use_cache=False)
     print(f"Retrieved {len(combined)} combined items from CMC Markets Canada")
+    
+    # Test Canadian crypto news sources
+    ndax_news = get_ndax_blog_news(max_items=3, use_cache=False)
+    print(f"Retrieved {len(ndax_news)} news items from NDAX")
+    
+    bitbuy_news = get_bitbuy_blog_news(max_items=3, use_cache=False)
+    print(f"Retrieved {len(bitbuy_news)} news items from Bitbuy")
+    
+    newton_articles = get_newton_learn_articles(max_items=3, use_cache=False)
+    print(f"Retrieved {len(newton_articles)} articles from Newton")
+    
+    # Test combined Canadian crypto news
+    all_canadian_news = get_all_canadian_crypto_news(max_per_source=2, use_cache=False)
+    print(f"Retrieved {len(all_canadian_news)} total Canadian crypto news items")

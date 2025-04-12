@@ -19,7 +19,15 @@ from typing import List, Dict, Any, Optional
 
 # CMC Markets Canada news module
 try:
-    from crypto_bot.cmc_canada_news import get_cmc_canada_news, get_cmc_canada_crypto_analysis, get_combined_cmc_canada_content
+    from crypto_bot.cmc_canada_news import (
+        get_cmc_canada_news, 
+        get_cmc_canada_crypto_analysis, 
+        get_combined_cmc_canada_content,
+        get_ndax_blog_news,
+        get_bitbuy_blog_news,
+        get_newton_learn_articles,
+        get_all_canadian_crypto_news
+    )
 except ImportError:
     logger = logging.getLogger(__name__)
     logger.warning("CMC Markets Canada news module not found. This news source will not be available.")
@@ -31,6 +39,18 @@ except ImportError:
         return []
     
     def get_combined_cmc_canada_content(max_news=5, max_analysis=3, use_cache=True):
+        return []
+    
+    def get_ndax_blog_news(max_items=5, use_cache=True):
+        return []
+    
+    def get_bitbuy_blog_news(max_items=5, use_cache=True):
+        return []
+    
+    def get_newton_learn_articles(max_items=5, use_cache=True):
+        return []
+    
+    def get_all_canadian_crypto_news(max_per_source=3, use_cache=True):
         return []
 
 # Setup logger
