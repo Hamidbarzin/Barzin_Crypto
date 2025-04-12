@@ -455,10 +455,28 @@ def get_crypto_news(limit: int = 10, translate: bool = True, include_canada: boo
     all_news = all_news[:limit]
     
     # ترجمه عناوین اخبار به فارسی
-    if translate and OPENAI_API_KEY:
-        all_news = translate_news(all_news)
-    else:
-        # اگر ترجمه نیاز نیست یا امکان آن وجود ندارد
+    try:
+        if translate and OPENAI_API_KEY:
+            # برای جلوگیری از خطای محدودیت API، تعداد اخبار برای ترجمه را محدود می‌کنیم
+            max_translate_items = min(5, len(all_news))
+            news_to_translate = all_news[:max_translate_items]
+            
+            logger.info(f"ترجمه {max_translate_items} خبر از {len(all_news)} خبر")
+            translated_news = translate_news(news_to_translate)
+            
+            # اخباری که ترجمه نشدند را اضافه می‌کنیم
+            for i in range(max_translate_items, len(all_news)):
+                all_news[i]['title_fa'] = all_news[i]['title']
+                
+            # جایگزینی اخبار ترجمه شده
+            all_news[:max_translate_items] = translated_news
+        else:
+            # اگر ترجمه نیاز نیست یا امکان آن وجود ندارد
+            for item in all_news:
+                item['title_fa'] = item['title']
+    except Exception as e:
+        logger.error(f"خطا در ترجمه اخبار در تابع اصلی: {str(e)}")
+        # در صورت هر خطایی، همه عناوین به انگلیسی نمایش داده می‌شوند
         for item in all_news:
             item['title_fa'] = item['title']
     
@@ -489,6 +507,24 @@ def get_crypto_sentiment_analysis() -> Dict[str, Any]:
             "updated_at": datetime.now(toronto_tz).strftime('%Y-%m-%d %H:%M'),
             "data_available": False
         }
+    
+    # اول سعی می‌کنیم نتایج قبلی را برگردانیم اگر خیلی قدیمی نباشند
+    # در اینجا استفاده از یک حافظه نهان ساده برای محدود کردن فراخوانی‌های API
+    cached_sentiment_file = os.path.join(os.path.dirname(__file__), "cached_sentiment.json")
+    try:
+        if os.path.exists(cached_sentiment_file):
+            with open(cached_sentiment_file, 'r') as f:
+                cached_data = json.load(f)
+                
+            # بررسی اعتبار داده‌های حافظه نهان (کمتر از 30 دقیقه)
+            cached_time = cached_data.get("cached_at", 0)
+            if time.time() - cached_time < 1800:  # 30 دقیقه
+                logger.info("استفاده از تحلیل احساسات ذخیره شده (کمتر از 30 دقیقه)")
+                return cached_data
+            else:
+                logger.info("تحلیل احساسات ذخیره شده منقضی شده است (بیش از 30 دقیقه)")
+    except Exception as cache_err:
+        logger.error(f"خطا در خواندن تحلیل احساسات ذخیره شده: {str(cache_err)}")
     
     try:
         # دریافت چند خبر برای تحلیل
@@ -538,9 +574,30 @@ def get_crypto_sentiment_analysis() -> Dict[str, Any]:
         result["updated_at"] = datetime.now(toronto_tz).strftime('%Y-%m-%d %H:%M')
         result["data_available"] = True
         
+        # ذخیره نتیجه در حافظه نهان
+        try:
+            result["cached_at"] = time.time()
+            with open(cached_sentiment_file, 'w') as f:
+                json.dump(result, f)
+            logger.info("تحلیل احساسات در حافظه نهان ذخیره شد")
+        except Exception as cache_err:
+            logger.error(f"خطا در ذخیره تحلیل احساسات در حافظه نهان: {str(cache_err)}")
+        
         return result
     except Exception as e:
         logger.error(f"خطا در تحلیل احساسات بازار: {str(e)}")
+        
+        # اگر خطا داشتیم، سعی می‌کنیم از حافظه نهان استفاده کنیم حتی اگر منقضی شده باشد
+        try:
+            if os.path.exists(cached_sentiment_file):
+                with open(cached_sentiment_file, 'r') as f:
+                    cached_data = json.load(f)
+                logger.info("استفاده از تحلیل احساسات ذخیره شده قدیمی به دلیل خطا")
+                return cached_data
+        except Exception as cache_err:
+            logger.error(f"خطا در خواندن تحلیل احساسات ذخیره شده قدیمی: {str(cache_err)}")
+        
+        # اگر حافظه نهان هم مشکل داشت، داده پیش‌فرض برمی‌گردانیم
         return {
             "overall_sentiment": "neutral",
             "sentiment_score": 50,

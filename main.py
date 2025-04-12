@@ -2982,6 +2982,7 @@ def api_check_price_alerts():
 
 # API‌های مربوط به اخبار ارزهای دیجیتال
 @app.route('/api/crypto-news', methods=['GET'])
+@app.route('/api/get-crypto-news', methods=['GET'])  # اضافه کردن مسیر قدیمی برای سازگاری
 def api_get_crypto_news():
     """
     Get cryptocurrency news
