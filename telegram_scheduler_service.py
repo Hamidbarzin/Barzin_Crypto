@@ -53,7 +53,7 @@ class TelegramSchedulerService:
         self.trading_signals_interval = 8  # Every 8 times (4 hours)
         self.crypto_news_interval = 16  # Every 16 times (8 hours)
         
-        # User-configurable settings
+        # Default user-configurable settings
         self.active_hours_start = 8  # Start hour (8 AM)
         self.active_hours_end = 22   # End hour (10 PM)
         self.message_sending_enabled = True  # Is message sending enabled?
@@ -62,6 +62,9 @@ class TelegramSchedulerService:
         # Important coins for technical analysis
         self.important_coins = ["BTC/USDT", "ETH/USDT", "BNB/USDT", "SOL/USDT", "XRP/USDT"]
         self.current_coin_index = 0
+        
+        # Load settings from file if they exist
+        self._load_settings()
     
     def start(self):
         """
@@ -475,6 +478,65 @@ class TelegramSchedulerService:
         seconds_left = reports_left * self.interval
         next_time = now + datetime.timedelta(seconds=seconds_left)
         return next_time.strftime("%Y-%m-%d %H:%M:%S")
+    
+    def _load_settings(self):
+        """
+        Load settings from file
+        """
+        try:
+            if os.path.exists(SETTINGS_FILE):
+                with open(SETTINGS_FILE, 'r') as f:
+                    settings = json.load(f)
+                
+                # Update settings
+                if 'message_sending_enabled' in settings:
+                    self.message_sending_enabled = bool(settings['message_sending_enabled'])
+                
+                if 'auto_start_on_boot' in settings:
+                    self.auto_start_on_boot = bool(settings['auto_start_on_boot'])
+                
+                if 'active_hours_start' in settings:
+                    active_hours_start = int(settings['active_hours_start'])
+                    if 0 <= active_hours_start <= 23:
+                        self.active_hours_start = active_hours_start
+                
+                if 'active_hours_end' in settings:
+                    active_hours_end = int(settings['active_hours_end'])
+                    if 1 <= active_hours_end <= 24:
+                        self.active_hours_end = active_hours_end
+                
+                if 'interval' in settings:
+                    interval = int(settings['interval'])
+                    if interval >= 60:
+                        self.interval = interval
+                
+                logger.info(f"Settings loaded from {SETTINGS_FILE}")
+            else:
+                logger.info(f"Settings file {SETTINGS_FILE} not found, using defaults")
+        except Exception as e:
+            logger.error(f"Error loading settings: {str(e)}")
+    
+    def _save_settings(self):
+        """
+        Save settings to file
+        """
+        try:
+            settings = {
+                'message_sending_enabled': self.message_sending_enabled,
+                'auto_start_on_boot': self.auto_start_on_boot,
+                'active_hours_start': self.active_hours_start,
+                'active_hours_end': self.active_hours_end,
+                'interval': self.interval
+            }
+            
+            with open(SETTINGS_FILE, 'w') as f:
+                json.dump(settings, f, indent=4)
+            
+            logger.info(f"Settings saved to {SETTINGS_FILE}")
+            return True
+        except Exception as e:
+            logger.error(f"Error saving settings: {str(e)}")
+            return False
 
 # Service instance to be used in main.py
 telegram_scheduler = TelegramSchedulerService()
@@ -552,6 +614,9 @@ def update_scheduler_settings(settings):
                 telegram_scheduler.interval = interval
         except (ValueError, TypeError):
             pass
+    
+    # Save settings to file
+    telegram_scheduler._save_settings()
     
     # Return current status
     return telegram_scheduler.status()
