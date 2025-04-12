@@ -1,0 +1,278 @@
+{% extends "minimal_base.html" %}
+
+{% block title %}{{ ui_text('crypto_analysis', 'Cryptocurrency Analysis') }} | {{ ui_text('title', 'Crypto Barzin') }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .analysis-card {
+        border-radius: 15px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .analysis-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    .crypto-chip {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        margin: 0.5rem;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+    }
+    .crypto-chip:hover {
+        background-color: #e9ecef;
+        border-color: #ced4da;
+    }
+    .crypto-chip i {
+        margin-right: 0.5rem;
+    }
+    .analysis-type-card {
+        cursor: pointer;
+        border-radius: 12px;
+        transition: all 0.2s;
+        height: 100%;
+    }
+    .analysis-type-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    .analysis-type-card .card-header {
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+    .analysis-type-card .card-body {
+        padding: 1.5rem;
+    }
+    .analysis-type-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    .form-label {
+        font-weight: 500;
+    }
+    .selected-analysis {
+        border: 2px solid var(--bs-primary);
+        box-shadow: 0 5px 15px rgba(var(--bs-primary-rgb), 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-4">
+                <i class="fas fa-chart-line me-2"></i> Cryptocurrency Analysis
+            </h1>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> Ask for analysis on any cryptocurrency - technical, fundamental, news, and more!
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Analysis Form Section -->
+        <div class="col-md-8">
+            <div class="card analysis-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Get Cryptocurrency Analysis</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('crypto_analysis_result') }}" method="post" id="analysis-form">
+                        <!-- Cryptocurrency Input -->
+                        <div class="mb-4">
+                            <label for="crypto_name" class="form-label">Cryptocurrency Name/Symbol:</label>
+                            <input type="text" class="form-control form-control-lg" id="crypto_name" name="crypto_name" 
+                                   placeholder="Enter cryptocurrency name (e.g., Bitcoin, ETH, XRP)" required>
+                        </div>
+                        
+                        <!-- Popular Cryptocurrencies -->
+                        <div class="mb-4">
+                            <label class="form-label">Popular Cryptocurrencies:</label>
+                            <div class="popular-cryptos">
+                                {% for crypto in popular_cryptos %}
+                                    <span class="crypto-chip" data-crypto="{{ crypto.name }}">
+                                        <i class="{{ crypto.icon }}"></i> {{ crypto.name }} ({{ crypto.symbol }})
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Analysis Type -->
+                        <div class="mb-4">
+                            <label class="form-label">Select Analysis Type:</label>
+                            <input type="hidden" id="analysis_type" name="analysis_type" value="general">
+                            
+                            <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+                                {% for type in analysis_types %}
+                                    <div class="col">
+                                        <div class="card analysis-type-card {% if type.id == 'general' %}selected-analysis{% endif %}" data-analysis-type="{{ type.id }}">
+                                            <div class="card-body text-center">
+                                                <div class="analysis-type-icon">
+                                                    <i class="{{ type.icon }}"></i>
+                                                </div>
+                                                <h5 class="card-title">{{ type.name }}</h5>
+                                                <p class="card-text text-muted small">{{ type.description }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-search me-2"></i> Get Analysis
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Features Section -->
+            <div class="card analysis-card">
+                <div class="card-header">
+                    <h5 class="mb-0">Analysis Features</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-chart-bar fa-2x text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5>Technical Analysis</h5>
+                                    <p class="text-muted">Chart patterns, support/resistance levels, RSI, MACD, and more indicators analyzed.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-project-diagram fa-2x text-success"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5>Fundamental Analysis</h5>
+                                    <p class="text-muted">Project technology, team, use cases, tokenomics, and market positioning.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-newspaper fa-2x text-info"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5>News Analysis</h5>
+                                    <p class="text-muted">Latest news and developments affecting the cryptocurrency's future.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exchange-alt fa-2x text-warning"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5>Trading Strategies</h5>
+                                    <p class="text-muted">Suggested entry/exit points and risk management approaches.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info Section -->
+        <div class="col-md-4">
+            <!-- How It Works Card -->
+            <div class="card analysis-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">How It Works</h5>
+                </div>
+                <div class="card-body">
+                    <ol class="list-group list-group-numbered mb-0">
+                        <li class="list-group-item border-0 d-flex">
+                            <div>
+                                <h6 class="mb-1">Enter Cryptocurrency</h6>
+                                <p class="mb-0 text-muted">Type any cryptocurrency name or symbol, or select from popular options.</p>
+                            </div>
+                        </li>
+                        <li class="list-group-item border-0 d-flex">
+                            <div>
+                                <h6 class="mb-1">Choose Analysis Type</h6>
+                                <p class="mb-0 text-muted">Select the type of analysis you need based on your interests.</p>
+                            </div>
+                        </li>
+                        <li class="list-group-item border-0 d-flex">
+                            <div>
+                                <h6 class="mb-1">Get Detailed Analysis</h6>
+                                <p class="mb-0 text-muted">Receive comprehensive insights based on AI-powered analysis.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Info Card -->
+            <div class="card analysis-card">
+                <div class="card-header">
+                    <h5 class="mb-0">About This Tool</h5>
+                </div>
+                <div class="card-body">
+                    <p>This cryptocurrency analysis tool provides comprehensive insights into any cryptocurrency you're interested in. Our analysis is powered by advanced AI that processes market data, news, and technical indicators.</p>
+                    <p>Whether you're a trader looking for entry points, an investor researching fundamentals, or simply curious about recent developments, our tool has you covered.</p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Analysis is provided for informational purposes only and should not be considered financial advice.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle popular cryptocurrency selection
+        const cryptoChips = document.querySelectorAll('.crypto-chip');
+        const cryptoNameInput = document.getElementById('crypto_name');
+        
+        cryptoChips.forEach(chip => {
+            chip.addEventListener('click', function() {
+                const cryptoName = this.getAttribute('data-crypto');
+                cryptoNameInput.value = cryptoName;
+                
+                // Highlight selected chip
+                cryptoChips.forEach(c => c.classList.remove('bg-primary', 'text-white'));
+                this.classList.add('bg-primary', 'text-white');
+            });
+        });
+        
+        // Handle analysis type selection
+        const analysisTypeCards = document.querySelectorAll('.analysis-type-card');
+        const analysisTypeInput = document.getElementById('analysis_type');
+        
+        analysisTypeCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const analysisType = this.getAttribute('data-analysis-type');
+                analysisTypeInput.value = analysisType;
+                
+                // Highlight selected card
+                analysisTypeCards.forEach(c => c.classList.remove('selected-analysis'));
+                this.classList.add('selected-analysis');
+            });
+        });
+    });
+</script>
+{% endblock %}

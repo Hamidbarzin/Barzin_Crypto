@@ -63,6 +63,14 @@ try:
 except Exception as e:
     logger.error(f"Error registering Crypto Quiz routes: {str(e)}")
 
+# Register Crypto Analysis routes
+try:
+    from crypto_bot.crypto_analysis_routes import register_routes as register_analysis_routes
+    register_analysis_routes(app)
+    logger.info("Crypto Analysis routes registered successfully.")
+except Exception as e:
+    logger.error(f"Error registering Crypto Analysis routes: {str(e)}")
+
 # Add datetime, language and developer info to all templates
 @app.context_processor
 def inject_now():
