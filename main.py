@@ -1834,7 +1834,7 @@ def get_price(symbol=None):
         return jsonify({'success': False, 'message': str(e)})
 
 @app.route('/api/technical')
-@app.route('/api/technical/<symbol>/<timeframe>')
+@app.route('/api/technical/<path:symbol>/<timeframe>')
 def get_technical(symbol=None, timeframe=None):
     try:
         # اگر پارامترها از URL نیامده اند، از query parameters دریافت کنیم
@@ -1847,6 +1847,10 @@ def get_technical(symbol=None, timeframe=None):
         # تضمین اینکه symbol و timeframe مقدار دارند
         if not symbol:
             symbol = 'BTC/USDT'
+            
+        # Convert symbol format if necessary
+        if '-' in symbol:
+            symbol = symbol.replace('-', '/')
         
         if not timeframe:
             timeframe = '1d'
@@ -1914,7 +1918,7 @@ def technical_analysis_page(symbol):
         
         # دریافت قیمت فعلی
         price_data = get_price(clean_symbol)
-        if price_data.get('success', False):
+        if isinstance(price_data, dict) and price_data.get('success', False):
             price = price_data['data']['price']
             change_24h = price_data['data']['change_24h']
         else:
