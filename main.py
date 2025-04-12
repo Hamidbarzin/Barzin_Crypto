@@ -2754,28 +2754,28 @@ def telegram_settings_saved():
 @app.route('/telegram-save-settings', methods=['POST'])
 @login_required
 def telegram_save_settings():
-    """ذخیره تنظیمات تلگرام با استفاده از فرم HTML"""
+    """Save Telegram settings from HTML form with enhanced logging"""
     try:
-        # لاگ کردن تمام داده‌های دریافتی برای دیباگ
-        logger.info(f"داده‌های دریافتی از فرم: {request.form}")
+        # Log all received form data for debugging
+        logger.info(f"Form data received: {request.form}")
         
-        # دریافت مقادیر از فرم
+        # Get values from form
         message_sending_enabled = request.form.get('message_sending_enabled') == 'on'
         auto_start_on_boot = request.form.get('auto_start_on_boot') == 'on'
         
-        # تبدیل مقادیر عددی
+        # Convert numeric values
         try:
             active_hours_start = int(request.form.get('active_hours_start', 8))
             active_hours_end = int(request.form.get('active_hours_end', 22))
             interval = int(request.form.get('interval', 1800))
         except (ValueError, TypeError) as e:
-            logger.error(f"خطا در تبدیل مقادیر عددی: {str(e)}")
-            # مقادیر پیش‌فرض
+            logger.error(f"Error converting numeric values: {str(e)}")
+            # Default values
             active_hours_start = 8
             active_hours_end = 22
             interval = 1800
         
-        # ساخت دیکشنری تنظیمات
+        # Create settings dictionary
         settings = {
             'message_sending_enabled': message_sending_enabled,
             'auto_start_on_boot': auto_start_on_boot,
@@ -2784,39 +2784,44 @@ def telegram_save_settings():
             'interval': interval
         }
         
-        # بروزرسانی تنظیمات با نمایش جزئیات خطاها
+        # Update settings with detailed error display
         settings_error = None
         try:
-            updated_status = telegram_scheduler_service.update_scheduler_settings(settings)
-            logger.info(f"تنظیمات با موفقیت به‌روزرسانی شد: {settings}")
+            # Log settings before update
+            logger.info(f"Attempting to update settings: {settings}")
             
-            # ذخیره پیام موفقیت در جلسه
+            updated_status = telegram_scheduler_service.update_scheduler_settings(settings)
+            logger.info(f"Settings successfully updated: {settings}")
+            
+            # Store success message in session
             session['settings_saved'] = True
             
-            # ذخیره تاریخ آخرین تنظیمات
-            session['last_settings_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            # Store last settings update date
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            session['last_settings_update'] = current_time
+            logger.info(f"Settings update time recorded: {current_time}")
             
-            # هدایت به صفحه اصلی تنظیمات با پیام موفقیت
+            # Redirect to main settings page with success message
             return redirect('/telegram_control_panel')
             
         except Exception as e:
-            # ثبت خطای دقیق
+            # Log detailed error
             error_message = str(e)
-            logger.error(f"خطای دقیق در بروزرسانی تنظیمات: {error_message}")
+            logger.error(f"Detailed error in settings update: {error_message}")
             
-            # ثبت اطلاعات اضافی دیباگ 
+            # Log additional debug info
             import traceback
-            logger.error(f"جزئیات خطا: {traceback.format_exc()}")
+            logger.error(f"Error details: {traceback.format_exc()}")
             
-            # ذخیره خطا در session
+            # Store error in session
             session['settings_error'] = error_message
             
-            # بازگشت به صفحه تنظیمات با نمایش خطا
+            # Return to settings page with error display
             return redirect('/telegram_control_panel?error=1')
             
     except Exception as e:
-        # خطا در پردازش درخواست
-        logger.error(f"خطا در پردازش درخواست فرم: {str(e)}")
+        # Error in request processing
+        logger.error(f"Error processing form request: {str(e)}")
         
         # ذخیره خطا در session
         session['settings_error'] = str(e)
