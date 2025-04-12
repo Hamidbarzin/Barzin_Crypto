@@ -1851,6 +1851,76 @@ def get_technical(symbol=None, timeframe=None):
             'data': get_default_technical_data(symbol, timeframe)
         })
         
+@app.route('/technical_analysis/<symbol>')
+@login_required
+def technical_analysis_page(symbol):
+    """
+    صفحه تحلیل تکنیکال برای یک ارز دیجیتال خاص
+    
+    Args:
+        symbol: نماد ارز دیجیتال
+    
+    Returns:
+        render_template: صفحه تحلیل تکنیکال
+    """
+    try:
+        # پاکسازی نماد
+        clean_symbol = symbol
+        if '-' in symbol:
+            clean_symbol = symbol.replace('-', '/')
+            
+        # دریافت نام ارز
+        name = clean_symbol.split('/')[0].capitalize()
+        
+        # دریافت تحلیل تکنیکال
+        from crypto_bot.technical_analysis import get_technical_analysis
+        data = get_technical_analysis(clean_symbol, '1d')
+        
+        # بررسی خطا
+        if 'error' in data:
+            flash(f"Error in technical analysis: {data['error']}", 'danger')
+            return redirect(url_for('cryptocurrencies'))
+        
+        # دریافت قیمت فعلی
+        price_data = get_price(clean_symbol)
+        if price_data.get('success', False):
+            price = price_data['data']['price']
+            change_24h = price_data['data']['change_24h']
+        else:
+            price = data.get('current_price', 0)
+            change_24h = 0
+        
+        # رندر صفحه با داده‌های تحلیل
+        return render_template(
+            'technical_analysis.html', 
+            symbol=clean_symbol,
+            name=name,
+            timestamp=data.get('timestamp', datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+            price=price,
+            change_24h=change_24h,
+            rsi=data.get('rsi', 50),
+            macd=data.get('macd', 0),
+            macd_signal=data.get('macd_signal', 0),
+            ma20=data.get('ma20', 0),
+            ma50=data.get('ma50', 0),
+            current_price=data.get('current_price', price),
+            bb_lower=data.get('bb_lower', 0),
+            bb_middle=data.get('bb_middle', 0),
+            bb_upper=data.get('bb_upper', 0),
+            bb_width=data.get('bb_width', 0),
+            stoch_k=data.get('stoch_k', 50),
+            stoch_d=data.get('stoch_d', 50),
+            volume_ema=data.get('volume_ema', 0),
+            price_trend_10d=data.get('price_trend_10d', 0),
+            signal=data.get('signal', 'خنثی'),
+            signal_strength=data.get('signal_strength', 0)
+        )
+    
+    except Exception as e:
+        logger.error(f"Error in technical analysis page for {symbol}: {str(e)}")
+        flash(f"Error: {str(e)}", 'danger')
+        return redirect(url_for('cryptocurrencies'))
+        
 def get_default_technical_data(symbol, timeframe):
     """
     ایجاد داده‌های پیش‌فرض برای تحلیل فنی در صورت بروز خطا

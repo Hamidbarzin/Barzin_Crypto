@@ -518,6 +518,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const cryptoName = cryptoNameElement.textContent;
                 const cryptoSymbol = cryptoSymbolElement.textContent;
                 
+                // Go to dedicated technical analysis page
+                console.log("Redirecting to technical analysis page for", cryptoSymbol);
+                window.location.href = `/technical_analysis/${cryptoSymbol}`;
+                
+                // No need for the rest of the code as we're redirecting
+                return;
+                
+                /* Old code - no longer used as we're redirecting to a dedicated page
                 // Update analysis section
                 const nameElement = document.getElementById('selected-crypto-name');
                 const symbolElement = document.getElementById('selected-crypto-symbol');
@@ -552,6 +560,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         behavior: 'smooth'
                     });
                 }
+                */
             }
         });
     });
