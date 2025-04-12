@@ -5,6 +5,7 @@
 import logging
 from datetime import datetime, timedelta
 import random  # برای داده‌های نمونه، در نسخه نهایی حذف خواهد شد
+import pandas as pd
 
 from crypto_bot.market_data import get_current_prices, get_historical_data
 from crypto_bot.technical_analysis import get_technical_indicators
@@ -63,7 +64,15 @@ def detect_buy_sell_opportunities(symbols, sensitivity="medium"):
                 technical = get_technical_indicators(symbol)
                 
                 # تشخیص فرصت‌ها بر اساس شاخص‌های فنی
-                opportunity = _analyze_technical_indicators(symbol, technical, current_prices.get(symbol, {}), sensitivity_factor)
+                price_data = {}
+                if symbol in current_prices:
+                    if isinstance(current_prices[symbol], dict):
+                        price_data = current_prices[symbol]
+                    else:
+                        # اگر current_prices[symbol] یک عدد یا شیء float64 باشد
+                        price_data = {'price': float(current_prices[symbol])}
+                
+                opportunity = _analyze_technical_indicators(symbol, technical, price_data, sensitivity_factor)
                 
                 # اضافه کردن تأثیر اخبار به تحلیل
                 opportunity = _add_news_impact(opportunity, news, symbol)
@@ -106,8 +115,32 @@ def detect_market_volatility(symbols, timeframe="1h", threshold="medium"):
                 historical_data = get_historical_data(symbol, timeframe=timeframe, limit=24)
                 
                 # محاسبه تغییرات قیمت
-                if not historical_data.empty and symbol in current_prices:
-                    current_price = current_prices[symbol]['price']
+                if historical_data is None:
+                    continue
+                    
+                # اگر لیست است، بررسی کنیم که خالی نباشد
+                if isinstance(historical_data, list):
+                    if not historical_data:  # اگر لیست خالی است
+                        continue
+                    # تبدیل لیست به دیتافریم
+                    try:
+                        historical_data = pd.DataFrame(historical_data)
+                    except Exception as e:
+                        logger.error(f"خطا در تبدیل داده‌های تاریخی به DataFrame برای {symbol}: {str(e)}")
+                        continue
+                
+                # بررسی کنیم که دیتافریم خالی نباشد و ستون‌های مورد نیاز را داشته باشد
+                if isinstance(historical_data, pd.DataFrame) and not historical_data.empty and 'close' in historical_data.columns and symbol in current_prices:
+                    # اگر current_prices[symbol] یک دیکشنری باشد
+                    if isinstance(current_prices[symbol], dict) and 'price' in current_prices[symbol]:
+                        current_price = current_prices[symbol]['price']
+                    # اگر current_prices[symbol] یک عدد یا شیء float64 باشد
+                    else:
+                        try:
+                            current_price = float(current_prices[symbol])
+                        except (ValueError, TypeError):
+                            # اگر نتوانستیم به float تبدیل کنیم، از این حلقه خارج می‌شویم
+                            continue
                     
                     # قیمت ابتدای دوره
                     start_price = historical_data.iloc[0]['close']
