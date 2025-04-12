@@ -81,23 +81,23 @@
   },
   "BITCOIN/USDT": {
     "data": {
-      "price": 84678,
-      "change_24h": 2.28976,
-      "market_cap": 1680903486121,
-      "volume_24h": 27009481584,
+      "price": 84661,
+      "change_24h": 2.26915,
+      "market_cap": 1680855476528,
+      "volume_24h": 26741901658,
       "source": "CoinGecko"
     },
-    "cached_at": 1744477077.2291374
+    "cached_at": 1744477305.4856603
   },
   "ETHEREUM/USDT": {
     "data": {
-      "price": 1643.11,
-      "change_24h": 4.80712,
-      "market_cap": 198356906777,
-      "volume_24h": 11138597367,
+      "price": 1642.45,
+      "change_24h": 4.7646,
+      "market_cap": 198306997149,
+      "volume_24h": 10089811657,
       "source": "CoinGecko"
     },
-    "cached_at": 1744477077.9157538
+    "cached_at": 1744477306.1773186
   },
   "SOLANA/USDT": {
     "data": {
