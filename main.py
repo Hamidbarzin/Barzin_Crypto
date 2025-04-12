@@ -2701,6 +2701,7 @@ def price_alerts_page():
 
 
 @app.route('/crypto_news')
+@app.route('/crypto-news')
 @app.route('/news')
 def crypto_news_page():
     """Cryptocurrency News Page"""
