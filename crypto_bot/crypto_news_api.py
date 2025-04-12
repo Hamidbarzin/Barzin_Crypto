@@ -45,13 +45,13 @@ def get_crypto_news_from_api(categories: List[str] = None, regions: List[str] = 
     """
     cache_key = f"news_api_{'-'.join(categories or [])}-{'-'.join(regions or [])}-{page}"
     
-    # بررسی کش
+    # Check cache
     if use_cache:
         cached_data = _get_cached_data(cache_key, ignore_cache_expiry)
         if cached_data:
             return cached_data
     
-    # تنظیم پارامترهای API
+    # Setup API parameters
     params = {
         'toppag': str(page),
         'items': str(items_per_page),
@@ -65,24 +65,24 @@ def get_crypto_news_from_api(categories: List[str] = None, regions: List[str] = 
         params['regions'] = ','.join(regions)
     
     try:
-        # درخواست به API
+        # Request to API
         url = f"{API_BASE_URL}/category"
         response = requests.get(url, params=params, timeout=15)
         
         if response.status_code != 200:
-            logger.error(f"API خبری خطا برگرداند: {response.status_code}")
+            logger.error(f"News API returned error: {response.status_code}")
             return []
         
-        # پردازش پاسخ
+        # Process response
         data = response.json()
         
         if data.get('status') != "success":
-            logger.error(f"خطای API خبری: {data.get('message')}")
+            logger.error(f"News API error: {data.get('message')}")
             return []
         
         news_items = data.get('data', [])
         
-        # تبدیل به فرمت استاندارد
+        # Convert to standard format
         standardized_news = []
         for item in news_items:
             news_item = {
@@ -97,28 +97,28 @@ def get_crypto_news_from_api(categories: List[str] = None, regions: List[str] = 
             }
             standardized_news.append(news_item)
         
-        # ذخیره در کش
+        # Store in cache
         _cache_data(cache_key, standardized_news)
         
         return standardized_news
     
     except Exception as e:
-        logger.error(f"خطا در دریافت اخبار از API: {str(e)}")
+        logger.error(f"Error getting news from API: {str(e)}")
         return []
 
 def get_canadian_crypto_news_from_api(items_per_page: int = 10, page: int = 1, 
                                      use_cache: bool = True, ignore_cache_expiry: bool = False) -> List[Dict[str, Any]]:
     """
-    دریافت اخبار ارزهای دیجیتال مربوط به کانادا از API
+    Get cryptocurrency news related to Canada from API
     
     Args:
-        items_per_page (int): تعداد اخبار در هر صفحه
-        page (int): شماره صفحه
-        use_cache (bool): استفاده از کش
-        ignore_cache_expiry (bool): نادیده گرفتن زمان انقضای کش در صورت خطا
+        items_per_page (int): Number of news items per page
+        page (int): Page number
+        use_cache (bool): Use cache
+        ignore_cache_expiry (bool): Ignore cache expiry time in case of error
         
     Returns:
-        List[Dict[str, Any]]: لیست اخبار
+        List[Dict[str, Any]]: List of news items
     """
     return get_crypto_news_from_api(regions=["canada"], items_per_page=items_per_page, 
                                    page=page, use_cache=use_cache, ignore_cache_expiry=ignore_cache_expiry)
@@ -126,17 +126,17 @@ def get_canadian_crypto_news_from_api(items_per_page: int = 10, page: int = 1,
 def get_news_by_category_from_api(category: str, items_per_page: int = 10, page: int = 1,
                                  use_cache: bool = True, ignore_cache_expiry: bool = False) -> List[Dict[str, Any]]:
     """
-    دریافت اخبار ارزهای دیجیتال بر اساس دسته‌بندی از API
+    Get cryptocurrency news by category from API
     
     Args:
-        category (str): دسته‌بندی اخبار (مانند "Bitcoin", "Ethereum", ...)
-        items_per_page (int): تعداد اخبار در هر صفحه
-        page (int): شماره صفحه
-        use_cache (bool): استفاده از کش
-        ignore_cache_expiry (bool): نادیده گرفتن زمان انقضای کش در صورت خطا
+        category (str): News category (such as "Bitcoin", "Ethereum", ...)
+        items_per_page (int): Number of news items per page
+        page (int): Page number
+        use_cache (bool): Use cache
+        ignore_cache_expiry (bool): Ignore cache expiry time in case of error
         
     Returns:
-        List[Dict[str, Any]]: لیست اخبار
+        List[Dict[str, Any]]: List of news items
     """
     category_map = {
         "bitcoin": ["Bitcoin", "BTC"],
@@ -155,63 +155,63 @@ def get_news_by_category_from_api(category: str, items_per_page: int = 10, page:
 
 def _get_cached_data(cache_key: str, ignore_expiry: bool = False) -> Optional[List[Dict[str, Any]]]:
     """
-    دریافت داده‌های کش شده
+    Get cached data
     
     Args:
-        cache_key (str): کلید کش
-        ignore_expiry (bool): نادیده گرفتن زمان انقضای کش
+        cache_key (str): Cache key
+        ignore_expiry (bool): Ignore cache expiry time
         
     Returns:
-        Optional[List[Dict[str, Any]]]: داده‌های کش شده یا None
+        Optional[List[Dict[str, Any]]]: Cached data or None
     """
     try:
         if os.path.exists(NEWS_API_CACHE_FILE):
             cache_age = time.time() - os.path.getmtime(NEWS_API_CACHE_FILE)
             
-            # بررسی معتبر بودن کش
+            # Check cache validity
             if cache_age < CACHE_EXPIRY or ignore_expiry:
                 with open(NEWS_API_CACHE_FILE, 'r', encoding='utf-8') as f:
                     cache_data = json.load(f)
                     
                     if cache_key in cache_data:
                         cache_status = "valid" if cache_age < CACHE_EXPIRY else "expired"
-                        logger.info(f"داده‌های '{cache_key}' از کش {cache_status} بارگذاری شد (سن: {int(cache_age/60)} دقیقه)")
+                        logger.info(f"Data for '{cache_key}' loaded from {cache_status} cache (age: {int(cache_age/60)} minutes)")
                         return cache_data[cache_key]['data']
     
     except Exception as e:
-        logger.error(f"خطا در خواندن کش: {str(e)}")
+        logger.error(f"Error reading cache: {str(e)}")
     
     return None
 
 def _cache_data(cache_key: str, data: List[Dict[str, Any]]) -> None:
     """
-    ذخیره داده‌ها در کش
+    Store data in cache
     
     Args:
-        cache_key (str): کلید کش
-        data (List[Dict[str, Any]]): داده‌ها برای ذخیره‌سازی
+        cache_key (str): Cache key
+        data (List[Dict[str, Any]]): Data to be stored
     """
     try:
-        # ساخت دایرکتوری کش اگر وجود ندارد
+        # Create cache directory if it doesn't exist
         os.makedirs(os.path.dirname(NEWS_API_CACHE_FILE), exist_ok=True)
         
-        # خواندن کش فعلی یا ایجاد کش جدید
+        # Read existing cache or create a new one
         cache_data = {}
         if os.path.exists(NEWS_API_CACHE_FILE):
             with open(NEWS_API_CACHE_FILE, 'r', encoding='utf-8') as f:
                 cache_data = json.load(f)
         
-        # بروزرسانی کش
+        # Update cache
         cache_data[cache_key] = {
             'timestamp': time.time(),
             'data': data
         }
         
-        # ذخیره کش
+        # Save cache
         with open(NEWS_API_CACHE_FILE, 'w', encoding='utf-8') as f:
             json.dump(cache_data, f, ensure_ascii=False, indent=2)
             
-        logger.info(f"{len(data)} خبر برای '{cache_key}' در کش ذخیره شد")
+        logger.info(f"{len(data)} news items for '{cache_key}' stored in cache")
         
     except Exception as e:
-        logger.error(f"خطا در ذخیره کش: {str(e)}")
+        logger.error(f"Error storing cache: {str(e)}")
