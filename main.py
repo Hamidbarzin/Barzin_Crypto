@@ -2581,6 +2581,9 @@ def send_test_message_replit():
 def telegram_login():
     """صفحه ورود به کنترل پنل تلگرام"""
     inject_now()
+    # اگر کاربر قبلاً احراز هویت شده باشد، مستقیم به پنل کنترل هدایت شود
+    if 'telegram_auth' in session and session['telegram_auth']:
+        return redirect(url_for('telegram_control_panel'))
     return render_template('telegram_login.html')
 
 @app.route('/telegram_login_process', methods=['POST'])
@@ -2597,7 +2600,7 @@ def telegram_login_process():
         next_url = session.pop('next_url', url_for('telegram_control_panel'))
         return redirect(next_url)
     else:
-        flash('نام کاربری یا رمز عبور اشتباه است', 'danger')
+        flash('Username or password is incorrect', 'danger')
         return redirect(url_for('telegram_login'))
 
 @app.route('/telegram_logout')
