@@ -390,7 +390,7 @@ def translate_news(news_items: List[Dict[str, Any]], target_language: str = "fa"
         return news_items
 
 
-def get_crypto_news(limit: int = 10, translate: bool = True, include_canada: bool = True) -> List[Dict[str, Any]]:
+def get_crypto_news(limit: int = 10, translate: bool = False, include_canada: bool = True) -> List[Dict[str, Any]]:
     """
     دریافت و ترکیب اخبار از منابع مختلف
     
@@ -735,7 +735,7 @@ def get_market_insights() -> Dict[str, Any]:
         Dict[str, Any]: Market insights and analysis data
     """
     # Get various data
-    news = get_crypto_news(limit=8, translate=True, include_canada=True)
+    news = get_crypto_news(limit=8, translate=False, include_canada=True)
     sentiment = get_crypto_sentiment_analysis()
     fear_greed = get_fear_greed_index()
     
@@ -864,7 +864,7 @@ def get_crypto_news_formatted_for_telegram() -> str:
 if __name__ == "__main__":
     # Module test
     print("Getting cryptocurrency news...")
-    news = get_crypto_news(limit=5, translate=True)
+    news = get_crypto_news(limit=5, translate=False)
     for item in news:
         print(f"Title: {item.get('title')}")
         print(f"Translation: {item.get('title_fa', '')}")
