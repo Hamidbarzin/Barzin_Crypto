@@ -1,83 +1,83 @@
 {
   "ETH-USDT": {
     "data": {
-      "price": 1552.92,
-      "change_24h": 0.79501,
-      "market_cap": 187377267524,
-      "volume_24h": 12947558059,
+      "price": 1553.8,
+      "change_24h": 0.85211,
+      "market_cap": 187496818656,
+      "volume_24h": 12901806265,
       "source": "CoinGecko"
     },
-    "cached_at": 1744429383.0278966
+    "cached_at": 1744429564.7167478
   },
   "ETH/USDT": {
     "data": {
-      "price": 1556.02839040212,
-      "change_24h": 0.7425657041209734,
-      "market_cap": 187790126131.34045,
-      "volume_24h": 1401911.49809594,
-      "source": "CryptoCompare"
+      "price": 1553.8,
+      "change_24h": 0.85211,
+      "market_cap": 187496818656,
+      "volume_24h": 12901806265,
+      "source": "CoinGecko"
     },
-    "cached_at": 1744429383.5297165
+    "cached_at": 1744429564.7942286
   },
   "BTC-USDT": {
     "data": {
-      "price": 83051,
-      "change_24h": 3.00033,
-      "market_cap": 1647740821528,
-      "volume_24h": 36831768561,
-      "source": "CoinGecko"
+      "price": 83080.9399019883,
+      "change_24h": 2.7668951649680964,
+      "market_cap": 1649161309587.1023,
+      "volume_24h": 79942.71300935,
+      "source": "CryptoCompare"
     },
-    "cached_at": 1744429382.8924484
+    "cached_at": 1744429565.3494225
   },
   "BTC/USDT": {
     "data": {
-      "price": 83051,
-      "change_24h": 3.00033,
-      "market_cap": 1647740821528,
-      "volume_24h": 36831768561,
-      "source": "CoinGecko"
+      "price": 83080.9399019883,
+      "change_24h": 2.7668951649680964,
+      "market_cap": 1649161309587.1023,
+      "volume_24h": 79942.71300935,
+      "source": "CryptoCompare"
     },
-    "cached_at": 1744429382.962186
+    "cached_at": 1744429565.911632
   },
   "XRP-USDT": {
     "data": {
-      "price": 2.01,
-      "change_24h": 0.74679,
-      "market_cap": 117397051372,
-      "volume_24h": 2851922906,
-      "source": "CoinGecko"
+      "price": 2.01283987643626,
+      "change_24h": 0.6045961359056641,
+      "market_cap": 201256317443.822,
+      "volume_24h": 295930308.96568,
+      "source": "CryptoCompare"
     },
-    "cached_at": 1744429382.75303
+    "cached_at": 1744429566.461131
   },
   "XRP/USDT": {
     "data": {
-      "price": 2.01,
-      "change_24h": 0.74679,
-      "market_cap": 117397051372,
-      "volume_24h": 2851922906,
-      "source": "CoinGecko"
+      "price": 2.01283744943234,
+      "change_24h": 0.6044748308023342,
+      "market_cap": 201256074776.79358,
+      "volume_24h": 295934765.574587,
+      "source": "CryptoCompare"
     },
-    "cached_at": 1744429382.8232312
+    "cached_at": 1744429567.0488856
   },
   "SOL-USDT": {
     "data": {
-      "price": 120.25010814129,
-      "change_24h": 4.189664369810614,
-      "market_cap": 71943470399.6421,
-      "volume_24h": 8936638.4745655,
+      "price": 120.254893718965,
+      "change_24h": 4.193810792125573,
+      "market_cap": 71946333524.43365,
+      "volume_24h": 8941493.77146354,
       "source": "CryptoCompare"
     },
-    "cached_at": 1744429384.7620606
+    "cached_at": 1744429567.5596864
   },
   "SOL/USDT": {
     "data": {
-      "price": 120.245387310818,
-      "change_24h": 4.185574047148732,
-      "market_cap": 71940646011.93407,
-      "volume_24h": 8936629.6834815,
+      "price": 120.263149592214,
+      "change_24h": 4.200964021974511,
+      "market_cap": 71951272864.46332,
+      "volume_24h": 8941514.86546354,
       "source": "CryptoCompare"
     },
-    "cached_at": 1744429386.943059
+    "cached_at": 1744429568.0900586
   },
   "BITCOIN/USDT": {
     "data": {

@@ -743,10 +743,10 @@ def format_market_insights_for_telegram(insights: Dict[str, Any]) -> str:
     ]
     message = "\n".join(message_parts)
     
-    # اضافه کردن اخبار
+    # Add news
     news_count = 0
     for i, item in enumerate(news[:4], 1):
-        # استفاده از نسخه فارسی عنوان اگر موجود باشد
+        # Use the English title if available
         title = item.get('title_fa', item.get('title', ''))
         url = item.get('url', '')
         source = item.get('source', '')
@@ -756,9 +756,9 @@ def format_market_insights_for_telegram(insights: Dict[str, Any]) -> str:
         message += f"\n   منبع: {source} | {published_date}"
         news_count += 1
     
-    # اضافه کردن اخبار CMC Markets Canada
+    # Add CMC Markets Canada news
     if cmc_canada:
-        # اگر قبلاً اخباری اضافه شده، یک خط فاصله ایجاد می‌کنیم
+        # If news was already added, create a line break
         if news_count > 0:
             message += "\n"
         
@@ -770,13 +770,13 @@ def format_market_insights_for_telegram(insights: Dict[str, Any]) -> str:
             source = "CMC Markets Canada"
             content_type = item.get('content_type', 'news')
             
-            # انتخاب ایموجی مناسب برای نوع محتوا
+            # Select appropriate emoji for content type
             emoji = "📊" if content_type == 'analysis' else "📰"
             
             message += f"\n{i}. {emoji} [{title}]({url})"
             message += f"\n   منبع: {source}"
     
-    # اضافه کردن تحلیل
+    # Add short analysis
     if sentiment.get('short_analysis'):
         message += f"\n\n🔍 *تحلیل کوتاه:*\n{sentiment.get('short_analysis')}"
     
