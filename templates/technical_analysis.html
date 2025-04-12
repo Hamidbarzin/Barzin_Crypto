@@ -4,10 +4,10 @@
 
 {% block content %}
 <!-- Page header with logo and navigation -->
-<div class="d-flex align-items-center justify-content-between mb-4">
+<div class="d-flex align-items-center justify-content-between p-2 mb-4 border-bottom">
     <div class="d-flex align-items-center">
         <div class="me-2">
-            <img src="/static/icons/logo.png" alt="Barzin Crypto" class="rounded me-2" width="32" height="32">
+            <img src="/static/icons/favicon-32x32.png" alt="Barzin Crypto" class="me-2" width="32" height="32">
         </div>
         <div>
             <h4 class="mb-0">{{ ui_text('title', 'برزین کریپتو') }}</h4>
@@ -17,16 +17,16 @@
     
     <div class="d-flex gap-2">
         <a href="/minimal" class="btn btn-sm btn-outline-light text-muted px-3">
-            {{ ui_text('dashboard', 'داشبورد') }}
+            <i class="fas fa-home me-1"></i> {{ ui_text('dashboard', 'داشبورد') }}
         </a>
         <a href="/cryptocurrencies" class="btn btn-sm btn-outline-light text-muted px-3">
-            {{ ui_text('markets', 'بازارها') }}
+            <i class="fas fa-chart-pie me-1"></i> {{ ui_text('markets', 'بازارها') }}
         </a>
         <a href="/price_alerts" class="btn btn-sm btn-outline-light text-muted px-3">
-            {{ ui_text('alerts', 'هشدارها') }}
+            <i class="fas fa-bell me-1"></i> {{ ui_text('alerts', 'هشدارها') }}
         </a>
         <a href="/minimal_settings" class="btn btn-sm btn-outline-light text-muted px-3">
-            {{ ui_text('settings', 'تنظیمات') }}
+            <i class="fas fa-cog me-1"></i> {{ ui_text('settings', 'تنظیمات') }}
         </a>
     </div>
 </div>
