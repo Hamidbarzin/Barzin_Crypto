@@ -11,6 +11,9 @@ import requests
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("replit_telegram")
 
+# وارد کردن تابع get_crypto_price از ماژول market_data
+from crypto_bot.market_data import get_crypto_price
+
 # وارد کردن ماژول نشانگر قابلیت اطمینان
 # تنظیم متغیرهای پیش‌فرض برای حل مشکل LSP
 # ماژول قابلیت اطمینان برای استفاده در توابع send_message و غیره لازم است
