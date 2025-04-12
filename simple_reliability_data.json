@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 788,
-    "successful": 788,
+    "total_sent": 792,
+    "successful": 792,
     "failed": 0,
     "history": [
       {
@@ -3943,12 +3943,32 @@
         "message_type": "crypto_news",
         "success": true,
         "timestamp": "2025-04-11T23:20:29.041105-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-11T23:27:28.025144-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-11T23:27:28.045195-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-11T23:28:12.429738-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-11T23:28:12.459397-04:00"
       }
     ]
   },
   "uptime": {
     "start_time": "2025-04-10T16:54:51.535404-04:00",
-    "last_restart": "2025-04-11T23:14:42.185155-04:00",
-    "restarts": 380
+    "last_restart": "2025-04-11T23:28:11.927287-04:00",
+    "restarts": 382
   }
 }

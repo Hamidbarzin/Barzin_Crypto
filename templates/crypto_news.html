@@ -318,15 +318,21 @@
         $('#newsLoading').show();
         $('#newsContainer').empty();
         
+        console.log("Fetching news from API...");
+        
         // First get regular crypto news
         $.ajax({
             url: '/api/crypto-news',
             method: 'GET',
             success: function(response) {
+                console.log("Received response from crypto-news API:", response);
                 let allNews = [];
                 
                 if (response.success && response.news && response.news.length > 0) {
+                    console.log(`Found ${response.news.length} news items`);
                     allNews = allNews.concat(response.news);
+                } else {
+                    console.warn("No news found in main API response");
                 }
                 
                 // Then get Canadian crypto news
@@ -335,12 +341,17 @@
                     method: 'GET',
                     success: function(canadaResponse) {
                         $('#newsLoading').hide();
+                        console.log("Received response from canadian-crypto-news API:", canadaResponse);
                         
                         if (canadaResponse.success && canadaResponse.news && canadaResponse.news.length > 0) {
+                            console.log(`Found ${canadaResponse.news.length} Canadian news items`);
                             allNews = allNews.concat(canadaResponse.news);
+                        } else {
+                            console.warn("No Canadian news found");
                         }
                         
                         if (allNews.length > 0) {
+                            console.log(`Rendering ${allNews.length} total news items`);
                             // Sort news by date if available
                             allNews.sort((a, b) => {
                                 const dateA = a.published_on || 0;
@@ -350,41 +361,48 @@
                             
                             renderNews(allNews);
                         } else {
+                            console.warn("No news items to display");
                             $('#newsContainer').html('<div class="alert alert-warning">No news found</div>');
                         }
                     },
                     error: function(xhr, status, error) {
                         // If Canadian news fails, still display regular news
                         $('#newsLoading').hide();
+                        console.error("Error fetching Canadian news:", error, xhr.responseText);
                         
                         if (allNews.length > 0) {
+                            console.log(`Rendering ${allNews.length} regular news items (Canadian news failed)`);
                             renderNews(allNews);
-                            console.error('Error fetching Canadian news:', error);
                         } else {
+                            console.warn("No news items to display after Canadian API error");
                             $('#newsContainer').html('<div class="alert alert-warning">No news found</div>');
                         }
                     }
                 });
             },
             error: function(xhr, status, error) {
+                console.error("Error fetching main news:", error, xhr.responseText);
+                
                 // Try to get at least Canadian news if regular news fails
                 $.ajax({
                     url: '/api/canadian-crypto-news',
                     method: 'GET',
                     success: function(canadaResponse) {
                         $('#newsLoading').hide();
+                        console.log("Received fallback response from canadian-crypto-news API:", canadaResponse);
                         
                         if (canadaResponse.success && canadaResponse.news && canadaResponse.news.length > 0) {
+                            console.log(`Rendering ${canadaResponse.news.length} Canadian news items as fallback`);
                             renderNews(canadaResponse.news);
                         } else {
+                            console.warn("No Canadian news found as fallback");
                             $('#newsContainer').html('<div class="alert alert-warning">No news found</div>');
                         }
                     },
                     error: function(canadaXhr, canadaStatus, canadaError) {
                         $('#newsLoading').hide();
+                        console.error("All news sources failed:", error, canadaError);
                         $('#newsContainer').html(`<div class="alert alert-danger">Error retrieving news: Unable to fetch from any source</div>`);
-                        console.error('Error fetching regular news:', error);
-                        console.error('Error fetching Canadian news:', canadaError);
                     }
                 });
             }
@@ -431,8 +449,8 @@
         newsItems.forEach(item => {
             const newsElement = $(template.html());
             
-            // Set title - use Persian title if available, otherwise use English
-            const title = item.title_fa || item.title;
+            // Always use English title
+            const title = item.title;
             newsElement.find('.news-title').text(title);
             
             // Set source

@@ -352,7 +352,7 @@ def send_system_report():
 """
     
     message += f"""
-⏰ <b>زمان گزارش:</b> {current_time} (تورنتو)
+⏰ <b>Report Time:</b> {current_time} (Toronto)
 """
     
     return send_message(message, parse_mode="HTML", message_type="system_report")
