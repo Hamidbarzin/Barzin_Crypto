@@ -602,16 +602,16 @@ def send_trading_signals():
 
 def send_crypto_news():
     """
-    ارسال اخبار ارزهای دیجیتال
+    Send cryptocurrency news to Telegram
     
     Returns:
-        bool: موفقیت یا شکست ارسال اخبار
+        bool: Success or failure of sending news
     """
     try:
-        # استفاده از ماژول جدید news_scanner برای دریافت و خلاصه‌سازی اخبار
+        # Use the news_scanner module to retrieve and summarize news
         from crypto_bot.news_scanner import get_combined_news
         
-        # اخبار برتر ارزهای دیجیتال
+        # Get top cryptocurrency news
         news = get_combined_news(max_items=7)
         
         # Create news message
@@ -643,7 +643,7 @@ def send_crypto_news():
             
         telegram_message += "\n*📊 Top Headlines:*\n"
         
-        # تعیین امتیاز اهمیت برای اخبار بر اساس کلمات کلیدی
+        # Determine importance score for news based on keywords
         important_keywords = [
             "bitcoin", "ethereum", "bearish", "bullish", "rally", "crash", 
             "record", "all-time high", "regulation", "halving", "crisis",
@@ -655,7 +655,7 @@ def send_crypto_news():
             url = item.get('url', '#')
             source = item.get('source', '')
             
-            # محاسبه امتیاز اهمیت خبر
+            # Calculate importance score for the news based on keywords
             importance_score = 0
             lower_title = title.lower()
             
@@ -664,27 +664,27 @@ def send_crypto_news():
                     importance_score += 2
             
             if importance_score > 0:
-                # اخبار مهم را با علامت مشخص کنیم
+                # Highlight important news
                 telegram_message += f"• 🔍 [{title}]({url})\n"
             else:
                 telegram_message += f"• [{title}]({url})\n"
                 
-            telegram_message += f"  منبع: {source}\n\n"
+            telegram_message += f"  Source: {source}\n\n"
         
-        telegram_message += "\n🤖 *کریپتو برزین* | *اخبار و تحلیل‌های بیشتر*"
+        telegram_message += "\n🤖 *Crypto Barzin* | *More News & Analysis*"
         
-        # ارسال پیام به تلگرام
+        # Send message to Telegram
         return send_message(telegram_message, parse_mode="Markdown", message_type="crypto_news")
         
     except ImportError as e:
         logger.error(f"Error accessing the news scanner module: {str(e)}")
-        error_message = "❌ خطا در دسترسی به ماژول اسکنر اخبار. لطفاً بعداً تلاش کنید."
+        error_message = "❌ Error accessing the news scanner module. Please try again later."
         return send_message(error_message, message_type="crypto_news")
     except Exception as e:
         logger.error(f"Error sending cryptocurrency news: {str(e)}")
-        # در صورت خطا، یک پیام ساده‌تر ارسال می‌کنیم
+        # Send a simpler message in case of error
         try:
-            error_message = "*📰 اخبار ارزهای دیجیتال*\n\n⚠️ در حال حاضر به دلیل مشکل فنی، امکان دریافت اخبار وجود ندارد.\n\nلطفاً بعداً دوباره تلاش کنید."
+            error_message = "*📰 Cryptocurrency News*\n\n⚠️ Due to a technical issue, news is currently unavailable.\n\nPlease try again later."
             return send_message(error_message, parse_mode="Markdown", message_type="crypto_news")
         except:
             return False

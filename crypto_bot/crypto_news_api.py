@@ -1,7 +1,7 @@
 """
-ماژول API اخبار ارز دیجیتال
+Cryptocurrency News API Module
 
-این ماژول برای دسترسی به API های خبری ارزهای دیجیتال استفاده می‌شود.
+This module is used to access cryptocurrency news APIs.
 """
 
 import os
@@ -12,36 +12,36 @@ import requests
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 
-# تنظیم لاگر
+# Configure logger
 logger = logging.getLogger(__name__)
 
-# تنظیم API کلید
+# Set API key
 CRYPTO_NEWS_API_KEY = os.environ.get("CRYPTO_NEWS_API_KEY", "2b2f67d9892c7942447e8c14d035da36ef2f848f")
 
-# مسیر کش
+# Cache paths
 CACHE_DIR = "data/news_cache"
 NEWS_API_CACHE_FILE = f"{CACHE_DIR}/news_api_cache.json"
-CACHE_EXPIRY = 60 * 30  # 30 دقیقه به ثانیه
+CACHE_EXPIRY = 60 * 30  # 30 minutes in seconds
 
-# آدرس‌های API
+# API URLs
 API_BASE_URL = "https://cryptonews-api.com/api/v1"
 
 def get_crypto_news_from_api(categories: List[str] = None, regions: List[str] = None, 
                              items_per_page: int = 10, page: int = 1,
                              use_cache: bool = True, ignore_cache_expiry: bool = False) -> List[Dict[str, Any]]:
     """
-    دریافت اخبار ارزهای دیجیتال از API
+    Get cryptocurrency news from API
     
     Args:
-        categories (List[str]): لیست دسته‌بندی‌های اخبار (مانند "Bitcoin", "Ethereum", ...)
-        regions (List[str]): لیست مناطق جغرافیایی (مانند "en", "canada", ...)
-        items_per_page (int): تعداد اخبار در هر صفحه
-        page (int): شماره صفحه
-        use_cache (bool): استفاده از کش
-        ignore_cache_expiry (bool): نادیده گرفتن زمان انقضای کش در صورت خطا
+        categories (List[str]): List of news categories (such as "Bitcoin", "Ethereum", ...)
+        regions (List[str]): List of geographic regions (such as "en", "canada", ...)
+        items_per_page (int): Number of news items per page
+        page (int): Page number
+        use_cache (bool): Use cache
+        ignore_cache_expiry (bool): Ignore cache expiry time in case of error
         
     Returns:
-        List[Dict[str, Any]]: لیست اخبار
+        List[Dict[str, Any]]: List of news items
     """
     cache_key = f"news_api_{'-'.join(categories or [])}-{'-'.join(regions or [])}-{page}"
     
