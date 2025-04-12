@@ -16,12 +16,12 @@ from typing import List, Dict, Any, Optional
 logger = logging.getLogger(__name__)
 
 # Set API key - try to get from environment variable first
-CRYPTO_NEWS_API_KEY = os.environ.get("CRYPTO_NEWS_API_KEY", "")
+CRYPTO_NEWS_API_KEY = os.environ.get("CRYPTO_NEWS_API_KEY", "demo_api_key")
 
-# Check if API key is available
-HAS_VALID_API_KEY = bool(CRYPTO_NEWS_API_KEY.strip())
+# Check if API key is available or using fallback demo key
+HAS_VALID_API_KEY = bool(CRYPTO_NEWS_API_KEY.strip()) and CRYPTO_NEWS_API_KEY != "demo_api_key"
 if not HAS_VALID_API_KEY:
-    logger.warning("No CRYPTO_NEWS_API_KEY found in environment variables. News API functionality will be limited.")
+    logger.warning("Using demo CRYPTO_NEWS_API_KEY with limited functionality. For full features, please add your API key to environment variables.")
 
 # Cache paths
 CACHE_DIR = "data/news_cache"
