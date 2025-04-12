@@ -131,7 +131,7 @@
                                     <td id="{{ coin.symbol.replace('/', '-') }}-change" class="{% if coin.change.startswith('+') %}text-success{% else %}text-danger{% endif %}">{{ coin.change }}</td>
                                     <td>{{ coin.volume }}</td>
                                     <td><span class="badge bg-{{ coin.signal_class }}">{{ coin.signal }}</span></td>
-                                    <td><a href="/technical_analysis/{{ coin.symbol }}" class="btn btn-sm btn-outline-primary">Technical Analysis</a></td>
+                                    <td><a href="/technical_analysis/{{ coin.symbol | replace('/', '-') }}" class="btn btn-sm btn-outline-primary">Technical Analysis</a></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

@@ -1882,8 +1882,8 @@ def get_technical(symbol=None, timeframe=None):
             'data': get_default_technical_data(symbol, timeframe)
         })
         
-@app.route('/technical_analysis/<symbol>')
-# Remove login_required to allow all users access to technical analysis
+@app.route('/technical_analysis/<symbol>', methods=['GET'])
+# No login required for technical analysis
 def technical_analysis_page(symbol):
     """
     صفحه تحلیل تکنیکال برای یک ارز دیجیتال خاص
