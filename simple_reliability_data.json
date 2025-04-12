@@ -1,7 +1,7 @@
 {
   "messages": {
-    "total_sent": 653,
-    "successful": 653,
+    "total_sent": 665,
+    "successful": 665,
     "failed": 0,
     "history": [
       {
@@ -3268,12 +3268,72 @@
         "message_type": "test_message",
         "success": true,
         "timestamp": "2025-04-11T20:14:49.684087-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-11T20:15:27.518725-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-11T20:15:27.543085-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-11T20:16:11.754113-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-11T20:16:11.781905-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-11T20:17:02.033344-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-11T20:17:02.051337-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-11T20:18:24.391073-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-11T20:18:24.417145-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-11T20:18:52.704045-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-11T20:18:52.732855-04:00"
+      },
+      {
+        "message_type": "price_report",
+        "success": true,
+        "timestamp": "2025-04-11T20:19:55.780172-04:00"
+      },
+      {
+        "message_type": "test_message",
+        "success": true,
+        "timestamp": "2025-04-11T20:19:55.820514-04:00"
       }
     ]
   },
   "uptime": {
     "start_time": "2025-04-10T16:54:51.535404-04:00",
-    "last_restart": "2025-04-11T20:14:49.163231-04:00",
-    "restarts": 313
+    "last_restart": "2025-04-11T20:19:55.254563-04:00",
+    "restarts": 319
   }
 }

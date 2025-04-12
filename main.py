@@ -2,6 +2,7 @@ import os
 import logging
 import random
 from datetime import datetime
+from crypto_bot.cache_manager import price_cache
 from flask import Flask, render_template, render_template_string, request, redirect, url_for, flash, session, jsonify
 from crypto_bot.config import DEFAULT_CURRENCIES, TIMEFRAMES
 from crypto_bot.market_data import get_current_prices
@@ -1591,9 +1592,13 @@ def get_market_trend():
         logger.error(f"Error getting market trend: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
 
+# تابع جدید با سیستم حافظه نهان
+from crypto_bot.cached_api import get_cached_price, get_special_coin_price
+
 @app.route('/api/price/<symbol>')
 @app.route('/get_price')
 def get_price(symbol=None):
+    """دریافت قیمت ارز دیجیتال با استفاده از سیستم حافظه نهان"""
     try:
         # If symbol is None, try to get it from request parameters
         if symbol is None:
@@ -1625,139 +1630,39 @@ def get_price(symbol=None):
             base_currency = 'USDT'
             symbol = f"{coin}/{base_currency}"
             
-        # For meme coins, AI coins and low-cost coins, use CryptoCompare API directly
+        # For meme coins, AI coins and low-cost coins, use special API
         meme_coins = ['DOGE', 'SHIB', 'PEPE', 'FLOKI', 'WIF', 'BONK', 'MEME', 'TURBO', 'BRETT', 'MOG', 'CAT', 'MYRO', 'POPCAT', 'TOSHI', 'SLERF', 'TOGE', 'GROK']
         ai_coins = ['RNDR', 'FET', 'WLD', 'OCEAN', 'AGIX', 'GEEQ', 'OLAS', 'GRT', 'NMR', 'PYTH', 'NEAR', 'ALI', 'RAD']
         low_cost_coins = ['VET', 'XDC', 'HBAR', 'XLM', 'CAKE', 'JASMY', 'STMX', 'SC', 'CELR', 'CTSI', 'ACH', 'HOOK', 'LOOM', 'SFP', 'TRU', 'BAL']
         
         special_coins = meme_coins + ai_coins + low_cost_coins
         
-        try:
-            if coin.upper() in special_coins:
-                # Special case for meme coins, AI coins and low-cost coins
-                from crypto_bot.market_api import get_price_from_cryptocompare
-                
-                # Try to get price from CryptoCompare API
-                result = get_price_from_cryptocompare(f"{coin}/USDT")
-                
-                # If we got a valid result, return it
-                if not result.get('error', False) and 'price' in result:
-                    logger.info(f"Using CryptoCompare direct API for {coin}")
-                    
-                    # Add default change_24h if missing to avoid frontend errors
-                    if 'change_24h' not in result:
-                        result['change_24h'] = 0
-                        
-                    return jsonify({
-                        'success': True,
-                        'data': result
-                    })
-        except Exception as e:
-            logger.warning(f"Failed to get direct price for {coin}: {str(e)}")
-            # Continue with normal flow
-        
-        # Normalize symbol format - both BTC/USDT and BTC-USDT should work
-        # Try with the symbol as provided first
-        symbols_to_try = [symbol]
-        
-        # Add alternative symbol format if not already in the list
-        if '/' in symbol:
-            alt_symbol = symbol.replace('/', '-')
-            symbols_to_try.append(alt_symbol)
-        elif '-' in symbol:
-            alt_symbol = symbol.replace('-', '/')
-            symbols_to_try.append(alt_symbol)
+        # ابتدا سعی می‌کنیم از سیستم حافظه نهان استفاده کنیم
+        if coin.upper() in special_coins:
+            # برای ارزهای خاص، از API متفاوتی استفاده می‌کنیم
+            logger.info(f"Getting price for special coin {coin} from cache or API")
+            result, is_cached = get_special_coin_price(coin)
             
-        logger.info(f"Trying to get prices for symbols: {symbols_to_try}")
+            if result:
+                return jsonify({
+                    'success': True,
+                    'data': result,
+                    'cached': is_cached
+                })
         
-        # Try to get prices with a short timeout to prevent waiting
-        result = get_current_prices(symbols_to_try, timeout=3)
+        # برای سایر ارزها، از سیستم اصلی استفاده می‌کنیم
+        logger.info(f"Getting price for {symbol} from cache or API")
+        result, is_cached = get_cached_price(symbol)
         
-        # Check if we got data for any of the symbol formats
-        for sym in symbols_to_try:
-            if sym in result:
-                logger.info(f"Found price data for {sym}")
-                return jsonify({'success': True, 'data': result[sym]})
-        
-        # If we didn't get data for any format, use API specific call for this coin
-        # This is useful when the primary API has rate limits
-        try:
-            # Extract coin name from symbol
-            coin = symbol.split('/')[0] if '/' in symbol else symbol.split('-')[0]
+        if result:
+            return jsonify({
+                'success': True,
+                'data': result,
+                'cached': is_cached
+            })
             
-            # Use cryptocompare API directly
-            from crypto_bot.market_api import get_price_from_cryptocompare, get_price_from_coingecko
-            
-            # Try Cryptocompare first
-            if '/' in symbol:
-                result = get_price_from_cryptocompare(symbol)
-            else:
-                result = get_price_from_cryptocompare(symbol.replace('-', '/'))
-                
-            if not result.get('error', False):
-                return jsonify({'success': True, 'data': result})
-                
-            # Then try Coingecko
-            if '/' in symbol:
-                result = get_price_from_coingecko(symbol)
-            else:
-                result = get_price_from_coingecko(symbol.replace('-', '/'))
-                
-            if not result.get('error', False):
-                return jsonify({'success': True, 'data': result})
-                
-        except Exception as e:
-            logger.error(f"Error using direct API for {symbol}: {str(e)}")
-        
-        # If all attempts failed, use fallback data for common coins
-        coin = symbol.split('/')[0] if '/' in symbol else symbol.split('-')[0] if '-' in symbol else symbol
-        coin = coin.upper()
-        
-        if coin == 'BTC':
-            logger.warning(f"Returning fallback price for Bitcoin")
-            return jsonify({
-                'success': True, 
-                'data': {
-                    'price': 69500.0,  # Updated BTC price April 2024
-                    'change_24h': 0.5,
-                    'high_24h': 70200.0,
-                    'low_24h': 68800.0,
-                    'volume_24h': 26500000000,
-                    'timestamp': datetime.now().isoformat(),
-                    'source': 'fallback' 
-                }
-            })
-        elif coin == 'ETH':
-            logger.warning(f"Returning fallback price for Ethereum")
-            return jsonify({
-                'success': True, 
-                'data': {
-                    'price': 3400.0,  # Updated ETH price April 2024
-                    'change_24h': -0.8,
-                    'high_24h': 3450.0,
-                    'low_24h': 3380.0,
-                    'volume_24h': 12500000000,
-                    'timestamp': datetime.now().isoformat(),
-                    'source': 'fallback'
-                }
-            })
-        elif coin == 'XRP':
-            logger.warning(f"Returning fallback price for XRP")
-            return jsonify({
-                'success': True, 
-                'data': {
-                    'price': 0.52,  # Updated XRP price April 2024
-                    'change_24h': 2.1,
-                    'high_24h': 0.53,
-                    'low_24h': 0.51,
-                    'volume_24h': 2200000000,
-                    'timestamp': datetime.now().isoformat(),
-                    'source': 'fallback'
-                }
-            })
-        
-        # If not a common coin, return failure
-        logger.warning(f"No result for {symbol} or alternatives, API request failed")
+        # اگر هیچ داده‌ای دریافت نشد، خطا برمی‌گردانیم
+        logger.warning(f"No cached or API result for {symbol}")
         return jsonify({
             'success': False, 
             'message': 'Error retrieving price data. Please try again later.'

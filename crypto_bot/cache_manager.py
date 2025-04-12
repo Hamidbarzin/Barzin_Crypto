@@ -5,10 +5,9 @@
 تا تعداد درخواست‌ها را کاهش دهد و سرعت بارگذاری صفحات را افزایش دهد.
 """
 
-import time
 import logging
-from typing import Dict, Any, Optional, Tuple, List
-from datetime import datetime, timedelta
+import time
+from typing import Dict, Any, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +21,8 @@ class CacheManager:
         Args:
             default_ttl_seconds: مدت زمان پیش‌فرض اعتبار داده در حافظه نهان (ثانیه)
         """
-        self.cache: Dict[str, Tuple[Any, float]] = {}
-        self.default_ttl = default_ttl_seconds
+        self.cache = {}  # کلید: (مقدار، زمان انقضا)
+        self.default_ttl_seconds = default_ttl_seconds
         logger.info(f"Cache manager initialized with default TTL of {default_ttl_seconds} seconds")
     
     def get(self, key: str) -> Optional[Any]:
@@ -37,18 +36,18 @@ class CacheManager:
             داده ذخیره شده یا None اگر کلید منقضی شده یا وجود نداشته باشد
         """
         if key not in self.cache:
+            logger.debug(f"Cache miss for key: {key}")
             return None
         
-        value, expiry = self.cache[key]
-        current_time = time.time()
+        value, expire_time = self.cache[key]
         
-        if current_time > expiry:
-            # حذف داده منقضی شده
-            logger.debug(f"Cache key '{key}' expired and removed")
+        # بررسی اعتبار داده
+        if expire_time < time.time():
+            logger.debug(f"Cache expired for key: {key}")
             del self.cache[key]
             return None
         
-        logger.debug(f"Cache hit for key '{key}'")
+        logger.debug(f"Cache hit for key: {key}")
         return value
     
     def set(self, key: str, value: Any, ttl_seconds: Optional[int] = None) -> None:
@@ -60,11 +59,12 @@ class CacheManager:
             value: داده برای ذخیره
             ttl_seconds: مدت زمان اعتبار (ثانیه)، اگر None باشد از مقدار پیش‌فرض استفاده می‌شود
         """
-        ttl = ttl_seconds if ttl_seconds is not None else self.default_ttl
-        expiry = time.time() + ttl
+        if ttl_seconds is None:
+            ttl_seconds = self.default_ttl_seconds
         
-        self.cache[key] = (value, expiry)
-        logger.debug(f"Cache set for key '{key}' with TTL {ttl} seconds")
+        expire_time = time.time() + ttl_seconds
+        self.cache[key] = (value, expire_time)
+        logger.debug(f"Cache set for key: {key}, expires in {ttl_seconds} seconds")
     
     def delete(self, key: str) -> bool:
         """
@@ -78,14 +78,14 @@ class CacheManager:
         """
         if key in self.cache:
             del self.cache[key]
-            logger.debug(f"Cache key '{key}' manually deleted")
+            logger.debug(f"Cache deleted for key: {key}")
             return True
         return False
     
     def clear(self) -> None:
         """پاک کردن تمام داده‌های حافظه نهان"""
         self.cache.clear()
-        logger.info("Cache cleared completely")
+        logger.info("Cache cleared")
     
     def cleanup(self) -> int:
         """
@@ -94,14 +94,14 @@ class CacheManager:
         Returns:
             تعداد کلیدهای حذف شده
         """
-        current_time = time.time()
-        expired_keys = [k for k, (_, exp) in self.cache.items() if current_time > exp]
+        now = time.time()
+        expired_keys = [k for k, (_, expire_time) in self.cache.items() if expire_time < now]
         
         for key in expired_keys:
             del self.cache[key]
         
         if expired_keys:
-            logger.debug(f"Cleaned up {len(expired_keys)} expired cache keys")
+            logger.debug(f"Cleaned up {len(expired_keys)} expired cache entries")
         
         return len(expired_keys)
     
@@ -112,21 +112,18 @@ class CacheManager:
         Returns:
             آمار مربوط به حافظه نهان
         """
-        current_time = time.time()
-        total_items = len(self.cache)
-        expired_items = sum(1 for _, exp in self.cache.values() if current_time > exp)
-        valid_items = total_items - expired_items
-        
-        # میانگین زمان باقیمانده برای داده‌های معتبر
-        remaining_ttls = [exp - current_time for _, exp in self.cache.values() 
-                         if current_time <= exp]
-        avg_remaining_ttl = sum(remaining_ttls) / len(remaining_ttls) if remaining_ttls else 0
+        now = time.time()
+        total = len(self.cache)
+        expired = sum(1 for _, expire_time in self.cache.values() if expire_time < now)
+        valid = total - expired
         
         return {
-            "total_items": total_items,
-            "valid_items": valid_items,
-            "expired_items": expired_items,
-            "avg_remaining_ttl": avg_remaining_ttl
+            'total_entries': total,
+            'valid_entries': valid,
+            'expired_entries': expired,
+            'oldest_entry_ttl': min((expire_time - now for _, expire_time in self.cache.values()), default=0) if self.cache else 0,
+            'newest_entry_ttl': max((expire_time - now for _, expire_time in self.cache.values()), default=0) if self.cache else 0,
+            'average_ttl': sum((expire_time - now for _, expire_time in self.cache.values())) / total if total > 0 else 0
         }
     
     def get_multiple(self, keys: List[str]) -> Dict[str, Any]:
@@ -145,7 +142,7 @@ class CacheManager:
             if value is not None:
                 result[key] = value
         
-        logger.debug(f"Cache multi-get: found {len(result)} of {len(keys)} keys")
+        logger.debug(f"Cache get_multiple: {len(result)}/{len(keys)} hits")
         return result
     
     def set_multiple(self, items: Dict[str, Any], ttl_seconds: Optional[int] = None) -> None:
@@ -159,11 +156,12 @@ class CacheManager:
         for key, value in items.items():
             self.set(key, value, ttl_seconds)
         
-        logger.debug(f"Cache multi-set: stored {len(items)} keys")
+        logger.debug(f"Cache set_multiple: {len(items)} items")
 
 
-# نمونه سازی یک نمونه عمومی از مدیریت حافظه نهان
-# TTL پیش‌فرض: 5 دقیقه
-price_cache = CacheManager(default_ttl_seconds=300)  # برای قیمت‌ها
-news_cache = CacheManager(default_ttl_seconds=1800)  # برای اخبار (30 دقیقه)
-technical_cache = CacheManager(default_ttl_seconds=900)  # برای تحلیل تکنیکال (15 دقیقه)
+# ایجاد یک نمونه از مدیر حافظه نهان برای استفاده در کل برنامه
+# زمان اعتبار پیش‌فرض 180 ثانیه (3 دقیقه) برای قیمت‌ها
+price_cache = CacheManager(default_ttl_seconds=180)
+
+# زمان اعتبار پیش‌فرض 600 ثانیه (10 دقیقه) برای اخبار و تحلیل‌ها
+news_cache = CacheManager(default_ttl_seconds=600)
