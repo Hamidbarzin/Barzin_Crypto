@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}Crypto Quiz - Answer Result{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .quiz-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .quiz-progress {
+        height: 8px;
+        margin-bottom: 2rem;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .quiz-progress-bar {
+        height: 100%;
+        background-color: var(--bs-primary);
+    }
+    .result-card {
+        border-radius: 15px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    .result-header {
+        text-align: center;
+        padding: 2rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .result-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: inline-block;
+    }
+    .correct-icon {
+        color: #198754;
+    }
+    .incorrect-icon {
+        color: #dc3545;
+    }
+    .explanation-box {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .answer-item {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+    }
+    .answer-label {
+        font-weight: bold;
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        text-align: center;
+        line-height: 25px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+    .answer-text {
+        font-size: 1.1rem;
+    }
+    .correct-answer {
+        background-color: rgba(25, 135, 84, 0.1);
+        border: 1px solid rgba(25, 135, 84, 0.3);
+    }
+    .correct-answer .answer-label {
+        background-color: #198754;
+        color: white;
+    }
+    .incorrect-answer {
+        background-color: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+    .incorrect-answer .answer-label {
+        background-color: #dc3545;
+        color: white;
+    }
+    .neutral-answer .answer-label {
+        background-color: #e9ecef;
+    }
+    .quiz-score-box {
+        text-align: center;
+        padding: 1rem;
+        background-color: rgba(13, 110, 253, 0.1);
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+    .quiz-score-value {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .progress-text {
+        text-align: center;
+        margin-bottom: 1rem;
+        font-weight: 500;
+        color: var(--bs-secondary);
+    }
+    .points-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background-color: var(--bs-primary);
+        color: white;
+        border-radius: 20px;
+        font-weight: bold;
+        margin-left: 0.5rem;
+    }
+    .level-up-alert {
+        background-color: #ffc107;
+        color: #212529;
+        text-align: center;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    .badge-earned {
+        display: inline-block;
+        background-color: #212529;
+        color: white;
+        font-size: 0.9rem;
+        border-radius: 12px;
+        padding: 0.35rem 0.85rem;
+        margin: 0.35rem;
+        animation: fadeIn 1s ease-in;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="quiz-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{{ url_for('crypto_quiz_home') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-home me-2"></i> Quiz Home
+            </a>
+            <h5 class="mb-0">Crypto Knowledge Quiz</h5>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-text">
+            Question {{ current_question }} of {{ total_questions }}
+        </div>
+        <div class="quiz-progress">
+            <div class="quiz-progress-bar" style="width: {{ (current_question / total_questions) * 100 }}%"></div>
+        </div>
+        
+        <!-- Result Card -->
+        <div class="card result-card">
+            <div class="result-header">
+                {% if result.is_correct %}
+                    <span class="result-icon correct-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </span>
+                    <h3>Correct Answer!</h3>
+                    <p class="mb-0">Great job! You earned <span class="points-badge">+{{ result.points_earned }} points</span></p>
+                {% else %}
+                    <span class="result-icon incorrect-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </span>
+                    <h3>Incorrect Answer</h3>
+                    <p class="mb-0">Don't worry, keep learning!</p>
+                {% endif %}
+            </div>
+            
+            <div class="card-body">
+                <h5 class="mb-3">{{ result.question_text }}</h5>
+                
+                <!-- Explanation -->
+                <div class="explanation-box">
+                    <h6><i class="fas fa-lightbulb me-2"></i> Explanation:</h6>
+                    <p>{{ result.explanation }}</p>
+                </div>
+                
+                <!-- User Answer -->
+                <h6 class="mb-3">Your Answer:</h6>
+                <div class="answer-item {% if result.is_correct %}correct-answer{% else %}incorrect-answer{% endif %}">
+                    <span class="answer-label">{{ result.user_answer|upper }}</span>
+                    <span class="answer-text">
+                        {% if result.user_answer == 'a' %}
+                            {{ question.option_a }}
+                        {% elif result.user_answer == 'b' %}
+                            {{ question.option_b }}
+                        {% elif result.user_answer == 'c' %}
+                            {{ question.option_c }}
+                        {% elif result.user_answer == 'd' %}
+                            {{ question.option_d }}
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <!-- Correct Answer (if user was wrong) -->
+                {% if not result.is_correct %}
+                    <h6 class="mb-3">Correct Answer:</h6>
+                    <div class="answer-item correct-answer">
+                        <span class="answer-label">{{ result.correct_answer|upper }}</span>
+                        <span class="answer-text">
+                            {% if result.correct_answer == 'a' %}
+                                {{ question.option_a }}
+                            {% elif result.correct_answer == 'b' %}
+                                {{ question.option_b }}
+                            {% elif result.correct_answer == 'c' %}
+                                {{ question.option_c }}
+                            {% elif result.correct_answer == 'd' %}
+                                {{ question.option_d }}
+                            {% endif %}
+                        </span>
+                    </div>
+                {% endif %}
+                
+                <!-- Quiz Score -->
+                <div class="quiz-score-box mt-4">
+                    <h6 class="mb-2">Current Quiz Score</h6>
+                    <div class="quiz-score-value">{{ quiz_score }} points</div>
+                    <p class="mb-0">{{ quiz_correct }} correct out of {{ current_question }}</p>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="text-center mt-4">
+                    {% if is_last_question %}
+                        <a href="{{ url_for('crypto_quiz_result') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-flag-checkered me-2"></i> See Final Results
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('crypto_quiz_question') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-arrow-right me-2"></i> Next Question
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Simple confetti effect for correct answers
+    function showConfetti() {
+        const isCorrect = {{ 'true' if result.is_correct else 'false' }};
+        
+        if (isCorrect) {
+            // Simple animation using existing elements (for simplicity)
+            const header = document.querySelector('.result-header');
+            
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti-particle';
+                
+                // Random styles
+                confetti.style.position = 'absolute';
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                confetti.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`;
+                confetti.style.borderRadius = '50%';
+                confetti.style.top = '-10px';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                confetti.style.opacity = '0';
+                
+                header.appendChild(confetti);
+                
+                // Animation
+                setTimeout(() => {
+                    confetti.style.transition = 'all 1s ease-out';
+                    confetti.style.opacity = '1';
+                    confetti.style.top = Math.random() * 100 + 'px';
+                }, 100);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    confetti.style.opacity = '0';
+                }, 1500);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 2500);
+            }
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        showConfetti();
+    });
+</script>
+{% endblock %}

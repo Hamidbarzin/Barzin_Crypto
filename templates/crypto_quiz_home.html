@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block title %}Crypto Knowledge Quiz{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .quiz-card {
+        border-radius: 15px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .quiz-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    .category-badge {
+        font-size: 0.75rem;
+        border-radius: 12px;
+        padding: 0.25rem 0.75rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .category-badge:hover {
+        opacity: 0.9;
+    }
+    .badge-bitcoin {
+        background-color: #f7931a;
+        color: white;
+    }
+    .badge-ethereum {
+        background-color: #627eea;
+        color: white;
+    }
+    .badge-general {
+        background-color: #6c757d;
+        color: white;
+    }
+    .badge-technical {
+        background-color: #17a2b8;
+        color: white;
+    }
+    .badge-defi {
+        background-color: #28a745;
+        color: white;
+    }
+    .difficulty-selector {
+        display: flex;
+        margin-bottom: 1.5rem;
+    }
+    .difficulty-btn {
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem;
+        border: 2px solid transparent;
+        border-radius: 8px;
+        margin: 0 0.25rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .difficulty-btn.active {
+        border-color: var(--bs-primary);
+        font-weight: bold;
+    }
+    .difficulty-btn:hover {
+        opacity: 0.9;
+    }
+    .difficulty-easy {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+    .difficulty-medium {
+        background-color: #fff3cd;
+        color: #664d03;
+    }
+    .difficulty-hard {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+    .quiz-stat-card {
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    .quiz-stat-value {
+        font-size: 1.75rem;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+    .quiz-stat-label {
+        font-size: 0.85rem;
+        opacity: 0.8;
+    }
+    .level-indicator {
+        position: relative;
+        height: 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+    .level-progress {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: var(--bs-primary);
+        border-radius: 4px;
+    }
+    .badge-item {
+        display: inline-block;
+        background-color: #212529;
+        color: white;
+        font-size: 0.75rem;
+        border-radius: 12px;
+        padding: 0.25rem 0.75rem;
+        margin: 0.25rem;
+    }
+    .leaderboard-table {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .leaderboard-table th {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+    .leaderboard-rank {
+        font-weight: bold;
+        width: 40px;
+        text-align: center;
+    }
+    .rank-1 {
+        color: gold;
+    }
+    .rank-2 {
+        color: silver;
+    }
+    .rank-3 {
+        color: #cd7f32; /* bronze */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-4">
+                <i class="fas fa-graduation-cap me-2"></i> Crypto Knowledge Quiz
+            </h1>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> Test your cryptocurrency knowledge, earn points and badges, and compete on the leaderboard!
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Quiz Setup Section -->
+        <div class="col-md-8">
+            <div class="card quiz-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Start a New Quiz</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('crypto_quiz_start') }}" method="get">
+                        <!-- Categories -->
+                        <div class="mb-4">
+                            <label class="form-label">Select Category:</label>
+                            <div>
+                                <input type="radio" class="btn-check" name="category" id="category-all" value="" checked>
+                                <label class="btn btn-outline-secondary me-2 mb-2" for="category-all">All Categories</label>
+                                
+                                {% for category in categories %}
+                                <input type="radio" class="btn-check" name="category" id="category-{{ category }}" value="{{ category }}">
+                                <label class="btn btn-outline-secondary me-2 mb-2" for="category-{{ category }}">
+                                    {{ category|capitalize }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Difficulty -->
+                        <div class="mb-4">
+                            <label class="form-label">Select Difficulty:</label>
+                            <div class="difficulty-selector">
+                                <input type="radio" class="btn-check" name="difficulty" id="difficulty-any" value="" checked>
+                                <label class="btn btn-outline-secondary" for="difficulty-any">Any Difficulty</label>
+                                
+                                <input type="radio" class="btn-check" name="difficulty" id="difficulty-easy" value="easy">
+                                <label class="btn btn-outline-success" for="difficulty-easy">Easy</label>
+                                
+                                <input type="radio" class="btn-check" name="difficulty" id="difficulty-medium" value="medium">
+                                <label class="btn btn-outline-warning" for="difficulty-medium">Medium</label>
+                                
+                                <input type="radio" class="btn-check" name="difficulty" id="difficulty-hard" value="hard">
+                                <label class="btn btn-outline-danger" for="difficulty-hard">Hard</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Number of questions -->
+                        <div class="mb-4">
+                            <label for="count" class="form-label">Number of Questions:</label>
+                            <select class="form-select" id="count" name="count">
+                                <option value="5" selected>5 Questions</option>
+                                <option value="10">10 Questions</option>
+                                <option value="15">15 Questions</option>
+                                <option value="20">20 Questions</option>
+                            </select>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-play-circle me-2"></i> Start Quiz
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Leaderboard Preview -->
+            <div class="card quiz-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Top Crypto Quiz Players</h5>
+                    <a href="{{ url_for('crypto_quiz_leaderboard') }}" class="btn btn-sm btn-outline-primary">View Full Leaderboard</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover leaderboard-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="leaderboard-rank">#</th>
+                                    <th>Player</th>
+                                    <th>Level</th>
+                                    <th>Points</th>
+                                    <th>Accuracy</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if leaderboard %}
+                                    {% for entry in leaderboard %}
+                                        <tr>
+                                            <td class="leaderboard-rank rank-{{ entry.rank }}">{{ entry.rank }}</td>
+                                            <td>{{ entry.username }}</td>
+                                            <td>{{ entry.level }}</td>
+                                            <td>{{ entry.points }}</td>
+                                            <td>{{ entry.accuracy }}%</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-3">No quiz attempts yet. Be the first!</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Stats Section -->
+        <div class="col-md-4">
+            <!-- User Stats Card -->
+            <div class="card quiz-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Your Quiz Stats</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_stats.total_questions > 0 %}
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <div class="quiz-stat-card">
+                                    <span class="quiz-stat-value">{{ user_stats.level }}</span>
+                                    <span class="quiz-stat-label">Level</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="quiz-stat-card">
+                                    <span class="quiz-stat-value">{{ user_stats.total_points }}</span>
+                                    <span class="quiz-stat-label">Points</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <div class="quiz-stat-card">
+                                    <span class="quiz-stat-value">{{ user_stats.total_questions }}</span>
+                                    <span class="quiz-stat-label">Questions</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="quiz-stat-card">
+                                    <span class="quiz-stat-value">{{ user_stats.accuracy }}%</span>
+                                    <span class="quiz-stat-label">Accuracy</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Level Progress -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between">
+                                <span>Level {{ user_stats.level }}</span>
+                                <span>Level {{ user_stats.next_level }}</span>
+                            </div>
+                            <div class="level-indicator">
+                                {% set progress = (user_stats.total_points - user_stats.points_to_next_level) / user_stats.points_to_next_level * 100 %}
+                                {% if progress > 100 %}
+                                    {% set progress = 100 %}
+                                {% endif %}
+                                <div class="level-progress" style="width: {{ progress }}%"></div>
+                            </div>
+                            <div class="text-center">
+                                <small>{{ user_stats.points_to_next_level }} points to next level</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Badges -->
+                        <div class="mb-3">
+                            <h6>Your Badges:</h6>
+                            {% if user_stats.badges %}
+                                <div>
+                                    {% for badge in user_stats.badges %}
+                                        <span class="badge-item">{{ badge|capitalize }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted">No badges earned yet. Keep playing!</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="text-center">
+                            <a href="{{ url_for('crypto_quiz_profile') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-user me-2"></i> View Full Profile
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-award fa-3x mb-3 text-muted"></i>
+                            <h5>No Quiz Stats Yet</h5>
+                            <p class="text-muted">Take your first quiz to start earning points and badges!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Quiz Tips Card -->
+            <div class="card quiz-card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quiz Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-star me-2 text-warning"></i>
+                            Earn more points with higher difficulty levels
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-level-up-alt me-2 text-primary"></i>
+                            Level up to unlock special badges
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-trophy me-2 text-success"></i>
+                            Compete for the top spot on the leaderboard
+                        </li>
+                        <li>
+                            <i class="fas fa-book me-2 text-info"></i>
+                            Learn about crypto with detailed explanations
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Additional JavaScript for Quiz Home interactions
+    document.addEventListener('DOMContentLoaded', function() {
+        // Example: animate the stats on page load
+        const statValues = document.querySelectorAll('.quiz-stat-value');
+        
+        statValues.forEach(stat => {
+            const value = parseInt(stat.textContent);
+            let startValue = 0;
+            const duration = 1000;
+            const startTime = Date.now();
+            
+            function updateValue() {
+                const currentTime = Date.now();
+                const elapsed = currentTime - startTime;
+                
+                if (elapsed < duration) {
+                    const progress = elapsed / duration;
+                    const currentValue = Math.floor(value * progress);
+                    stat.textContent = currentValue;
+                    requestAnimationFrame(updateValue);
+                } else {
+                    stat.textContent = value;
+                }
+            }
+            
+            requestAnimationFrame(updateValue);
+        });
+    });
+</script>
+{% endblock %}

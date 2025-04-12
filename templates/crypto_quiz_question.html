@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Crypto Quiz - Question {{ current }} of {{ total }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .quiz-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .quiz-progress {
+        height: 8px;
+        margin-bottom: 2rem;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .quiz-progress-bar {
+        height: 100%;
+        background-color: var(--bs-primary);
+    }
+    .question-card {
+        border-radius: 15px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    .question-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .option-container {
+        cursor: pointer;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 2px solid transparent;
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+    .option-container:hover {
+        border-color: var(--bs-primary);
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .option-container input {
+        margin-right: 10px;
+    }
+    .option-container label {
+        display: block;
+        width: 100%;
+        cursor: pointer;
+        margin-bottom: 0;
+    }
+    .option-label {
+        font-weight: bold;
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        text-align: center;
+        line-height: 25px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        margin-right: 10px;
+    }
+    .option-text {
+        font-size: 1.1rem;
+    }
+    .question-footer {
+        padding: 1.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    .difficulty-badge {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    .badge-easy {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+    .badge-medium {
+        background-color: #fff3cd;
+        color: #664d03;
+    }
+    .badge-hard {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+    .category-badge {
+        background-color: #6c757d;
+        color: white;
+    }
+    .category-bitcoin {
+        background-color: #f7931a;
+    }
+    .category-ethereum {
+        background-color: #627eea;
+    }
+    .category-defi {
+        background-color: #28a745;
+    }
+    .category-technical {
+        background-color: #17a2b8;
+    }
+    .progress-text {
+        text-align: center;
+        margin-bottom: 1rem;
+        font-weight: 500;
+        color: var(--bs-secondary);
+    }
+    .timer-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    .timer-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="quiz-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{{ url_for('crypto_quiz_home') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Back to Quiz Home
+            </a>
+            <h5 class="mb-0">Crypto Knowledge Quiz</h5>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-text">
+            Question {{ current }} of {{ total }}
+        </div>
+        <div class="quiz-progress">
+            <div class="quiz-progress-bar" style="width: {{ (current / total) * 100 }}%"></div>
+        </div>
+        
+        <!-- Question Card -->
+        <div class="card question-card">
+            <div class="question-header">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="difficulty-badge badge-{{ question.difficulty }}">
+                        {{ question.difficulty }}
+                    </span>
+                    <span class="badge category-badge category-{{ question.category }}">
+                        {{ question.category }}
+                    </span>
+                </div>
+                <h4>{{ question.question }}</h4>
+            </div>
+            
+            <div class="card-body">
+                <form method="post" id="quiz-form">
+                    <div class="option-container">
+                        <input type="radio" name="answer" id="option-a" value="a" class="quiz-option">
+                        <label for="option-a" class="d-flex align-items-center">
+                            <span class="option-label">A</span>
+                            <span class="option-text">{{ question.option_a }}</span>
+                        </label>
+                    </div>
+                    
+                    <div class="option-container">
+                        <input type="radio" name="answer" id="option-b" value="b" class="quiz-option">
+                        <label for="option-b" class="d-flex align-items-center">
+                            <span class="option-label">B</span>
+                            <span class="option-text">{{ question.option_b }}</span>
+                        </label>
+                    </div>
+                    
+                    <div class="option-container">
+                        <input type="radio" name="answer" id="option-c" value="c" class="quiz-option">
+                        <label for="option-c" class="d-flex align-items-center">
+                            <span class="option-label">C</span>
+                            <span class="option-text">{{ question.option_c }}</span>
+                        </label>
+                    </div>
+                    
+                    <div class="option-container">
+                        <input type="radio" name="answer" id="option-d" value="d" class="quiz-option">
+                        <label for="option-d" class="d-flex align-items-center">
+                            <span class="option-label">D</span>
+                            <span class="option-text">{{ question.option_d }}</span>
+                        </label>
+                    </div>
+                    
+                    <div class="question-footer">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submit-answer">
+                            <i class="fas fa-check-circle me-2"></i> Submit Answer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Highlight the selected option
+        const optionContainers = document.querySelectorAll('.option-container');
+        const optionInputs = document.querySelectorAll('.quiz-option');
+        
+        optionContainers.forEach((container, index) => {
+            container.addEventListener('click', function() {
+                // Reset all containers
+                optionContainers.forEach(c => {
+                    c.style.borderColor = 'transparent';
+                    c.style.backgroundColor = 'transparent';
+                });
+                
+                // Highlight selected container
+                container.style.borderColor = 'var(--bs-primary)';
+                container.style.backgroundColor = 'rgba(13, 110, 253, 0.05)';
+                
+                // Select the radio button
+                optionInputs[index].checked = true;
+            });
+        });
+        
+        // Form submission validation
+        document.getElementById('quiz-form').addEventListener('submit', function(e) {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            
+            if (!selectedOption) {
+                e.preventDefault();
+                alert('Please select an answer before submitting.');
+            }
+        });
+    });
+</script>
+{% endblock %}
