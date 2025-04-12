@@ -57,7 +57,9 @@ def get_cached_data(key: str) -> Optional[Any]:
             return cache_entry["data"]
     return None
 
-def get_technical_analysis(symbol: str) -> Dict[str, Any]:
+def get_technical_analysis(symbol: Optional[str] = None) -> Dict[str, Any]:
+    # Default to BTC if symbol is None
+    symbol = symbol or "BTC"
     """
     Get technical analysis for a cryptocurrency
     
@@ -144,7 +146,9 @@ def get_technical_analysis(symbol: str) -> Dict[str, Any]:
             "analysis": f"Technical analysis for {symbol} is not available at the moment due to an internal error."
         }
 
-def get_fundamental_analysis(symbol: str) -> Dict[str, Any]:
+def get_fundamental_analysis(symbol: Optional[str] = None) -> Dict[str, Any]:
+    # Default to ETH if symbol is None
+    symbol = symbol or "ETH"
     """
     Get fundamental analysis for a cryptocurrency
     
@@ -173,13 +177,23 @@ def get_fundamental_analysis(symbol: str) -> Dict[str, Any]:
                 "analysis": f"Fundamental analysis for {symbol} is not available at the moment due to data retrieval issues."
             }
         
-        # Get news related to the symbol
-        news_data = get_crypto_news(symbol=symbol, count=5)
+        # Get news and filter for the symbol
+        news_data = get_crypto_news(limit=10, translate=False)
+        # Filter news that mention the symbol or full name
+        full_name = get_full_name(symbol)
+        filtered_news = []
+        
+        for item in news_data:
+            title = item.get('title', '').upper()
+            summary = item.get('summary', '').upper()
+            if symbol.upper() in title or symbol.upper() in summary or full_name.upper() in title or full_name.upper() in summary:
+                filtered_news.append(item)
+        
         news_text = ""
-        if news_data and len(news_data) > 0:
+        if filtered_news and len(filtered_news) > 0:
             news_text = "Recent news:\n" + "\n".join(
                 [f"- {item.get('title', 'Untitled')}: {item.get('summary', 'No summary')[:100]}..." 
-                 for item in news_data[:3]]
+                 for item in filtered_news[:3]]
             )
         
         # Add full cryptocurrency name

@@ -61,6 +61,8 @@ def register_routes(app):
                     # Default to BTC if we still can't find a symbol
                     symbol = 'BTC'
                     
+            # Ensure symbol is a string, not None
+            symbol = symbol or 'BTC'
             result = get_technical_analysis(symbol)
                     
         elif 'fundamental' in query_lower or 'fundamentals' in query_lower or 'tokenomics' in query_lower:
@@ -77,7 +79,9 @@ def register_routes(app):
                 
                 if not symbol:
                     symbol = 'ETH'
-                    
+            
+            # Ensure symbol is a string, not None        
+            symbol = symbol or 'ETH'
             result = get_fundamental_analysis(symbol)
                     
         elif len(query.strip().split()) <= 2 and extract_crypto_symbol(query):
@@ -85,6 +89,8 @@ def register_routes(app):
             # But let's default to technical as it's more common
             query_type = 'technical'
             symbol = extract_crypto_symbol(query)
+            # Ensure symbol is a string, not None
+            symbol = symbol or 'BTC'
             result = get_technical_analysis(symbol)
         else:
             # General question
