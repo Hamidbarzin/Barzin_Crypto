@@ -230,3 +230,31 @@ def analyze_symbol(symbol: str, timeframe: str = "1d") -> Dict[str, Any]:
         Dict[str, Any]: نتایج تحلیل تکنیکال
     """
     return get_technical_analysis(symbol, timeframe)
+
+
+def get_technical_indicators(symbol: str, timeframe: str = "1d") -> Dict[str, Any]:
+    """
+    دریافت اندیکاتورهای تکنیکال برای یک ارز
+    
+    این تابع برای استفاده در ماژول market_detector اضافه شده است
+    و همان تابع calculate_technical_indicators را فراخوانی می‌کند.
+    
+    Args:
+        symbol: نماد ارز
+        timeframe: بازه زمانی
+    
+    Returns:
+        Dict[str, Any]: اندیکاتورهای تکنیکال
+    """
+    try:
+        # دریافت داده‌های تاریخی
+        historical_data = get_historical_data(symbol, timeframe=timeframe, limit=100)
+        
+        # محاسبه اندیکاتورها
+        indicators = calculate_technical_indicators(historical_data, symbol)
+        
+        return indicators
+    
+    except Exception as e:
+        logger.error(f"خطا در دریافت اندیکاتورهای تکنیکال برای {symbol}: {str(e)}")
+        return {}
