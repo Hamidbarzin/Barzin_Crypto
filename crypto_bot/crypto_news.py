@@ -17,17 +17,17 @@ import trafilatura
 from openai import OpenAI
 from typing import List, Dict, Any, Optional
 
-# اضافه کردن دسترسی به API جدید خبری
+# Add access to the new cryptocurrency news API
 try:
     from crypto_bot.crypto_news_api import (
         get_crypto_news_from_api,
         get_canadian_crypto_news_from_api
     )
     HAS_NEWS_API = True
-    logging.info("ماژول API اخبار ارز دیجیتال با موفقیت بارگذاری شد")
+    logging.info("Cryptocurrency News API module loaded successfully")
 except ImportError:
     HAS_NEWS_API = False
-    logging.warning("ماژول API اخبار ارز دیجیتال یافت نشد، از منابع قدیمی استفاده می‌شود")
+    logging.warning("Cryptocurrency News API module not found, using legacy sources")
 
 # CMC Markets Canada news module
 try:
@@ -72,20 +72,20 @@ logger = logging.getLogger(__name__)
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 CRYPTOCOMPARE_API_KEY = os.environ.get("CRYPTOCOMPARE_API_KEY")
 
-# تنظیم منطقه زمانی تورنتو
+# Set Toronto timezone
 toronto_tz = pytz.timezone('America/Toronto')
 
 
 def get_cryptocompare_news(limit: int = 10, lang: str = "EN") -> List[Dict[str, Any]]:
     """
-    دریافت اخبار از CryptoCompare API
+    Get news from CryptoCompare API
     
     Args:
-        limit (int): تعداد اخبار مورد نیاز
-        lang (str): زبان اخبار
+        limit (int): Number of news items needed
+        lang (str): News language
         
     Returns:
-        List[Dict[str, Any]]: لیست اخبار دریافت شده
+        List[Dict[str, Any]]: List of retrieved news items
     """
     try:
         url = f"https://min-api.cryptocompare.com/data/v2/news/?lang={lang}&api_key={CRYPTOCOMPARE_API_KEY}&limit={limit}"
@@ -96,25 +96,25 @@ def get_cryptocompare_news(limit: int = 10, lang: str = "EN") -> List[Dict[str, 
             if data.get("Response") == "Success" or data.get("Type") == 100:
                 return data.get("Data", [])
             else:
-                logger.warning(f"خطا در پاسخ CryptoCompare: {data.get('Message')}")
+                logger.warning(f"Error in CryptoCompare response: {data.get('Message')}")
                 return []
         else:
-            logger.warning(f"خطا در درخواست CryptoCompare: {response.status_code}")
+            logger.warning(f"Error in CryptoCompare request: {response.status_code}")
             return []
     except Exception as e:
-        logger.error(f"خطا در دریافت اخبار از CryptoCompare: {str(e)}")
+        logger.error(f"Error getting news from CryptoCompare: {str(e)}")
         return []
 
 
 def get_coindesk_news(limit: int = 5) -> List[Dict[str, Any]]:
     """
-    دریافت اخبار از وب‌سایت CoinDesk
+    Get news from CoinDesk website
     
     Args:
-        limit (int): تعداد اخبار مورد نیاز
+        limit (int): Number of news items needed
         
     Returns:
-        List[Dict[str, Any]]: لیست اخبار دریافت شده
+        List[Dict[str, Any]]: List of retrieved news items
     """
     try:
         url = "https://www.coindesk.com/"
@@ -138,7 +138,7 @@ def get_coindesk_news(limit: int = 5) -> List[Dict[str, Any]]:
                         if not link.startswith('http'):
                             link = f"https://www.coindesk.com{link}"
                         
-                        # دریافت تصویر اگر موجود باشد
+                        # Get image if available
                         img_elem = article.select_one('img')
                         image_url = img_elem.get('src', '') if img_elem else ''
                         
@@ -150,15 +150,15 @@ def get_coindesk_news(limit: int = 5) -> List[Dict[str, Any]]:
                             "published_on": int(time.time())
                         })
                 except Exception as e:
-                    logger.error(f"خطا در پردازش مقاله CoinDesk: {str(e)}")
+                    logger.error(f"Error processing CoinDesk article: {str(e)}")
                     continue
             
             return articles
         else:
-            logger.warning(f"خطا در درخواست CoinDesk: {response.status_code}")
+            logger.warning(f"Error in CoinDesk request: {response.status_code}")
             return []
     except Exception as e:
-        logger.error(f"خطا در دریافت اخبار از CoinDesk: {str(e)}")
+        logger.error(f"Error getting news from CoinDesk: {str(e)}")
         return []
 
 
@@ -339,17 +339,17 @@ def get_crypto_news(limit: int = 10, translate: bool = True, include_canada: boo
     # اول سعی کنیم از API جدید استفاده کنیم
     if HAS_NEWS_API:
         try:
-            logger.info("تلاش برای دریافت اخبار از API تخصصی...")
+            logger.info("Attempting to get news from specialized API...")
             api_news = get_crypto_news_from_api(items_per_page=limit)
             
             if api_news:
-                logger.info(f"{len(api_news)} خبر از API تخصصی دریافت شد")
+                logger.info(f"{len(api_news)} news items received from specialized API")
                 
-                # اضافه کردن اخبار کانادایی اگر لازم است
+                # Add Canadian news if needed
                 if include_canada:
                     canada_news = get_canadian_crypto_news_from_api(items_per_page=limit // 2)
                     if canada_news:
-                        logger.info(f"{len(canada_news)} خبر کانادایی از API تخصصی دریافت شد")
+                        logger.info(f"{len(canada_news)} Canadian news items received from specialized API")
                         # ادغام اخبار با اطمینان از عدم تکرار
                         seen_urls = {item['url'] for item in api_news}
                         for item in canada_news:
