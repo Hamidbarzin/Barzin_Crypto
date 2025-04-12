@@ -207,15 +207,15 @@ def get_cointelegraph_news(limit: int = 5) -> List[Dict[str, Any]]:
                             "published_on": int(time.time())
                         })
                 except Exception as e:
-                    logger.error(f"خطا در پردازش مقاله CoinTelegraph: {str(e)}")
+                    logger.error(f"Error processing CoinTelegraph article: {str(e)}")
                     continue
             
             return articles
         else:
-            logger.warning(f"خطا در درخواست CoinTelegraph: {response.status_code}")
+            logger.warning(f"Error in CoinTelegraph request: {response.status_code}")
             return []
     except Exception as e:
-        logger.error(f"خطا در دریافت اخبار از CoinTelegraph: {str(e)}")
+        logger.error(f"Error retrieving news from CoinTelegraph: {str(e)}")
         return []
 
 
@@ -258,7 +258,7 @@ def extract_article_content(url: str) -> str:
         
         return ""
     except Exception as e:
-        logger.error(f"خطا در استخراج محتوای مقاله: {str(e)}")
+        logger.error(f"Error extracting article content: {str(e)}")
         return ""
 
 
@@ -384,7 +384,7 @@ def get_crypto_news(limit: int = 10, translate: bool = True, include_canada: boo
                             if 'published_on' not in item:
                                 item['published_on'] = int(dt.timestamp())
                         except Exception as dt_error:
-                            logger.error(f"خطا در تبدیل تاریخ: {str(dt_error)}")
+                            logger.error(f"Error converting date: {str(dt_error)}")
                             item['published_date'] = datetime.now(toronto_tz).strftime('%Y-%m-%d %H:%M')
                             item['published_on'] = int(time.time())
                 
@@ -394,7 +394,7 @@ def get_crypto_news(limit: int = 10, translate: bool = True, include_canada: boo
                 # محدود کردن تعداد اخبار
                 return api_news[:limit]
         except Exception as api_err:
-            logger.error(f"خطا در دریافت اخبار از API تخصصی: {str(api_err)}")
+            logger.error(f"Error getting news from specialized API: {str(api_err)}")
             # ادامه با روش قدیمی در صورت خطا
     
     # اگر API جدید در دسترس نباشد یا خطا داشته باشد، از روش قدیمی استفاده می‌کنیم
