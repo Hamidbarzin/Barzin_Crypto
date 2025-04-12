@@ -806,14 +806,14 @@ if __name__ == "__main__":
         print(f"Link: {item.get('url')}")
         print("-" * 50)
     
-    print("\nتحلیل احساسات بازار:")
+    print("\nMarket Sentiment Analysis:")
     sentiment = get_crypto_sentiment_analysis()
     print(json.dumps(sentiment, indent=2, ensure_ascii=False))
     
-    print("\nشاخص ترس و طمع:")
+    print("\nFear and Greed Index:")
     fear_greed = get_fear_greed_index()
     print(json.dumps(fear_greed, indent=2, ensure_ascii=False))
     
-    print("\nگزارش تلگرام:")
+    print("\nTelegram Report:")
     telegram_message = get_crypto_news_formatted_for_telegram()
     print(telegram_message)
