@@ -89,11 +89,33 @@ def get_crypto_price(symbol: str, timeout: Optional[int] = None) -> Optional[Dic
         # ذخیره در کش
         if price_data:
             _cache_price_data(std_symbol, price_data)
+            return price_data
         
-        return price_data
+        # اگر هیچ یک از API ها جواب ندادند، از کش منقضی شده استفاده کن
+        expired_data = _get_cached_price(std_symbol, ignore_expiry=True)
+        if expired_data:
+            logger.info(f"Using expired cached data for {std_symbol} due to API failures")
+            # اضافه کردن نشانگر داده قدیمی
+            expired_data["is_stale"] = True
+            expired_data["timestamp"] = time.time()
+            return expired_data
+        
+        return None
     
     except Exception as e:
         logger.error(f"Error in get_crypto_price for {symbol}: {str(e)}")
+        
+        # در صورت خطا، تلاش کن از کش منقضی شده استفاده کنی
+        try:
+            expired_data = _get_cached_price(symbol.upper(), ignore_expiry=True)
+            if expired_data:
+                logger.info(f"Using expired cached data for {symbol} after exception")
+                expired_data["is_stale"] = True
+                expired_data["timestamp"] = time.time()
+                return expired_data
+        except:
+            pass
+        
         return None
 
 def get_multiple_prices(symbols: List[str], timeout: Optional[int] = None) -> Dict[str, Dict[str, Any]]:
@@ -110,9 +132,22 @@ def get_multiple_prices(symbols: List[str], timeout: Optional[int] = None) -> Di
     result = {}
     
     for symbol in symbols:
-        price_data = get_crypto_price(symbol, timeout=timeout)
-        if price_data:
-            result[symbol] = price_data
+        try:
+            price_data = get_crypto_price(symbol, timeout=timeout)
+            if price_data:
+                result[symbol] = price_data
+        except Exception as e:
+            logger.error(f"Error in get_multiple_prices for {symbol}: {str(e)}")
+            # تلاش برای استفاده از داده منقضی شده کش در صورت خطا
+            try:
+                expired_data = _get_cached_price(symbol.upper(), ignore_expiry=True)
+                if expired_data:
+                    logger.info(f"Using expired cached data for {symbol} in multiple prices request")
+                    expired_data["is_stale"] = True
+                    expired_data["timestamp"] = time.time()
+                    result[symbol] = expired_data
+            except:
+                pass
     
     return result
 
@@ -149,12 +184,13 @@ def get_current_prices(symbols_list=None, include_favorites=True, timeout=None):
     # دریافت قیمت‌ها
     return get_multiple_prices(symbols, timeout=timeout)
 
-def _get_cached_price(symbol: str) -> Optional[Dict[str, Any]]:
+def _get_cached_price(symbol: str, ignore_expiry: bool = False) -> Optional[Dict[str, Any]]:
     """
     دریافت قیمت از کش
     
     Args:
         symbol (str): نماد ارز دیجیتال
+        ignore_expiry (bool): آیا انقضای کش نادیده گرفته شود
         
     Returns:
         Optional[Dict[str, Any]]: داده‌های کش شده یا None
@@ -176,11 +212,16 @@ def _get_cached_price(symbol: str) -> Optional[Dict[str, Any]]:
         cached_time = cache[symbol]['cached_at']
         current_time = time.time()
         
-        if current_time - cached_time > CACHE_EXPIRY:
-            # داده منقضی شده است
+        # اضافه کردن وضعیت منقضی شدن به داده
+        data = cache[symbol]['data']
+        
+        if current_time - cached_time > CACHE_EXPIRY and not ignore_expiry:
+            # داده منقضی شده است اما در صورت درخواست، آن را برمی‌گردانیم
+            logger.info(f"Using cached price data for {symbol}")
             return None
         
-        return cache[symbol]['data']
+        # اگر داده هنوز معتبر است یا کاربر خواسته انقضا نادیده گرفته شود
+        return data
     
     except Exception as e:
         logger.error(f"Error reading cache for {symbol}: {str(e)}")
