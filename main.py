@@ -3,7 +3,7 @@ import logging
 import random
 from datetime import datetime
 from crypto_bot.cache_manager import price_cache
-from flask import Flask, render_template, render_template_string, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, render_template_string, request, redirect, url_for, flash, session, jsonify, send_file
 from crypto_bot.config import DEFAULT_CURRENCIES, TIMEFRAMES
 from crypto_bot.market_data import get_current_prices
 from crypto_bot.scheduler import start_scheduler, stop_scheduler
@@ -994,6 +994,37 @@ def test_dashboard():
 def test_menu():
     """Render test menu page to debug navigation issues"""
     return redirect(url_for('index'))
+    
+@app.route('/test-tech')
+def test_tech():
+    """A simple page to test technical analysis links"""
+    return '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Test Technical Analysis Page</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { color: #333; }
+            ul { margin-top: 20px; }
+            li { margin-bottom: 10px; }
+            a { color: #0066cc; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+        </style>
+    </head>
+    <body>
+        <h1>Test Technical Analysis Page</h1>
+        <p>This is a simple test to check if technical analysis pages are working</p>
+        
+        <h2>Click the links below to test technical analysis routing:</h2>
+        <ul>
+            <li><a href="/technical_analysis/BTC-USDT">Test BTC-USDT</a></li>
+            <li><a href="/technical_analysis/ETH-USDT">Test ETH-USDT</a></li>
+            <li><a href="/technical_analysis/SOL-USDT">Test SOL-USDT</a></li>
+        </ul>
+    </body>
+    </html>
+    '''
 
 @app.route('/app_settings')
 @login_required
@@ -1851,9 +1882,8 @@ def get_technical(symbol=None, timeframe=None):
             'data': get_default_technical_data(symbol, timeframe)
         })
         
-@app.route('/technical_analysis/<path:symbol>', methods=['GET'])
-# اجازه دسترسی همه کاربران به صفحه تحلیل تکنیکال
-# @login_required
+@app.route('/technical_analysis/<symbol>')
+# Remove login_required to allow all users access to technical analysis
 def technical_analysis_page(symbol):
     """
     صفحه تحلیل تکنیکال برای یک ارز دیجیتال خاص
