@@ -23,6 +23,7 @@ from crypto_bot.language_manager import (
 from crypto_bot.telegram_auth import verify_password, change_password, register_user, login_required
 import replit_telegram_sender
 import telegram_scheduler_service
+from models import db
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -30,6 +31,21 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "crypto_bot_secret_key")
+
+# Configure the SQLAlchemy database
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Initialize the SQLAlchemy instance with the Flask app
+db.init_app(app)
+
+# Create database tables if they don't exist
+with app.app_context():
+    db.create_all()
 
 # Register AI analysis routes
 try:
