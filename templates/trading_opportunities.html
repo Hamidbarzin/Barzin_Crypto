@@ -209,6 +209,46 @@
                 </div>
             </div>
         </div>
+        
+        <!-- تحلیل تکنیکال -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i> تحلیل تکنیکال</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <span class="me-2">ارز دیجیتال:</span>
+                    <select class="form-select me-3" id="symbolSelect">
+                        <option value="BTC/USDT">بیت‌کوین (BTC)</option>
+                        <option value="ETH/USDT">اتریوم (ETH)</option>
+                        <option value="SOL/USDT">سولانا (SOL)</option>
+                        <option value="XRP/USDT">ریپل (XRP)</option>
+                        <option value="DOGE/USDT">دوج کوین (DOGE)</option>
+                        <option value="ADA/USDT">کاردانو (ADA)</option>
+                        <option value="AVAX/USDT">آوالانچ (AVAX)</option>
+                        <option value="LINK/USDT">چین‌لینک (LINK)</option>
+                    </select>
+                    <span class="me-2">بازه زمانی:</span>
+                    <select class="form-select" id="technicalTimeframe">
+                        <option value="1h">۱ ساعت</option>
+                        <option value="4h">۴ ساعت</option>
+                        <option value="1d" selected>روزانه</option>
+                        <option value="1w">هفتگی</option>
+                    </select>
+                </div>
+                <div id="technical-analysis-container">
+                    <div class="text-center p-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">در حال بارگذاری...</span>
+                        </div>
+                        <p class="mt-2">در حال دریافت تحلیل تکنیکال...</p>
+                    </div>
+                </div>
+                <div id="no-technical-analysis" class="alert alert-info d-none">
+                    داده‌های تحلیل تکنیکال در دسترس نیست.
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class="col-md-5">
@@ -284,6 +324,11 @@
         
         if (symbolSelect) {
             symbolSelect.addEventListener('change', loadTechnicalAnalysis);
+        }
+        
+        const technicalTimeframeSelect = document.getElementById('technicalTimeframe');
+        if (technicalTimeframeSelect) {
+            technicalTimeframeSelect.addEventListener('change', loadTechnicalAnalysis);
         }
         
         function loadData() {
@@ -489,7 +534,8 @@
             }
             
             const symbol = symbolSelect ? symbolSelect.value : 'BTC/USDT';
-            const timeframe = timeframeSelect.value;
+            const technicalTimeframeSelect = document.getElementById('technicalTimeframe');
+            const timeframe = technicalTimeframeSelect ? technicalTimeframeSelect.value : '1d';
             
             return fetch(`/api/technical?symbol=${symbol}&timeframe=${timeframe}`)
                 .then(response => response.json())
