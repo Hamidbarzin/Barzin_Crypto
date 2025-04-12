@@ -27,21 +27,18 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card crypto-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Market Categories</h5>
-                    <div class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            Select Category
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
-                            <li><a class="dropdown-item" href="#" data-crypto-category="major">Major Coins</a></li>
-                            <li><a class="dropdown-item" href="#" data-crypto-category="stable">Stablecoins</a></li>
-                            <li><a class="dropdown-item" href="#" data-crypto-category="promising">AI Coins</a></li>
-                            <li><a class="dropdown-item" href="#" data-crypto-category="meme">Meme Coins</a></li>
-                            <li><a class="dropdown-item" href="#" data-crypto-category="low-cost">Low Cost</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#" data-crypto-category="all">All Coins</a></li>
-                        </ul>
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">Market Categories</h5>
+                        <span class="text-muted small">Filter coins by type</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        <button type="button" class="btn btn-sm btn-primary" data-crypto-category="all">All Coins</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-crypto-category="major">Major Coins</button>
+                        <button type="button" class="btn btn-sm btn-outline-success" data-crypto-category="stable">Stablecoins</button>
+                        <button type="button" class="btn btn-sm btn-outline-warning" data-crypto-category="promising">AI Coins</button>
+                        <button type="button" class="btn btn-sm btn-outline-info" data-crypto-category="meme">Meme Coins</button>
+                        <button type="button" class="btn btn-sm btn-outline-dark" data-crypto-category="low-cost">Low Cost</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -271,27 +268,60 @@ function loadMoreNews() {
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize category dropdown items
-    document.querySelectorAll('.dropdown-item[data-crypto-category]').forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Remove active class from all dropdown items
-            document.querySelectorAll('.dropdown-item[data-crypto-category]').forEach(dropItem => {
-                dropItem.classList.remove('active');
+    // Initialize category filter buttons
+    document.querySelectorAll('button[data-crypto-category]').forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class and reset all buttons to outline style
+            document.querySelectorAll('button[data-crypto-category]').forEach(btn => {
+                btn.classList.remove('btn-primary', 'btn-secondary', 'btn-success', 'btn-warning', 'btn-info', 'btn-dark');
+                
+                // Add appropriate outline class based on original style
+                if (btn.classList.contains('btn-outline-secondary') || 
+                    btn.classList.contains('btn-outline-success') || 
+                    btn.classList.contains('btn-outline-warning') || 
+                    btn.classList.contains('btn-outline-info') || 
+                    btn.classList.contains('btn-outline-dark')) {
+                    // Button already has outline class, do nothing
+                } else {
+                    // Button doesn't have outline class, check data attribute to determine style
+                    const btnCategory = btn.getAttribute('data-crypto-category');
+                    if (btnCategory === 'major') {
+                        btn.classList.add('btn-outline-secondary');
+                    } else if (btnCategory === 'stable') {
+                        btn.classList.add('btn-outline-success');
+                    } else if (btnCategory === 'promising') {
+                        btn.classList.add('btn-outline-warning');
+                    } else if (btnCategory === 'meme') {
+                        btn.classList.add('btn-outline-info');
+                    } else if (btnCategory === 'low-cost') {
+                        btn.classList.add('btn-outline-dark');
+                    } else if (btnCategory === 'all') {
+                        btn.classList.add('btn-outline-primary');
+                    }
+                }
             });
             
-            // Add active class to clicked item
-            this.classList.add('active');
-            
-            // Update dropdown button text
-            const categoryDropdown = document.getElementById('categoryDropdown');
-            if (categoryDropdown) {
-                categoryDropdown.textContent = this.textContent;
-            }
-            
-            // Get the category
+            // Add solid class to clicked button (remove outline)
             const category = this.getAttribute('data-crypto-category');
+            if (category === 'major') {
+                this.classList.remove('btn-outline-secondary');
+                this.classList.add('btn-secondary');
+            } else if (category === 'stable') {
+                this.classList.remove('btn-outline-success');
+                this.classList.add('btn-success');
+            } else if (category === 'promising') {
+                this.classList.remove('btn-outline-warning');
+                this.classList.add('btn-warning');
+            } else if (category === 'meme') {
+                this.classList.remove('btn-outline-info');
+                this.classList.add('btn-info');
+            } else if (category === 'low-cost') {
+                this.classList.remove('btn-outline-dark');
+                this.classList.add('btn-dark');
+            } else if (category === 'all') {
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('btn-primary');
+            }
             
             // Handle the special "All Coins" category
             if (category === 'all') {
@@ -467,16 +497,11 @@ document.addEventListener('DOMContentLoaded', function() {
             row.style.display = 'table-row';
         });
         
-        // Set initial dropdown text
-        const categoryDropdown = document.getElementById('categoryDropdown');
-        if (categoryDropdown) {
-            categoryDropdown.textContent = 'All Coins';
-        }
-        
-        // Make the "All Coins" item active by default
-        const allCoinsItem = document.querySelector('.dropdown-item[data-crypto-category="all"]');
-        if (allCoinsItem) {
-            allCoinsItem.classList.add('active');
+        // Make sure "All Coins" button is active by default
+        const allCoinsButton = document.querySelector('button[data-crypto-category="all"]');
+        if (allCoinsButton) {
+            allCoinsButton.classList.add('btn-primary');
+            allCoinsButton.classList.remove('btn-outline-primary');
         }
     }
     
