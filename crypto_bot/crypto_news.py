@@ -515,15 +515,24 @@ def get_market_insights() -> Dict[str, Any]:
         Dict[str, Any]: بینش‌ها و تحلیل‌های بازار
     """
     # دریافت داده‌های مختلف
-    news = get_crypto_news(limit=8, translate=True)
+    news = get_crypto_news(limit=8, translate=True, include_canada=True)
     sentiment = get_crypto_sentiment_analysis()
     fear_greed = get_fear_greed_index()
+    
+    # دریافت اخبار CMC Markets Canada به صورت جداگانه
+    cmc_canada_content = []
+    try:
+        cmc_canada_content = get_combined_cmc_canada_content(max_news=3, max_analysis=2)
+        logger.info(f"Retrieved {len(cmc_canada_content)} items from CMC Markets Canada")
+    except Exception as e:
+        logger.error(f"Error getting CMC Markets Canada content: {str(e)}")
     
     # ترکیب و برگرداندن داده‌ها
     return {
         "news": news,
         "sentiment": sentiment,
         "fear_greed_index": fear_greed,
+        "cmc_canada": cmc_canada_content,
         "updated_at": datetime.now(toronto_tz).strftime('%Y-%m-%d %H:%M')
     }
 
@@ -541,6 +550,7 @@ def format_market_insights_for_telegram(insights: Dict[str, Any]) -> str:
     news = insights.get('news', [])
     sentiment = insights.get('sentiment', {})
     fear_greed = insights.get('fear_greed_index', {})
+    cmc_canada = insights.get('cmc_canada', [])
     
     # تنظیم ایموجی بر اساس احساسات بازار
     sentiment_emoji = "😐"  # neutral by default
@@ -581,7 +591,8 @@ def format_market_insights_for_telegram(insights: Dict[str, Any]) -> str:
     message = "\n".join(message_parts)
     
     # اضافه کردن اخبار
-    for i, item in enumerate(news[:5], 1):
+    news_count = 0
+    for i, item in enumerate(news[:4], 1):
         # استفاده از نسخه فارسی عنوان اگر موجود باشد
         title = item.get('title_fa', item.get('title', ''))
         url = item.get('url', '')
@@ -590,6 +601,27 @@ def format_market_insights_for_telegram(insights: Dict[str, Any]) -> str:
         
         message += f"\n{i}. [{title}]({url})"
         message += f"\n   منبع: {source} | {published_date}"
+        news_count += 1
+    
+    # اضافه کردن اخبار CMC Markets Canada
+    if cmc_canada:
+        # اگر قبلاً اخباری اضافه شده، یک خط فاصله ایجاد می‌کنیم
+        if news_count > 0:
+            message += "\n"
+        
+        message += "\n🇨🇦 *تحلیل بازار کانادا:*"
+        
+        for i, item in enumerate(cmc_canada[:2], news_count + 1):
+            title = item.get('title_fa', item.get('title', ''))
+            url = item.get('url', '')
+            source = "CMC Markets Canada"
+            content_type = item.get('content_type', 'news')
+            
+            # انتخاب ایموجی مناسب برای نوع محتوا
+            emoji = "📊" if content_type == 'analysis' else "📰"
+            
+            message += f"\n{i}. {emoji} [{title}]({url})"
+            message += f"\n   منبع: {source}"
     
     # اضافه کردن تحلیل
     if sentiment.get('short_analysis'):

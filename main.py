@@ -2989,8 +2989,9 @@ def api_get_crypto_news():
     try:
         limit = request.args.get('limit', default=10, type=int)
         translate = request.args.get('translate', default=True, type=lambda v: v.lower() == 'true')
+        include_canada = request.args.get('include_canada', default=True, type=lambda v: v.lower() == 'true')
         
-        news = get_crypto_news(limit=limit, translate=translate)
+        news = get_crypto_news(limit=limit, translate=translate, include_canada=include_canada)
         
         return jsonify({
             "success": True,
@@ -3001,6 +3002,39 @@ def api_get_crypto_news():
         return jsonify({
             "success": False,
             "message": f"خطا در دریافت اخبار: {str(e)}"
+        }), 500
+
+
+@app.route('/api/cmc-canada-news', methods=['GET'])
+def api_get_cmc_canada_news():
+    """
+    دریافت اخبار و تحلیل‌های CMC Markets Canada
+    """
+    try:
+        from crypto_bot.cmc_canada_news import get_combined_cmc_canada_content
+        
+        max_news = request.args.get('max_news', default=5, type=int)
+        max_analysis = request.args.get('max_analysis', default=3, type=int)
+        
+        news = get_combined_cmc_canada_content(max_news=max_news, max_analysis=max_analysis)
+        
+        return jsonify({
+            "success": True,
+            "news": news,
+            "source": "CMC Markets Canada",
+            "count": len(news)
+        })
+    except ImportError as e:
+        logger.error(f"خطا: ماژول CMC Markets Canada در دسترس نیست: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": "ماژول CMC Markets Canada در دسترس نیست"
+        }), 404
+    except Exception as e:
+        logger.error(f"خطا در دریافت اخبار CMC Markets Canada: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"خطا در دریافت اخبار CMC Markets Canada: {str(e)}"
         }), 500
 
 
