@@ -453,13 +453,27 @@
         newsItems.forEach(item => {
             const newsElement = $(template.html());
             
-            // Always use English title
-            const title = item.title;
+            // Extract title - use clean URL if title is generic/empty
+            let title = item.title;
+            if (!title || title === 'News' || title === 'Market Analysis' || title === 'How to') {
+                // Try to extract a more meaningful title from the URL
+                const url = item.url || '';
+                if (url.includes('/')) {
+                    const segments = url.split('/');
+                    const lastSegment = segments[segments.length - 1];
+                    if (lastSegment && lastSegment !== '') {
+                        // Convert slug to title format (replace hyphens with spaces, capitalize words)
+                        title = lastSegment.replace(/-/g, ' ')
+                            .replace(/\b\w/g, l => l.toUpperCase());
+                    }
+                }
+            }
+            
             newsElement.find('.news-title').text(title);
             
             // Set source
-            newsElement.find('.news-source').text(item.source);
-            newsElement.attr('data-source', item.source);
+            newsElement.find('.news-source').text(item.source || 'Crypto News');
+            newsElement.attr('data-source', item.source || 'Unknown');
             
             // Set date
             const publishDate = item.published_date || '';
@@ -474,6 +488,9 @@
                 newsElement.find('.news-image-placeholder').removeClass('news-image-placeholder').addClass('news-image').css('background-image', `url(${item.imageurl})`);
             } else if (item.image_url && item.image_url.trim() !== '') {
                 newsElement.find('.news-image-placeholder').removeClass('news-image-placeholder').addClass('news-image').css('background-image', `url(${item.image_url})`);
+            } else {
+                // Keep the placeholder image as is
+                console.log("Using placeholder image for article:", title);
             }
             
             container.append(newsElement);

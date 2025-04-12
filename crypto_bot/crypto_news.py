@@ -264,60 +264,126 @@ def extract_article_content(url: str) -> str:
 
 def translate_news(news_items: List[Dict[str, Any]], target_language: str = "fa") -> List[Dict[str, Any]]:
     """
-    ترجمه عناوین اخبار با استفاده از OpenAI API
+    Translate news titles using OpenAI API
     
     Args:
-        news_items (List[Dict[str, Any]]): لیست اخبار
-        target_language (str): زبان مقصد (fa برای فارسی)
+        news_items (List[Dict[str, Any]]): List of news items
+        target_language (str): Target language (fa for Persian)
         
     Returns:
-        List[Dict[str, Any]]: لیست اخبار با عناوین ترجمه شده
+        List[Dict[str, Any]]: List of news items with translated titles
     """
+    # Check if we have API key and news items
     if not OPENAI_API_KEY or not news_items:
+        logger.warning("Translation skipped: Missing API key or empty news list")
+        # Set English title as the default for all items
+        for item in news_items:
+            item['title_fa'] = item['title']
         return news_items
+    
+    # Check if we should attempt translation
+    translation_cache_path = os.path.join(os.path.dirname(__file__), "translation_status.json")
+    try:
+        if os.path.exists(translation_cache_path):
+            with open(translation_cache_path, 'r') as f:
+                translation_status = json.load(f)
+                
+            # If we hit rate limits recently, skip translation for a while
+            if translation_status.get('rate_limited', False):
+                last_error_time = translation_status.get('last_error_time', 0)
+                if time.time() - last_error_time < 3600:  # Wait 1 hour after rate limit
+                    logger.warning("Translation skipped: Rate limit cooldown period (1 hour)")
+                    # Set English title as the default for all items
+                    for item in news_items:
+                        item['title_fa'] = item['title']
+                    return news_items
+    except Exception as cache_err:
+        logger.error(f"Error reading translation status cache: {str(cache_err)}")
     
     try:
         client = OpenAI(api_key=OPENAI_API_KEY)
         translated_items = []
         
-        # ترجمه هر ۴ خبر در یک درخواست
+        # Translate up to 4 news items in a single request
         for i in range(0, len(news_items), 4):
             batch = news_items[i:i+4]
             titles = [item['title'] for item in batch]
             
-            # ساخت پرامپت به صورت دستی و با استفاده از + برای چسباندن رشته‌ها به جای f-string
+            # Create prompt manually
             titles_formatted = "\n".join([f"{idx+1}. {title}" for idx, title in enumerate(titles)])
-            prompt = "ترجمه عناوین زیر از انگلیسی به فارسی به صورت طبیعی و روان:\n\n" + titles_formatted + "\n\nپاسخ را فقط به صورت عناوین ترجمه شده با شماره بدهید، بدون هیچ توضیح یا مقدمه."
+            prompt = "Translate the following titles from English to Persian naturally and fluently:\n\n" + titles_formatted + "\n\nRespond with just the translated titles with numbers, no explanations or introductions."
             
-            response = client.chat.completions.create(
-                model="gpt-4o",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.2,
-            )
-            
-            translation_text = response.choices[0].message.content.strip()
-            
-            # پردازش ترجمه‌ها
-            translations = []
-            for line in translation_text.split('\n'):
-                line = line.strip()
-                if line and any(line.startswith(f"{i}.") for i in range(1, 10)):
-                    # حذف شماره از ابتدای خط
-                    translations.append(line.split('.', 1)[1].strip())
-            
-            # اعمال ترجمه به اخبار
-            for j, item in enumerate(batch):
-                if j < len(translations):
-                    translated_title = translations[j]
-                    item['title_fa'] = translated_title
-                else:
-                    item['title_fa'] = item['title']  # اگر ترجمه موفق نبود، از عنوان اصلی استفاده می‌کنیم
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.2,
+                )
                 
-                translated_items.append(item)
+                translation_text = response.choices[0].message.content.strip()
+                
+                # Process translations
+                translations = []
+                for line in translation_text.split('\n'):
+                    line = line.strip()
+                    if line and any(line.startswith(f"{i}.") for i in range(1, 10)):
+                        # Remove number from the beginning of the line
+                        translations.append(line.split('.', 1)[1].strip())
+                
+                # Apply translations to news items
+                for j, item in enumerate(batch):
+                    if j < len(translations):
+                        translated_title = translations[j]
+                        item['title_fa'] = translated_title
+                    else:
+                        item['title_fa'] = item['title']  # If translation failed, use original title
+                    
+                    translated_items.append(item)
+            
+            except Exception as batch_error:
+                logger.error(f"Error translating batch: {str(batch_error)}")
+                # If batch translation fails, use original titles
+                for item in batch:
+                    item['title_fa'] = item['title']
+                    translated_items.append(item)
+                
+                # If it's a rate limit error, store this information
+                error_str = str(batch_error).lower()
+                if "429" in error_str or "rate" in error_str or "limit" in error_str or "quota" in error_str:
+                    try:
+                        # Create translation status cache
+                        with open(translation_cache_path, 'w') as f:
+                            json.dump({
+                                "rate_limited": True,
+                                "last_error_time": time.time(),
+                                "error": str(batch_error)
+                            }, f)
+                        logger.warning("Rate limit detected. Translation will be disabled for 1 hour.")
+                    except Exception as cache_err:
+                        logger.error(f"Error writing translation status cache: {str(cache_err)}")
+                    
+                    # Stop processing more batches if we hit rate limits
+                    break
         
         return translated_items
     except Exception as e:
         logger.error(f"Error translating news: {str(e)}")
+        
+        # If it's a rate limit error, store this information
+        error_str = str(e).lower()
+        if "429" in error_str or "rate" in error_str or "limit" in error_str or "quota" in error_str:
+            try:
+                # Create translation status cache
+                with open(translation_cache_path, 'w') as f:
+                    json.dump({
+                        "rate_limited": True,
+                        "last_error_time": time.time(),
+                        "error": str(e)
+                    }, f)
+                logger.warning("Rate limit detected. Translation will be disabled for 1 hour.")
+            except Exception as cache_err:
+                logger.error(f"Error writing translation status cache: {str(cache_err)}")
+        
         # If translation fails, return the original news
         for item in news_items:
             item['title_fa'] = item['title']
