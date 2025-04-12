@@ -30,13 +30,61 @@
                 <div class="card-header bg-dark">
                     <h5 class="mb-3 text-white">Cryptocurrency Categories</h5>
                     <div>
-                        <button onclick="filterByCategory('all')" class="btn btn-primary me-1 mb-1">All Coins</button>
-                        <button onclick="filterByCategory('major')" class="btn btn-outline-light me-1 mb-1">Major Coins</button>
-                        <button onclick="filterByCategory('stable')" class="btn btn-outline-light me-1 mb-1">Stablecoins</button>
-                        <button onclick="filterByCategory('promising')" class="btn btn-outline-light me-1 mb-1">AI Coins</button>
-                        <button onclick="filterByCategory('meme')" class="btn btn-outline-light me-1 mb-1">Meme Coins</button>
-                        <button onclick="filterByCategory('low-cost')" class="btn btn-outline-light me-1 mb-1">Low Cost</button>
+                        <button id="btn-all" class="btn btn-primary me-1 mb-1">All Coins</button>
+                        <button id="btn-major" class="btn btn-outline-light me-1 mb-1">Major Coins</button>
+                        <button id="btn-stable" class="btn btn-outline-light me-1 mb-1">Stablecoins</button>
+                        <button id="btn-promising" class="btn btn-outline-light me-1 mb-1">AI Coins</button>
+                        <button id="btn-meme" class="btn btn-outline-light me-1 mb-1">Meme Coins</button>
+                        <button id="btn-low-cost" class="btn btn-outline-light me-1 mb-1">Low Cost</button>
                     </div>
+                    
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Filter function
+                        function filterByCategory(category) {
+                            console.log(`Filtering by category: ${category}`);
+                            
+                            // Reset all buttons to outline style
+                            document.querySelectorAll('.card-header .btn').forEach(btn => {
+                                btn.classList.remove('btn-primary');
+                                btn.classList.add('btn-outline-light');
+                            });
+                            
+                            // Highlight the clicked button
+                            const clickedBtn = document.getElementById('btn-' + category);
+                            if (clickedBtn) {
+                                clickedBtn.classList.remove('btn-outline-light');
+                                clickedBtn.classList.add('btn-primary');
+                            }
+                            
+                            // Filter the coins
+                            if (category === 'all') {
+                                // Show all rows
+                                document.querySelectorAll('.crypto-row').forEach(row => {
+                                    row.style.display = '';
+                                });
+                            } else {
+                                // Hide all rows first
+                                document.querySelectorAll('.crypto-row').forEach(row => {
+                                    row.style.display = 'none';
+                                });
+                                
+                                // Show only matching rows
+                                document.querySelectorAll(`.crypto-row.${category}`).forEach(row => {
+                                    row.style.display = '';
+                                });
+                            }
+                        }
+                        
+                        // Add event listeners to buttons
+                        document.getElementById('btn-all').addEventListener('click', function() { filterByCategory('all'); });
+                        document.getElementById('btn-major').addEventListener('click', function() { filterByCategory('major'); });
+                        document.getElementById('btn-stable').addEventListener('click', function() { filterByCategory('stable'); });
+                        document.getElementById('btn-promising').addEventListener('click', function() { filterByCategory('promising'); });
+                        document.getElementById('btn-meme').addEventListener('click', function() { filterByCategory('meme'); });
+                        document.getElementById('btn-low-cost').addEventListener('click', function() { filterByCategory('low-cost'); });
+                    });
+                    </script>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -264,22 +312,7 @@ function loadMoreNews() {
 
 {% block extra_js %}
 <script>
-// Simple function for direct button filtering
-function filterByCategory(category) {
-    console.log(`Filtering by category: ${category}`);
-    
-    // Reset all buttons to outline style
-    document.querySelectorAll('button[onclick*="filterByCategory"]').forEach(btn => {
-        btn.classList.remove('btn-primary');
-        btn.classList.add('btn-outline-light');
-    });
-    
-    // Highlight the selected button
-    const selectedBtn = document.querySelector(`button[onclick="filterByCategory('${category}')"]`);
-    if (selectedBtn) {
-        selectedBtn.classList.remove('btn-outline-light');
-        selectedBtn.classList.add('btn-primary');
-    }
+// The filter function is now in the card-header
     
     // Filter the coins
     if (category === 'all') {

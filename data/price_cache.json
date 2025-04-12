@@ -81,13 +81,13 @@
   },
   "BITCOIN/USDT": {
     "data": {
-      "price": 84982,
-      "change_24h": 3.37877,
-      "market_cap": 1686158799609,
-      "volume_24h": 27403251993,
+      "price": 84861,
+      "change_24h": 2.7912,
+      "market_cap": 1684550987181,
+      "volume_24h": 27147427867,
       "source": "CoinGecko"
     },
-    "cached_at": 1744475286.2219048
+    "cached_at": 1744476055.9109752
   },
   "ETHEREUM/USDT": {
     "data": {
