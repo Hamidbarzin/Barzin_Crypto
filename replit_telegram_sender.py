@@ -614,17 +614,17 @@ def send_crypto_news():
         # اخبار برتر ارزهای دیجیتال
         news = get_combined_news(max_items=7)
         
-        # ساخت پیام اخبار
+        # Create news message
         if not news:
-            message = "⚠️ اخبار ارزهای دیجیتال در دسترس نیست."
+            message = "⚠️ Cryptocurrency news is not available."
             return send_message(message, message_type="crypto_news")
         
-        telegram_message = "*📰 اخبار مهم ارزهای دیجیتال*\n\n"
+        telegram_message = "*📰 Important Cryptocurrency News*\n\n"
         
-        # اضافه کردن وضعیت کلی بازار
-        telegram_message += "*💹 وضعیت بازار:*\n"
+        # Add market overview
+        telegram_message += "*💹 Market Status:*\n"
         
-        # دریافت قیمت فعلی بیت‌کوین و اتریوم برای نمایش در گزارش
+        # Get current Bitcoin and Ethereum prices for the report
         from crypto_bot.market_data import get_crypto_price
         btc_data = get_crypto_price("BTC/USDT")
         eth_data = get_crypto_price("ETH/USDT")
@@ -633,15 +633,15 @@ def send_crypto_news():
             btc_price = btc_data["price"]
             btc_change = btc_data.get("change_24h", 0)
             btc_emoji = "🟢" if btc_change >= 0 else "🔴"
-            telegram_message += f"• بیت‌کوین: ${btc_price:,.0f} ({btc_emoji} {btc_change:.2f}%)\n"
+            telegram_message += f"• Bitcoin: ${btc_price:,.0f} ({btc_emoji} {btc_change:.2f}%)\n"
         
         if eth_data and "price" in eth_data:
             eth_price = eth_data["price"]
             eth_change = eth_data.get("change_24h", 0)
             eth_emoji = "🟢" if eth_change >= 0 else "🔴"
-            telegram_message += f"• اتریوم: ${eth_price:,.0f} ({eth_emoji} {eth_change:.2f}%)\n"
+            telegram_message += f"• Ethereum: ${eth_price:,.0f} ({eth_emoji} {eth_change:.2f}%)\n"
             
-        telegram_message += "\n*📊 عناوین مهم خبری:*\n"
+        telegram_message += "\n*📊 Top Headlines:*\n"
         
         # تعیین امتیاز اهمیت برای اخبار بر اساس کلمات کلیدی
         important_keywords = [

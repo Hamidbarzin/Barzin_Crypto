@@ -3200,27 +3200,27 @@ def api_telegram_technical_analysis():
 @app.route('/api/telegram/send-news', methods=['POST'])
 def api_telegram_send_news():
     """
-    ارسال اخبار ارزهای دیجیتال به تلگرام
+    Send cryptocurrency news to Telegram
     """
     try:
-        # استفاده از فانکشن جدید send_crypto_news که خودش اخبار را می‌گیرد و ارسال می‌کند
+        # Use send_crypto_news function to fetch and send news
         result = replit_telegram_sender.send_crypto_news()
         
         if result:
             return jsonify({
                 "success": True,
-                "message": "اخبار ارزهای دیجیتال با موفقیت به تلگرام ارسال شد"
+                "message": "Cryptocurrency news successfully sent to Telegram"
             })
         else:
             return jsonify({
                 "success": False,
-                "message": "خطا در ارسال اخبار به تلگرام"
+                "message": "Error sending news to Telegram"
             }), 500
     except Exception as e:
-        logger.error(f"خطا در ارسال اخبار به تلگرام: {str(e)}")
+        logger.error(f"Error sending news to Telegram: {str(e)}")
         return jsonify({
             "success": False,
-            "message": f"خطا در ارسال اخبار به تلگرام: {str(e)}"
+            "message": f"Error sending news to Telegram: {str(e)}"
         }), 500
 
 
