@@ -1,5 +1,5 @@
 """
-سرویس اعلان و هشدار Telegram برای ارسال پیام و تصویر در مورد فرصت‌های خرید و فروش و نوسانات بازار
+Telegram notification and alert service for sending messages and images about buying and selling opportunities and market volatility
 """
 
 import os
@@ -8,13 +8,13 @@ import asyncio
 from datetime import datetime
 import pathlib
 
-# تنظیم لاگر
+# Setting up logger
 logger = logging.getLogger(__name__)
 
-# کنترل دسترسی به تلگرام
+# Control Telegram access
 TELEGRAM_AVAILABLE = False
 
-# این متغیر به عنوان پرچم برای دسترسی به ماژول تلگرام استفاده می‌شود
+# This variable is used as a flag to access the Telegram module
 _telegram = None
 _telegram_error = None
 
@@ -90,7 +90,7 @@ def send_telegram_message(chat_id, message, parse_mode=None, max_retries=3, retr
             chat_id = default_chat_id
             logger.info(f"استفاده از چت آیدی پیش‌فرض: {chat_id}")
         else:
-            logger.error("چت آیدی مشخص نشده و چت آیدی پیش‌فرض نیز یافت نشد.")
+            logger.error("Chat ID مشخص نشده و چت آیدی پیش‌فرض نیز یافت نشد.")
             return False
     if not TELEGRAM_AVAILABLE or _telegram is None:
         logger.error("کتابخانه تلگرام نصب نشده است")
@@ -213,14 +213,14 @@ def send_buy_sell_notification(chat_id, symbol, action, price, reason):
     Args:
         chat_id (int or str): شناسه چت کاربر
         symbol (str): نماد ارز
-        action (str): 'خرید' یا 'فروش'
+        action (str): 'Buy' یا 'Sell'
         price (float): قیمت فعلی
         reason (str): دلیل توصیه
 
     Returns:
         bool: آیا ارسال موفقیت‌آمیز بود
     """
-    emoji = "🟢" if action == "خرید" else "🔴"
+    emoji = "🟢" if action == "Buy" else "🔴"
     message = f"{emoji} <b>سیگنال {action} برای {symbol}</b>\n\n"
     message += f"💰 <b>قیمت فعلی:</b> {price}\n\n"
     message += f"📊 <b>دلیل:</b>\n{reason}\n\n"
@@ -260,7 +260,7 @@ def send_market_trend_alert(chat_id, trend, affected_coins, reason):
 
     Args:
         chat_id (int or str): شناسه چت کاربر
-        trend (str): روند بازار ('صعودی'، 'نزولی' یا 'خنثی')
+        trend (str): روند بازار ('صعودی'، 'نزولی' یا 'Neutral')
         affected_coins (list): لیست ارزهای تحت تأثیر
         reason (str): دلیل روند
 
@@ -294,7 +294,7 @@ def send_test_notification(chat_id=None):
         if not chat_id:
             return {
                 "success": False,
-                "message": "چت آیدی پیش‌فرض تنظیم نشده است"
+                "message": "Chat ID پیش‌فرض تنظیم نشده است"
             }
     
     # اطمینان از اینکه chat_id به فرمت عددی است
@@ -320,7 +320,7 @@ def send_test_notification(chat_id=None):
         if result:
             return {
                 "success": True,
-                "message": "پیام تست با موفقیت ارسال شد."
+                "message": "Test Message با موفقیت ارسال شد."
             }
         else:
             # بررسی علت احتمالی خطا
