@@ -33,6 +33,7 @@ def register_routes(app):
         return render_template('crypto_ai_analysis.html')
     
     @app.route('/ai-analysis/submit', methods=['POST'])
+    @app.route('/crypto-ai-analysis/submit', methods=['POST'])
     def crypto_ai_submit():
         """Handle AI analysis submission"""
         query = request.form.get('query', '').strip()
