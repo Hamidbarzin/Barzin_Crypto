@@ -263,9 +263,12 @@
         const volatilityContainer = document.getElementById('volatility-container');
         const noVolatility = document.getElementById('no-volatility');
         const marketTrend = document.getElementById('market-trend');
+        const technicalAnalysisContainer = document.getElementById('technical-analysis-container');
+        const noTechnicalAnalysis = document.getElementById('no-technical-analysis');
         const refreshButton = document.getElementById('refreshButton');
         const sensitivitySelect = document.getElementById('sensitivitySelect');
         const timeframeSelect = document.getElementById('timeframeSelect');
+        const symbolSelect = document.getElementById('symbolSelect');
         const loading = document.getElementById('loading');
         
         // Load initial data
@@ -279,13 +282,18 @@
         sensitivitySelect.addEventListener('change', loadOpportunities);
         timeframeSelect.addEventListener('change', loadVolatility);
         
+        if (symbolSelect) {
+            symbolSelect.addEventListener('change', loadTechnicalAnalysis);
+        }
+        
         function loadData() {
             loading.style.display = 'flex';
             
             Promise.all([
                 loadOpportunities(),
                 loadVolatility(),
-                loadMarketTrend()
+                loadMarketTrend(),
+                loadTechnicalAnalysis()
             ]).then(() => {
                 loading.style.display = 'none';
             }).catch(error => {
@@ -473,6 +481,174 @@
             };
             
             return translations[timeframe] || timeframe;
+        }
+        
+        function loadTechnicalAnalysis() {
+            if (!technicalAnalysisContainer) {
+                return Promise.resolve();
+            }
+            
+            const symbol = symbolSelect ? symbolSelect.value : 'BTC/USDT';
+            const timeframe = timeframeSelect.value;
+            
+            return fetch(`/api/technical?symbol=${symbol}&timeframe=${timeframe}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        const analysis = data.data;
+                        noTechnicalAnalysis.classList.add('d-none');
+                        
+                        let signalClass, signalIcon, signalColor;
+                        if (analysis.signal.includes('خرید قوی')) {
+                            signalClass = 'success';
+                            signalIcon = 'fa-arrow-up';
+                            signalColor = 'text-success';
+                        } else if (analysis.signal.includes('خرید')) {
+                            signalClass = 'success';
+                            signalIcon = 'fa-arrow-up';
+                            signalColor = 'text-success';
+                        } else if (analysis.signal.includes('فروش قوی')) {
+                            signalClass = 'danger';
+                            signalIcon = 'fa-arrow-down';
+                            signalColor = 'text-danger';
+                        } else if (analysis.signal.includes('فروش')) {
+                            signalClass = 'danger';
+                            signalIcon = 'fa-arrow-down';
+                            signalColor = 'text-danger';
+                        } else {
+                            signalClass = 'warning';
+                            signalIcon = 'fa-minus';
+                            signalColor = 'text-warning';
+                        }
+                        
+                        technicalAnalysisContainer.innerHTML = `
+                            <div class="card p-3 mb-3 border-${signalClass}">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">${analysis.symbol}</h5>
+                                    <span class="badge bg-${signalClass}">
+                                        <i class="fas ${signalIcon} me-1"></i> ${analysis.signal}
+                                    </span>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6 class="mb-2">اندیکاتورهای قیمت</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <tbody>
+                                                    ${analysis.ma20 ? `
+                                                    <tr>
+                                                        <td>MA 20:</td>
+                                                        <td class="text-end">${analysis.ma20.toFixed(2)}</td>
+                                                    </tr>` : ''}
+                                                    ${analysis.ma50 ? `
+                                                    <tr>
+                                                        <td>MA 50:</td>
+                                                        <td class="text-end">${analysis.ma50.toFixed(2)}</td>
+                                                    </tr>` : ''}
+                                                    ${analysis.ma200 ? `
+                                                    <tr>
+                                                        <td>MA 200:</td>
+                                                        <td class="text-end">${analysis.ma200.toFixed(2)}</td>
+                                                    </tr>` : ''}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <h6 class="mb-2">اندیکاتورهای مومنتوم</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <tbody>
+                                                    ${analysis.rsi ? `
+                                                    <tr>
+                                                        <td>RSI:</td>
+                                                        <td class="text-end">${analysis.rsi.toFixed(2)}</td>
+                                                    </tr>` : ''}
+                                                    ${analysis.macd ? `
+                                                    <tr>
+                                                        <td>MACD:</td>
+                                                        <td class="text-end">${analysis.macd.toFixed(2)}</td>
+                                                    </tr>` : ''}
+                                                    ${analysis.macd_signal ? `
+                                                    <tr>
+                                                        <td>MACD Signal:</td>
+                                                        <td class="text-end">${analysis.macd_signal.toFixed(2)}</td>
+                                                    </tr>` : ''}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="mb-2">باندهای بولینگر</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <tbody>
+                                                    ${analysis.bb_upper ? `
+                                                    <tr>
+                                                        <td>باند بالایی:</td>
+                                                        <td class="text-end">${analysis.bb_upper.toFixed(2)}</td>
+                                                    </tr>` : ''}
+                                                    ${analysis.bb_middle ? `
+                                                    <tr>
+                                                        <td>باند میانی:</td>
+                                                        <td class="text-end">${analysis.bb_middle.toFixed(2)}</td>
+                                                    </tr>` : ''}
+                                                    ${analysis.bb_lower ? `
+                                                    <tr>
+                                                        <td>باند پایینی:</td>
+                                                        <td class="text-end">${analysis.bb_lower.toFixed(2)}</td>
+                                                    </tr>` : ''}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <h6 class="mb-2">اطلاعات بیشتر</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <tbody>
+                                                    ${analysis.stoch_k ? `
+                                                    <tr>
+                                                        <td>Stochastic K:</td>
+                                                        <td class="text-end">${analysis.stoch_k.toFixed(2)}</td>
+                                                    </tr>` : ''}
+                                                    ${analysis.stoch_d ? `
+                                                    <tr>
+                                                        <td>Stochastic D:</td>
+                                                        <td class="text-end">${analysis.stoch_d.toFixed(2)}</td>
+                                                    </tr>` : ''}
+                                                    ${analysis.price_trend_10d ? `
+                                                    <tr>
+                                                        <td>روند 10 روزه:</td>
+                                                        <td class="text-end">${analysis.price_trend_10d.toFixed(2)}%</td>
+                                                    </tr>` : ''}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-muted small mt-2">
+                                    بروزرسانی: ${analysis.timestamp}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        noTechnicalAnalysis.classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching technical analysis:', error);
+                    if (technicalAnalysisContainer) {
+                        technicalAnalysisContainer.innerHTML = '<div class="alert alert-danger">خطا در بارگذاری تحلیل تکنیکال</div>';
+                    }
+                });
         }
         
         // Auto-refresh every 5 minutes
