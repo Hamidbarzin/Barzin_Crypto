@@ -274,6 +274,78 @@ def submit_quiz_answer(user_id, quiz_id, answer):
         dict: نتیجه عملیات شامل صحت پاسخ و امتیاز کسب شده
     """
     try:
+        # اگر user_id صفر باشد، به جای آن از session storage استفاده کنیم
+        if user_id == 0:
+            # در صورت عدم وجود کاربر با شناسه 0، از امتیازات موقت استفاده می‌کنیم
+            # و نتایج را برمی‌گردانیم بدون اینکه در پایگاه داده ذخیره کنیم
+            
+            # دریافت سوال کوییز
+            quiz = CryptoQuiz.query.get(quiz_id)
+            if not quiz:
+                return {
+                    'success': False,
+                    'message': 'Quiz question not found'
+                }
+            
+            # بررسی صحت پاسخ
+            is_correct = answer.lower() == quiz.correct_answer.lower()
+            points_earned = quiz.points if is_correct else 0
+            
+            return {
+                'success': True,
+                'is_correct': is_correct,
+                'points_earned': points_earned,
+                'correct_answer': quiz.correct_answer,
+                'explanation': quiz.explanation,
+                'total_points': points_earned,  # فقط امتیاز همین سوال
+                'level': 1,  # سطح پیش‌فرض
+                'level_up': False,
+                'badges': [],
+                'guest_mode': True  # نشان‌دهنده حالت مهمان
+            }
+        
+        # بررسی اینکه آیا کاربر در پایگاه داده وجود دارد
+        user = User.query.get(user_id)
+        if not user:
+            # اگر کاربر وجود نداشت، یک کاربر مهمان موقت ایجاد می‌کنیم
+            try:
+                guest_username = f"guest_{user_id}_{int(datetime.now().timestamp())}"
+                new_user = User(
+                    id=user_id,
+                    username=guest_username,
+                    is_admin=False
+                )
+                # تنظیم یک رمز عبور پیش‌فرض
+                new_user.set_password("guest_password")  
+                db.session.add(new_user)
+                db.session.commit()
+                logger.info(f"Created temporary guest user with ID {user_id}")
+            except Exception as user_error:
+                logger.error(f"Error creating guest user: {str(user_error)}")
+                # اگر نتوانستیم کاربر ایجاد کنیم، حالت مهمان را برمی‌گردانیم
+                quiz = CryptoQuiz.query.get(quiz_id)
+                if not quiz:
+                    return {
+                        'success': False,
+                        'message': 'Quiz question not found'
+                    }
+                
+                is_correct = answer.lower() == quiz.correct_answer.lower()
+                points_earned = quiz.points if is_correct else 0
+                
+                return {
+                    'success': True,
+                    'is_correct': is_correct,
+                    'points_earned': points_earned,
+                    'correct_answer': quiz.correct_answer,
+                    'explanation': quiz.explanation,
+                    'total_points': points_earned,
+                    'level': 1,
+                    'level_up': False,
+                    'badges': [],
+                    'guest_mode': True
+                }
+        
         # بررسی اینکه آیا کاربر قبلاً به این سوال پاسخ داده است
         existing_attempt = UserQuizAttempt.query.filter_by(user_id=user_id, quiz_id=quiz_id).first()
         
@@ -345,7 +417,8 @@ def submit_quiz_answer(user_id, quiz_id, answer):
             'total_points': user_score.total_points,
             'level': user_score.level,
             'level_up': level_up,
-            'badges': badges
+            'badges': badges,
+            'guest_mode': False
         }
     
     except Exception as e:
