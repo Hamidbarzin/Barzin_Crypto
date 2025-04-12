@@ -1094,7 +1094,6 @@ def ai_dashboard():
     )
 
 @app.route('/dashboard')
-@login_required
 def dashboard():
     """هاب اصلی قیمت‌ها، چارت‌ها و اخبار - هدایت به نسخه مینیمال"""
     return redirect(url_for('minimal_dashboard'))
@@ -2459,7 +2458,6 @@ def get_email_message():
 # Minimal UI routes
 @app.route('/minimal')
 @app.route('/minimal_dashboard')
-@login_required
 def minimal_dashboard():
     """صفحه داشبورد با طراحی مینیمال"""
     # inject_now() is called automatically by context_processor, no need to call it manually
@@ -2483,7 +2481,6 @@ def test_prices():
     return render_template('test_prices.html')
 
 @app.route('/minimal_settings')
-@login_required
 def minimal_settings():
     """صفحه تنظیمات با طراحی مینیمال"""
     # inject_now() is called automatically by context_processor, no need to call it manually
