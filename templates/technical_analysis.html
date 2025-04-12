@@ -1,42 +1,47 @@
-{% extends "base.html" %}
+{% extends "minimal_base.html" %}
 
 {% block title %}Technical Analysis - {{ symbol }}{% endblock %}
 
 {% block content %}
-<!-- Dark background hero banner at the top of the page -->
-<div class="container-fluid bg-dark text-white py-4 mb-4">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="text-warning">
-                        <i class="fas fa-chart-line me-2"></i>
-                        {{ name }} <span class="badge bg-light text-dark">{{ symbol }}</span>
-                    </h2>
-                    <div>
-                        <span class="badge bg-light text-dark">Technical Analysis</span>
-                    </div>
-                </div>
-                <p class="text-light mb-0">Last updated: {{ timestamp }}</p>
+<!-- Page header -->
+<div class="row mb-3">
+    <div class="col-md-8">
+        <div class="d-flex align-items-center">
+            <i class="fab fa-bitcoin text-warning me-2" style="font-size: 24px;"></i>
+            <div>
+                <h1 class="mb-0">{{ name }} <span class="badge bg-warning text-dark">{{ symbol }}</span></h1>
+                <p class="text-muted mb-0">Technical Analysis • Last updated: {{ timestamp }}</p>
             </div>
         </div>
     </div>
+    <div class="col-md-4 text-end">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href="/minimal" class="text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item"><a href="/cryptocurrencies" class="text-decoration-none">Markets</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Analysis</li>
+            </ol>
+        </nav>
+    </div>
 </div>
 
-<!-- Main content container -->
-<div class="container my-4">
-    <!-- Navigation breadcrumb below the hero section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/minimal">Home</a></li>
-                    <li class="breadcrumb-item"><a href="/cryptocurrencies">Cryptocurrencies</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Technical Analysis - {{ symbol }}</li>
-                </ol>
-            </nav>
+<!-- Main content section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <!-- Navigation links -->
+        <div class="d-flex mb-3">
+            <a href="/cryptocurrencies" class="me-3 text-decoration-none">
+                <i class="fas fa-list-ul me-1"></i> All Markets
+            </a>
+            <a href="/technical_analysis/{{ symbol }}" class="me-3 text-decoration-none text-warning">
+                <i class="fas fa-chart-line me-1"></i> Technical Analysis
+            </a>
+            <a href="/minimal" class="me-3 text-decoration-none">
+                <i class="fas fa-home me-1"></i> Dashboard
+            </a>
         </div>
     </div>
+</div>
 
     <div class="row mb-4">
         <div class="col-md-8">
