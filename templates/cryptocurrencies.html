@@ -30,12 +30,12 @@
                 <div class="card-header bg-dark">
                     <h5 class="mb-3 text-white">Cryptocurrency Categories</h5>
                     <div>
-                        <button onclick="javascript:filterByCategory('all')" class="btn btn-primary me-1 mb-1">All Coins</button>
-                        <button onclick="javascript:filterByCategory('major')" class="btn btn-outline-light me-1 mb-1">Major Coins</button>
-                        <button onclick="javascript:filterByCategory('stable')" class="btn btn-outline-light me-1 mb-1">Stablecoins</button>
-                        <button onclick="javascript:filterByCategory('promising')" class="btn btn-outline-light me-1 mb-1">AI Coins</button>
-                        <button onclick="javascript:filterByCategory('meme')" class="btn btn-outline-light me-1 mb-1">Meme Coins</button>
-                        <button onclick="javascript:filterByCategory('low-cost')" class="btn btn-outline-light me-1 mb-1">Low Cost</button>
+                        <button onclick="filterByCategory('all')" class="btn btn-primary me-1 mb-1">All Coins</button>
+                        <button onclick="filterByCategory('major')" class="btn btn-outline-light me-1 mb-1">Major Coins</button>
+                        <button onclick="filterByCategory('stable')" class="btn btn-outline-light me-1 mb-1">Stablecoins</button>
+                        <button onclick="filterByCategory('promising')" class="btn btn-outline-light me-1 mb-1">AI Coins</button>
+                        <button onclick="filterByCategory('meme')" class="btn btn-outline-light me-1 mb-1">Meme Coins</button>
+                        <button onclick="filterByCategory('low-cost')" class="btn btn-outline-light me-1 mb-1">Low Cost</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -269,13 +269,13 @@ function filterByCategory(category) {
     console.log(`Filtering by category: ${category}`);
     
     // Reset all buttons to outline style
-    document.querySelectorAll('[onclick^="javascript:filterByCategory"]').forEach(btn => {
+    document.querySelectorAll('button[onclick*="filterByCategory"]').forEach(btn => {
         btn.classList.remove('btn-primary');
         btn.classList.add('btn-outline-light');
     });
     
     // Highlight the selected button
-    const selectedBtn = document.querySelector(`[onclick="javascript:filterByCategory('${category}')"]`);
+    const selectedBtn = document.querySelector(`button[onclick="filterByCategory('${category}')"]`);
     if (selectedBtn) {
         selectedBtn.classList.remove('btn-outline-light');
         selectedBtn.classList.add('btn-primary');
