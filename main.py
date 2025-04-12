@@ -712,6 +712,17 @@ def cryptocurrencies():
         },
         {
             'id': 18, 
+            'name': 'Token 4444', 
+            'symbol': '4444/USDT', 
+            'icon': 'fas fa-fire text-danger',
+            'price': '0.0044',
+            'change': '+4.4%',
+            'volume': '444M',
+            'signal': 'Strong Buy',
+            'signal_class': 'success'
+        },
+        {
+            'id': 19, 
             'name': 'Bonk', 
             'symbol': 'BONK/USDT', 
             'icon': 'fas fa-dog text-warning',
@@ -722,7 +733,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 19, 
+            'id': 20, 
             'name': 'Turbo', 
             'symbol': 'TURBO/USDT', 
             'icon': 'fas fa-bolt text-danger',
@@ -733,7 +744,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 20, 
+            'id': 21, 
             'name': 'Brett', 
             'symbol': 'BRETT/USDT', 
             'icon': 'fas fa-meteor text-primary',
@@ -748,7 +759,7 @@ def cryptocurrencies():
     # لیست ارزهای کم‌هزینه با پتانسیل رشد
     low_cost_coins = [
         {
-            'id': 18, 
+            'id': 22, 
             'name': 'VeChain', 
             'symbol': 'VET/USDT', 
             'icon': 'fas fa-link text-primary',
@@ -759,7 +770,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 19, 
+            'id': 23, 
             'name': 'XDC', 
             'symbol': 'XDC/USDT', 
             'icon': 'fas fa-cube text-info',
@@ -770,7 +781,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 20, 
+            'id': 24, 
             'name': 'Hedera', 
             'symbol': 'HBAR/USDT', 
             'icon': 'fas fa-h-square text-primary',
@@ -781,7 +792,7 @@ def cryptocurrencies():
             'signal_class': 'success'
         },
         {
-            'id': 21, 
+            'id': 25, 
             'name': 'Stellar', 
             'symbol': 'XLM/USDT', 
             'icon': 'fas fa-star text-warning',
