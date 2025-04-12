@@ -640,7 +640,7 @@ def get_fear_greed_index() -> Dict[str, Any]:
                     "data_available": True
                 }
         
-        # اگر داده در دسترس نباشد یا با خطا مواجه شویم
+        # If data is not available or we encounter an error
         return {
             "value": 50,
             "value_classification": "Neutral",
@@ -662,17 +662,17 @@ def get_fear_greed_index() -> Dict[str, Any]:
 
 def get_market_insights() -> Dict[str, Any]:
     """
-    دریافت بینش‌ها و تحلیل‌های بازار ارزهای دیجیتال
+    Get market insights and analysis for cryptocurrencies
     
     Returns:
-        Dict[str, Any]: بینش‌ها و تحلیل‌های بازار
+        Dict[str, Any]: Market insights and analysis data
     """
-    # دریافت داده‌های مختلف
+    # Get various data
     news = get_crypto_news(limit=8, translate=True, include_canada=True)
     sentiment = get_crypto_sentiment_analysis()
     fear_greed = get_fear_greed_index()
     
-    # دریافت اخبار CMC Markets Canada به صورت جداگانه
+    # Get CMC Markets Canada news separately
     cmc_canada_content = []
     try:
         cmc_canada_content = get_combined_cmc_canada_content(max_news=3, max_analysis=2)
@@ -680,7 +680,7 @@ def get_market_insights() -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Error getting CMC Markets Canada content: {str(e)}")
     
-    # ترکیب و برگرداندن داده‌ها
+    # Combine and return the data
     return {
         "news": news,
         "sentiment": sentiment,
@@ -692,27 +692,27 @@ def get_market_insights() -> Dict[str, Any]:
 
 def format_market_insights_for_telegram(insights: Dict[str, Any]) -> str:
     """
-    قالب‌بندی بینش‌های بازار برای ارسال به تلگرام
+    Format market insights for sending to Telegram
     
     Args:
-        insights (Dict[str, Any]): بینش‌های بازار
+        insights (Dict[str, Any]): Market insights data
         
     Returns:
-        str: متن قالب‌بندی شده برای تلگرام
+        str: Formatted text for Telegram
     """
     news = insights.get('news', [])
     sentiment = insights.get('sentiment', {})
     fear_greed = insights.get('fear_greed_index', {})
     cmc_canada = insights.get('cmc_canada', [])
     
-    # تنظیم ایموجی بر اساس احساسات بازار
+    # Set emoji based on market sentiment
     sentiment_emoji = "😐"  # neutral by default
     if sentiment.get('overall_sentiment') == 'bullish':
         sentiment_emoji = "🚀"
     elif sentiment.get('overall_sentiment') == 'bearish':
         sentiment_emoji = "🐻"
     
-    # تنظیم ایموجی برای شاخص ترس و طمع
+    # Set emoji for fear and greed index
     fng_value = fear_greed.get('value', 50)
     fng_emoji = "😐"  # neutral by default
     if fng_value >= 75:
@@ -724,7 +724,7 @@ def format_market_insights_for_telegram(insights: Dict[str, Any]) -> str:
     elif fng_value <= 45:
         fng_emoji = "😨"  # fear
     
-    # ساخت متن اصلی با استفاده از روش جایگزین برای اجتناب از مشکلات f-string با حروف فارسی
+    # Build the main text using an alternative method to avoid f-string issues with non-English characters
     message_parts = [
         "🌐 *گزارش روزانه بازار ارزهای دیجیتال* 🌐",
         f"تاریخ: {insights.get('updated_at')}",
@@ -785,10 +785,10 @@ def format_market_insights_for_telegram(insights: Dict[str, Any]) -> str:
 
 def get_crypto_news_formatted_for_telegram() -> str:
     """
-    دریافت اخبار ارزهای دیجیتال با قالب‌بندی مناسب برای تلگرام
+    Get cryptocurrency news formatted for Telegram
     
     Returns:
-        str: متن قالب‌بندی شده برای تلگرام
+        str: Formatted text for Telegram
     """
     insights = get_market_insights()
     return format_market_insights_for_telegram(insights)
