@@ -461,7 +461,7 @@ def get_crypto_news(limit: int = 10, translate: bool = True, include_canada: boo
             max_translate_items = min(5, len(all_news))
             news_to_translate = all_news[:max_translate_items]
             
-            logger.info(f"ترجمه {max_translate_items} خبر از {len(all_news)} خبر")
+            logger.info(f"Translating {max_translate_items} news items out of {len(all_news)} total")
             translated_news = translate_news(news_to_translate)
             
             # اخباری که ترجمه نشدند را اضافه می‌کنیم
@@ -475,8 +475,8 @@ def get_crypto_news(limit: int = 10, translate: bool = True, include_canada: boo
             for item in all_news:
                 item['title_fa'] = item['title']
     except Exception as e:
-        logger.error(f"خطا در ترجمه اخبار در تابع اصلی: {str(e)}")
-        # در صورت هر خطایی، همه عناوین به انگلیسی نمایش داده می‌شوند
+        logger.error(f"Error in news translation in main function: {str(e)}")
+        # In case of any error, all titles will be displayed in English
         for item in all_news:
             item['title_fa'] = item['title']
     
@@ -519,12 +519,12 @@ def get_crypto_sentiment_analysis() -> Dict[str, Any]:
             # بررسی اعتبار داده‌های حافظه نهان (کمتر از 30 دقیقه)
             cached_time = cached_data.get("cached_at", 0)
             if time.time() - cached_time < 1800:  # 30 دقیقه
-                logger.info("استفاده از تحلیل احساسات ذخیره شده (کمتر از 30 دقیقه)")
+                logger.info("Using cached sentiment analysis (less than 30 minutes old)")
                 return cached_data
             else:
-                logger.info("تحلیل احساسات ذخیره شده منقضی شده است (بیش از 30 دقیقه)")
+                logger.info("Cached sentiment analysis has expired (more than 30 minutes old)")
     except Exception as cache_err:
-        logger.error(f"خطا در خواندن تحلیل احساسات ذخیره شده: {str(cache_err)}")
+        logger.error(f"Error reading cached sentiment analysis: {str(cache_err)}")
     
     try:
         # دریافت چند خبر برای تحلیل
@@ -579,25 +579,25 @@ def get_crypto_sentiment_analysis() -> Dict[str, Any]:
             result["cached_at"] = time.time()
             with open(cached_sentiment_file, 'w') as f:
                 json.dump(result, f)
-            logger.info("تحلیل احساسات در حافظه نهان ذخیره شد")
+            logger.info("Sentiment analysis saved in cache")
         except Exception as cache_err:
-            logger.error(f"خطا در ذخیره تحلیل احساسات در حافظه نهان: {str(cache_err)}")
+            logger.error(f"Error saving sentiment analysis in cache: {str(cache_err)}")
         
         return result
     except Exception as e:
-        logger.error(f"خطا در تحلیل احساسات بازار: {str(e)}")
+        logger.error(f"Error in market sentiment analysis: {str(e)}")
         
-        # اگر خطا داشتیم، سعی می‌کنیم از حافظه نهان استفاده کنیم حتی اگر منقضی شده باشد
+        # If there was an error, try to use the cached data even if it's expired
         try:
             if os.path.exists(cached_sentiment_file):
                 with open(cached_sentiment_file, 'r') as f:
                     cached_data = json.load(f)
-                logger.info("استفاده از تحلیل احساسات ذخیره شده قدیمی به دلیل خطا")
+                logger.info("Using expired cached sentiment analysis due to error")
                 return cached_data
         except Exception as cache_err:
-            logger.error(f"خطا در خواندن تحلیل احساسات ذخیره شده قدیمی: {str(cache_err)}")
+            logger.error(f"Error reading expired cached sentiment analysis: {str(cache_err)}")
         
-        # اگر حافظه نهان هم مشکل داشت، داده پیش‌فرض برمی‌گردانیم
+        # If the cache also had a problem, we return default data
         return {
             "overall_sentiment": "neutral",
             "sentiment_score": 50,
@@ -611,10 +611,10 @@ def get_crypto_sentiment_analysis() -> Dict[str, Any]:
 
 def get_fear_greed_index() -> Dict[str, Any]:
     """
-    دریافت شاخص ترس و طمع بازار
+    Get Fear and Greed index of the market
     
     Returns:
-        Dict[str, Any]: شاخص ترس و طمع
+        Dict[str, Any]: Fear and Greed index data
     """
     try:
         url = "https://api.alternative.me/fng/"
@@ -625,7 +625,7 @@ def get_fear_greed_index() -> Dict[str, Any]:
             if data.get("metadata", {}).get("error") is None:
                 fng_data = data.get("data", [{}])[0]
                 
-                # تبدیل تاریخ به منطقه زمانی تورنتو
+                # Convert date to Toronto timezone
                 time_until_update = fng_data.get("time_until_update", "")
                 timestamp = int(fng_data.get("timestamp", "0"))
                 dt_utc = datetime.utcfromtimestamp(timestamp)
@@ -649,7 +649,7 @@ def get_fear_greed_index() -> Dict[str, Any]:
             "data_available": False
         }
     except Exception as e:
-        logger.error(f"خطا در دریافت شاخص ترس و طمع: {str(e)}")
+        logger.error(f"Error retrieving fear and greed index: {str(e)}")
         return {
             "value": 50,
             "value_classification": "Neutral",
