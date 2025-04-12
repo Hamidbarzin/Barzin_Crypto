@@ -377,8 +377,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Update RSI
                     if (analysis.rsi !== undefined) {
-                        const rsiEl = document.querySelector('.indicator-box:nth-child(1) .indicator-value');
-                        const rsiProgressEl = document.querySelector('.indicator-box:nth-child(1) .progress-bar');
+                        console.log("RSI value:", analysis.rsi);
+                        // Use more specific selectors
+                        const rsiEl = document.querySelector('#technical-content .indicator-box:nth-child(1) .indicator-value');
+                        const rsiProgressEl = document.querySelector('#technical-content .indicator-box:nth-child(1) .progress-bar');
+                        console.log("RSI elements found:", rsiEl, rsiProgressEl);
                         
                         if (rsiEl) {
                             rsiEl.textContent = analysis.rsi.toFixed(1);
@@ -401,9 +404,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Update MACD
                     if (analysis.macd !== undefined && analysis.macd_signal !== undefined) {
-                        const macdEl = document.querySelector('.indicator-box:nth-child(2) .text-warning');
-                        const signalEl = document.querySelector('.indicator-box:nth-child(2) .text-info');
-                        const macdDescEl = document.querySelector('.indicator-box:nth-child(2) .indicator-description span');
+                        console.log("MACD values:", analysis.macd, analysis.macd_signal);
+                        const macdEl = document.querySelector('#technical-content .indicator-box:nth-child(2) .text-warning');
+                        const signalEl = document.querySelector('#technical-content .indicator-box:nth-child(2) .text-info');
+                        const macdDescEl = document.querySelector('#technical-content .indicator-box:nth-child(2) .indicator-description span');
+                        console.log("MACD elements found:", macdEl, signalEl, macdDescEl);
                         
                         if (macdEl) {
                             macdEl.textContent = analysis.macd.toFixed(2);
