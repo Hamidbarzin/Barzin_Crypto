@@ -796,6 +796,82 @@ def cryptocurrencies():
         }
     ]
     
+    # لیست ارزهای با پشتوانه و استیبل‌کوین‌ها
+    stable_backed_coins = [
+        {
+            'id': 40, 
+            'name': 'Tether (USDT)', 
+            'symbol': 'USDT/USD', 
+            'icon': 'fas fa-dollar-sign text-success',
+            'price': '1.000',
+            'change': '+0.01%',
+            'volume': '85.6B',
+            'signal': 'Stable',
+            'signal_class': 'info',
+            'backed_by': 'USD, Treasury bills, Cash'
+        },
+        {
+            'id': 41, 
+            'name': 'USD Coin', 
+            'symbol': 'USDC/USD', 
+            'icon': 'fas fa-dollar-sign text-primary',
+            'price': '1.000',
+            'change': '+0.02%',
+            'volume': '42.3B',
+            'signal': 'Stable',
+            'signal_class': 'info',
+            'backed_by': 'US Dollar'
+        },
+        {
+            'id': 42, 
+            'name': 'Binance USD', 
+            'symbol': 'BUSD/USD', 
+            'icon': 'fas fa-dollar-sign text-warning',
+            'price': '1.000',
+            'change': '+0.01%',
+            'volume': '5.7B',
+            'signal': 'Stable',
+            'signal_class': 'info',
+            'backed_by': 'US Dollar'
+        },
+        {
+            'id': 43, 
+            'name': 'DAI', 
+            'symbol': 'DAI/USD', 
+            'icon': 'fas fa-coins text-warning',
+            'price': '0.998',
+            'change': '-0.02%',
+            'volume': '2.4B',
+            'signal': 'Stable',
+            'signal_class': 'info',
+            'backed_by': 'Crypto Collateral'
+        },
+        {
+            'id': 44, 
+            'name': 'PAXG (Gold)', 
+            'symbol': 'PAXG/USD', 
+            'icon': 'fas fa-coins text-warning',
+            'price': '2481.50',
+            'change': '+0.42%',
+            'volume': '65.7M',
+            'signal': 'Buy',
+            'signal_class': 'success',
+            'backed_by': 'Physical Gold'
+        },
+        {
+            'id': 45, 
+            'name': 'XAUT (Gold)', 
+            'symbol': 'XAUT/USD', 
+            'icon': 'fas fa-coins text-warning',
+            'price': '2480.89',
+            'change': '+0.38%',
+            'volume': '54.2M',
+            'signal': 'Buy',
+            'signal_class': 'success',
+            'backed_by': 'Physical Gold'
+        }
+    ]
+    
     # لیست ارزهای کم‌هزینه با پتانسیل رشد
     low_cost_coins = [
         {
@@ -882,12 +958,13 @@ def cryptocurrencies():
     ]
     
     # ترکیب همه ارزها
-    all_cryptocurrencies = important_coins + ai_coins + meme_coins + low_cost_coins + layer_coins
+    all_cryptocurrencies = important_coins + ai_coins + stable_backed_coins + meme_coins + low_cost_coins + layer_coins
     
     return render_template('cryptocurrencies.html', 
                           cryptocurrencies=all_cryptocurrencies,
                           major_coins=important_coins,
                           promising_coins=ai_coins,
+                          stable_backed_coins=stable_backed_coins,
                           meme_coins=meme_coins,
                           low_cost_coins=low_cost_coins,
                           new_coins=layer_coins,

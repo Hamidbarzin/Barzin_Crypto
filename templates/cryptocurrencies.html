@@ -30,7 +30,10 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Market Categories</h5>
                     <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm btn-secondary" data-crypto-category="major">Major</button>
+                        <button type="button" class="btn btn-sm btn-success" data-crypto-category="stable">Stablecoins</button>
                         <button type="button" class="btn btn-sm btn-warning active" data-crypto-category="promising">AI Coins</button>
+                        <button type="button" class="btn btn-sm btn-info" data-crypto-category="low-cost">Low Cost</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -51,10 +54,16 @@
                             <tbody>
                                 <!-- List of cryptocurrencies using dynamic data -->
                                 {% for coin in cryptocurrencies %}
-                                {% if coin.id <= 7 %}
+                                {% if coin.id <= 8 %}
                                 <tr class="crypto-row major">
-                                {% elif coin.id <= 13 %}
+                                {% elif coin.id <= 11 %}
                                 <tr class="crypto-row promising">
+                                {% elif coin.id <= 19 %}
+                                <tr class="crypto-row meme">
+                                {% elif coin.id >= 40 and coin.id <= 45 %}
+                                <tr class="crypto-row stable">
+                                {% elif coin.id >= 22 and coin.id <= 25 %}
+                                <tr class="crypto-row low-cost">
                                 {% else %}
                                 <tr class="crypto-row new">
                                 {% endif %}
@@ -254,6 +263,32 @@ function loadMoreNews() {
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize category buttons
+    document.querySelectorAll('[data-crypto-category]').forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            document.querySelectorAll('[data-crypto-category]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Get the category
+            const category = this.getAttribute('data-crypto-category');
+            
+            // Hide all rows
+            document.querySelectorAll('.crypto-row').forEach(row => {
+                row.style.display = 'none';
+            });
+            
+            // Show only rows of selected category
+            document.querySelectorAll(`.crypto-row.${category}`).forEach(row => {
+                row.style.display = 'table-row';
+            });
+        });
+    });
+    
     // Price formatting function
     function formatPrice(price) {
         if (price === null || price === undefined || isNaN(price)) {
