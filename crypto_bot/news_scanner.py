@@ -164,7 +164,18 @@ def fetch_web_news(source, max_items=5):
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         }
-        response = requests.get(source["url"], headers=headers, timeout=10)
+        
+        # افزایش تایم‌اوت و مدیریت خطاهای اتصال
+        try:
+            response = requests.get(
+                source["url"], 
+                headers=headers, 
+                timeout=15,  # افزایش تایم‌اوت
+                allow_redirects=True  # اجازه دادن به تغییر مسیر
+            )
+        except requests.RequestException as e:
+            logger.error(f"Network error fetching {source['name']}: {str(e)}")
+            return []
         
         if response.status_code != 200:
             logger.warning(f"Failed to fetch {source['name']}: {response.status_code}")
@@ -173,6 +184,16 @@ def fetch_web_news(source, max_items=5):
         # استخراج اخبار
         soup = BeautifulSoup(response.content, "html.parser")
         articles = soup.select(source["selector"])
+        
+        if not articles:
+            logger.warning(f"No articles found for {source['name']} using selector: {source['selector']}")
+            # تلاش با selector‌های عمومی اگر selector اصلی کار نکرد
+            backup_selectors = ["article", ".article", ".post", ".news-item", ".card"]
+            for backup_selector in backup_selectors:
+                articles = soup.select(backup_selector)
+                if articles:
+                    logger.info(f"Found articles with backup selector {backup_selector} for {source['name']}")
+                    break
         
         news_items = []
         for i, article in enumerate(articles[:max_items]):
@@ -185,8 +206,14 @@ def fetch_web_news(source, max_items=5):
                 url = link_element.get("href", "")
                 if not url.startswith("http"):
                     # اضافه کردن دامنه به URL های نسبی
-                    domain = re.match(r"https?://[^/]+", source["url"]).group(0)
-                    url = f"{domain}{url if url.startswith('/') else '/' + url}"
+                    try:
+                        domain = re.match(r"https?://[^/]+", source["url"]).group(0)
+                        url = f"{domain}{url if url.startswith('/') else '/' + url}"
+                    except (AttributeError, TypeError):
+                        # اگر regex مطابقت نکرد، از URL اصلی استفاده کن
+                        parts = source["url"].split('/')
+                        domain = '/'.join(parts[:3])  # http(s)://domain.com
+                        url = f"{domain}{url if url.startswith('/') else '/' + url}"
                 
                 # استخراج عنوان
                 title_element = article.find("h2") or article.find("h3") or link_element
@@ -198,8 +225,13 @@ def fetch_web_news(source, max_items=5):
                 if img_element and img_element.has_attr("src"):
                     image_url = img_element.attrs["src"]
                     if not image_url.startswith("http"):
-                        domain = re.match(r"https?://[^/]+", source["url"]).group(0)
-                        image_url = f"{domain}{image_url if image_url.startswith('/') else '/' + image_url}"
+                        try:
+                            domain = re.match(r"https?://[^/]+", source["url"]).group(0)
+                            image_url = f"{domain}{image_url if image_url.startswith('/') else '/' + image_url}"
+                        except (AttributeError, TypeError):
+                            parts = source["url"].split('/')
+                            domain = '/'.join(parts[:3])  # http(s)://domain.com
+                            image_url = f"{domain}{image_url if image_url.startswith('/') else '/' + image_url}"
                 
                 # ساخت آیتم خبری
                 news_item = {
