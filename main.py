@@ -3005,6 +3005,38 @@ def api_get_crypto_news():
         }), 500
 
 
+@app.route('/api/canadian-crypto-news', methods=['GET'])
+def api_get_canadian_crypto_news():
+    """
+    Get cryptocurrency news from multiple Canadian sources
+    """
+    try:
+        from crypto_bot.cmc_canada_news import get_all_canadian_crypto_news
+        
+        max_per_source = request.args.get('max_per_source', default=3, type=int)
+        use_cache = request.args.get('use_cache', default='true').lower() == 'true'
+        
+        news = get_all_canadian_crypto_news(max_per_source=max_per_source, use_cache=use_cache)
+        
+        return jsonify({
+            "success": True,
+            "news": news,
+            "sources": ["CMC Markets Canada", "NDAX", "Bitbuy", "Newton"],
+            "count": len(news)
+        })
+    except ImportError as e:
+        logger.error(f"Error: Canadian crypto news module not available: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": "Canadian crypto news module not available"
+        }), 404
+    except Exception as e:
+        logger.error(f"Error retrieving Canadian crypto news: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"Error retrieving Canadian crypto news: {str(e)}"
+        }), 500
+
 @app.route('/api/cmc-canada-news', methods=['GET'])
 def api_get_cmc_canada_news():
     """

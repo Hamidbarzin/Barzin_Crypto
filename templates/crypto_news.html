@@ -155,6 +155,11 @@
                 <option value="CryptoCompare">CryptoCompare</option>
                 <option value="CoinDesk">CoinDesk</option>
                 <option value="CoinTelegraph">CoinTelegraph</option>
+                <option value="CMC Markets Canada">CMC Markets Canada</option>
+                <option value="NDAX">NDAX</option>
+                <option value="Bitbuy">Bitbuy</option>
+                <option value="Newton">Newton</option>
+                <option value="canadian">All Canadian Sources</option>
             </select>
         </div>
         <div class="news-actions">
@@ -313,22 +318,75 @@
         $('#newsLoading').show();
         $('#newsContainer').empty();
         
+        // First get regular crypto news
         $.ajax({
             url: '/api/crypto-news',
             method: 'GET',
             success: function(response) {
-                $('#newsLoading').hide();
+                let allNews = [];
                 
                 if (response.success && response.news && response.news.length > 0) {
-                    renderNews(response.news);
-                } else {
-                    $('#newsContainer').html('<div class="alert alert-warning">No news found</div>');
+                    allNews = allNews.concat(response.news);
                 }
+                
+                // Then get Canadian crypto news
+                $.ajax({
+                    url: '/api/canadian-crypto-news',
+                    method: 'GET',
+                    success: function(canadaResponse) {
+                        $('#newsLoading').hide();
+                        
+                        if (canadaResponse.success && canadaResponse.news && canadaResponse.news.length > 0) {
+                            allNews = allNews.concat(canadaResponse.news);
+                        }
+                        
+                        if (allNews.length > 0) {
+                            // Sort news by date if available
+                            allNews.sort((a, b) => {
+                                const dateA = a.published_on || 0;
+                                const dateB = b.published_on || 0;
+                                return dateB - dateA; // Sort in descending order (newest first)
+                            });
+                            
+                            renderNews(allNews);
+                        } else {
+                            $('#newsContainer').html('<div class="alert alert-warning">No news found</div>');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // If Canadian news fails, still display regular news
+                        $('#newsLoading').hide();
+                        
+                        if (allNews.length > 0) {
+                            renderNews(allNews);
+                            console.error('Error fetching Canadian news:', error);
+                        } else {
+                            $('#newsContainer').html('<div class="alert alert-warning">No news found</div>');
+                        }
+                    }
+                });
             },
             error: function(xhr, status, error) {
-                $('#newsLoading').hide();
-                $('#newsContainer').html(`<div class="alert alert-danger">Error retrieving news: ${error}</div>`);
-                console.error('Error fetching news:', error);
+                // Try to get at least Canadian news if regular news fails
+                $.ajax({
+                    url: '/api/canadian-crypto-news',
+                    method: 'GET',
+                    success: function(canadaResponse) {
+                        $('#newsLoading').hide();
+                        
+                        if (canadaResponse.success && canadaResponse.news && canadaResponse.news.length > 0) {
+                            renderNews(canadaResponse.news);
+                        } else {
+                            $('#newsContainer').html('<div class="alert alert-warning">No news found</div>');
+                        }
+                    },
+                    error: function(canadaXhr, canadaStatus, canadaError) {
+                        $('#newsLoading').hide();
+                        $('#newsContainer').html(`<div class="alert alert-danger">Error retrieving news: Unable to fetch from any source</div>`);
+                        console.error('Error fetching regular news:', error);
+                        console.error('Error fetching Canadian news:', canadaError);
+                    }
+                });
             }
         });
     }
@@ -468,8 +526,14 @@
     // Filter news by source
     function filterNewsBySource(source) {
         if (source === 'all') {
+            // Show all news
             $('.news-card').show();
+        } else if (source === 'canadian') {
+            // Show only Canadian sources
+            $('.news-card').hide();
+            $('.news-card[data-source="CMC Markets Canada"], .news-card[data-source="NDAX"], .news-card[data-source="Bitbuy"], .news-card[data-source="Newton"]').show();
         } else {
+            // Show a specific source
             $('.news-card').hide();
             $(`.news-card[data-source="${source}"]`).show();
         }
