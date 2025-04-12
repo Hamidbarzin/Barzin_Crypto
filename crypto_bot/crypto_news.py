@@ -17,6 +17,22 @@ import trafilatura
 from openai import OpenAI
 from typing import List, Dict, Any, Optional
 
+# ماژول اخبار CMC Markets Canada
+try:
+    from crypto_bot.cmc_canada_news import get_cmc_canada_news, get_cmc_canada_crypto_analysis, get_combined_cmc_canada_content
+except ImportError:
+    logger = logging.getLogger(__name__)
+    logger.warning("ماژول CMC Markets Canada اخبار یافت نشد. این منبع اخبار در دسترس نخواهد بود.")
+    
+    def get_cmc_canada_news(max_items=5, use_cache=True):
+        return []
+    
+    def get_cmc_canada_crypto_analysis(max_items=3, use_cache=True):
+        return []
+    
+    def get_combined_cmc_canada_content(max_news=5, max_analysis=3, use_cache=True):
+        return []
+
 # تنظیم لاگر
 logger = logging.getLogger(__name__)
 
@@ -276,19 +292,21 @@ def translate_news(news_items: List[Dict[str, Any]], target_language: str = "fa"
         return news_items
 
 
-def get_crypto_news(limit: int = 10, translate: bool = True) -> List[Dict[str, Any]]:
+def get_crypto_news(limit: int = 10, translate: bool = True, include_canada: bool = True) -> List[Dict[str, Any]]:
     """
     دریافت و ترکیب اخبار از منابع مختلف
     
     Args:
         limit (int): تعداد کل اخبار مورد نیاز
         translate (bool): آیا اخبار ترجمه شوند
+        include_canada (bool): آیا اخبار بازار کانادا شامل شود
         
     Returns:
         List[Dict[str, Any]]: لیست اخبار ترکیب شده
     """
     # تعیین تعداد اخبار از هر منبع
-    per_source = limit // 3 + 1
+    source_count = 4 if include_canada else 3
+    per_source = limit // source_count + 1
     
     # دریافت اخبار از منابع مختلف
     cryptocompare_news = get_cryptocompare_news(limit=per_source)
@@ -300,6 +318,39 @@ def get_crypto_news(limit: int = 10, translate: bool = True) -> List[Dict[str, A
     all_news.extend(cryptocompare_news)
     all_news.extend(coindesk_news)
     all_news.extend(cointelegraph_news)
+    
+    # اضافه کردن اخبار CMC Markets Canada
+    if include_canada:
+        try:
+            # دریافت اخبار و تحلیل‌های CMC Markets Canada
+            cmc_canada_content = get_combined_cmc_canada_content(max_news=per_source, max_analysis=2)
+            
+            # تبدیل فرمت اخبار CMC Markets Canada به فرمت استاندارد
+            for item in cmc_canada_content:
+                # اضافه کردن فیلدهای ضروری
+                if 'published_on' not in item:
+                    item['published_on'] = int(time.time())
+                
+                # افزودن منبع اگر وجود ندارد
+                if 'source' not in item:
+                    item['source'] = 'CMC Markets Canada'
+                
+                # تبدیل URL تصویر
+                if 'image_url' in item and 'imageurl' not in item:
+                    item['imageurl'] = item['image_url']
+                
+                # افزودن برچسب‌های اضافی
+                if 'tags' not in item:
+                    item['tags'] = ['canada', 'market']
+                elif 'canada' not in item['tags']:
+                    item['tags'].append('canada')
+                
+                # اضافه کردن به لیست کل
+                all_news.append(item)
+            
+            logger.info(f"Added {len(cmc_canada_content)} news items from CMC Markets Canada")
+        except Exception as e:
+            logger.error(f"Error fetching CMC Markets Canada content: {str(e)}")
     
     # مرتب‌سازی بر اساس زمان انتشار (جدیدترین اخبار ابتدا)
     all_news.sort(key=lambda x: x.get('published_on', 0), reverse=True)
