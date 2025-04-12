@@ -600,47 +600,105 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Update cryptocurrency prices (API-based)
+    // Update cryptocurrency prices (API-based) with optimized batch requests
     function updatePrices() {
-        const cryptoPriceElements = document.querySelectorAll('[id$="-price"]');
-        const cryptoChangeElements = document.querySelectorAll('[id$="-change"]');
+        // Track when last update happened to avoid too frequent calls
+        const now = Date.now();
+        const lastUpdate = window.lastPriceUpdate || 0;
         
-        // Update prices using API
-        cryptoPriceElements.forEach(el => {
-            const domId = el.id;
-            const symbol = domId.replace('-price', '');
-            if (symbol) {
-                fetch(`/api/price/${symbol}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.data) {
-                            // Update price
-                            el.textContent = formatPrice(data.data.price);
-                            
-                            // Update percentage change (if element exists)
-                            const changeEl = document.getElementById(`${symbol}-change`);
-                            if (changeEl && data.data.change_24h !== undefined) {
-                                const newChange = data.data.change_24h;
-                                changeEl.textContent = (newChange >= 0 ? '+' : '') + newChange.toFixed(2) + '%';
+        // Don't update more frequently than every 10 seconds
+        if (now - lastUpdate < 10000) {
+            console.log("Skipping price update - too soon since last update");
+            return;
+        }
+        
+        window.lastPriceUpdate = now;
+        
+        // Get only visible elements to reduce API load
+        const visibleElements = Array.from(document.querySelectorAll('[id$="-price"]')).filter(el => {
+            // Check if the element or its parent row is visible
+            let current = el;
+            while (current) {
+                const style = window.getComputedStyle(current);
+                if (style.display === 'none') return false;
+                current = current.parentElement;
+                // Stop at the table
+                if (current && current.tagName === 'TABLE') break;
+            }
+            return true;
+        });
+        
+        // Don't update if no elements are visible
+        if (visibleElements.length === 0) {
+            console.log("No visible price elements found, skipping update");
+            return;
+        }
+        
+        console.log(`Updating ${visibleElements.length} visible price elements`);
+        
+        // Limit to 4 concurrent updates to avoid overwhelming the API
+        const maxConcurrent = 4;
+        const chunks = [];
+        
+        // Split visible elements into chunks
+        for (let i = 0; i < visibleElements.length; i += maxConcurrent) {
+            chunks.push(visibleElements.slice(i, i + maxConcurrent));
+        }
+        
+        // Process chunks sequentially with delay between them
+        let chunkIndex = 0;
+        
+        function processNextChunk() {
+            if (chunkIndex >= chunks.length) return;
+            
+            const currentChunk = chunks[chunkIndex++];
+            console.log(`Processing price update chunk ${chunkIndex} of ${chunks.length}`);
+            
+            // Process each element in the current chunk
+            currentChunk.forEach(el => {
+                const domId = el.id;
+                const symbol = domId.replace('-price', '');
+                if (symbol) {
+                    fetch(`/api/price/${symbol}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.data) {
+                                // Update price
+                                el.textContent = formatPrice(data.data.price);
                                 
-                                // Update colors
-                                if (newChange >= 0) {
-                                    changeEl.className = 'text-success';
-                                } else {
-                                    changeEl.className = 'text-danger';
+                                // Update percentage change (if element exists)
+                                const changeEl = document.getElementById(`${symbol}-change`);
+                                if (changeEl && data.data.change_24h !== undefined) {
+                                    const newChange = data.data.change_24h;
+                                    changeEl.textContent = (newChange >= 0 ? '+' : '') + newChange.toFixed(2) + '%';
+                                    
+                                    // Update colors
+                                    if (newChange >= 0) {
+                                        changeEl.className = 'text-success';
+                                    } else {
+                                        changeEl.className = 'text-danger';
+                                    }
                                 }
                             }
-                        }
-                    })
-                    .catch(error => {
-                        console.error(`Error fetching price for ${symbol}:`, error);
-                    });
+                        })
+                        .catch(error => {
+                            console.error(`Error fetching price for ${symbol}:`, error);
+                        });
+                }
+            });
+            
+            // Process next chunk with delay
+            if (chunkIndex < chunks.length) {
+                setTimeout(processNextChunk, 2000); // 2 second delay between chunks
             }
-        });
+        }
+        
+        // Start processing chunks
+        processNextChunk();
     }
     
-    // Update prices every 5 seconds
-    setInterval(updatePrices, 5000);
+    // Update prices with less frequency to reduce API calls (30 seconds)
+    setInterval(updatePrices, 30000);
     
     // Search functionality
     function setupSearch() {
