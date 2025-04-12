@@ -17,6 +17,18 @@ import trafilatura
 from openai import OpenAI
 from typing import List, Dict, Any, Optional
 
+# اضافه کردن دسترسی به API جدید خبری
+try:
+    from crypto_bot.crypto_news_api import (
+        get_crypto_news_from_api,
+        get_canadian_crypto_news_from_api
+    )
+    HAS_NEWS_API = True
+    logging.info("ماژول API اخبار ارز دیجیتال با موفقیت بارگذاری شد")
+except ImportError:
+    HAS_NEWS_API = False
+    logging.warning("ماژول API اخبار ارز دیجیتال یافت نشد، از منابع قدیمی استفاده می‌شود")
+
 # CMC Markets Canada news module
 try:
     from crypto_bot.cmc_canada_news import (
@@ -324,6 +336,70 @@ def get_crypto_news(limit: int = 10, translate: bool = True, include_canada: boo
     Returns:
         List[Dict[str, Any]]: لیست اخبار ترکیب شده
     """
+    # اول سعی کنیم از API جدید استفاده کنیم
+    if HAS_NEWS_API:
+        try:
+            logger.info("تلاش برای دریافت اخبار از API تخصصی...")
+            api_news = get_crypto_news_from_api(items_per_page=limit)
+            
+            if api_news:
+                logger.info(f"{len(api_news)} خبر از API تخصصی دریافت شد")
+                
+                # اضافه کردن اخبار کانادایی اگر لازم است
+                if include_canada:
+                    canada_news = get_canadian_crypto_news_from_api(items_per_page=limit // 2)
+                    if canada_news:
+                        logger.info(f"{len(canada_news)} خبر کانادایی از API تخصصی دریافت شد")
+                        # ادغام اخبار با اطمینان از عدم تکرار
+                        seen_urls = {item['url'] for item in api_news}
+                        for item in canada_news:
+                            if item['url'] not in seen_urls:
+                                api_news.append(item)
+                                seen_urls.add(item['url'])
+                
+                # ترجمه عناوین اخبار به فارسی اگر لازم است
+                if translate and OPENAI_API_KEY:
+                    try:
+                        api_news = translate_news(api_news)
+                    except Exception as e:
+                        logger.error(f"خطا در ترجمه اخبار: {str(e)}")
+                        # اگر ترجمه با خطا مواجه شود، فیلد عنوان فارسی را با عنوان انگلیسی پر می‌کنیم
+                        for item in api_news:
+                            if 'title_fa' not in item:
+                                item['title_fa'] = item['title']
+                else:
+                    # اگر ترجمه نیاز نیست، عنوان انگلیسی را کپی می‌کنیم
+                    for item in api_news:
+                        item['title_fa'] = item['title']
+                
+                # تبدیل timestamp به تاریخ و زمان خوانا
+                for item in api_news:
+                    if 'published_at' in item and not item.get('published_date'):
+                        try:
+                            # تبدیل ISO format به datetime
+                            dt = datetime.fromisoformat(item['published_at'].replace('Z', '+00:00'))
+                            dt_toronto = dt.astimezone(toronto_tz)
+                            item['published_date'] = dt_toronto.strftime('%Y-%m-%d %H:%M')
+                            # اضافه کردن published_on برای سازگاری با فرمت قدیمی
+                            if 'published_on' not in item:
+                                item['published_on'] = int(dt.timestamp())
+                        except Exception as dt_error:
+                            logger.error(f"خطا در تبدیل تاریخ: {str(dt_error)}")
+                            item['published_date'] = datetime.now(toronto_tz).strftime('%Y-%m-%d %H:%M')
+                            item['published_on'] = int(time.time())
+                
+                # مرتب‌سازی بر اساس زمان انتشار
+                api_news.sort(key=lambda x: x.get('published_on', 0), reverse=True)
+                
+                # محدود کردن تعداد اخبار
+                return api_news[:limit]
+        except Exception as api_err:
+            logger.error(f"خطا در دریافت اخبار از API تخصصی: {str(api_err)}")
+            # ادامه با روش قدیمی در صورت خطا
+    
+    # اگر API جدید در دسترس نباشد یا خطا داشته باشد، از روش قدیمی استفاده می‌کنیم
+    logger.warning("استفاده از منابع قدیمی برای دریافت اخبار")
+    
     # تعیین تعداد اخبار از هر منبع
     source_count = 4 if include_canada else 3
     per_source = limit // source_count + 1
