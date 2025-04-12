@@ -520,7 +520,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Go to dedicated technical analysis page
                 console.log("Redirecting to technical analysis page for", cryptoSymbol);
-                window.location.href = `/technical_analysis/${cryptoSymbol}`;
+                const cleanSymbol = cryptoSymbol.trim();
+                console.log("Clean symbol:", cleanSymbol);
+                window.location.href = `/technical_analysis/${cleanSymbol}`;
                 
                 // No need for the rest of the code as we're redirecting
                 return;

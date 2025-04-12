@@ -1851,8 +1851,9 @@ def get_technical(symbol=None, timeframe=None):
             'data': get_default_technical_data(symbol, timeframe)
         })
         
-@app.route('/technical_analysis/<symbol>')
-@login_required
+@app.route('/technical_analysis/<path:symbol>')
+# اجازه دسترسی همه کاربران به صفحه تحلیل تکنیکال
+# @login_required
 def technical_analysis_page(symbol):
     """
     صفحه تحلیل تکنیکال برای یک ارز دیجیتال خاص
