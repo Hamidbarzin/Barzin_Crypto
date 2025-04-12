@@ -53,7 +53,8 @@ def get_cached_price(symbol: str, max_age_seconds: int = 180) -> Tuple[Dict[str,
     
     # دریافت داده قیمت برای نماد
     try:
-        price_data = market_data.get_price_data(symbol_formats, timeout=2)
+        # استفاده از تابع موجود برای دریافت قیمت‌ها با تایم‌اوت کوتاه
+        price_data = market_data.get_current_prices(symbol_formats, timeout=2)
         
         # یافتن اولین فرمت نماد که داده برگرداند
         found_symbol = None

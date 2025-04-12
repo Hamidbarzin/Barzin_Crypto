@@ -351,3 +351,21 @@ def get_historical_data_from_alternative_source(symbol, timeframe='1d', limit=10
     # We can add support for Alpha Vantage, Yahoo Finance, or other data sources
     logger.warning("Alternative data sources not yet implemented")
     return pd.DataFrame()
+    
+    
+def get_price_data(symbols, timeout=3):
+    """
+    دریافت داده‌های قیمت برای نمادهای ارز دیجیتال
+    این تابع یک ابزار مفید برای سیستم حافظه نهان است
+    
+    Args:
+        symbols (list): لیست نمادها مانند ['BTC/USDT', 'ETH/USDT']
+        timeout (int): حداکثر زمان انتظار برای دریافت پاسخ API (ثانیه)
+        
+    Returns:
+        dict: دیکشنری حاوی داده‌های قیمت برای هر نماد
+    """
+    logger.info(f"Getting price data for symbols: {symbols}")
+    
+    # استفاده از تابع موجود برای دریافت قیمت‌ها
+    return get_current_prices(symbols, timeout=timeout)
