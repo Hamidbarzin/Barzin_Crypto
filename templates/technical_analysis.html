@@ -3,16 +3,35 @@
 {% block title %}{{ ui_text('technical_analysis', 'تحلیل تکنیکال') }} - {{ symbol }}{% endblock %}
 
 {% block content %}
-<!-- Page header - Yellow banner at top -->
-<div class="alert alert-warning py-2 mb-3 d-flex justify-content-between align-items-center">
+<!-- Page header with logo and navigation -->
+<div class="d-flex align-items-center justify-content-between mb-4">
     <div class="d-flex align-items-center">
-        <i class="fas fa-gem me-2"></i>
-        <span>{{ ui_text('only_for_premium', 'فقط مخصوص اعضای پریمیوم') }}</span>
+        <div class="me-2">
+            <img src="/static/icons/logo.png" alt="Barzin Crypto" class="rounded me-2" width="32" height="32">
+        </div>
+        <div>
+            <h4 class="mb-0">{{ ui_text('title', 'برزین کریپتو') }}</h4>
+            <div class="text-muted small">{{ ui_text('crypto_advisor', 'مشاور ارزهای دیجیتال') }}</div>
+        </div>
     </div>
-    <a href="#" class="btn btn-sm btn-dark">{{ ui_text('upgrade', 'ارتقا') }}</a>
+    
+    <div class="d-flex gap-2">
+        <a href="/minimal" class="btn btn-sm btn-outline-light text-muted px-3">
+            {{ ui_text('dashboard', 'داشبورد') }}
+        </a>
+        <a href="/cryptocurrencies" class="btn btn-sm btn-outline-light text-muted px-3">
+            {{ ui_text('markets', 'بازارها') }}
+        </a>
+        <a href="/price_alerts" class="btn btn-sm btn-outline-light text-muted px-3">
+            {{ ui_text('alerts', 'هشدارها') }}
+        </a>
+        <a href="/minimal_settings" class="btn btn-sm btn-outline-light text-muted px-3">
+            {{ ui_text('settings', 'تنظیمات') }}
+        </a>
+    </div>
 </div>
 
-<!-- Main header -->
+<!-- Cryptocurrency Analysis Header -->
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
     <div class="d-flex align-items-center">
         <img src="/static/icons/crypto-btc.svg" alt="BTC" class="me-2" width="32" height="32">
