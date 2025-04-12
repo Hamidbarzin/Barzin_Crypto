@@ -4,35 +4,59 @@
 این ماژول از OpenAI API برای تحلیل تکنیکال و فاندامنتال ارزهای دیجیتال استفاده می‌کند.
 """
 
-import os
-import json
 import logging
-from typing import Dict, Any, Optional, List
+import os
 import time
-from datetime import datetime
+import json
+import re
+from typing import Dict, Any, List, Optional
 
-from openai import OpenAI
-from crypto_bot.market_data import get_price_data, get_historical_data
+import openai
+from crypto_bot.market_data import get_crypto_price, get_historical_data
 from crypto_bot.crypto_news import get_crypto_news
-from crypto_bot.cache_manager import cache_with_expiry
 
 # Setup logging
 logger = logging.getLogger(__name__)
 
-# Initialize OpenAI client
+# Initialize OpenAI API key
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
+openai.api_key = OPENAI_API_KEY
 
-# the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
-# do not change this unless explicitly requested by the user
-GPT_MODEL = "gpt-4o"
+# Cache for analysis to prevent repeated API calls
+ANALYSIS_CACHE = {}
+CACHE_EXPIRY = 3600  # 1 hour in seconds
 
-# Cache expiration times
-CACHE_EXPIRY_TECHNICAL = 900  # 15 minutes
-CACHE_EXPIRY_FUNDAMENTAL = 3600  # 1 hour
-CACHE_EXPIRY_GENERAL = 7200  # 2 hours
+def cache_with_expiry(key: str, data: Any, expiry_seconds: int = CACHE_EXPIRY) -> None:
+    """
+    Cache data with expiry
+    
+    Args:
+        key (str): Cache key
+        data (Any): Data to cache
+        expiry_seconds (int): Cache expiry time in seconds
+    """
+    ANALYSIS_CACHE[key] = {
+        "data": data,
+        "timestamp": time.time(),
+        "expiry": expiry_seconds
+    }
 
-@cache_with_expiry(expiry_seconds=CACHE_EXPIRY_TECHNICAL)
+def get_cached_data(key: str) -> Optional[Any]:
+    """
+    Get cached data if not expired
+    
+    Args:
+        key (str): Cache key
+        
+    Returns:
+        Optional[Any]: Cached data or None if expired/not found
+    """
+    if key in ANALYSIS_CACHE:
+        cache_entry = ANALYSIS_CACHE[key]
+        if time.time() - cache_entry["timestamp"] < cache_entry["expiry"]:
+            return cache_entry["data"]
+    return None
+
 def get_technical_analysis(symbol: str) -> Dict[str, Any]:
     """
     Get technical analysis for a cryptocurrency
@@ -43,96 +67,83 @@ def get_technical_analysis(symbol: str) -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: Technical analysis data
     """
+    # Check cache first
+    cache_key = f"technical_{symbol.upper()}"
+    cached = get_cached_data(cache_key)
+    if cached:
+        return cached
+    
     try:
         # Standardize symbol format
-        if "/" not in symbol and "-" not in symbol:
-            symbol = f"{symbol}/USDT"
+        std_symbol = f"{symbol.upper()}/USDT"
         
         # Get current price data
-        price_data = get_price_data(symbol)
+        price_data = get_crypto_price(std_symbol)
+        if not price_data:
+            return {
+                "success": False,
+                "message": f"Could not retrieve price data for {symbol}",
+                "analysis": f"Technical analysis for {symbol} is not available at the moment due to data retrieval issues."
+            }
         
         # Get historical data for technical indicators
-        timeframes = ["1d", "4h", "1h"]
-        historical_data = {}
+        historical_data = get_historical_data(std_symbol, timeframe="1d", limit=30)
         
-        for timeframe in timeframes:
-            try:
-                data = get_historical_data(symbol, timeframe)
-                if data and len(data) > 0:
-                    historical_data[timeframe] = data
-            except Exception as e:
-                logger.warning(f"Error getting {timeframe} historical data for {symbol}: {str(e)}")
+        # Prepare prompt for OpenAI
+        prompt = f"""
+        As a cryptocurrency technical analyst, provide a detailed technical analysis for {symbol} based on the following data:
         
-        # Prepare the prompt for OpenAI
-        historical_summary = ""
-        for timeframe, data in historical_data.items():
-            if data and len(data) >= 5:
-                last_candles = data[-5:]  # Get last 5 candles
-                candle_summary = "\n".join([
-                    f"- {candle['timestamp'].strftime('%Y-%m-%d %H:%M')}: Open ${candle['open']:.2f}, "
-                    f"High ${candle['high']:.2f}, Low ${candle['low']:.2f}, Close ${candle['close']:.2f}, "
-                    f"Volume {candle['volume']:.2f}"
-                    for candle in last_candles
-                ])
-                historical_summary += f"\n\n{timeframe.upper()} Timeframe:\n{candle_summary}"
+        Current price: ${price_data.get('price', 0):,.2f}
+        24h change: {price_data.get('change_24h', 0):+.2f}%
         
-        # Create analysis prompt
-        analysis_prompt = f"""
-        You are a professional cryptocurrency technical analyst. 
-        Provide a detailed technical analysis for {symbol}.
-        
-        Current Data:
-        - Price: ${price_data.get('price', 'Unknown')}
-        - 24h Change: {price_data.get('change_24h', 'Unknown')}%
-        
-        Recent Price Action: {historical_summary}
-        
-        Please analyze the following:
-        1. Current trend direction (bullish, bearish, or neutral)
+        Please include analysis of:
+        1. Current price action and trends
         2. Key support and resistance levels
-        3. RSI, MACD and moving averages analysis (estimate these based on the price action)
-        4. Volume analysis
-        5. Chart patterns if any are visible
-        6. Trading recommendation (buy, sell, or hold) with confidence level
+        3. RSI, MACD, and other relevant indicators
+        4. Short-term price predictions (next 24-48 hours)
+        5. Medium-term outlook (1-2 weeks)
         
-        Format your response as a detailed analysis a trader could use to make decisions.
-        Include numerical values for support/resistance levels and indicators where possible.
+        Keep your analysis concise yet comprehensive, focused on actionable insights.
         """
         
         # Call OpenAI API
-        response = openai_client.chat.completions.create(
-            model=GPT_MODEL,
-            messages=[
-                {"role": "system", "content": "You are a professional cryptocurrency technical analyst expert."},
-                {"role": "user", "content": analysis_prompt}
-            ],
-            temperature=0.4,  # Lower temperature for more factual responses
-            max_tokens=1000
-        )
+        if OPENAI_API_KEY:
+            response = openai.chat.completions.create(
+                model="gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+                messages=[
+                    {"role": "system", "content": "You are a professional cryptocurrency technical analyst."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=800
+            )
+            
+            analysis = response.choices[0].message.content.strip()
+        else:
+            analysis = f"Technical analysis for {symbol} is not available at the moment due to API configuration issues."
         
-        # Extract the analysis text
-        analysis_text = response.choices[0].message.content
-        
-        return {
+        # Build result object
+        result = {
             "success": True,
-            "symbol": symbol,
-            "price": price_data.get('price', None),
-            "change_24h": price_data.get('change_24h', None),
-            "timestamp": datetime.now().isoformat(),
-            "analysis": analysis_text,
-            "timeframes_analyzed": list(historical_data.keys())
+            "symbol": symbol.upper(),
+            "price": price_data.get('price', 0),
+            "change_24h": price_data.get('change_24h', 0),
+            "analysis": analysis,
+            "timestamp": time.time()
         }
-    
+        
+        # Cache the result
+        cache_with_expiry(cache_key, result)
+        
+        return result
+        
     except Exception as e:
-        logger.error(f"Error in technical analysis for {symbol}: {str(e)}")
+        logger.error(f"Error generating technical analysis for {symbol}: {str(e)}")
         return {
             "success": False,
-            "symbol": symbol,
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
+            "message": f"Error: {str(e)}",
+            "analysis": f"Technical analysis for {symbol} is not available at the moment due to an internal error."
         }
 
-@cache_with_expiry(expiry_seconds=CACHE_EXPIRY_FUNDAMENTAL)
 def get_fundamental_analysis(symbol: str) -> Dict[str, Any]:
     """
     Get fundamental analysis for a cryptocurrency
@@ -143,104 +154,95 @@ def get_fundamental_analysis(symbol: str) -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: Fundamental analysis data
     """
+    # Check cache first
+    cache_key = f"fundamental_{symbol.upper()}"
+    cached = get_cached_data(cache_key)
+    if cached:
+        return cached
+    
     try:
-        # Normalize symbol
-        normalized_symbol = symbol.upper().replace("/USDT", "").replace("-USDT", "")
+        # Standardize symbol format
+        std_symbol = f"{symbol.upper()}/USDT"
         
         # Get current price data
-        if "/" not in symbol and "-" not in symbol:
-            price_symbol = f"{symbol}/USDT"
-        else:
-            price_symbol = symbol
-            
-        price_data = get_price_data(price_symbol)
+        price_data = get_crypto_price(std_symbol)
+        if not price_data:
+            return {
+                "success": False,
+                "message": f"Could not retrieve price data for {symbol}",
+                "analysis": f"Fundamental analysis for {symbol} is not available at the moment due to data retrieval issues."
+            }
         
-        # Get latest news (without translation)
-        news_data = get_crypto_news(translate=False, limit=5)
+        # Get news related to the symbol
+        news_data = get_crypto_news(symbol=symbol, count=5)
+        news_text = ""
+        if news_data and len(news_data) > 0:
+            news_text = "Recent news:\n" + "\n".join(
+                [f"- {item.get('title', 'Untitled')}: {item.get('summary', 'No summary')[:100]}..." 
+                 for item in news_data[:3]]
+            )
         
-        # Filter news relevant to this cryptocurrency if possible
-        relevant_news = []
-        keywords = [
-            normalized_symbol, 
-            get_full_name(normalized_symbol),
-            f"${normalized_symbol}"
-        ]
+        # Add full cryptocurrency name
+        full_name = get_full_name(symbol)
         
-        for news in news_data:
-            title = news.get('title', '').lower()
-            if any(keyword.lower() in title for keyword in keywords):
-                relevant_news.append(news)
+        # Prepare prompt for OpenAI
+        prompt = f"""
+        As a cryptocurrency fundamental analyst, provide a detailed fundamental analysis for {full_name} ({symbol}) based on the following data:
         
-        # If we couldn't find specific news for this crypto, include general market news
-        if len(relevant_news) < 2:
-            relevant_news = news_data[:5]  # Just take the 5 most recent news
+        Current price: ${price_data.get('price', 0):,.2f}
+        24h change: {price_data.get('change_24h', 0):+.2f}%
         
-        # Format news for the prompt
-        news_summary = "\n".join([
-            f"- {news.get('title', 'Unknown')}: {news.get('summary', '')[:100]}... (Source: {news.get('source', 'Unknown')})"
-            for news in relevant_news
-        ])
+        {news_text}
         
-        # Create analysis prompt
-        analysis_prompt = f"""
-        You are a cryptocurrency fundamental analyst. 
-        Provide a detailed fundamental analysis for {normalized_symbol} ({get_full_name(normalized_symbol)}).
+        Please include analysis of:
+        1. Market position and strengths/weaknesses
+        2. Tokenomics and economic model
+        3. Technology and development activity
+        4. Adoption, partnerships, and ecosystem
+        5. Market sentiment and long-term potential
         
-        Current Data:
-        - Price: ${price_data.get('price', 'Unknown')}
-        - 24h Change: {price_data.get('change_24h', 'Unknown')}%
-        
-        Recent News:
-        {news_summary}
-        
-        Please analyze the following aspects:
-        1. Market position and market cap analysis
-        2. Recent developments and news impact
-        3. Team and development activity
-        4. Tokenomics and use case
-        5. Competitive positioning
-        6. Future outlook and potential catalysts
-        7. Investment thesis (pros and cons)
-        
-        Format your response as a comprehensive fundamental analysis that investors could use to make long-term decisions.
-        If you don't have specific information about certain aspects of this cryptocurrency, provide general analysis and mention where data is limited.
+        Keep your analysis concise yet comprehensive, focused on investment value.
         """
         
         # Call OpenAI API
-        response = openai_client.chat.completions.create(
-            model=GPT_MODEL,
-            messages=[
-                {"role": "system", "content": "You are a cryptocurrency fundamental analyst and expert."},
-                {"role": "user", "content": analysis_prompt}
-            ],
-            temperature=0.4,  # Lower temperature for more factual responses
-            max_tokens=1200
-        )
+        if OPENAI_API_KEY:
+            response = openai.chat.completions.create(
+                model="gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+                messages=[
+                    {"role": "system", "content": "You are a professional cryptocurrency fundamental analyst."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=800
+            )
+            
+            analysis = response.choices[0].message.content.strip()
+        else:
+            analysis = f"Fundamental analysis for {symbol} is not available at the moment due to API configuration issues."
         
-        # Extract the analysis text
-        analysis_text = response.choices[0].message.content
-        
-        return {
+        # Build result object
+        result = {
             "success": True,
-            "symbol": normalized_symbol,
-            "full_name": get_full_name(normalized_symbol),
-            "price": price_data.get('price', None),
-            "change_24h": price_data.get('change_24h', None),
-            "timestamp": datetime.now().isoformat(),
-            "analysis": analysis_text,
-            "news_count": len(relevant_news)
+            "symbol": symbol.upper(),
+            "full_name": full_name,
+            "price": price_data.get('price', 0),
+            "change_24h": price_data.get('change_24h', 0),
+            "analysis": analysis,
+            "timestamp": time.time()
         }
-    
+        
+        # Cache the result
+        cache_with_expiry(cache_key, result)
+        
+        return result
+        
     except Exception as e:
-        logger.error(f"Error in fundamental analysis for {symbol}: {str(e)}")
+        logger.error(f"Error generating fundamental analysis for {symbol}: {str(e)}")
         return {
             "success": False,
-            "symbol": symbol,
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
+            "message": f"Error: {str(e)}",
+            "analysis": f"Fundamental analysis for {symbol} is not available at the moment due to an internal error."
         }
 
-@cache_with_expiry(expiry_seconds=CACHE_EXPIRY_GENERAL)
 def get_crypto_ai_answer(query: str) -> Dict[str, Any]:
     """
     Get AI-powered answer to cryptocurrency questions
@@ -251,71 +253,74 @@ def get_crypto_ai_answer(query: str) -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: AI-generated answer and metadata
     """
+    # Check cache first
+    cache_key = f"query_{hash(query)}"
+    cached = get_cached_data(cache_key)
+    if cached:
+        return cached
+    
     try:
-        # Extract symbol if the query is about a specific cryptocurrency
-        symbol = extract_crypto_symbol(query)
+        # Extract potential cryptocurrency symbols
+        potential_symbol = extract_crypto_symbol(query)
         
-        # Get some context data if we have a specific cryptocurrency
-        context_data = ""
-        if symbol:
-            try:
-                price_symbol = f"{symbol}/USDT"
-                price_data = get_price_data(price_symbol)
-                context_data += f"\nCurrent {symbol} data:\n"
-                context_data += f"- Price: ${price_data.get('price', 'Unknown')}\n"
-                context_data += f"- 24h Change: {price_data.get('change_24h', 'Unknown')}%\n"
-            except Exception as e:
-                logger.warning(f"Could not get price data for {symbol}: {str(e)}")
+        # Get price data if a symbol is detected
+        price_context = ""
+        if potential_symbol:
+            std_symbol = f"{potential_symbol.upper()}/USDT"
+            price_data = get_crypto_price(std_symbol)
+            if price_data:
+                price_context = f"""
+                Current {potential_symbol} price: ${price_data.get('price', 0):,.2f}
+                24h change: {price_data.get('change_24h', 0):+.2f}%
+                """
         
-        # Create analysis prompt
-        analysis_prompt = f"""
-        You are a cryptocurrency expert advisor who can analyze markets and provide detailed information.
+        # Prepare prompt for OpenAI
+        prompt = f"""
+        As a cryptocurrency expert analyst, please answer the following question:
         
-        User Query: {query}
+        {query}
         
-        {context_data}
+        {price_context}
         
-        Please provide a comprehensive, accurate answer to the query. Include:
-        - Relevant facts and data
-        - Technical and fundamental considerations if applicable
-        - Historical context if relevant
-        - Future outlook based on current trends and known information
-        
-        If the query is too vague, still provide helpful information about the general topic.
-        If the query concerns price predictions, explain factors that could affect price rather than giving specific price targets.
-        
-        Today's date is {datetime.now().strftime('%Y-%m-%d')}.
+        Provide a detailed, accurate, and helpful response based on current market knowledge.
+        Include specific data points, trends, or recommendations as appropriate.
         """
         
         # Call OpenAI API
-        response = openai_client.chat.completions.create(
-            model=GPT_MODEL,
-            messages=[
-                {"role": "system", "content": "You are a cryptocurrency expert advisor with detailed knowledge of blockchain technology, trading, and markets."},
-                {"role": "user", "content": analysis_prompt}
-            ],
-            temperature=0.5,
-            max_tokens=1000
-        )
+        if OPENAI_API_KEY:
+            response = openai.chat.completions.create(
+                model="gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+                messages=[
+                    {"role": "system", "content": "You are a professional cryptocurrency analyst and expert. Always provide accurate, up-to-date information and clearly indicate when something is your opinion vs. established fact."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=1000
+            )
+            
+            answer = response.choices[0].message.content.strip()
+        else:
+            answer = "AI-powered analysis is not available at the moment due to API configuration issues."
         
-        # Extract the analysis text
-        answer_text = response.choices[0].message.content
-        
-        return {
+        # Build result object
+        result = {
             "success": True,
             "query": query,
-            "detected_symbol": symbol,
-            "answer": answer_text,
-            "timestamp": datetime.now().isoformat()
+            "detected_symbol": potential_symbol,
+            "answer": answer,
+            "timestamp": time.time()
         }
-    
+        
+        # Cache the result
+        cache_with_expiry(cache_key, result)
+        
+        return result
+        
     except Exception as e:
-        logger.error(f"Error in AI answer generation for query '{query}': {str(e)}")
+        logger.error(f"Error generating AI answer for query '{query}': {str(e)}")
         return {
             "success": False,
-            "query": query,
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
+            "message": f"Error: {str(e)}",
+            "answer": "Unable to process your question at this time due to an internal error."
         }
 
 def get_full_name(symbol: str) -> str:
@@ -328,45 +333,72 @@ def get_full_name(symbol: str) -> str:
     Returns:
         str: Full name of cryptocurrency
     """
-    crypto_names = {
+    symbol_map = {
         "BTC": "Bitcoin",
         "ETH": "Ethereum",
         "SOL": "Solana",
-        "XRP": "XRP (Ripple)",
+        "XRP": "Ripple",
         "ADA": "Cardano",
         "DOGE": "Dogecoin",
-        "DOT": "Polkadot",
         "SHIB": "Shiba Inu",
+        "BNB": "Binance Coin",
+        "DOT": "Polkadot",
         "AVAX": "Avalanche",
         "MATIC": "Polygon",
-        "LTC": "Litecoin",
-        "UNI": "Uniswap",
         "LINK": "Chainlink",
+        "LTC": "Litecoin",
         "XLM": "Stellar",
-        "ATOM": "Cosmos",
-        "NEAR": "NEAR Protocol",
         "ALGO": "Algorand",
-        "BCH": "Bitcoin Cash",
-        "ICP": "Internet Computer",
+        "UNI": "Uniswap",
+        "ATOM": "Cosmos",
         "FIL": "Filecoin",
         "VET": "VeChain",
+        "HBAR": "Hedera",
+        "NEAR": "NEAR Protocol",
+        "XTZ": "Tezos",
+        "EGLD": "MultiversX",
+        "EOS": "EOS",
+        "ZEC": "Zcash",
+        "DASH": "Dash",
+        "XMR": "Monero",
+        "ICP": "Internet Computer",
+        "FTM": "Fantom",
         "SAND": "The Sandbox",
         "MANA": "Decentraland",
         "AXS": "Axie Infinity",
-        "HBAR": "Hedera",
-        "EGLD": "MultiversX (Elrond)",
-        "EOS": "EOS",
-        "XTZ": "Tezos",
-        "PEPE": "Pepe",
+        "CAKE": "PancakeSwap",
+        "GRT": "The Graph",
+        "CHZ": "Chiliz",
+        "ENJ": "Enjin Coin",
+        "ONE": "Harmony",
+        "HOT": "Holo",
+        "ZIL": "Zilliqa",
+        "BAT": "Basic Attention Token",
+        "RVN": "Ravencoin",
+        "SC": "Siacoin",
+        "ANKR": "Ankr",
+        "STORJ": "Storj",
+        "KAVA": "Kava",
+        "BNT": "Bancor",
+        "CELO": "Celo",
         "WIF": "Dogwifhat",
+        "PEPE": "Pepe",
+        "JTO": "Jito",
+        "JUP": "Jupiter",
+        "BONK": "Bonk",
         "FLOKI": "Floki Inu",
-        "XDC": "XDC Network",
-        "GALA": "Gala",
+        "MEME": "Meme Coin",
         "JASMY": "JasmyCoin",
-        "MEME": "MemeAI"
+        "INJ": "Injective",
+        "IMX": "Immutable X",
+        "OP": "Optimism",
+        "ARB": "Arbitrum",
+        "CRO": "Cronos",
+        "TIA": "Celestia",
     }
     
-    return crypto_names.get(symbol.upper(), symbol)
+    upper_symbol = symbol.upper()
+    return symbol_map.get(upper_symbol, f"{upper_symbol} Coin")
 
 def extract_crypto_symbol(text: str) -> Optional[str]:
     """
@@ -378,75 +410,69 @@ def extract_crypto_symbol(text: str) -> Optional[str]:
     Returns:
         Optional[str]: Extracted cryptocurrency symbol or None
     """
+    # Common cryptocurrency symbols
     common_symbols = [
-        "BTC", "ETH", "SOL", "XRP", "ADA", "DOGE", "DOT", "SHIB", "AVAX", "MATIC",
-        "LTC", "UNI", "LINK", "XLM", "ATOM", "NEAR", "ALGO", "BCH", "ICP", "FIL",
-        "VET", "SAND", "MANA", "AXS", "HBAR", "EGLD", "EOS", "XTZ"
+        "BTC", "ETH", "SOL", "XRP", "ADA", "DOGE", "SHIB", "BNB", 
+        "DOT", "AVAX", "MATIC", "LINK", "LTC", "XLM", "ALGO", "UNI",
+        "ATOM", "FIL", "VET", "HBAR", "NEAR", "XTZ", "EGLD", "EOS", 
+        "ZEC", "DASH", "XMR", "ICP", "FTM", "SAND", "MANA", "AXS",
+        "CAKE", "GRT", "CHZ", "ENJ", "ONE", "HOT", "ZIL", "BAT",
+        "RVN", "SC", "ANKR", "STORJ", "KAVA", "BNT", "CELO", "WIF",
+        "PEPE", "JTO", "JUP", "BONK", "FLOKI", "MEME", "JASMY", "INJ",
+        "IMX", "OP", "ARB", "CRO", "TIA"
     ]
     
-    # Also look for common names
-    common_names = {
+    # Pattern to find crypto symbols
+    pattern = r'\b(' + '|'.join(common_symbols) + r')\b'
+    
+    # Find all matches
+    matches = re.findall(pattern, text.upper())
+    
+    if matches:
+        return matches[0]
+    
+    # Look for symbol/USDT pattern
+    usdt_pattern = r'([A-Z]+)(?:/|-|/)USDT'
+    usdt_matches = re.findall(usdt_pattern, text.upper())
+    
+    if usdt_matches:
+        return usdt_matches[0]
+    
+    # Look for full cryptocurrency names
+    full_name_map = {
         "BITCOIN": "BTC",
         "ETHEREUM": "ETH",
         "SOLANA": "SOL",
         "RIPPLE": "XRP",
         "CARDANO": "ADA",
-        "DOGECOIN": "DOGE",
-        "POLKADOT": "DOT",
-        "SHIBA": "SHIB",
-        "AVALANCHE": "AVAX",
-        "POLYGON": "MATIC",
-        "LITECOIN": "LTC",
-        "UNISWAP": "UNI",
-        "CHAINLINK": "LINK",
-        "STELLAR": "XLM",
-        "COSMOS": "ATOM",
-        "NEAR": "NEAR",
-        "ALGORAND": "ALGO",
-        "BITCOIN CASH": "BCH",
-        "INTERNET COMPUTER": "ICP",
-        "FILECOIN": "FIL",
-        "VECHAIN": "VET",
-        "SANDBOX": "SAND",
-        "DECENTRALAND": "MANA",
-        "AXIE": "AXS",
-        "HEDERA": "HBAR",
-        "ELROND": "EGLD",
-        "TEZOS": "XTZ"
+        "DOGECOIN": "DOGE"
     }
     
-    # Check for symbols first
-    upper_text = text.upper()
-    for symbol in common_symbols:
-        # Look for symbol with various delimiters
-        for pattern in [f" {symbol} ", f"${symbol}", f"#{symbol}", f" {symbol}/", f" {symbol}-"]:
-            if pattern in upper_text:
-                return symbol
-    
-    # Check for names next
-    for name, symbol in common_names.items():
-        if name in upper_text:
+    for name, symbol in full_name_map.items():
+        if name in text.upper():
             return symbol
     
     return None
 
-# Testing function
 def test_analysis():
     """Test the analysis functions"""
-    print("Testing technical analysis...")
-    tech_analysis = get_technical_analysis("BTC")
-    print(f"Success: {tech_analysis['success']}")
-    print(f"Analysis length: {len(tech_analysis.get('analysis', ''))}")
+    # Test technical analysis
+    btc_technical = get_technical_analysis("BTC")
+    print("BTC Technical Analysis:")
+    print(json.dumps(btc_technical, indent=2))
     
-    print("\nTesting fundamental analysis...")
-    fund_analysis = get_fundamental_analysis("ETH")
-    print(f"Success: {fund_analysis['success']}")
-    print(f"Analysis length: {len(fund_analysis.get('analysis', ''))}")
+    # Test fundamental analysis
+    eth_fundamental = get_fundamental_analysis("ETH")
+    print("\nETH Fundamental Analysis:")
+    print(json.dumps(eth_fundamental, indent=2))
     
-    print("\nTesting general query...")
-    ai_answer = get_crypto_ai_answer("What are the prospects for layer 2 solutions in 2025?")
-    print(f"Success: {ai_answer['success']}")
-    print(f"Answer length: {len(ai_answer.get('answer', ''))}")
+    # Test AI Q&A
+    query_result = get_crypto_ai_answer("What is the long-term outlook for Bitcoin considering the recent halving?")
+    print("\nBTC Question Answer:")
+    print(json.dumps(query_result, indent=2))
 
 if __name__ == "__main__":
-    test_analysis()
+    if OPENAI_API_KEY:
+        test_analysis()
+    else:
+        print("OPENAI_API_KEY environment variable is not set. Cannot run tests.")

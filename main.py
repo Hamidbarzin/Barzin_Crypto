@@ -31,6 +31,14 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "crypto_bot_secret_key")
 
+# Register AI analysis routes
+try:
+    from crypto_bot.ai_routes import register_routes
+    register_routes(app)
+    logger.info("AI analysis routes registered successfully.")
+except Exception as e:
+    logger.error(f"Error registering AI analysis routes: {str(e)}")
+
 # Add datetime, language and developer info to all templates
 @app.context_processor
 def inject_now():

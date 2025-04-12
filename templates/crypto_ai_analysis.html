@@ -1,176 +1,263 @@
 {% extends "base.html" %}
 
-{% block title %}AI Crypto Analysis{% endblock %}
+{% block title %}AI Cryptocurrency Analysis{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    .ai-container {
+        background-color: var(--bs-dark-bg-subtle);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    .analysis-type-badge {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        margin-right: 0.5rem;
+    }
+    .crypto-price-badge {
+        background-color: var(--bs-dark);
+        color: var(--bs-warning);
+        font-size: 0.9rem;
+        font-weight: bold;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+    }
+    .analysis-content {
+        margin-top: 1.25rem;
+        line-height: 1.6;
+        white-space: pre-line;
+    }
+    .query-display {
+        font-style: italic;
+        background-color: rgba(0, 0, 0, 0.05);
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        margin-bottom: 1rem;
+    }
+    .change-positive {
+        color: var(--bs-success);
+    }
+    .change-negative {
+        color: var(--bs-danger);
+    }
+    .analysis-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    .analysis-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .ai-form {
+        margin-bottom: 2rem;
+    }
+    .crypto-symbol {
+        font-weight: bold;
+        color: var(--bs-warning);
+    }
+    .loading-indicator {
+        display: none;
+        margin-top: 1rem;
+    }
+    .ai-examples {
+        margin-top: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .example-item {
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        transition: background-color 0.2s;
+    }
+    .example-item:hover {
+        background-color: var(--bs-dark-bg-subtle);
+    }
+    .ai-query-description {
+        margin-bottom: 1.5rem;
+        color: var(--bs-body-color);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="text-center">AI Crypto Analysis</h1>
-            <p class="text-center text-muted">
-                Ask questions about cryptocurrencies or request technical and fundamental analysis
-            </p>
-        </div>
-    </div>
-
-    <div class="row justify-content-center mb-4">
+    <h1 class="mb-4">AI Cryptocurrency Analysis</h1>
+    
+    <div class="row">
         <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form id="analysisForm" action="{{ url_for('crypto_ai_submit') }}" method="post">
-                        <div class="mb-3">
-                            <label for="queryInput" class="form-label">Enter cryptocurrency symbol or question:</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="queryInput" name="query" placeholder="E.g., 'BTC', 'Analysis of Ethereum', or 'How did Bitcoin perform in 2024?'" required>
-                                <button class="btn btn-warning" type="submit" id="submitButton">
-                                    <i class="fas fa-search"></i> Analyze
-                                </button>
-                            </div>
-                            <div class="form-text">
-                                For technical or fundamental analysis, simply enter the cryptocurrency symbol (e.g., BTC, ETH, SOL)
-                            </div>
+            <div class="ai-query-description">
+                <p>Ask our AI analyst about cryptocurrencies - you can request:</p>
+                <ul>
+                    <li>Technical analysis for any cryptocurrency (charts, RSI, MACD, support/resistance)</li>
+                    <li>Fundamental analysis (tokenomics, team, market position, news impact)</li>
+                    <li>General cryptocurrency questions on trends, technology or market conditions</li>
+                </ul>
+            </div>
+            
+            <form method="post" action="{{ url_for('crypto_ai_submit') }}" class="ai-form">
+                <div class="input-group">
+                    <input type="text" name="query" id="queryInput" class="form-control" 
+                           placeholder="Enter cryptocurrency symbol or question (e.g., BTC technical analysis or What's the future of Ethereum?)" 
+                           required value="{{ request.form.get('query', '') }}">
+                    <button type="submit" class="btn btn-primary">Analyze</button>
+                </div>
+                
+                {% if error %}
+                <div class="alert alert-danger mt-3">{{ error }}</div>
+                {% endif %}
+            </form>
+            
+            <div class="ai-examples">
+                <h5>Quick Analysis Examples:</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="example-item" onclick="setQuery('BTC technical analysis')">
+                            <span class="crypto-symbol">BTC</span> technical analysis
                         </div>
-                        <div class="d-flex gap-2 mt-3">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Technical analysis of BTC')">Technical Analysis</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('Fundamental analysis of ETH')">Fundamental Analysis</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setQuery('What are layer 2 solutions?')">General Question</button>
+                        <div class="example-item" onclick="setQuery('ETH fundamental analysis')">
+                            <span class="crypto-symbol">ETH</span> fundamental analysis
                         </div>
-                    </form>
+                        <div class="example-item" onclick="setQuery('SOL price prediction')">
+                            <span class="crypto-symbol">SOL</span> price prediction
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="example-item" onclick="setQuery('How does Bitcoin halving affect the price?')">
+                            How does Bitcoin halving affect the price?
+                        </div>
+                        <div class="example-item" onclick="setQuery('Compare Ethereum and Solana')">
+                            Compare Ethereum and Solana
+                        </div>
+                        <div class="example-item" onclick="setQuery('What are the best cryptocurrencies to invest in 2025?')">
+                            Best cryptocurrencies to invest in 2025
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    {% if result %}
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <div>
-                        <i class="fas fa-chart-line me-2"></i>
-                        {% if query_type == 'technical' %}
-                            Technical Analysis: {{ result.symbol }}
-                        {% elif query_type == 'fundamental' %}
-                            Fundamental Analysis: {{ result.full_name }}
-                        {% else %}
-                            AI Answer: {{ result.query }}
-                        {% endif %}
-                    </div>
-                    <div class="text-muted small">
-                        Updated: {{ result.timestamp|truncate(19, True, '') }}
-                    </div>
+            
+            <div class="loading-indicator text-center" id="loadingIndicator">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
-                <div class="card-body">
-                    {% if result.success %}
-                        {% if query_type == 'technical' or query_type == 'fundamental' %}
-                            <div class="d-flex justify-content-between mb-4">
-                                <div>
-                                    <h4>{{ result.symbol }}{% if result.full_name %} ({{ result.full_name }}){% endif %}</h4>
-                                </div>
-                                <div class="text-end">
-                                    <h4 class="mb-0">${{ '{:,.2f}'.format(result.price if result.price else 0) }}</h4>
-                                    <div class="{% if result.change_24h > 0 %}text-success{% elif result.change_24h < 0 %}text-danger{% else %}text-muted{% endif %}">
-                                        {% if result.change_24h > 0 %}+{% endif %}{{ '{:.2f}'.format(result.change_24h if result.change_24h else 0) }}%
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        
-                        <div class="analysis-content">
-                            {% if query_type == 'technical' or query_type == 'fundamental' %}
-                                {{ result.analysis|safe|replace('\n', '<br>')|replace('  ', '&nbsp;&nbsp;') }}
-                            {% else %}
-                                {{ result.answer|safe|replace('\n', '<br>')|replace('  ', '&nbsp;&nbsp;') }}
+                <p class="mt-2">Consulting our AI analyst. This may take a moment...</p>
+            </div>
+            
+            {% if result %}
+            <div class="ai-container">
+                <div class="analysis-header">
+                    {% if query_type == 'technical' %}
+                        <div>
+                            <span class="analysis-type-badge bg-primary">Technical Analysis</span>
+                            <span class="crypto-symbol">{{ result.symbol }}</span>
+                            {% if result.price %}
+                                <span class="crypto-price-badge">${{ "{:,.2f}".format(result.price) }}</span>
+                                <span class="ms-2 {% if result.change_24h > 0 %}change-positive{% else %}change-negative{% endif %}">
+                                    {{ "{:+.2f}%".format(result.change_24h) }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    {% elif query_type == 'fundamental' %}
+                        <div>
+                            <span class="analysis-type-badge bg-success">Fundamental Analysis</span>
+                            <span class="crypto-symbol">{{ result.symbol }}</span>
+                            {% if result.full_name %}
+                                <span class="ms-2">({{ result.full_name }})</span>
+                            {% endif %}
+                            {% if result.price %}
+                                <span class="crypto-price-badge">${{ "{:,.2f}".format(result.price) }}</span>
+                                <span class="ms-2 {% if result.change_24h > 0 %}change-positive{% else %}change-negative{% endif %}">
+                                    {{ "{:+.2f}%".format(result.change_24h) }}
+                                </span>
                             {% endif %}
                         </div>
                     {% else %}
-                        <div class="alert alert-danger">
-                            Error retrieving analysis: {{ result.error }}
+                        <div>
+                            <span class="analysis-type-badge bg-info">AI Analysis</span>
+                            <span class="query-display">{{ result.query }}</span>
+                            {% if result.detected_symbol %}
+                                <span class="crypto-symbol">{{ result.detected_symbol }}</span>
+                            {% endif %}
                         </div>
                     {% endif %}
+                    
+                    <div class="analysis-actions">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+                            <i class="bi bi-printer"></i>
+                        </button>
+                        
+                        <button class="btn btn-sm btn-outline-primary" id="sendToTelegramBtn" 
+                                data-type="{{ query_type }}" 
+                                data-query="{{ result.query or request.form.get('query', '') }}">
+                            <i class="bi bi-telegram"></i> Send to Telegram
+                        </button>
+                    </div>
                 </div>
-                {% if result.success %}
-                <div class="card-footer d-flex justify-content-end">
-                    <button class="btn btn-sm btn-warning me-2" id="sendToTelegramBtn">
-                        <i class="fab fa-telegram"></i> Send to Telegram
-                    </button>
-                    <a href="{{ url_for('crypto_ai_analysis') }}" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-search"></i> New Analysis
-                    </a>
+                
+                <div class="analysis-content">
+                    {% if result.success == False %}
+                        <div class="alert alert-warning">{{ result.message }}</div>
+                    {% endif %}
+                    
+                    {% if query_type == 'technical' or query_type == 'fundamental' %}
+                        {{ result.analysis|safe }}
+                    {% else %}
+                        {{ result.answer|safe }}
+                    {% endif %}
                 </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header">
-                    <i class="fas fa-chart-line me-2"></i> Technical Analysis
-                </div>
-                <div class="card-body">
-                    <p>Get detailed technical analysis for any cryptocurrency:</p>
-                    <ul>
-                        <li>Current trend analysis</li>
-                        <li>Support and resistance levels</li>
-                        <li>RSI, MACD, and moving averages</li>
-                        <li>Volume analysis</li>
-                        <li>Chart patterns</li>
-                        <li>Trading recommendation</li>
-                    </ul>
-                </div>
-                <div class="card-footer">
-                    <button class="btn btn-sm btn-outline-secondary w-100" onclick="setQuery('Technical analysis of BTC')">
-                        Analyze BTC Technically
-                    </button>
+                
+                <div class="text-end mt-3">
+                    <small class="text-muted">Generated {{ ((now.timestamp() - result.timestamp) / 60)|int }} minutes ago</small>
                 </div>
             </div>
+            {% endif %}
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100">
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
                 <div class="card-header">
-                    <i class="fas fa-newspaper me-2"></i> Fundamental Analysis
+                    <h5 class="mb-0">Live Prices</h5>
                 </div>
-                <div class="card-body">
-                    <p>Get comprehensive fundamental analysis:</p>
-                    <ul>
-                        <li>Market position and market cap</li>
-                        <li>Recent news and developments</li>
-                        <li>Team and development activity</li>
-                        <li>Tokenomics and use cases</li>
-                        <li>Competitive positioning</li>
-                        <li>Future outlook and investment thesis</li>
-                    </ul>
-                </div>
-                <div class="card-footer">
-                    <button class="btn btn-sm btn-outline-secondary w-100" onclick="setQuery('Fundamental analysis of ETH')">
-                        Analyze ETH Fundamentally
-                    </button>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <tbody>
+                            <tr>
+                                <td>Bitcoin (BTC)</td>
+                                <td class="text-end"><span id="BTC-USDT-price">--</span></td>
+                            </tr>
+                            <tr>
+                                <td>Ethereum (ETH)</td>
+                                <td class="text-end"><span id="ETH-USDT-price">--</span></td>
+                            </tr>
+                            <tr>
+                                <td>Solana (SOL)</td>
+                                <td class="text-end"><span id="SOL-USDT-price">--</span></td>
+                            </tr>
+                            <tr>
+                                <td>Ripple (XRP)</td>
+                                <td class="text-end"><span id="XRP-USDT-price">--</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100">
+            
+            <div class="card">
                 <div class="card-header">
-                    <i class="fas fa-robot me-2"></i> AI Assistant
+                    <h5 class="mb-0">What to Ask?</h5>
                 </div>
                 <div class="card-body">
-                    <p>Ask any cryptocurrency question:</p>
-                    <ul>
-                        <li>Historical performance</li>
-                        <li>Blockchain technology explanations</li>
-                        <li>Market trends and contexts</li>
-                        <li>Specific cryptocurrencies comparisons</li>
-                        <li>Tokenomics and economics</li>
-                        <li>General market questions</li>
-                    </ul>
-                </div>
-                <div class="card-footer">
-                    <button class="btn btn-sm btn-outline-secondary w-100" onclick="setQuery('What was Bitcoin\'s performance in 2024?')">
-                        Ask About Bitcoin
-                    </button>
+                    <h6>Technical Analysis</h6>
+                    <p>Ask about price action, trends, support and resistance levels, RSI, MACD, and price predictions.</p>
+                    <h6>Fundamental Analysis</h6>
+                    <p>Ask about tokenomics, economic model, development team, technology, partnerships, and market trends.</p>
+                    <h6>General Questions</h6>
+                    <p>Ask about market conditions, historical comparisons, investment strategies, or specific events like halving.</p>
                 </div>
             </div>
         </div>
@@ -179,58 +266,64 @@
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
 <script>
-    $(document).ready(function() {
-        // Show loading spinner when form is submitted
-        $('#analysisForm').on('submit', function() {
-            $('#submitButton').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Analyzing...');
-            $('#submitButton').prop('disabled', true);
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to set the query input value
+    window.setQuery = function(queryText) {
+        document.getElementById('queryInput').value = queryText;
+        // Optional: Auto-submit the form
+        // document.querySelector('.ai-form').submit();
+    };
+    
+    // Form submission loading indicator
+    const form = document.querySelector('.ai-form');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    
+    if (form) {
+        form.addEventListener('submit', function() {
+            loadingIndicator.style.display = 'block';
         });
-        
-        // Send to Telegram functionality
-        $('#sendToTelegramBtn').on('click', function() {
-            const button = $(this);
-            button.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...');
-            button.prop('disabled', true);
+    }
+    
+    // Send to Telegram functionality
+    const telegramBtn = document.getElementById('sendToTelegramBtn');
+    if (telegramBtn) {
+        telegramBtn.addEventListener('click', function() {
+            const type = this.getAttribute('data-type');
+            const query = this.getAttribute('data-query');
             
-            // Get the analysis content
-            const analysisType = "{{ query_type }}";
-            const query = "{{ result.query if result.query else result.symbol }}";
+            this.disabled = true;
+            this.innerHTML = '<i class="bi bi-telegram"></i> Sending...';
             
-            $.ajax({
-                url: '/api/telegram/send-analysis',
+            fetch('/api/telegram/send-analysis', {
                 method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    type: analysisType,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    type: type || 'general',
                     query: query
                 }),
-                success: function(response) {
-                    if (response.success) {
-                        alert('Analysis successfully sent to Telegram!');
-                    } else {
-                        alert('Error sending to Telegram: ' + response.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    alert('Error sending to Telegram: ' + error);
-                },
-                complete: function() {
-                    button.html('<i class="fab fa-telegram"></i> Send to Telegram');
-                    button.prop('disabled', false);
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Analysis sent to Telegram successfully!');
+                } else {
+                    alert('Error: ' + data.message);
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while sending to Telegram');
+            })
+            .finally(() => {
+                this.disabled = false;
+                this.innerHTML = '<i class="bi bi-telegram"></i> Send to Telegram';
             });
         });
-    });
-    
-    function setQuery(query) {
-        $('#queryInput').val(query);
-        // Scroll to the form
-        $('html, body').animate({
-            scrollTop: $("#analysisForm").offset().top - 100
-        }, 500);
-        // Focus on the input
-        $('#queryInput').focus();
     }
+});
 </script>
 {% endblock %}
