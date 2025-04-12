@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Crypto Quiz - Leaderboard{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .quiz-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .leaderboard-card {
+        border-radius: 15px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    .leaderboard-header {
+        text-align: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .leaderboard-table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .leaderboard-table tbody tr {
+        transition: all 0.2s;
+    }
+    .leaderboard-table tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .leaderboard-rank {
+        width: 50px;
+        text-align: center;
+        font-weight: bold;
+    }
+    .leaderboard-username {
+        font-weight: 500;
+    }
+    .rank-1 {
+        background-color: rgba(255, 215, 0, 0.1);
+    }
+    .rank-1 .leaderboard-rank {
+        color: gold;
+    }
+    .rank-2 {
+        background-color: rgba(192, 192, 192, 0.1);
+    }
+    .rank-2 .leaderboard-rank {
+        color: silver;
+    }
+    .rank-3 {
+        background-color: rgba(205, 127, 50, 0.1);
+    }
+    .rank-3 .leaderboard-rank {
+        color: #cd7f32; /* bronze */
+    }
+    .level-badge {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        border-radius: 50%;
+        background-color: var(--bs-primary);
+        color: white;
+        font-weight: bold;
+        font-size: 0.85rem;
+    }
+    .accuracy-bar {
+        height: 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        width: 100%;
+    }
+    .accuracy-fill {
+        height: 100%;
+        background-color: #198754;
+        border-radius: 4px;
+    }
+    .points-cell {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: var(--bs-primary);
+    }
+    .trophy-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #ffc107;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="quiz-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{{ url_for('crypto_quiz_home') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-home me-2"></i> Quiz Home
+            </a>
+            <h5 class="mb-0">Crypto Knowledge Quiz</h5>
+        </div>
+        
+        <!-- Leaderboard Card -->
+        <div class="card leaderboard-card">
+            <div class="leaderboard-header">
+                <span class="trophy-icon">
+                    <i class="fas fa-trophy"></i>
+                </span>
+                <h2>Crypto Quiz Leaderboard</h2>
+                <p class="lead mb-0">Top players ranked by total points</p>
+            </div>
+            
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover leaderboard-table mb-0">
+                        <thead>
+                            <tr>
+                                <th class="leaderboard-rank">Rank</th>
+                                <th>Player</th>
+                                <th class="text-center">Level</th>
+                                <th class="text-end">Points</th>
+                                <th class="text-center">Correct</th>
+                                <th>Accuracy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if leaderboard %}
+                                {% for entry in leaderboard %}
+                                    <tr class="rank-{{ entry.rank }}">
+                                        <td class="leaderboard-rank">
+                                            {% if entry.rank == 1 %}
+                                                <i class="fas fa-crown"></i>
+                                            {% else %}
+                                                {{ entry.rank }}
+                                            {% endif %}
+                                        </td>
+                                        <td class="leaderboard-username">{{ entry.username }}</td>
+                                        <td class="text-center">
+                                            <span class="level-badge">{{ entry.level }}</span>
+                                        </td>
+                                        <td class="text-end points-cell">{{ entry.points }}</td>
+                                        <td class="text-center">{{ entry.correct_answers }}/{{ entry.total_questions }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="accuracy-bar me-2">
+                                                    <div class="accuracy-fill" style="width: {{ entry.accuracy }}%"></div>
+                                                </div>
+                                                <span class="small">{{ entry.accuracy }}%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="alert alert-info mb-0">
+                                            No quiz attempts yet. Be the first to make it to the leaderboard!
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card-footer text-center py-3">
+                <p class="mb-0">Keep playing to improve your ranking!</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Simple animation for accuracy bars
+        const accuracyBars = document.querySelectorAll('.accuracy-fill');
+        
+        accuracyBars.forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            
+            setTimeout(() => {
+                bar.style.transition = 'width 1.5s ease-out';
+                bar.style.width = width;
+            }, 300);
+        });
+    });
+</script>
+{% endblock %}

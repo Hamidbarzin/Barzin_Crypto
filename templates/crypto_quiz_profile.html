@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+
+{% block title %}Crypto Quiz - User Profile{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .quiz-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .profile-card {
+        border-radius: 15px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    .profile-header {
+        padding: 2rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        background-color: #f8f9fa;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        background-color: var(--bs-primary);
+        color: white;
+    }
+    .level-badge {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border-radius: 50%;
+        background-color: var(--bs-primary);
+        color: white;
+        font-weight: bold;
+        font-size: 1.25rem;
+        margin-left: 0.75rem;
+        vertical-align: middle;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .stat-card {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .stat-label {
+        color: var(--bs-secondary);
+        font-size: 0.9rem;
+    }
+    .level-progress {
+        height: 10px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+    .level-progress-bar {
+        height: 100%;
+        background-color: var(--bs-primary);
+        border-radius: 5px;
+    }
+    .badges-section {
+        margin-bottom: 2rem;
+    }
+    .badge-item {
+        display: inline-block;
+        background-color: #212529;
+        color: white;
+        font-size: 0.85rem;
+        border-radius: 12px;
+        padding: 0.35rem 0.85rem;
+        margin: 0.35rem;
+    }
+    .quiz-attempt {
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
+    }
+    .quiz-attempt:hover {
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    }
+    .attempt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    .attempt-date {
+        font-size: 0.85rem;
+        color: var(--bs-secondary);
+    }
+    .attempt-correct {
+        background-color: rgba(25, 135, 84, 0.1);
+        border-color: rgba(25, 135, 84, 0.3);
+    }
+    .attempt-incorrect {
+        background-color: rgba(220, 53, 69, 0.1);
+        border-color: rgba(220, 53, 69, 0.3);
+    }
+    .attempt-question {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    .attempt-answer {
+        display: flex;
+        align-items: center;
+    }
+    .answer-icon {
+        margin-right: 0.75rem;
+    }
+    .correct-icon {
+        color: #198754;
+    }
+    .incorrect-icon {
+        color: #dc3545;
+    }
+    .tab-content {
+        padding: 1.5rem;
+    }
+    .attempt-points {
+        font-weight: bold;
+        color: var(--bs-primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="quiz-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{{ url_for('crypto_quiz_home') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-home me-2"></i> Quiz Home
+            </a>
+            <h5 class="mb-0">Crypto Knowledge Quiz</h5>
+        </div>
+        
+        <!-- Profile Card -->
+        <div class="card profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                
+                <h3>
+                    {% if session.username %}
+                        {{ session.username }}
+                    {% else %}
+                        Guest User
+                    {% endif %}
+                    <span class="level-badge">{{ user_stats.level }}</span>
+                </h3>
+                
+                <p class="lead mb-0">Crypto Quiz Profile</p>
+            </div>
+            
+            <div class="card-body">
+                <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab" aria-controls="stats" aria-selected="true">
+                            <i class="fas fa-chart-line me-2"></i> Stats
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="badges-tab" data-bs-toggle="tab" data-bs-target="#badges" type="button" role="tab" aria-controls="badges" aria-selected="false">
+                            <i class="fas fa-award me-2"></i> Badges
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
+                            <i class="fas fa-history me-2"></i> History
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="profileTabsContent">
+                    <!-- Stats Tab -->
+                    <div class="tab-pane fade show active" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value">{{ user_stats.total_points }}</div>
+                                <div class="stat-label">TOTAL POINTS</div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-value">{{ user_stats.level }}</div>
+                                <div class="stat-label">CURRENT LEVEL</div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-value">{{ user_stats.total_correct }}</div>
+                                <div class="stat-label">CORRECT ANSWERS</div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-value">{{ user_stats.accuracy }}%</div>
+                                <div class="stat-label">ACCURACY</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Level Progress -->
+                        <div class="mb-4">
+                            <h5>Level Progress</h5>
+                            <div class="d-flex justify-content-between">
+                                <span>Level {{ user_stats.level }}</span>
+                                <span>Level {{ user_stats.next_level }}</span>
+                            </div>
+                            <div class="level-progress">
+                                {% set progress = (user_stats.total_points - user_stats.points_to_next_level) / user_stats.points_to_next_level * 100 %}
+                                {% if progress > 100 %}
+                                    {% set progress = 100 %}
+                                {% endif %}
+                                <div class="level-progress-bar" style="width: {{ progress }}%"></div>
+                            </div>
+                            <div class="text-center">
+                                <small>{{ user_stats.points_to_next_level }} points to next level</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Stats -->
+                        <div class="card mb-0">
+                            <div class="card-header">
+                                <h5 class="mb-0">Quiz Statistics</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Total Questions
+                                                <span class="badge bg-primary rounded-pill">{{ user_stats.total_questions }}</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Correct Answers
+                                                <span class="badge bg-success rounded-pill">{{ user_stats.total_correct }}</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Incorrect Answers
+                                                <span class="badge bg-danger rounded-pill">{{ user_stats.total_questions - user_stats.total_correct }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Total Points
+                                                <span class="badge bg-primary rounded-pill">{{ user_stats.total_points }}</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Current Level
+                                                <span class="badge bg-primary rounded-pill">{{ user_stats.level }}</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Accuracy Rate
+                                                <span class="badge bg-info rounded-pill">{{ user_stats.accuracy }}%</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Badges Tab -->
+                    <div class="tab-pane fade" id="badges" role="tabpanel" aria-labelledby="badges-tab">
+                        <div class="badges-section">
+                            <h5>Your Earned Badges</h5>
+                            {% if user_stats.badges %}
+                                <div class="row mt-4">
+                                    {% for badge in user_stats.badges %}
+                                        <div class="col-md-6 mb-4">
+                                            <div class="card">
+                                                <div class="card-body text-center">
+                                                    <div class="display-4 mb-3">
+                                                        {% if badge == 'beginner' %}
+                                                            <i class="fas fa-seedling text-success"></i>
+                                                        {% elif badge == 'novice' %}
+                                                            <i class="fas fa-book text-info"></i>
+                                                        {% elif badge == 'intermediate' %}
+                                                            <i class="fas fa-star text-warning"></i>
+                                                        {% elif badge == 'advanced' %}
+                                                            <i class="fas fa-medal text-primary"></i>
+                                                        {% elif badge == 'expert' %}
+                                                            <i class="fas fa-trophy text-warning"></i>
+                                                        {% elif badge == 'master' %}
+                                                            <i class="fas fa-crown text-warning"></i>
+                                                        {% elif badge == 'crypto_genius' %}
+                                                            <i class="fas fa-brain text-danger"></i>
+                                                        {% else %}
+                                                            <i class="fas fa-award text-secondary"></i>
+                                                        {% endif %}
+                                                    </div>
+                                                    <h4>{{ badge|capitalize }}</h4>
+                                                    <p class="text-muted">
+                                                        {% if badge == 'beginner' %}
+                                                            Earned 50+ points in Crypto Quiz
+                                                        {% elif badge == 'novice' %}
+                                                            Earned 100+ points in Crypto Quiz
+                                                        {% elif badge == 'intermediate' %}
+                                                            Earned 200+ points in Crypto Quiz
+                                                        {% elif badge == 'advanced' %}
+                                                            Earned 400+ points in Crypto Quiz
+                                                        {% elif badge == 'expert' %}
+                                                            Earned 800+ points in Crypto Quiz
+                                                        {% elif badge == 'master' %}
+                                                            Earned 1500+ points in Crypto Quiz
+                                                        {% elif badge == 'crypto_genius' %}
+                                                            Earned 3000+ points in Crypto Quiz
+                                                        {% else %}
+                                                            Special badge for quiz achievement
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i> You haven't earned any badges yet. Keep playing quizzes to earn badges!
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- History Tab -->
+                    <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                        <h5>Quiz Attempt History</h5>
+                        
+                        {% if history %}
+                            <div class="mt-4">
+                                {% for attempt in history %}
+                                    <div class="quiz-attempt {{ 'attempt-correct' if attempt.is_correct else 'attempt-incorrect' }}">
+                                        <div class="attempt-header">
+                                            <span class="attempt-date">{{ attempt.timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+                                            <span class="attempt-points">{{ attempt.points }} points</span>
+                                        </div>
+                                        
+                                        <div class="attempt-question">
+                                            {{ attempt.question }}
+                                        </div>
+                                        
+                                        <div class="attempt-answer">
+                                            <span class="answer-icon {{ 'correct-icon' if attempt.is_correct else 'incorrect-icon' }}">
+                                                <i class="{{ 'fas fa-check-circle' if attempt.is_correct else 'fas fa-times-circle' }}"></i>
+                                            </span>
+                                            
+                                            <div>
+                                                <strong>Your answer:</strong> {{ attempt.user_answer|upper }}
+                                                {% if not attempt.is_correct %}
+                                                    <span class="ms-3"><strong>Correct answer:</strong> {{ attempt.correct_answer|upper }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info mt-4">
+                                <i class="fas fa-info-circle me-2"></i> You haven't taken any quizzes yet. Start playing to see your history!
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate the stats on page load
+        const statValues = document.querySelectorAll('.stat-value');
+        
+        statValues.forEach(stat => {
+            const targetValue = stat.textContent.replace('%', '');
+            let startValue = 0;
+            const duration = 1000;
+            const startTime = Date.now();
+            
+            function updateValue() {
+                const currentTime = Date.now();
+                const elapsed = currentTime - startTime;
+                
+                if (elapsed < duration) {
+                    const progress = elapsed / duration;
+                    const currentValue = Math.floor(parseFloat(targetValue) * progress);
+                    
+                    if (stat.textContent.includes('%')) {
+                        stat.textContent = currentValue + '%';
+                    } else {
+                        stat.textContent = currentValue;
+                    }
+                    
+                    requestAnimationFrame(updateValue);
+                } else {
+                    if (stat.textContent.includes('%')) {
+                        stat.textContent = targetValue + '%';
+                    } else {
+                        stat.textContent = targetValue;
+                    }
+                }
+            }
+            
+            requestAnimationFrame(updateValue);
+        });
+        
+        // Initialize tabs
+        const triggerTabList = [].slice.call(document.querySelectorAll('#profileTabs a'));
+        triggerTabList.forEach(function (triggerEl) {
+            const tabTrigger = new bootstrap.Tab(triggerEl);
+            
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault();
+                tabTrigger.show();
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block title %}Crypto Quiz - Final Results{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .quiz-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .results-card {
+        border-radius: 15px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    .results-header {
+        text-align: center;
+        padding: 2rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        background-color: #f8f9fa;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+    .results-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        display: inline-block;
+        color: #ffc107;
+    }
+    .score-display {
+        text-align: center;
+        margin: 2rem 0;
+    }
+    .score-circle {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    .score-circle-inner {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .score-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        line-height: 1;
+        color: var(--bs-primary);
+    }
+    .score-label {
+        font-size: 0.9rem;
+        color: var(--bs-secondary);
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .stat-card {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .stat-label {
+        color: var(--bs-secondary);
+        font-size: 0.9rem;
+    }
+    .badges-section {
+        margin-bottom: 2rem;
+    }
+    .badge-item {
+        display: inline-block;
+        background-color: #212529;
+        color: white;
+        font-size: 0.85rem;
+        border-radius: 12px;
+        padding: 0.35rem 0.85rem;
+        margin: 0.35rem;
+    }
+    .progress-bar {
+        height: 10px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        background-color: var(--bs-primary);
+        border-radius: 5px;
+    }
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        opacity: 0;
+        animation: confetti-fall 4s ease forwards;
+    }
+    @keyframes confetti-fall {
+        0% {
+            transform: translateY(-50px) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(800px) rotate(360deg);
+            opacity: 0;
+        }
+    }
+    .level-gained {
+        background-color: #ffc107;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .action-buttons .btn {
+        flex: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="quiz-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{{ url_for('crypto_quiz_home') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-home me-2"></i> Quiz Home
+            </a>
+            <h5 class="mb-0">Crypto Knowledge Quiz</h5>
+        </div>
+        
+        <!-- Results Card -->
+        <div class="card results-card">
+            <div class="results-header">
+                <span class="results-icon">
+                    <i class="fas fa-trophy"></i>
+                </span>
+                <h2>Quiz Completed!</h2>
+                <p class="lead mb-0">Here are your final results:</p>
+            </div>
+            
+            <div class="card-body">
+                <!-- Score Display -->
+                <div class="score-display">
+                    <div class="score-circle" id="score-circle">
+                        <div class="score-circle-inner">
+                            <div class="score-value">{{ quiz_score }}</div>
+                            <div class="score-label">POINTS</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ quiz_correct }}</div>
+                        <div class="stat-label">CORRECT ANSWERS</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value">{{ total_questions }}</div>
+                        <div class="stat-label">TOTAL QUESTIONS</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value">{{ user_stats.level }}</div>
+                        <div class="stat-label">CURRENT LEVEL</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value">{{ (quiz_correct / total_questions * 100)|int }}%</div>
+                        <div class="stat-label">ACCURACY</div>
+                    </div>
+                </div>
+                
+                <!-- Level Progress -->
+                <div class="mb-4">
+                    <h5>Level Progress</h5>
+                    <div class="d-flex justify-content-between">
+                        <span>Level {{ user_stats.level }}</span>
+                        <span>Level {{ user_stats.next_level }}</span>
+                    </div>
+                    <div class="progress-bar">
+                        {% set progress = (user_stats.total_points - user_stats.points_to_next_level) / user_stats.points_to_next_level * 100 %}
+                        {% if progress > 100 %}
+                            {% set progress = 100 %}
+                        {% endif %}
+                        <div class="progress-bar-fill" style="width: {{ progress }}%"></div>
+                    </div>
+                    <div class="text-center">
+                        <small>{{ user_stats.points_to_next_level }} points to next level</small>
+                    </div>
+                </div>
+                
+                <!-- Badges -->
+                <div class="badges-section">
+                    <h5>Your Badges</h5>
+                    {% if user_stats.badges %}
+                        <div>
+                            {% for badge in user_stats.badges %}
+                                <span class="badge-item">{{ badge|capitalize }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No badges earned yet. Keep playing to earn badges!</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <a href="{{ url_for('crypto_quiz_start') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-redo me-2"></i> Take Another Quiz
+                    </a>
+                    
+                    <a href="{{ url_for('crypto_quiz_leaderboard') }}" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-list-ol me-2"></i> View Leaderboard
+                    </a>
+                </div>
+                
+                <!-- Share Results -->
+                <div class="text-center mt-4">
+                    <h5>Share Your Results</h5>
+                    <div class="btn-group mt-2">
+                        <button class="btn btn-outline-primary">
+                            <i class="fab fa-twitter"></i>
+                        </button>
+                        <button class="btn btn-outline-primary">
+                            <i class="fab fa-facebook"></i>
+                        </button>
+                        <button class="btn btn-outline-primary">
+                            <i class="fab fa-telegram"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create confetti animation
+        const createConfetti = () => {
+            const container = document.querySelector('.score-display');
+            const colors = ['#ffc107', '#0d6efd', '#dc3545', '#198754', '#6f42c1'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 4 + 's';
+                    
+                    container.appendChild(confetti);
+                    
+                    // Remove after animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 4000);
+                }, Math.random() * 1000);
+            }
+        };
+        
+        // Animate stats
+        const animateStats = () => {
+            const statValues = document.querySelectorAll('.stat-value');
+            
+            statValues.forEach(stat => {
+                const targetValue = stat.textContent.replace('%', '');
+                let startValue = 0;
+                const duration = 1500;
+                const startTime = Date.now();
+                
+                const updateValue = () => {
+                    const currentTime = Date.now();
+                    const elapsed = currentTime - startTime;
+                    
+                    if (elapsed < duration) {
+                        const progress = elapsed / duration;
+                        const currentValue = Math.floor(parseFloat(targetValue) * progress);
+                        
+                        if (stat.textContent.includes('%')) {
+                            stat.textContent = currentValue + '%';
+                        } else {
+                            stat.textContent = currentValue;
+                        }
+                        
+                        requestAnimationFrame(updateValue);
+                    } else {
+                        if (stat.textContent.includes('%')) {
+                            stat.textContent = targetValue + '%';
+                        } else {
+                            stat.textContent = targetValue;
+                        }
+                    }
+                };
+                
+                updateValue();
+            });
+        };
+        
+        // Initialize animations
+        createConfetti();
+        animateStats();
+    });
+</script>
+{% endblock %}
