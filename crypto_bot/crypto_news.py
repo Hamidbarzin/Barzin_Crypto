@@ -347,6 +347,7 @@ def get_crypto_news(limit: int = 10, translate: bool = True, include_canada: boo
                 
                 # Add Canadian news if needed
                 if include_canada:
+                    logger.info("Attempting to get Canadian news from specialized API...")
                     canada_news = get_canadian_crypto_news_from_api(items_per_page=limit // 2)
                     if canada_news:
                         logger.info(f"{len(canada_news)} Canadian news items received from specialized API")

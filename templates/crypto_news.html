@@ -330,6 +330,10 @@
                 
                 if (response.success && response.news && response.news.length > 0) {
                     console.log(`Found ${response.news.length} news items`);
+                    // Debug the first news item
+                    if (response.news.length > 0) {
+                        console.log("Sample news item:", response.news[0]);
+                    }
                     allNews = allNews.concat(response.news);
                 } else {
                     console.warn("No news found in main API response");
@@ -466,8 +470,10 @@
             newsElement.find('a').attr('href', newsUrl);
             
             // Set image (if available)
-            if (item.imageurl) {
+            if (item.imageurl && item.imageurl.trim() !== '') {
                 newsElement.find('.news-image-placeholder').removeClass('news-image-placeholder').addClass('news-image').css('background-image', `url(${item.imageurl})`);
+            } else if (item.image_url && item.image_url.trim() !== '') {
+                newsElement.find('.news-image-placeholder').removeClass('news-image-placeholder').addClass('news-image').css('background-image', `url(${item.image_url})`);
             }
             
             container.append(newsElement);

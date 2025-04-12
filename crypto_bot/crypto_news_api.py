@@ -15,8 +15,13 @@ from typing import List, Dict, Any, Optional
 # Configure logger
 logger = logging.getLogger(__name__)
 
-# Set API key
-CRYPTO_NEWS_API_KEY = os.environ.get("CRYPTO_NEWS_API_KEY", "2b2f67d9892c7942447e8c14d035da36ef2f848f")
+# Set API key - try to get from environment variable first
+CRYPTO_NEWS_API_KEY = os.environ.get("CRYPTO_NEWS_API_KEY", "")
+
+# Check if API key is available
+HAS_VALID_API_KEY = bool(CRYPTO_NEWS_API_KEY.strip())
+if not HAS_VALID_API_KEY:
+    logger.warning("No CRYPTO_NEWS_API_KEY found in environment variables. News API functionality will be limited.")
 
 # Cache paths
 CACHE_DIR = "data/news_cache"
@@ -51,6 +56,11 @@ def get_crypto_news_from_api(categories: List[str] = None, regions: List[str] = 
         if cached_data:
             return cached_data
     
+    # Check if we have a valid API key
+    if not HAS_VALID_API_KEY:
+        logger.warning("Cannot fetch news from API: No API key available")
+        return []
+    
     # Setup API parameters
     params = {
         'toppag': str(page),
@@ -67,6 +77,7 @@ def get_crypto_news_from_api(categories: List[str] = None, regions: List[str] = 
     try:
         # Request to API
         url = f"{API_BASE_URL}/category"
+        logger.info(f"Fetching news from {url} with categories={categories} and regions={regions}")
         response = requests.get(url, params=params, timeout=15)
         
         if response.status_code != 200:
