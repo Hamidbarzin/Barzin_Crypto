@@ -1027,7 +1027,6 @@ def test_tech():
     '''
 
 @app.route('/app_settings')
-@login_required
 def app_settings():
     """صفحه تنظیمات ساده"""
     return redirect(url_for('dashboard'))
@@ -2481,6 +2480,7 @@ def test_prices():
     return render_template('test_prices.html')
 
 @app.route('/minimal_settings')
+@login_required
 def minimal_settings():
     """صفحه تنظیمات با طراحی مینیمال"""
     # inject_now() is called automatically by context_processor, no need to call it manually
