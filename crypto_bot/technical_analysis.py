@@ -18,19 +18,36 @@ from crypto_bot.market_data import get_historical_data
 
 logger = logging.getLogger(__name__)
 
-def calculate_technical_indicators(historical_data: pd.DataFrame, symbol: str) -> Dict[str, Any]:
+def calculate_technical_indicators(historical_data: Union[pd.DataFrame, list], symbol: str) -> Dict[str, Any]:
     """
     محاسبه اندیکاتورهای تکنیکال برای یک ارز
 
     Args:
-        historical_data: داده‌های تاریخی با ستون‌های OHLC
+        historical_data: داده‌های تاریخی با ستون‌های OHLC (DataFrame یا list)
         symbol: نماد ارز
 
     Returns:
         Dict[str, Any]: اندیکاتورهای تکنیکال
     """
-    if historical_data is None or historical_data.empty:
+    # Check if historical_data is None or empty
+    if historical_data is None:
         logger.warning(f"داده‌های تاریخی برای {symbol} در دسترس نیست")
+        return {}
+        
+    # Convert list to DataFrame if it's a list
+    if isinstance(historical_data, list):
+        if not historical_data:  # Check if list is empty
+            logger.warning(f"داده‌های تاریخی خالی برای {symbol}")
+            return {}
+        try:
+            historical_data = pd.DataFrame(historical_data)
+        except Exception as e:
+            logger.error(f"خطا در تبدیل داده‌های تاریخی به DataFrame برای {symbol}: {str(e)}")
+            return {}
+    
+    # Check if DataFrame is empty
+    if isinstance(historical_data, pd.DataFrame) and historical_data.empty:
+        logger.warning(f"داده‌های تاریخی برای {symbol} خالی است")
         return {}
 
     try:
@@ -138,15 +155,26 @@ def get_technical_analysis(symbol: str, timeframe: str = "1d") -> Dict[str, Any]
         # دریافت داده‌های تاریخی
         historical_data = get_historical_data(symbol, timeframe=timeframe, limit=100)
         
-        # محاسبه اندیکاتورها
-        indicators = calculate_technical_indicators(historical_data, symbol)
-        
         # آماده‌سازی نتیجه
         analysis = {
             'symbol': symbol,
             'timeframe': timeframe,
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         }
+        
+        # Get current price if possible
+        current_price = None
+        if isinstance(historical_data, pd.DataFrame) and not historical_data.empty and 'close' in historical_data.columns:
+            current_price = historical_data['close'].iloc[-1]
+        elif isinstance(historical_data, list) and historical_data and 'close' in historical_data[-1]:
+            current_price = historical_data[-1]['close']
+        
+        # If we have a current price, add it to the analysis
+        if current_price is not None:
+            analysis['current_price'] = current_price
+        
+        # محاسبه اندیکاتورها
+        indicators = calculate_technical_indicators(historical_data, symbol)
         
         # ترکیب با اندیکاتورها
         analysis.update(indicators)
@@ -181,16 +209,16 @@ def get_technical_analysis(symbol: str, timeframe: str = "1d") -> Dict[str, Any]
             ma50 = indicators['ma50']
             ma200 = indicators['ma200']
             
-            current_price = historical_data['close'].iloc[-1]
-            
-            if current_price > ma20 > ma50 > ma200:
-                if signal != "فروش":
-                    signal = "خرید"
-                signal_strength += 2
-            elif current_price < ma20 < ma50 < ma200:
-                if signal != "خرید":
-                    signal = "فروش"
-                signal_strength -= 2
+            # Use safely retrieved current_price or indicators['current_price'] if it exists
+            if current_price is not None:
+                if current_price > ma20 > ma50 > ma200:
+                    if signal != "فروش":
+                        signal = "خرید"
+                    signal_strength += 2
+                elif current_price < ma20 < ma50 < ma200:
+                    if signal != "خرید":
+                        signal = "فروش"
+                    signal_strength -= 2
         
         # تعیین قدرت سیگنال
         if signal_strength >= 3:
