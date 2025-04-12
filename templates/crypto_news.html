@@ -175,13 +175,38 @@
     <div class="row">
         <!-- News Column -->
         <div class="col-lg-8">
-            <div id="newsLoading" class="loading-spinner">
-                <div class="spinner-border text-warning" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
             <div id="newsContainer" class="news-container">
-                <!-- News will be placed here -->
+                {% if news_items and news_items|length > 0 %}
+                    {% for item in news_items %}
+                        <div class="news-card">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    {% if item.imageurl and item.imageurl|length > 0 %}
+                                        <div class="news-image" style="background-image: url('{{ item.imageurl }}')"></div>
+                                    {% elif item.image_url and item.image_url|length > 0 %}
+                                        <div class="news-image" style="background-image: url('{{ item.image_url }}')"></div>
+                                    {% else %}
+                                        <div class="news-image-placeholder">
+                                            <i class="fas fa-newspaper fa-3x"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="news-title">{{ item.title or 'Crypto News' }}</h5>
+                                        <p class="news-date">{{ item.published_date or '' }}</p>
+                                        <span class="news-source">{{ item.source or 'Crypto News' }}</span>
+                                        {% if item.url and item.url|length > 0 %}
+                                            <a href="{{ item.url }}" target="_blank" class="btn btn-sm btn-outline-warning mt-2">Read More</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-warning">No news found. Please check back later.</div>
+                {% endif %}
             </div>
         </div>
         
@@ -290,13 +315,13 @@
 {% block scripts %}
 <script>
     $(document).ready(function() {
-        // Update news and market sentiment on page load
-        fetchNews();
+        // News is now directly rendered from the server
+        // Only fetch market sentiment
         fetchMarketInsights();
         
         // Button event handlers
         $('#refreshNewsBtn').click(function() {
-            fetchNews();
+            window.location.reload(); // Reload the page instead of using AJAX
         });
         
         $('#sendNewsToTelegramBtn').click(function() {

@@ -2705,7 +2705,27 @@ def price_alerts_page():
 @app.route('/news')
 def crypto_news_page():
     """Cryptocurrency News Page"""
-    return render_template('crypto_news.html')
+    # Get news data directly from the server
+    from crypto_bot.crypto_news import get_crypto_news
+    
+    # Don't attempt translation (use English content)
+    news_data = get_crypto_news(translate=False)
+    
+    # Get Canadian news
+    try:
+        from crypto_bot.news_scanner import get_canadian_crypto_news
+        canada_news = get_canadian_crypto_news()
+    except (ImportError, AttributeError):
+        app.logger.warning("Canadian news module not available")
+        canada_news = []
+    
+    # Combine news sources
+    all_news = news_data + canada_news
+    
+    # Sort by published date if available
+    all_news.sort(key=lambda x: x.get('published_on', 0) if x.get('published_on') else 0, reverse=True)
+    
+    return render_template('crypto_news.html', news_items=all_news)
 
 
 # API‌های کنترل سرویس تلگرام
