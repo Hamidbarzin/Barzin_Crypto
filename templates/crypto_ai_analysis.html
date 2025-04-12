@@ -212,7 +212,13 @@
                 </div>
                 
                 <div class="text-end mt-3">
-                    <small class="text-muted">Generated {{ ((now.timestamp() - result.timestamp) / 60)|int }} minutes ago</small>
+                    <small class="text-muted">
+                        {% if result.timestamp is defined %}
+                            Generated {{ ((now.timestamp() - result.timestamp) / 60)|int }} minutes ago
+                        {% else %}
+                            Generated just now
+                        {% endif %}
+                    </small>
                 </div>
             </div>
             {% endif %}
