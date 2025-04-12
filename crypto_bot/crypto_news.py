@@ -317,8 +317,8 @@ def translate_news(news_items: List[Dict[str, Any]], target_language: str = "fa"
         
         return translated_items
     except Exception as e:
-        logger.error(f"خطا در ترجمه اخبار: {str(e)}")
-        # اگر ترجمه با خطا مواجه شود، اخبار اصلی را برمی‌گردانیم
+        logger.error(f"Error translating news: {str(e)}")
+        # If translation fails, return the original news
         for item in news_items:
             item['title_fa'] = item['title']
         return news_items
@@ -362,8 +362,8 @@ def get_crypto_news(limit: int = 10, translate: bool = True, include_canada: boo
                     try:
                         api_news = translate_news(api_news)
                     except Exception as e:
-                        logger.error(f"خطا در ترجمه اخبار: {str(e)}")
-                        # اگر ترجمه با خطا مواجه شود، فیلد عنوان فارسی را با عنوان انگلیسی پر می‌کنیم
+                        logger.error(f"Error translating news: {str(e)}")
+                        # If translation fails, fill the Persian title field with the English title
                         for item in api_news:
                             if 'title_fa' not in item:
                                 item['title_fa'] = item['title']
@@ -398,7 +398,7 @@ def get_crypto_news(limit: int = 10, translate: bool = True, include_canada: boo
             # ادامه با روش قدیمی در صورت خطا
     
     # اگر API جدید در دسترس نباشد یا خطا داشته باشد، از روش قدیمی استفاده می‌کنیم
-    logger.warning("استفاده از منابع قدیمی برای دریافت اخبار")
+    logger.warning("Using old sources to retrieve news")
     
     # تعیین تعداد اخبار از هر منبع
     source_count = 4 if include_canada else 3

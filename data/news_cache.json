@@ -1,10 +1,74 @@
 [
   {
     "title": "News",
+    "url": "https://cointelegraph.com/news/crypto-markets-rebound-trump-canada-mexico-tarriffs-on-hold",
+    "image_url": "",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:34.305871",
+    "source": "CoinTelegraph"
+  },
+  {
+    "title": "Market Analysis",
+    "url": "https://cointelegraph.com/news/will-trump-s-trade-war-bring-an-early-end-to-the-bitcoin-bull-market",
+    "image_url": "",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:34.305803",
+    "source": "CoinTelegraph"
+  },
+  {
+    "title": "News",
+    "url": "https://cointelegraph.com/news/ciro-excludes-crypto-funds-reduced-margin-eligibility",
+    "image_url": "",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:34.305735",
+    "source": "CoinTelegraph"
+  },
+  {
+    "title": "News",
+    "url": "https://cointelegraph.com/news/national-bank-canada-hints-bearish-take-bitcoin",
+    "image_url": "",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:34.305667",
+    "source": "CoinTelegraph"
+  },
+  {
+    "title": "News",
+    "url": "https://cointelegraph.com/news/howard-lutnick-us-senate-confirms-commerce-secretary",
+    "image_url": "",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:34.305597",
+    "source": "CoinTelegraph"
+  },
+  {
+    "title": "News",
+    "url": "https://cointelegraph.com/news/metaplanet-el-salvador-buy-bitcoin-5-percent-price-fall",
+    "image_url": "",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:34.305525",
+    "source": "CoinTelegraph"
+  },
+  {
+    "title": "How to",
+    "url": "https://cointelegraph.com/news/how-to-buy-bitcoin-in-canada",
+    "image_url": "",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:34.305450",
+    "source": "CoinTelegraph"
+  },
+  {
+    "title": "Market Analysis",
+    "url": "https://cointelegraph.com/news/bitcoin-crashes-to-3-month-low-will-macroeconomic-uncertainty-spark-a-btc-price-rebound",
+    "image_url": "",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:34.305373",
+    "source": "CoinTelegraph"
+  },
+  {
+    "title": "News",
     "url": "https://cointelegraph.com/news/canadas-new-prime-minister-mark-carney-bitcoin-critic",
     "image_url": "",
     "summary": "",
-    "published_at": "2025-04-12T03:20:28.073813",
+    "published_at": "2025-04-12T11:52:34.305303",
     "source": "CoinTelegraph"
   },
   {
@@ -12,7 +76,7 @@
     "url": "https://cointelegraph.com/news/crypto-scam-lure-victim-trade-war-fears-canada-securities-regulators",
     "image_url": "",
     "summary": "",
-    "published_at": "2025-04-12T03:20:28.073631",
+    "published_at": "2025-04-12T11:52:34.305229",
     "source": "CoinTelegraph"
   },
   {
@@ -20,7 +84,7 @@
     "url": "https://cointelegraph.com/news/canada-liberal-pm-mark-carney-crypto",
     "image_url": "",
     "summary": "",
-    "published_at": "2025-04-12T03:20:28.073429",
+    "published_at": "2025-04-12T11:52:34.305150",
     "source": "CoinTelegraph"
   },
   {
@@ -28,7 +92,7 @@
     "url": "https://cointelegraph.com/news/us-canada-tariff-bitcoin-miners",
     "image_url": "",
     "summary": "",
-    "published_at": "2025-04-12T03:20:28.073272",
+    "published_at": "2025-04-12T11:52:34.305074",
     "source": "CoinTelegraph"
   },
   {
@@ -36,7 +100,7 @@
     "url": "https://cointelegraph.com/news/canadian-commercial-property-tokenized-polymesh-ocree-capital",
     "image_url": "",
     "summary": "",
-    "published_at": "2025-04-12T03:20:28.073124",
+    "published_at": "2025-04-12T11:52:34.305001",
     "source": "CoinTelegraph"
   },
   {
@@ -44,7 +108,7 @@
     "url": "https://cointelegraph.com/news/apx-lending-exemptive-relief-canadian-securities-admin",
     "image_url": "",
     "summary": "",
-    "published_at": "2025-04-12T03:20:28.072976",
+    "published_at": "2025-04-12T11:52:34.304904",
     "source": "CoinTelegraph"
   },
   {
@@ -52,7 +116,127 @@
     "url": "https://cointelegraph.com/news/kraken-secures-restricted-dealer-registration-canada",
     "image_url": "",
     "summary": "",
-    "published_at": "2025-04-12T03:20:28.072807",
+    "published_at": "2025-04-12T11:52:34.304734",
     "source": "CoinTelegraph"
+  },
+  {
+    "title": "OpenAI countersues Elon Musk over alleged sabotage campaign",
+    "url": "https://cryptoslate.com/openai-countersues-elon-musk-over-alleged-sabotage-campaign/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/elonmusk-openai--300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547809",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "Ethereum’s Vitalik Buterin reveals roadmap to boost Layer-1 privacy",
+    "url": "https://cryptoslate.com/ethereums-vitalik-buterin-reveals-roadmap-to-boost-layer-1-privacy/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/vitalik-buterin-ethereum-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547775",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "Coinbase accuses FDIC of stalling crypto debanking document release",
+    "url": "https://cryptoslate.com/coinbase-accuses-fdic-of-stalling-crypto-debanking-document-release/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/fdic-coinbase-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547740",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "US lawmakers and Elizabeth Warren criticize DOJ for disbanding crypto enforcement team",
+    "url": "https://cryptoslate.com/us-lawmakers-and-elizabeth-warren-criticize-doj-for-disbanding-crypto-enforcement-team/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/doj-crypto-enforcement-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547706",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "BlackRock’s crypto ETFs thrive in one of the toughest quarters with $3 billion inflow",
+    "url": "https://cryptoslate.com/blackrocks-crypto-etfs-thrive-in-one-of-the-toughest-quarters-with-3-billion-inflow/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/blackrock-etf-inflow-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547672",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "Pumpfun fully restores streaming feature with stricter moderation policy",
+    "url": "https://cryptoslate.com/pumpfun-fully-restores-streaming-feature-with-stricter-moderation-policy/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/pumpfun-livestreaming-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547639",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "SEC acting chair signals support for regulatory sandbox to facilitate crypto trading innovation",
+    "url": "https://cryptoslate.com/sec-acting-chair-signals-support-for-regulatory-sandbox-to-facilitate-crypto-trading-innovation/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/mark-uyeda-sec-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547605",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "Swedish lawmaker urges government to establish Bitcoin reserve amid global economic shifts",
+    "url": "https://cryptoslate.com/swedish-lawmaker-urges-government-to-establish-bitcoin-reserve-amid-global-economic-shifts/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/bitcoin-sweden-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547571",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "Senators reintroduce legislation to tighten rules on crypto custody",
+    "url": "https://cryptoslate.com/senators-reintroduce-legislation-to-tighten-rules-on-crypto-custody/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/ftx-proof-act--300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547537",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "Survey reveals 1 in 5 Americans own crypto, with 76% reporting personal benefits",
+    "url": "https://cryptoslate.com/survey-reveals-1-in-5-americans-own-crypto-with-76-reporting-personal-benefits/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/03/crypto-usa-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547503",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "Bank of England sounds alarm on stablecoin oversight issues",
+    "url": "https://cryptoslate.com/bank-of-england-sounds-alarm-on-stablecoin-oversight-issues/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/bankofengland-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547467",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "Standard Chartered, OKX, Franklin Templeton launch trading platform pilot with tokenized fund collateral",
+    "url": "https://cryptoslate.com/standard-chartered-okx-franklin-templeton-launch-trading-platform-pilot-with-tokenized-fund-collateral/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/stanchart-okx-franklin-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547432",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "Long-term holders continue to accumulate as short-term sellers react to market stress",
+    "url": "https://cryptoslate.com/long-term-holders-continue-to-accumulate-as-short-term-sellers-react-to-market-stress/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/bitcoin-holders-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547397",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "WhiteBIT Featured on Coinglass Amid Top Exchanges for Data Reliability",
+    "url": "https://cryptoslate.com/press-releases/whitebit-featured-on-coinglass-amid-top-exchanges-for-data-reliability/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/whitebit-pr-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547358",
+    "source": "CryptoSlate"
+  },
+  {
+    "title": "AB Charity Foundation Launches Global Operations with Blockchain-Backed Public Good Framework",
+    "url": "https://cryptoslate.com/press-releases/ab-charity-foundation-launches-global-operations-with-blockchain-backed-public-good-framework/",
+    "image_url": "https://cryptoslate.com/wp-content/uploads/2025/04/ab-charity-pr-300x158.jpg",
+    "summary": "",
+    "published_at": "2025-04-12T11:52:33.547322",
+    "source": "CryptoSlate"
   }
 ]
