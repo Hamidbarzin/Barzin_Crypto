@@ -367,9 +367,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // API request
+        console.log("Loading technical data for:", symbol);
         fetch(`/api/technical/${symbol}/1d`)
             .then(response => response.json())
             .then(data => {
+                console.log("Technical analysis data received:", data);
                 if (data.success && data.data) {
                     const analysis = data.data;
                     
