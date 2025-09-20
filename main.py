@@ -1,4 +1,4 @@
-# Railway Full Application - Updated for deployment
+# Railway Full Application - Updated for deployment - FORCE REBUILD
 import os
 import logging
 import random
@@ -33,6 +33,9 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "crypto_bot_secret_key_default_for_development")
+
+# Railway deployment marker - FORCE REBUILD
+print("🚀 Railway Full Application Starting - Version 2.0")
 
 # Initialize SocketIO for real-time updates
 socketio = SocketIO(app, cors_allowed_origins="*")
