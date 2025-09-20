@@ -1,8 +1,8 @@
 {
   "messages": {
-    "total_sent": 1214,
+    "total_sent": 1218,
     "successful": 1172,
-    "failed": 42,
+    "failed": 46,
     "history": [
       {
         "message_type": "price_report",
@@ -6115,12 +6115,36 @@
         "success": false,
         "timestamp": "2025-09-20T01:12:12.825716-04:00",
         "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "price_report",
+        "success": false,
+        "timestamp": "2025-09-20T01:23:09.370121-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-09-20T01:23:09.378807-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "price_report",
+        "success": false,
+        "timestamp": "2025-09-20T01:33:56.885758-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-09-20T01:33:56.891949-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
       }
     ]
   },
   "uptime": {
     "start_time": "2025-04-10T16:54:51.535404-04:00",
-    "last_restart": "2025-09-20T01:12:12.819312-04:00",
-    "restarts": 591
+    "last_restart": "2025-09-20T01:33:56.885743-04:00",
+    "restarts": 593
   }
 }

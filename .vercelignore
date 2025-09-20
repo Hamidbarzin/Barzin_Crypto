@@ -1,0 +1,79 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# Large files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp3
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+
+# Data files
+data/
+charts/
+attached_assets/
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# Documentation
+*.md
+README.md
+LICENSE
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test_*.py
+*_test.py
+tests/
+
+# Cache files
+*.cache
+.cache/
+
+# Large directories
+attached_assets/
+charts/
+data/
+
+# Specific large files
+app.py
+vercel_main.py
