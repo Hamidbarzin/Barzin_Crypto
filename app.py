@@ -41,8 +41,8 @@ template = """
                         <h5 class="fw-bold mb-3">BTC</h5>
                         <div class="fs-4 fw-bold mb-2" id="BTC-price">$0</div>
                         <div class="fs-6 mb-3" id="BTC-change">+0.00%</div>
-                        <button class="btn btn-sm btn-primary" onclick="getPrice('bitcoin')">
-                            <i class="fas fa-sync-alt me-1"></i>به‌روزرسانی
+                        <button class="btn btn-sm btn-primary" onclick="getAdvice('BTC')">
+                            <i class="fas fa-robot me-1"></i>مشاوره هوشمند
                         </button>
                     </div>
                 </div>
@@ -53,8 +53,8 @@ template = """
                         <h5 class="fw-bold mb-3">ETH</h5>
                         <div class="fs-4 fw-bold mb-2" id="ETH-price">$0</div>
                         <div class="fs-6 mb-3" id="ETH-change">+0.00%</div>
-                        <button class="btn btn-sm btn-primary" onclick="getPrice('ethereum')">
-                            <i class="fas fa-sync-alt me-1"></i>به‌روزرسانی
+                        <button class="btn btn-sm btn-primary" onclick="getAdvice('ETH')">
+                            <i class="fas fa-robot me-1"></i>مشاوره هوشمند
                         </button>
                     </div>
                 </div>
@@ -65,8 +65,8 @@ template = """
                         <h5 class="fw-bold mb-3">SOL</h5>
                         <div class="fs-4 fw-bold mb-2" id="SOL-price">$0</div>
                         <div class="fs-6 mb-3" id="SOL-change">+0.00%</div>
-                        <button class="btn btn-sm btn-primary" onclick="getPrice('solana')">
-                            <i class="fas fa-sync-alt me-1"></i>به‌روزرسانی
+                        <button class="btn btn-sm btn-primary" onclick="getAdvice('SOL')">
+                            <i class="fas fa-robot me-1"></i>مشاوره هوشمند
                         </button>
                     </div>
                 </div>
@@ -77,9 +77,21 @@ template = """
                         <h5 class="fw-bold mb-3">XRP</h5>
                         <div class="fs-4 fw-bold mb-2" id="XRP-price">$0</div>
                         <div class="fs-6 mb-3" id="XRP-change">+0.00%</div>
-                        <button class="btn btn-sm btn-primary" onclick="getPrice('ripple')">
-                            <i class="fas fa-sync-alt me-1"></i>به‌روزرسانی
+                        <button class="btn btn-sm btn-primary" onclick="getAdvice('XRP')">
+                            <i class="fas fa-robot me-1"></i>مشاوره هوشمند
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="crypto-card p-4">
+                    <h5 class="fw-bold mb-3">دستیار هوشمند</h5>
+                    <div id="aiAdvice" class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        روی دکمه‌های مشاوره کلیک کنید تا تحلیل دریافت کنید.
                     </div>
                 </div>
             </div>
@@ -87,49 +99,132 @@ template = """
     </div>
 
     <script>
-        async function getPrice(coinId) {
+        const coinIds = {
+            'BTC': 'bitcoin',
+            'ETH': 'ethereum', 
+            'SOL': 'solana',
+            'XRP': 'ripple'
+        };
+
+        async function fetchPrices() {
             try {
-                const response = await fetch(`/api/price/${coinId}`);
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,ripple&vs_currencies=usd&include_24hr_change=true');
                 const data = await response.json();
                 
-                const symbol = coinId.toUpperCase();
-                const priceElement = document.getElementById(`${symbol}-price`);
-                const changeElement = document.getElementById(`${symbol}-change`);
-                
-                if (priceElement && data.price) {
-                    priceElement.textContent = `$${formatPrice(data.price)}`;
-                    priceElement.classList.add('price-up');
-                    setTimeout(() => priceElement.classList.remove('price-up'), 1000);
-                }
-                
-                if (changeElement && data.change_24h !== undefined) {
-                    const change = data.change_24h;
-                    const sign = change >= 0 ? '+' : '';
-                    changeElement.textContent = `${sign}${change.toFixed(2)}%`;
-                    changeElement.className = `fs-6 mb-3 ${change >= 0 ? 'text-success' : 'text-danger'}`;
+                for (const [symbol, coinId] of Object.entries(coinIds)) {
+                    if (data[coinId]) {
+                        updatePrice(symbol, data[coinId].usd, data[coinId].usd_24h_change);
+                    }
                 }
             } catch (error) {
-                console.error('Error fetching price:', error);
+                console.error('Error fetching prices:', error);
+            }
+        }
+
+        function updatePrice(symbol, price, change) {
+            const priceElement = document.getElementById(`${symbol}-price`);
+            const changeElement = document.getElementById(`${symbol}-change`);
+            
+            if (priceElement) {
+                priceElement.textContent = `$${formatPrice(price)}`;
+                
+                if (change >= 0) {
+                    priceElement.classList.add('price-up');
+                    changeElement.classList.add('text-success');
+                    changeElement.classList.remove('text-danger');
+                } else {
+                    priceElement.classList.add('price-down');
+                    changeElement.classList.add('text-danger');
+                    changeElement.classList.remove('text-success');
+                }
+                
+                setTimeout(() => {
+                    priceElement.classList.remove('price-up', 'price-down');
+                }, 1000);
+            }
+            
+            if (changeElement) {
+                const sign = change >= 0 ? '+' : '';
+                changeElement.textContent = `${sign}${change.toFixed(2)}%`;
             }
         }
 
         function formatPrice(price) {
+            price = parseFloat(price);
             if (price >= 1000) {
                 return price.toLocaleString('en-US', {maximumFractionDigits: 0});
             } else if (price >= 1) {
                 return price.toLocaleString('en-US', {maximumFractionDigits: 2});
-            } else {
+            } else if (price >= 0.01) {
                 return price.toLocaleString('en-US', {maximumFractionDigits: 4});
+            } else {
+                return price.toLocaleString('en-US', {maximumFractionDigits: 8});
             }
         }
 
+        function getAdvice(symbol) {
+            const coinId = coinIds[symbol];
+            const adviceElement = document.getElementById('aiAdvice');
+            
+            adviceElement.innerHTML = `
+                <div class="spinner-border spinner-border-sm me-2" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                در حال تحلیل ${symbol}...
+            `;
+            
+            fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data[coinId]) {
+                        const change = data[coinId].usd_24h_change;
+                        const price = data[coinId].usd;
+                        
+                        let analysis, sentiment, prediction;
+                        
+                        if (change > 5) {
+                            analysis = `قیمت ${symbol} در 24 ساعت گذشته ${change.toFixed(2)}% افزایش یافته است. روند قوی صعودی.`;
+                            sentiment = "بسیار مثبت";
+                            prediction = "احتمال ادامه روند صعودی در کوتاه‌مدت";
+                        } else if (change > 0) {
+                            analysis = `قیمت ${symbol} در 24 ساعت گذشته ${change.toFixed(2)}% افزایش یافته است. روند مثبت.`;
+                            sentiment = "مثبت";
+                            prediction = "احتمال افزایش قیمت در کوتاه‌مدت";
+                        } else if (change > -5) {
+                            analysis = `قیمت ${symbol} در 24 ساعت گذشته ${change.toFixed(2)}% تغییر کرده است. روند خنثی.`;
+                            sentiment = "خنثی";
+                            prediction = "احتمال نوسان در محدوده فعلی";
+                        } else {
+                            analysis = `قیمت ${symbol} در 24 ساعت گذشته ${change.toFixed(2)}% کاهش یافته است. روند نزولی.`;
+                            sentiment = "منفی";
+                            prediction = "احتمال ادامه روند نزولی در کوتاه‌مدت";
+                        }
+                        
+                        adviceElement.innerHTML = `
+                            <h6 class="fw-bold">مشاوره برای ${symbol}</h6>
+                            <p><strong>تحلیل:</strong> ${analysis}</p>
+                            <p><strong>احساسات بازار:</strong> ${sentiment}</p>
+                            <p><strong>پیش‌بینی قیمت:</strong> ${prediction}</p>
+                            <p><strong>قیمت فعلی:</strong> $${formatPrice(price)}</p>
+                            <small class="text-muted">آخرین به‌روزرسانی: ${new Date().toLocaleString()}</small>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    adviceElement.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            خطا در دریافت داده‌ها. لطفاً دوباره تلاش کنید.
+                        </div>
+                    `;
+                });
+        }
+
         // Load prices on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            getPrice('bitcoin');
-            getPrice('ethereum');
-            getPrice('solana');
-            getPrice('ripple');
-        });
+        fetchPrices();
+        
+        // Update prices every 30 seconds
+        setInterval(fetchPrices, 30000);
     </script>
 </body>
 </html>
@@ -139,22 +234,5 @@ template = """
 def home():
     return render_template_string(template)
 
-@app.route('/api/price/<coin_id>')
-def get_price(coin_id):
-    try:
-        # Use CoinGecko API
-        response = requests.get(f'https://api.coingecko.com/api/v3/simple/price?ids={coin_id}&vs_currencies=usd&include_24hr_change=true')
-        data = response.json()
-        
-        if coin_id in data:
-            return {
-                'price': data[coin_id]['usd'],
-                'change_24h': data[coin_id]['usd_24h_change']
-            }
-        else:
-            return {'error': 'Coin not found'}, 404
-    except Exception as e:
-        return {'error': str(e)}, 500
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
