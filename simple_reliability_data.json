@@ -1,8 +1,8 @@
 {
   "messages": {
-    "total_sent": 1198,
+    "total_sent": 1214,
     "successful": 1172,
-    "failed": 26,
+    "failed": 42,
     "history": [
       {
         "message_type": "price_report",
@@ -6019,12 +6019,108 @@
         "success": false,
         "timestamp": "2025-09-19T23:26:41.740806-04:00",
         "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "price_report",
+        "success": false,
+        "timestamp": "2025-09-20T00:49:25.780671-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-09-20T00:49:25.798252-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "price_report",
+        "success": false,
+        "timestamp": "2025-09-20T00:49:37.515436-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-09-20T00:49:37.521935-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "price_report",
+        "success": false,
+        "timestamp": "2025-09-20T01:11:36.170846-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-09-20T01:11:36.208407-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "price_report",
+        "success": false,
+        "timestamp": "2025-09-20T01:11:47.291119-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-09-20T01:11:47.299185-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "price_report",
+        "success": false,
+        "timestamp": "2025-09-20T01:11:59.119774-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-09-20T01:11:59.127665-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "price_report",
+        "success": false,
+        "timestamp": "2025-09-20T01:12:01.965479-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-09-20T01:12:01.971996-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "price_report",
+        "success": false,
+        "timestamp": "2025-09-20T01:12:03.251152-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-09-20T01:12:03.257483-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "price_report",
+        "success": false,
+        "timestamp": "2025-09-20T01:12:12.819232-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
+      },
+      {
+        "message_type": "test_message",
+        "success": false,
+        "timestamp": "2025-09-20T01:12:12.825716-04:00",
+        "error": "TELEGRAM_BOT_TOKEN not found"
       }
     ]
   },
   "uptime": {
     "start_time": "2025-04-10T16:54:51.535404-04:00",
-    "last_restart": "2025-09-19T23:26:41.733580-04:00",
-    "restarts": 583
+    "last_restart": "2025-09-20T01:12:12.819312-04:00",
+    "restarts": 591
   }
 }

@@ -3711,4 +3711,4 @@ if __name__ == "__main__":
     price_thread = threading.Thread(target=background_price_updates, daemon=True)
     price_thread.start()
     
-    socketio.run(app, host="0.0.0.0", port=8000, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host="0.0.0.0", port=9000, debug=True, allow_unsafe_werkzeug=True)
