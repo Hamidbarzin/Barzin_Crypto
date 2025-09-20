@@ -1,0 +1,85 @@
+# Railway ignore file
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# Large files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp3
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+
+# Data files
+data/
+charts/
+attached_assets/
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# Documentation
+*.md
+README.md
+LICENSE
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test_*.py
+*_test.py
+tests/
+
+# Cache files
+*.cache
+.cache/
+
+# Large directories
+attached_assets/
+charts/
+data/
+
+# Specific files to ignore
+railway_main.py
+render_main.py
+vercel_main.py
+railway_deploy.py
+pythonanywhere_setup.py
+pythonanywhere_deploy.py
+railway_deploy.py
