@@ -5,7 +5,7 @@
 اجزای مختلف سیستم را فراهم می‌کند.
 """
 
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app, Response
 import os
 import sys
 import logging
@@ -375,4 +375,109 @@ def api_health_check():
             'time': get_toronto_time(),
             'system_status': 'partial_failure',
             'message': f'خطا در بررسی سلامت سیستم: {str(e)}'
+        })
+
+# Vercel-compatible API routes
+@api.route('/stream', methods=['GET'])
+def stream_updates():
+    """
+    Server-Sent Events stream for real-time updates (Vercel compatible)
+    """
+    def generate():
+        while True:
+            try:
+                # Get current prices
+                symbols = ['BTC-USDT', 'ETH-USDT', 'SOL-USDT', 'XRP-USDT']
+                price_data = {}
+                
+                for symbol in symbols:
+                    try:
+                        from crypto_bot.market_data import get_current_prices
+                        price_info = get_current_prices([symbol])
+                        if price_info and symbol in price_info:
+                            price_data[symbol] = price_info[symbol]
+                    except Exception as e:
+                        logger.error(f"Error getting price for {symbol}: {e}")
+                
+                if price_data:
+                    yield f"data: {json.dumps({'type': 'price_update', 'data': price_data})}\n\n"
+                
+                time.sleep(30)  # Update every 30 seconds
+            except Exception as e:
+                logger.error(f"Error in stream: {e}")
+                break
+    
+    return Response(generate(), mimetype='text/event-stream')
+
+@api.route('/ai-advice', methods=['POST'])
+def api_ai_advice():
+    """
+    Get AI trading advice for a specific symbol
+    """
+    try:
+        data = request.get_json()
+        symbol = data.get('symbol', 'BTC-USDT')
+        timeframe = data.get('timeframe', '1h')
+        
+        # Get AI analysis
+        from crypto_bot.ai_module import get_technical_analysis, get_market_sentiment, get_price_prediction
+        
+        analysis = get_technical_analysis(symbol, timeframe)
+        sentiment = get_market_sentiment(symbol)
+        prediction = get_price_prediction(symbol)
+        
+        advice = {
+            'symbol': symbol,
+            'timeframe': timeframe,
+            'analysis': analysis,
+            'sentiment': sentiment,
+            'prediction': prediction,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        return jsonify({
+            'success': True,
+            'data': advice
+        })
+    except Exception as e:
+        logger.error(f"Error in AI advice: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Error getting AI advice: {str(e)}'
+        })
+
+@api.route('/ai-chat', methods=['POST'])
+def api_ai_chat():
+    """
+    AI chat endpoint for smart assistant
+    """
+    try:
+        data = request.get_json()
+        message = data.get('message', '')
+        
+        # Simple AI response generator (in production, use OpenAI API)
+        responses = [
+            'بر اساس تحلیل تکنیکال، پیشنهاد می‌کنم صبر کنید تا سیگنال‌های واضح‌تری دریافت کنید.',
+            'احساسات بازار در حال حاضر مثبت است. می‌توانید با احتیاط وارد معامله شوید.',
+            'RSI در حال حاضر در محدوده خنثی است. منتظر شکست سطح مقاومت باشید.',
+            'MACD نشان‌دهنده سیگنال خرید است. می‌توانید با حجم کم وارد شوید.',
+            'سطح حمایت قوی در این محدوده وجود دارد. ریسک کم است.',
+            'تحلیل فاندامنتال نشان می‌دهد که این ارز پتانسیل رشد دارد.',
+            'نوسانات بازار در حال حاضر بالا است. مدیریت ریسک را جدی بگیرید.',
+            'شاخص‌های تکنیکال سیگنال خرید قوی نشان می‌دهند.',
+            'احتمال اصلاح قیمت در کوتاه‌مدت وجود دارد.',
+            'روند کلی صعودی است اما احتیاط کنید.'
+        ]
+        
+        response = responses[hash(message) % len(responses)]
+        
+        return jsonify({
+            'success': True,
+            'response': response
+        })
+    except Exception as e:
+        logger.error(f"Error in AI chat: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Error processing chat: {str(e)}'
         })

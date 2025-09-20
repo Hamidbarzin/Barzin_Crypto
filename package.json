@@ -1,0 +1,28 @@
+{
+  "name": "salam-messenger",
+  "version": "1.0.0",
+  "description": "SalamMessenger - Real-time Crypto Trading Bot with AI Assistant",
+  "main": "main.py",
+  "scripts": {
+    "deploy": "vercel --prod",
+    "dev": "python main.py",
+    "start": "python main.py"
+  },
+  "keywords": [
+    "crypto",
+    "trading",
+    "bot",
+    "ai",
+    "real-time",
+    "persian",
+    "farsi"
+  ],
+  "author": "Hamidreza Zebardast",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}

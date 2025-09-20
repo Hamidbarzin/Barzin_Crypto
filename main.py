@@ -4,6 +4,7 @@ import random
 from datetime import datetime
 from crypto_bot.cache_manager import price_cache
 from flask import Flask, render_template, render_template_string, request, redirect, url_for, flash, session, jsonify, send_file
+from flask_socketio import SocketIO, emit
 from crypto_bot.config import DEFAULT_CURRENCIES, TIMEFRAMES
 from crypto_bot.market_data import get_current_prices
 from crypto_bot.scheduler import start_scheduler, stop_scheduler
@@ -31,6 +32,9 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "crypto_bot_secret_key_default_for_development")
+
+# Initialize SocketIO for real-time updates
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Configure the SQLAlchemy database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///crypto_bot.db")
@@ -3622,4 +3626,89 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"استثنا در راه‌اندازی سرویس زمان‌بندی تلگرام: {str(e)}")
     
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # WebSocket event handlers
+    @socketio.on('connect')
+    def handle_connect():
+        logger.info('Client connected to WebSocket')
+        emit('status', {'message': 'Connected to real-time updates'})
+    
+    @socketio.on('disconnect')
+    def handle_disconnect():
+        logger.info('Client disconnected from WebSocket')
+    
+    @socketio.on('request_price_update')
+    def handle_price_update_request():
+        """Handle real-time price update requests"""
+        try:
+            # Get current prices for main cryptocurrencies
+            symbols = ['BTC-USDT', 'ETH-USDT', 'SOL-USDT', 'XRP-USDT']
+            price_data = {}
+            
+            for symbol in symbols:
+                try:
+                    price_info = get_current_prices([symbol])
+                    if price_info and symbol in price_info:
+                        price_data[symbol] = price_info[symbol]
+                except Exception as e:
+                    logger.error(f"Error getting price for {symbol}: {e}")
+            
+            emit('price_update', {'data': price_data})
+        except Exception as e:
+            logger.error(f"Error in price update handler: {e}")
+            emit('error', {'message': 'Failed to update prices'})
+    
+    @socketio.on('request_ai_advice')
+    def handle_ai_advice_request(data):
+        """Handle AI trading advice requests"""
+        try:
+            symbol = data.get('symbol', 'BTC-USDT')
+            timeframe = data.get('timeframe', '1h')
+            
+            # Get AI analysis
+            analysis = get_technical_analysis(symbol, timeframe)
+            sentiment = get_market_sentiment(symbol)
+            prediction = get_price_prediction(symbol)
+            
+            advice = {
+                'symbol': symbol,
+                'timeframe': timeframe,
+                'analysis': analysis,
+                'sentiment': sentiment,
+                'prediction': prediction,
+                'timestamp': datetime.now().isoformat()
+            }
+            
+            emit('ai_advice', advice)
+        except Exception as e:
+            logger.error(f"Error in AI advice handler: {e}")
+            emit('error', {'message': 'Failed to get AI advice'})
+    
+    # Background task for periodic price updates
+    def background_price_updates():
+        """Background task to send periodic price updates to connected clients"""
+        import time
+        while True:
+            try:
+                time.sleep(30)  # Update every 30 seconds
+                symbols = ['BTC-USDT', 'ETH-USDT', 'SOL-USDT', 'XRP-USDT']
+                price_data = {}
+                
+                for symbol in symbols:
+                    try:
+                        price_info = get_current_prices([symbol])
+                        if price_info and symbol in price_info:
+                            price_data[symbol] = price_info[symbol]
+                    except Exception as e:
+                        logger.error(f"Error getting price for {symbol}: {e}")
+                
+                if price_data:
+                    socketio.emit('price_update', {'data': price_data})
+            except Exception as e:
+                logger.error(f"Error in background price updates: {e}")
+    
+    # Start background task
+    import threading
+    price_thread = threading.Thread(target=background_price_updates, daemon=True)
+    price_thread.start()
+    
+    socketio.run(app, host="0.0.0.0", port=8000, debug=True, allow_unsafe_werkzeug=True)

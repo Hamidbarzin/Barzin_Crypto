@@ -5,6 +5,7 @@
 {% block head %}
 {{ super() }}
 <script src="{{ url_for('static', filename='js/cryptocurrency-updates.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vercel-realtime.js') }}"></script>
 <script>
 // اسکریپت مستقیم برای به‌روزرسانی قیمت‌ها با استفاده از درخواست‌های API مستقیم
 document.addEventListener('DOMContentLoaded', function() {
@@ -99,11 +100,25 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
     
+    <!-- Real-time Status and Controls -->
     <div class="row mb-3">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">{{ ui_text('popular', 'Popular') }}</h4>
-                <a href="/cryptocurrencies" class="text-decoration-none text-muted">{{ ui_text('see_listing', 'View All') }}</a>
+                <div class="d-flex align-items-center">
+                    <h4 class="mb-0 me-3">{{ ui_text('popular', 'Popular') }}</h4>
+                    <div class="connection-status" id="connectionStatus">
+                        <i class="fas fa-circle text-warning me-1"></i>در حال اتصال...
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-sm btn-outline-primary me-2" id="refreshBtn">
+                        <i class="fas fa-sync-alt me-1"></i>به‌روزرسانی
+                    </button>
+                    <button class="btn btn-sm btn-success me-2" id="assistantToggle">
+                        <i class="fas fa-robot me-1"></i>دستیار هوشمند
+                    </button>
+                    <a href="/cryptocurrencies" class="text-decoration-none text-muted">{{ ui_text('see_listing', 'View All') }}</a>
+                </div>
             </div>
         </div>
     </div>
@@ -451,7 +466,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </p>
                                     <div class="text-center mt-3">
                                         <button class="btn btn-sm btn-outline-warning me-2">{{ ui_text("share", "اشتراک‌گذاری") }} <i class="fas fa-share-alt ms-1"></i></button>
-                                        <button class="btn btn-sm btn-primary">{{ ui_text("buy", "خرید") }} <i class="fas fa-arrow-right ms-1"></i></button>
+                                        <button class="btn btn-sm btn-primary me-2">{{ ui_text("buy", "خرید") }} <i class="fas fa-arrow-right ms-1"></i></button>
+                                        <button class="btn btn-sm btn-info ai-advice-btn" data-symbol="BTC-USDT">
+                                            <i class="fas fa-robot me-1"></i>مشاوره هوشمند
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="card-footer text-muted">
@@ -498,7 +516,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </p>
                                     <div class="text-center mt-3">
                                         <button class="btn btn-sm btn-outline-warning me-2">{{ ui_text("share", "اشتراک‌گذاری") }} <i class="fas fa-share-alt ms-1"></i></button>
-                                        <button class="btn btn-sm btn-danger">{{ ui_text("sell", "فروش") }} <i class="fas fa-arrow-left ms-1"></i></button>
+                                        <button class="btn btn-sm btn-danger me-2">{{ ui_text("sell", "فروش") }} <i class="fas fa-arrow-left ms-1"></i></button>
+                                        <button class="btn btn-sm btn-info ai-advice-btn" data-symbol="ETH-USDT">
+                                            <i class="fas fa-robot me-1"></i>مشاوره هوشمند
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="card-footer text-muted">
@@ -545,7 +566,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </p>
                                     <div class="text-center mt-3">
                                         <button class="btn btn-sm btn-outline-warning me-2">{{ ui_text("share", "اشتراک‌گذاری") }} <i class="fas fa-share-alt ms-1"></i></button>
-                                        <button class="btn btn-sm btn-primary">{{ ui_text("buy", "خرید") }} <i class="fas fa-arrow-right ms-1"></i></button>
+                                        <button class="btn btn-sm btn-primary me-2">{{ ui_text("buy", "خرید") }} <i class="fas fa-arrow-right ms-1"></i></button>
+                                        <button class="btn btn-sm btn-info ai-advice-btn" data-symbol="SOL-USDT">
+                                            <i class="fas fa-robot me-1"></i>مشاوره هوشمند
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="card-footer text-muted">
@@ -592,7 +616,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </p>
                                     <div class="text-center mt-3">
                                         <button class="btn btn-sm btn-outline-warning me-2">{{ ui_text("share", "اشتراک‌گذاری") }} <i class="fas fa-share-alt ms-1"></i></button>
-                                        <button class="btn btn-sm btn-secondary">{{ ui_text("set_alert", "تنظیم هشدار") }} <i class="fas fa-bell ms-1"></i></button>
+                                        <button class="btn btn-sm btn-secondary me-2">{{ ui_text("set_alert", "تنظیم هشدار") }} <i class="fas fa-bell ms-1"></i></button>
+                                        <button class="btn btn-sm btn-info ai-advice-btn" data-symbol="BNB-USDT">
+                                            <i class="fas fa-robot me-1"></i>مشاوره هوشمند
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="card-footer text-muted">

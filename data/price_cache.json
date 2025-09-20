@@ -1,93 +1,93 @@
 {
   "ETH-USDT": {
     "data": {
-      "price": 1644.48891815626,
-      "change_24h": 5.261233741830118,
-      "market_cap": 198466032668.17554,
-      "volume_24h": 1187190.53603521,
-      "source": "CryptoCompare"
+      "price": 4466.19,
+      "change_24h": -2.89864,
+      "market_cap": 538960663417,
+      "volume_24h": 27316286087,
+      "source": "CoinGecko"
     },
-    "cached_at": 1744482463.8095624
+    "cached_at": 1758338415.563263
   },
   "ETH/USDT": {
     "data": {
-      "price": 1644.49335241994,
-      "change_24h": 5.261517572302027,
-      "market_cap": 198466567819.68106,
-      "volume_24h": 1187189.67333521,
+      "price": 4465.25079019904,
+      "change_24h": -1.8604255184178964,
+      "market_cap": 538973134210.90125,
+      "volume_24h": 861131.48964693,
       "source": "CryptoCompare"
     },
-    "cached_at": 1744482464.312877
+    "cached_at": 1758338416.029571
   },
   "BTC-USDT": {
     "data": {
-      "price": 84865,
-      "change_24h": 1.14147,
-      "market_cap": 1684522414612,
-      "volume_24h": 24077593180,
+      "price": 115578,
+      "change_24h": -1.4206,
+      "market_cap": 2302410853982,
+      "volume_24h": 32882436877,
       "source": "CoinGecko"
     },
-    "cached_at": 1744482461.7206337
+    "cached_at": 1758338640.86933
   },
   "BTC/USDT": {
     "data": {
-      "price": 84924.0986403601,
-      "change_24h": 1.5765291979794496,
-      "market_cap": 1685770618646.8115,
-      "volume_24h": 48258.65395806,
+      "price": 115527.817771766,
+      "change_24h": -1.2382135814291928,
+      "market_cap": 2301694909700.9546,
+      "volume_24h": 29563.70986734,
       "source": "CryptoCompare"
     },
-    "cached_at": 1744482462.248838
+    "cached_at": 1758338416.046197
   },
   "XRP-USDT": {
     "data": {
-      "price": 2.13295434235356,
-      "change_24h": 4.67710045995768,
-      "market_cap": 213266112840.48663,
-      "volume_24h": 308468860.982413,
-      "source": "CryptoCompare"
+      "price": 2.99,
+      "change_24h": -2.72545,
+      "market_cap": 178638622089,
+      "volume_24h": 4491691327,
+      "source": "CoinGecko"
     },
-    "cached_at": 1744482464.8174174
+    "cached_at": 1758338415.5609658
   },
   "XRP/USDT": {
     "data": {
-      "price": 2.13295434235356,
-      "change_24h": 4.67710045995768,
-      "market_cap": 213266112840.48663,
-      "volume_24h": 308468860.982413,
+      "price": 2.98936746097534,
+      "change_24h": -1.8896111963953335,
+      "market_cap": 298894297617.67426,
+      "volume_24h": 231374852.214015,
       "source": "CryptoCompare"
     },
-    "cached_at": 1744482465.3341587
+    "cached_at": 1758338416.247831
   },
   "SOL-USDT": {
     "data": {
-      "price": 129.958959021223,
-      "change_24h": 8.353615864265498,
-      "market_cap": 77752024859.27151,
-      "volume_24h": 8578669.44509251,
-      "source": "CryptoCompare"
+      "price": 238.26,
+      "change_24h": -3.69304,
+      "market_cap": 129318904963,
+      "volume_24h": 7482720644,
+      "source": "CoinGecko"
     },
-    "cached_at": 1744482462.7566664
+    "cached_at": 1758338415.579593
   },
   "SOL/USDT": {
     "data": {
-      "price": 129.948000937575,
-      "change_24h": 8.34447953387976,
-      "market_cap": 77745468841.90552,
-      "volume_24h": 8574275.3521112,
+      "price": 238.234324555356,
+      "change_24h": -2.77166006228297,
+      "market_cap": 145331193136.36514,
+      "volume_24h": 6687573.63638892,
       "source": "CryptoCompare"
     },
-    "cached_at": 1744482463.3012083
+    "cached_at": 1758338416.036014
   },
   "BITCOIN/USDT": {
     "data": {
-      "price": 84868,
-      "change_24h": 1.14579,
-      "market_cap": 1684522414612,
-      "volume_24h": 24037136459,
+      "price": 115550,
+      "change_24h": -1.44879,
+      "market_cap": 2301999831218,
+      "volume_24h": 32889283582,
       "source": "CoinGecko"
     },
-    "cached_at": 1744482587.618064
+    "cached_at": 1758338415.588466
   },
   "ETHEREUM/USDT": {
     "data": {
@@ -199,4 +199,4 @@
     },
     "cached_at": 1744479432.0994902
   }
-}
+}}
